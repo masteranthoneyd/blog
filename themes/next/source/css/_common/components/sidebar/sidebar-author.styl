@@ -1,0 +1,40 @@
+.site-author-image {
+  display: block;
+  margin: 0 auto;
+  padding: $site-author-image-padding;
+  max-width: $site-author-image-width;
+  height: $site-author-image-height;
+  border: $site-author-image-border-width solid $site-author-image-border-color;
+
+  /* start*/
+  border-radius: 50%
+  webkit-transition: 1.4s all;
+  moz-transition: 1.4s all;
+  ms-transition: 1.4s all;
+  transition: 1.4s all;
+  /* end */
+}
+
+/* start */
+.site-author-image:hover {
+  background-color: #55DAE1;
+  webkit-transform: rotate(360deg) scale(1.1);
+  moz-transform: rotate(360deg) scale(1.1);
+  ms-transform: rotate(360deg) scale(1.1);
+  transform: rotate(360deg) scale(1.1);
+}
+/* end */
+
+.site-author-name {
+  margin: $site-author-name-margin;
+  text-align: $site-author-name-align;
+  color: $site-author-name-color;
+  font-weight: $site-author-name-weight;
+}
+
+.site-description {
+  margin-top: $site-description-margin-top;
+  text-align: $site-description-align;
+  font-size: $site-description-font-size;
+  color: $site-description-color;
+}

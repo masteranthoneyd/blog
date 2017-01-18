@@ -1,0 +1,149 @@
+# Hexo Configuration
+## Docs: https://hexo.io/docs/configuration.html
+## Source: https://github.com/hexojs/hexo/
+
+# Site
+title: ookamiAntD's Blog
+subtitle: Easy coding,easy life.
+description: 码渣 | rocker | 二次元 | 美剧 | 宅
+author: ookamiAntD
+language: zh-Hans
+timezone:
+
+# URL
+## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
+url: http://www.ookamiantd.top
+root: /
+permalink: :year:month:day/:title/
+permalink_defaults:
+
+# Directory
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+i18n_dir: :lang
+skip_render: 
+
+# Writing # 文章布局、写作格式的定义
+new_post_name: :title.md # File name of new posts
+default_layout: post
+titlecase: false # Transform title into titlecase
+external_link: true # Open external links in new tab
+filename_case: 0
+render_drafts: false
+post_asset_folder: false  # 启动asset文件夹
+relative_link: false
+future: true
+highlight:
+  enable: true
+  line_number: true
+  auto_detect: false
+  tab_replace:
+
+# Category & Tag
+default_category: uncategorized
+category_map:
+tag_map:
+
+# Date / Time format
+## Hexo uses Moment.js to parse and display date
+## You can customize the date format as defined in
+## http://momentjs.com/docs/#/displaying/format/
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
+
+# Pagination
+## Set per_page to 0 to disable pagination
+per_page: 6
+pagination_dir: page
+
+# Extensions
+## Plugins: https://hexo.io/plugins/
+## Themes: https://hexo.io/themes/
+theme: next
+
+# Duoshuo
+## duoshuo_shortname: {duoshuo_shortname}
+duoshuo_shortname: ookamiantd
+
+# baidu tongji
+baidu_analytics: e9505ac4e11d464329d615553a72b526
+
+# RSS
+feed:
+  type: atom
+  path: atom.xml
+  limit: 0
+  hub:
+  content:
+
+# hexo sitemap 
+sitemap:
+  path: sitemap.xml
+
+baidusitemap:
+  path: baidusitemap.xml
+
+baidu_url_submit:
+  count: 3 ## 比如3，代表提交最新的三个链接
+  host: www.ookamiantd.top ## 在百度站长平台中注册的域名
+  token: sKIjGrW5IgkkDrVu ## 请注意这是您的秘钥， 请不要发布在公众仓库里!
+  path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
+
+
+# 多说分享服务
+duoshuo_share: true
+
+# 多说热评文章 true 或者 false
+duoshuo_hotartical: true
+
+# JiaThis 分享服务
+jiathis: false
+
+# Algolia 搜索
+algolia:
+  applicationID: RI3NF6GUI0
+  apiKey: 3d33fa60ba30d3b17f37220bb1a36749
+  adminApiKey: 313c96267a13129641a1203ac402e172
+  indexName: blogIndex
+  chunkSize: 5000
+
+# ---------------下面选项需要对应插件的支持---------------
+# npm install hexo-generator-index --save
+# npm install hexo-generator-archive --save
+# npm install hexo-generator-category --save
+# npm install hexo-generator-tag --save
+
+index_generator:
+  per_page: 6
+
+archive_generator:
+  per_page: 10 ##归档页面默认20篇文章标题
+  yearly: true  ##生成年视图
+  monthly: true ##生成月视图
+
+tag_generator:
+  per_page: 10
+
+# 七牛插件
+admin:
+  qiniuCfg:
+      imageslim: false
+      AccessKey: 6vqwQIxzil7a0Py-NHKMRFCPkoZUTH3P-ATxLJbX
+      SecretKey: daB4sQ9PpvTcmBZ98S4YZ2h6yoggoAQBUkHZ59ij
+      BucketName: blog
+      bucketHost: ojoba1c98.bkt.clouddn.com
+
+# Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy:
+- type: baidu_url_submitter
+- type: git
+  repo:
+    github: git@github.com:masteranthoneyd/masteranthoneyd.github.io.git,master
+    coding: git@git.coding.net:ookamiantd/ookamiantd.git,master
+  
+  
