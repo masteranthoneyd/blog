@@ -141,7 +141,7 @@ git remote add origin git@github.com:your-name/repo-name.git
 git push -u origin master
 ```
 把本地库的内容推送到远程，用 `git push` 命令，实际上是把当前分支 `master` 推送到远程
-由于远程库是空的，我们第一次推送 `master` 分支时，加上了 `-u` 参数，Git不但会把本地的 `maste` r分支内容推送的远程新的 `master` 分支，还会把本地的 `master` 分支和远程的 `master` 分支关联起来，在以后的推送或者拉取时就可以简化命令
+由于远程库是空的，我们第一次推送 `master` 分支时，加上了 `-u` 参数，Git不但会把本地的 `master` 分支内容推送的远程新的 `master` 分支，还会把本地的 `master` 分支和远程的 `master` 分支关联起来，在以后的推送或者拉取时就可以简化命令
 
 此后的推送都可以使用：
 ```
@@ -176,7 +176,7 @@ git git@github.com:your-name/repo-name.git
 ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitConflict.png)
 那么再次合并有可能会冲突
 ```
-➜  repo git:(master) git merge dev 
+➜  repo git:(master) git merge feature1 
 自动合并 read
 冲突（内容）：合并冲突于 read
 自动合并失败，修正冲突然后提交修正的结果。
@@ -199,13 +199,66 @@ Git is a version control
 Creating a new branch is quick & simple.
 =======
 Creating a new branch is quick AND simple.
->>>>>>> dev
+>>>>>>> feature1
 ```
-Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，那么经过合意，不好意思，大师兄说了，在座的各位都是垃圾，于是改成
+Git用`<<<<<<<`，`=======`，`>>>>>>>`标记出不同分支的内容，那么经过合意，不好意思，大师兄说了，在座的各位都是垃圾，于是改成
 ```
 Git,too fast too simple
 ```
-ok了，再次 `add` 和 `commit` ，现在master分支和dev分支变成了这样
+再提交
+```
+➜  repo git:(master) ✗ git add read 
+➜  repo git:(master) ✗ git commit -m "conflict fixed"
+[master 8933f88] conflict fixed
+➜  repo git:(master) 
+```
+ok了，再次 `add` 和 `commit` ，现在 `master` 分支和` feature1 `分支变成了这样
+![](http://ojoba1c98.bkt.clouddn.com/img/git/gitFixConflict.png)
+
+
+## 多PC协同开发
+当你从远程仓库克隆时，实际上Git自动把本地的 `master` 分支和远程的 `master` 分支对应起来了，并且，远程仓库的默认名称是 `origin` 
+
+查看远程库的信息：
+查看简单信息：`git remote`
+查看详细信息：`git remote -v`
+查看远程仓库分支：`git branch -r`
+查看本地分支与远程分支的对应关系：`git branch -vv`
+
+
+推送分支
+```
+git push origin <branch> 
+
+git push -u origin <branch> # 第一次推送加-u可以把当前分支与远程分支关联起来
+```
+
+克隆分支并关联
+```
+git clone git@github.com:youName/program.git # 默认克隆master分支到当前目录（包含分支文件目录）
+
+git clone -b <branch> git@github.com:youName/program.git ./
+# 克隆指定分支到指定文件目录下（不包含分支文件目录）
+
+```
+
+创建远程 `origin` 的 `dev` 分支到本地
+```
+git checkout -b <branch> origin/<branch>
+```
+
+
+关联本地分支与远程仓库分支
+```
+git branch --set-upstream <branch> origin/<branch>
+```
+
+# 最后
+Git真的异常强大，但命令繁多，需多加练习
+
+> ***参考：[廖雪峰老师的教程](http://www.liaoxuefeng.com/)***
+
+附命令图一张：
 ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitCommand.png)
 
 [^1]: 集中式版本管理系统之一

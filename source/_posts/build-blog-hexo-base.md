@@ -269,7 +269,7 @@ git config --global user.email your_email@youremail.com
 ```
 关于git可参考：
 *[史上最全github使用方法：github入门到精通](http://blog.csdn.net/v123411739/article/details/44071059/)*
-*[廖雪峰老师的Git教程](http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)*
+*[Git学习笔记](http://www.ookamiantd.top/20170118/note-of-learning-git/)*
 
 # 部署到Github与Coding
 在此之前，先安装**Git部署插件**
