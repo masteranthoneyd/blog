@@ -167,11 +167,45 @@ git git@github.com:your-name/repo-name.git
 查看分支：`git branch`
 创建分支：`git branch <name>`
 切换分支：`git checkout <name>`
-切换分支：`git checkout <name>`
+创建+切换分支：`git checkout -b <name>`
 合并某分支到当前分支：`git merge <name>`
 删除分支：`git branch -d <name>`
 
+## 解决冲突
+合并分支并不是每次都不会出问题，如不同的分支对同一个文件同一行都被修改过，就会出现以下情况
+![](http://ojoba1c98.bkt.clouddn.com/img/git/gitConflict.png)
+那么再次合并有可能会冲突
+```
+➜  repo git:(master) git merge dev 
+自动合并 read
+冲突（内容）：合并冲突于 read
+自动合并失败，修正冲突然后提交修正的结果。
+➜  repo git:(master) ✗ git status 
+位于分支 master
+您有尚未合并的路径。
+  （解决冲突并运行 "git commit"）
 
+未合并的路径：
+  （使用 "git add <文件>..." 标记解决方案）
+
+	双方修改：   read
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+```
+这种情况必须手动解决然后再次 `git add .`，`git commit -m "commit"`，打开文件可看到
+```
+Git is a version control
+<<<<<<< HEAD
+Creating a new branch is quick & simple.
+=======
+Creating a new branch is quick AND simple.
+>>>>>>> dev
+```
+Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，那么经过合意，不好意思，大师兄说了，在座的各位都是垃圾，于是改成
+```
+Git,too fast too simple
+```
+ok了，再次 `add` 和 `commit` ，现在master分支和dev分支变成了这样
 ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitCommand.png)
 
 [^1]: 集中式版本管理系统之一
