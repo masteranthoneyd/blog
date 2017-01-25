@@ -168,23 +168,23 @@ sudo chown -R mysql data mysql-files
 sudo cp support-files/my-default.cnf ./my.cnf 
 ```
 
-## 测试启动，如果能够启动成功，则登陆mysql
+## 测试启动，修改密码
 
 ```
 # 后台启动mysql
 sudo bin/mysqld_safe --user=mysql &  
 # 启动
-bin/mysql
+./bin/mysql -u root -p
 ```
-
-> 因为前面修改了`my.cnf`文件，增加了 `skip-grant-tables` 参数，所以不需要用户名即可登陆
-> 进去后立即修改`root`用户的密码，密码的字段是 `authentication_string`
-> **update mysql.user set authentication_string=password('root') where user='root';**
-> 修改密码后，再把`my.cnf`里面的 `skip-grant-tables` 去掉
-﻿
-## This is optional
-
-修改密码也可以使用安装到时候提示到随机密码进行登录，然后使用下面到命令修改密码。
+### 方式一
+因为前面修改了`my.cnf`文件，增加了 `skip-grant-tables` 参数，所以不需要用户名即可登陆
+进去后立即修改`root`用户的密码，密码的字段是 `authentication_string`
+```
+update mysql.user set authentication_string=password('root') where user='root';
+```
+修改密码后，再把`my.cnf`里面的 `skip-grant-tables` 去掉
+### 方式二
+修改密码也可以使用安装到时候提示到**随机密码**进行登录，然后使用下面到命令修改密码。
 建议用下面的方式设置数据库的密码
 ```
 alter user user() identified by 'root';
@@ -201,7 +201,7 @@ sudo cp support-files/mysql.server /etc/init.d/mysql
 sudo update-rc.d -f mysql defaults
 ```
 
-## 增加mysql命令的路径到PATH环境变量
+## 增加`mysql`命令的路径到`PATH`环境变量
 
 ```
 sudo touch /etc/profile.d/mysql.sh
@@ -211,7 +211,7 @@ sudo chmod 644 /etc/profile.d/mysql.sh
 ```
 ***<font color=red>到此，mysql的安装基本完成</font>***
 
-## 修复乱码以及忽略大小写，找到MySQL文件里的my.cnf在末尾添加
+## 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
 lower_case_table_names=1
@@ -220,9 +220,8 @@ character_set_server=utf8
 
 
 ## 如果登录mysql出现以下错误
-
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/mysql-problom.png)
 **则可能配置未加载或服务未启动，请重启系统，然后启动mysql服务**
-
 ```
 sudo service mysql start
 ```
@@ -231,7 +230,7 @@ sudo service mysql start
 ```
 sudo service mysql stop
 ```
-## Navicat For Mysql
+# 安装Navicat For Mysql
 到*[官网](https://www.navicat.com/download)*下载对应系统版本
 解压到适应文件夹
 解压后，进入解压后的目录运行命令：
@@ -244,7 +243,7 @@ OK，这样就完啦
 1.查看系统支持的字符集: `locale -a` 
 2.到start_navicat修改字符集: `export LANG=zh_CN.utf8`
 
-### <font color=red>破解方案</font> 
+## <font color=red>破解方案</font> 
 第一次执行`start_navicat`时，会在用户主目录下生成一个名为`.navicat`的隐藏文件夹。
 ```
 cd /home/ybd/.navicat/  
@@ -254,7 +253,7 @@ cd /home/ybd/.navicat/
 rm system.reg
 ```
 把此文件删除后，下次启动`navicat` 会重新生成此文件，30天试用期会按新的时间开始计算。
-### 创建快捷方式
+## 创建快捷方式
 
 ```
 cd /usr/share/applications/

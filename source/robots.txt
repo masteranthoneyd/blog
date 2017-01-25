@@ -9,5 +9,7 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 #Sitemap: http://ookamiantd.top/search.xml
+Sitemap: http://www.ookamiantd.top/sitemap.xml
+Sitemap: http://www.ookamiantd.top/baidusitemap.xml
 Sitemap: http://ookamiantd.top/sitemap.xml
 Sitemap: http://ookamiantd.top/baidusitemap.xml

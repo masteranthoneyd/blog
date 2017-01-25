@@ -82,7 +82,7 @@ git reset --hard HEAD^
 ```
 git checkout -- read
 ```
-命令 `git checkout -- read` 意思就是，把 `readme` 文件在工作区的修改全部撤销，这里有两种情况：
+命令 `git checkout -- read` 意思就是，把 `read` 文件在工作区的修改全部撤销，这里有两种情况：
 
 一种是 `read` 自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态
 
@@ -145,7 +145,7 @@ git push -u origin master
 
 此后的推送都可以使用：
 ```
-git push origin master
+git push
 ```
 
 ## 从远程仓库克隆
