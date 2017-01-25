@@ -1,7 +1,7 @@
 ---
 title: Ubuntu的Java开发环境基本搭建(JDK+IDE+Tomcat+MySQL+Navicat)
 date: 2017-01-20 11:31:22
-categories: Ubuntu Develop environment
+categories: Ubuntu
 tags: [Ubuntu,IDE,jdk,tomcat]
 ---
 # 前言
@@ -74,11 +74,11 @@ sudo javac -version
 sudo tar zxvf eclipse-jee-mars-2-linux-gtk-x86_64.tar.gz -C ~/IDE
 ```
 创建快捷方式
-(1)在终端中执行如下命令
+1\. 在终端中执行如下命令
 ```
 sudo gedit /usr/share/applications/eclipse.desktop
 ```
-(2)粘贴并保存如下内容(注意更改相应的名字和目录)
+2\. 粘贴并保存如下内容(注意更改相应的名字和目录)
 ```
 [Desktop Entry] 
 Name=Eclipse Mars.2 
@@ -91,7 +91,12 @@ NoDisplay=false
 Categories=Development;IDE; 
 Name[en]=Eclipse Mars.2
 ```
-- 护眼色代码是： ***`#B5E7BB`***
+**通用设置**
+`window → preferences →`
+* 设置字体：general → appearance → color and font → basic → text font
+* 编辑器背景颜色：general →  editors → text editors → background color → `RGB:85,123,208`,`#C7EDCC`
+* 工作空间字符编码：general → workspace 
+* 作者签名：java → code style → code templates → types  签名快捷键：`alt + shift + j`
 
 ## MyEclipse
 MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](http://ookamiantd.top/20170111/ubuntu-myeclipse-crack/)***
