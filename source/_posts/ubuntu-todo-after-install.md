@@ -1,12 +1,12 @@
 ---
-title: Ubuntu安装后的个性化简要
+title: Ubuntu安装后的主题美化与个性化设置
 date: 2017-01-12 23:04:36
 categories: Ubuntu
 tags: [Ubuntu]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/desktop.png)
 # 前言
-既然是博主是喜欢折腾的人，那么重装这种事情也是必不可少的，每次重装之后，从新设置个性化总是觉得少了点什么。博主笨拙，那么把需要安装的、美化的记下来免得下次又少了点什么。
+既然是博主是喜欢折腾的人，那么重装这种事情也是必不可少的，每次重装之后，重新设置个性化总是觉得少了点什么。博主笨拙，那么把需要安装的、美化的记下来免得下次又少了点什么。
 
 <!--more-->
 
@@ -54,7 +54,7 @@ sudo mv -f hosts /etc/hosts
 
 ## 方式二：下载Lantern
 **如果为了更方便地科学上网，建议下载`Lantern`**
-可在github（免翻墙）找到[开源项目](https://github.com/getlantern/lantern/)，拉到下面`README`下载对应版本
+可在github（免翻墙）找到*[开源项目](https://github.com/getlantern/lantern/)*，拉到下面`README`下载对应版本
 
 ```
 sudo dpkg -i lantern.deb
@@ -94,14 +94,14 @@ sudo apt-get install ultra-flat-icons
 ```
 
 **安装完成后，打开`unity-tweak-tool`软件，修改主题和图标**
-
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/unity-tweak-tool.png)
 
 
 进入`Theme`，修改为`Flatabulous`：
-
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/theme.png)
 
 在此界面下进入`Icons`栏，修改为`Ultra-flat`:
-
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/icons.png)
 
 
 ## 安装zsh
@@ -132,11 +132,11 @@ chsh -s /bin/zsh
 ```
 
 最后，修改以下配色，会让你的终端样式看起来更舒服，在终端任意地方右键，进入配置文件(`profile`)->外观配置(`profile Preferences`)，弹出如下界面，进入`colors`一栏:
-
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh.png)
 
 
 其中，文字和背景采用系统主题，透明度设为10%，下面的`palette`样式采用`Tango`，这样一通设置后，效果如下：
-
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh-show.png)
 
 
 ## 安装字体
@@ -168,12 +168,12 @@ sudo apt-get install wiznote
 ```
 
 ## vim
-系统并没有集成vim，可以执行以下代码安装：
+系统并没有集成`vim`，可以执行以下代码安装：
 ```
 sudo apt-get install vim
 ```
 ## wps
-去[wps](http://linux.wps.cn/)官网下载wps for Linux。
+去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
 下载后，打开终端，运行一下命令
 ```
 sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
@@ -184,7 +184,7 @@ sudo apt-get install -f
 ```
 
 ## chrome
-去*[chrome](https://www.google.com/chrome/browser/desktop/index.html)* 官网下载linux版的chrome。
+去*[chrome官网](https://www.google.com/chrome/browser/desktop/index.html)* 下载linux版的chrome。
 ```
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 ```
@@ -206,14 +206,6 @@ sudo apt-get install shutter
 名字随便起，命令：`shutter -s`
 点击确定，再点禁用，键盘按下`ctrl+alt+a`，完成设置
 
-## 点击图标最小化
-`Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。
-方法有两种，你可以安装 `Unity Tweak Tool` 图形界面工具之后在 `「Unity」-「Launcher」-「Minimise」`中进行配置，或直接在终端中使用如下命令启用。
-
-## exfat驱动
-```
-sudo apt-get install exfat-fuse
-```
 
 ## 系统清理软件 BleachBit
 ```
@@ -223,17 +215,7 @@ sudo apt-get install bleachbit
 ```
 
 
-## 设置grub2引导等待时间
-`Ubuntu`系统的`Grub2`菜单的相关信息在读取`/boot/grub/grub.cfg`文件，不过`Ubuntu`官方不建议直接修改这个文件，想要修改`Grub2`的等待时间还可以修改`/etc/deafalt/grub`来实现。具体的修改方法如下：
-```
-sudo gedit /etc/default/grub
-```
-将`GRUB_TIMEOUT=10`中的`10`改为你想要修改的等待时间，比如`3`，网上很多的教程都是到这一步，其实是不行的，估计都是乱转一气。到这里还有最重要的一步，就是使用#号将`GRUB_HIDDEN_TIMEOUT=0`标注,然后再次回到终端，输入下面的命令刷新`/boot/grub/grub.cfg`文件：
-```
-sudo update-grub2
-```
-
-## 安装多线程下载器
+## 多线程下载器
 `XTREME`下载管理器旨在为您提供一个快速和安全的工具，用于管理所有的下载。采用了先进的动态分割算法，应用程序可以加快下载过程。 下载管理器支持`HTTP`，`HTTPS`，`FTP`协议，代理服务器需要授权的网站。此外，它可以无缝地集成到`Xtreme`下载管理器安装的浏览器发送任何下载。由于它是用`Java`编写的，它是兼容所有主要平台。
  
 最终版本 `Xtreme Download Manager` (`XDMAN`) 4.7 已经发布。
@@ -272,22 +254,43 @@ tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
 ```
 
-## 启动项管理
-```
-gnome-session-properties
-```
-## 提高逼格
-```
-sudo apt-get install cmatrix
-cmatrix -b
-```
 ## filezilla
 ```
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
 ```
+# 其他设置篇
+## 点击图标最小化
+`Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。
+方法有两种，你可以安装 `Unity Tweak Tool` 图形界面工具之后在 `「Unity」-「Launcher」-「Minimise」`中进行配置，或直接在终端中使用如下命令启用。
 
+## exfat驱动
+```
+sudo apt-get install exfat-fuse
+```
 
+## 设置grub2引导等待时间
+`Ubuntu`系统的`Grub2`菜单的相关信息在读取`/boot/grub/grub.cfg`文件，不过`Ubuntu`官方不建议直接修改这个文件，想要修改`Grub2`的等待时间还可以修改`/etc/deafalt/grub`来实现。具体的修改方法如下：
+```
+sudo gedit /etc/default/grub
+```
+将`GRUB_TIMEOUT=10`中的`10`改为你想要修改的等待时间，比如`3`，网上很多的教程都是到这一步，其实是不行的，估计都是乱转一气。到这里还有最重要的一步，就是使用`#`号将`GRUB_HIDDEN_TIMEOUT=0`标注,然后再次回到终端，输入下面的命令刷新`/boot/grub/grub.cfg`文件：
+```
+sudo update-grub2
+```
+
+## 启动项管理
+```
+gnome-session-properties
+```
+
+## 提高逼格
+```
+sudo apt-get install cmatrix
+cmatrix -b
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/cmatrix.png)
 
 # 参考
 > 参考来源 请查看***[ubuntu16.04主题美化和软件推荐](http://blog.csdn.net/terence1212/article/details/52270210)***
