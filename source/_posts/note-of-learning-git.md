@@ -1,8 +1,8 @@
 ---
 title: Git学习笔记
 date: 2017-01-18 12:42:52
-categories: git
-tags: [git,github]
+categories: Git/Github
+tags: [Git,Github]
 ---
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/git/git-operations.png)

@@ -1,7 +1,7 @@
 ---
 title: Ubuntu安装后的主题美化与个性化设置
 date: 2017-01-12 23:04:36
-categories: Ubuntu
+categories: OperatingSystemNote
 tags: [Ubuntu]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/desktop.png)

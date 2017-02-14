@@ -2,7 +2,7 @@
 title: 基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)
 date: 2017-01-15 20:44:05
 categories: Hexo
-tags: [Hexo, nodejs, github, coding, git]
+tags: [Hexo, Node.js, Github, Coding, Git]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/hexoGoverment.png)
 
