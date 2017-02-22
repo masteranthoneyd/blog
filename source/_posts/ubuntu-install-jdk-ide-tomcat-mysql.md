@@ -1,7 +1,7 @@
 ---
 title: Ubuntu的Java开发环境基本搭建(JDK+IDE+Tomcat+MySQL+Navicat)
 date: 2017-01-20 11:31:22
-categories: OperatingSystemNote
+categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
 ---
 # 前言

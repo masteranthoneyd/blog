@@ -22,7 +22,7 @@ Life is a generic method like [ public <T> Life doSomething(T t){} ],T is the pa
 &emsp;&emsp; 见步践行，勿忘初心
 
 # About source code
-&emsp;&emsp; *[这是项目源代码，包含各种配置文件](https://github.com/masteranthoneyd/hexo-source)*
+&emsp;&emsp; *[这是项目源代码，包含各种配置文件](https://github.com/masteranthoneyd/blog)*
 &emsp;&emsp; *[这是项编译后代码，用于部署外网](https://github.com/masteranthoneyd/masteranthoneyd.github.io)*
 
 # About contact
