@@ -462,6 +462,117 @@ menu:
 guestbook: 留言
 ```
 
+# 元素微调自定义篇
+那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
+那就是通过浏览器元素定位，调到自己喜欢的样式，然后加到`themes/next/source/css/_custom/custom.styl`文件下面。
+## 定位元素
+用谷歌或者火狐浏览器打开博客页面，按下F12进入调试
+先点击定位按钮，然后选择元素，然后在定位出来的样式进行修改，调到自己喜欢的样子，就像这样↓
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/yemiantiaoshi.png)
+
+## 添加到样式文件
+打开`themes/next/source/css/_custom/custom.styl`，把调试好的样式加进去，保存后`Ctrl+F5`就能看到效果了，前提是在本地运行的，下面列出博主的一些自定义样式：
+```
+// Custom styles.
+// 页面头部背景
+.header {  background:url(http://ojoba1c98.bkt.clouddn.com/img/header/header_background.jpg);}
+
+// 子标题
+.site-subtitle{ font-size: 15px; color: white; }
+
+// 标题
+.site-title {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+// 标题背景
+.brand{
+    background: transparent;
+}
+
+// 菜单栏
+.menu {
+	margin-top: 20px;
+	padding-left: 0;
+	text-align: center;
+	background: rgba(240, 240, 240, 0.5);
+	margin-left: auto;
+	margin-right: auto;
+	width: 530px;
+	border-radius: initial;
+}
+
+// 菜单图表链接 以及 超链接样式
+a {
+    color: rgba(0,0,0,0.8);
+}
+a:hover {
+    color: #ff106c;
+    border-bottom-color: #ff106c;
+}
+
+// 菜单字体大小
+.menu .menu-item a {
+    font-size: 14px;
+}
+.menu .menu-item a:hover {
+    border-bottom-color: #ff106c;
+}
+
+
+// 文章背景框框
+.post {
+    margin-top: 10px;
+    margin-bottom: 40px;
+    padding: 18px;
+    -webkit-box-shadow: 0 0 5px rgba(202, 203, 203, 0.8);
+   }
+
+// 站点描述
+.site-description {
+    font-size: 16px;
+
+}
+
+// 头部inner
+.header-inner {
+    padding: 45px 0 25px;
+    width: 700px;
+}
+
+// 作者名
+.site-author-name {
+    font-family: 'Comic Sans MS', sans-serif;
+    font-size: 20px;
+}
+
+// 文章之间的分割线
+.posts-expand .post-eof {
+    margin: 40px auto 40px;
+    background: white;
+}
+
+// 按钮样式
+.btn {
+    margin-top: 20px;
+}
+
+// ``代码块样式
+code {
+    color: #E6006B;
+    background: white;
+    border-radius: 3px;
+}
+
+
+body {
+    color: #444;
+    font-size: 16px;
+}
+```
+但并不是所有的样式都能调，像页宽，多说评论的样式在`custom.styl`文件是无效的
+
 # 域名绑定篇
 
 # 站点加速篇
@@ -763,6 +874,9 @@ npm install hexo-reference --save
 ```
 
 # 最后
+一路摸爬滚打下来也挺折腾的，不过确实满满的成就感
+同时还要感谢很多很多的大神们的文章，有一些都忘了收藏记录下来，由衷地感谢
+
 
 [^1]: basic footnote content
 
