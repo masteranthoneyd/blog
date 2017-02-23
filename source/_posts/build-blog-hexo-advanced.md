@@ -441,7 +441,7 @@ this is a basic footnote[/^1] ##用的时候把/去掉
 [/^1]: basic footnote content ##用的时候把/去掉
 ```
 
-this is a basic footnote[^1]
+eg:this is a basic footnote[^1]
 
 ## 自定义页面
 执行`hexo new page "guestbook"`之后，那怎么在博客中加进去呢？
@@ -611,7 +611,7 @@ npm install hexo-all-minifier --save
 **方式一：文件验证**
 * 登录百度站长选择添加网站，使用方式为文件验证
 * 将下载的文件放到`source`文件下
-* 由于hexo自动会对html文件进行渲染，所以在站点配置文件中找到`skip_render:`
+* 由于hexo自动会对html文件进行渲染，所以在`站点配置文件`中找到`skip_render:`
 * 在后面添加文件名字，如有多个用`[a.html,b.html]`，eg:`skip_render:[baidu_verify_tdOGHi8IQG.html, baidu_verify_vcJkI72f1e.html]`
 * 重新渲染文件
 ```
