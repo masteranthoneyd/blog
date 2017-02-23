@@ -8,7 +8,8 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 # 前言
 好久没更新了，因为懒- -
 前面介绍了Hexo的一些基本搭建→***[基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)](http://www.ookamiantd.top/2017/build-blog-hexo-base/)***
-对于追求装X的博主来说，基本的搭建是满足不了的，接下来整理了一下各方面的细节优化，包括页面字体大小、配色、背景、SEO(搜索引擎优化)、域名绑定、DNS域名解析实现负载均衡等
+对于追求装X的博主来说，基本的搭建是满足不了的，接下来整理了一下各方面的细节优化，包括页面字体大小、配色、背景、SEO(搜索引擎优化)、域名绑定、DNS域名解析实现负载均衡等。
+关于`NexT`主题的很多配置、插件都可以在***[官方文档](theme-next.iissnan.com/getting-started.html)***找到答案，那么博主只是整理了一些官方没怎么提及的细节优化。
 
 <!--more-->
 # 高度定制优化篇
@@ -574,6 +575,20 @@ body {
 但并不是所有的样式都能调，像页宽，多说评论的样式在`custom.styl`文件是无效的
 
 # 域名绑定篇
+博客托管在Github和Coding，所以个人博客地址是Github或Coding的二级域名，不容易让人记住，也很难让百度收录，所以很多人都自己注册域名，和博客地址绑定，这样只要输入自己申请的域名，就能跳转到博客首页，也算是真正拥有了个人网站了
+## 购买域名
+博主选择***[万网](https://wanwang.aliyun.com/)***购买的域名，可以淘宝账号登陆，之后支付宝付款，搜索自己想好的域名，没被注册的话，点击购买，top顶级域名第一年只要四元，选其他更高逼格的也可以，看个人喜好
+## 域名解析
+购买玩以后进入工作台，点击域名，然后解析
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/yumingjiexi.png)
+第一次可能需要填写个人信息，填完了，点击上面的域名解析->解析设置->添加解析，记录类型选`A`或`CNAME`，`A`记录的记录值就是ip地址，Github提供了两个IP地址，`192.30.252.153`和`192.30.252.154`，随便填一个就行，解析记录设置两个www和不填，线路就默认就行了，`CNAME`记录值填你的`Coding`的博客网址。如果选择`A`记录，就要在**网站根目录**新建`CNAME`文件，里面填写注册的域名`ookamiantd.top`
+
+博主的是这样的↓
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/DNSyumingjiexi.png)
+
+一般解析配置好并不能马上访问，得看人品= =，博主的是第二天才访问到的，祝你好运
+
+
 
 # 站点加速篇
 ## embed.js本地化
@@ -607,6 +622,12 @@ npm install hexo-all-minifier --save
 
 # SEO(搜索引擎优化)篇
 ## 网站验证
+以下是几个搜索引擎的提交入口：
+* ***[百度提交入口](http://zhanzhang.baidu.com/linksubmit/url)***
+* ***[Google提交入口](https://www.google.com/webmasters/tools/home?hl=zh-CN)***
+* ***[360提交入口](http://info.so.360.cn/site_submit.html)***
+
+以百度为例，谷歌的太简单就不说了：
 打开*[百度站长](http://zhanzhang.baidu.com/linksubmit/url)*验证网站
 **方式一：文件验证**
 * 登录百度站长选择添加网站，使用方式为文件验证
@@ -629,6 +650,8 @@ hexo d -g
 
 就像这样↓
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/DNSjiexi.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/baiduyanzheng.png)
 
 ## 添加并提交sitemap
 安装hexo的`sitemap`网站地图生成插件:
