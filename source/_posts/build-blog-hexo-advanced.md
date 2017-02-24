@@ -577,11 +577,19 @@ body {
 # 域名绑定篇
 博客托管在Github和Coding，所以个人博客地址是Github或Coding的二级域名，不容易让人记住，也很难让百度收录，所以很多人都自己注册域名，和博客地址绑定，这样只要输入自己申请的域名，就能跳转到博客首页，也算是真正拥有了个人网站了
 ## 购买域名
-博主选择***[万网](https://wanwang.aliyun.com/)***购买的域名，可以淘宝账号登陆，之后支付宝付款，搜索自己想好的域名，没被注册的话，点击购买，top顶级域名第一年只要四元，选其他更高逼格的也可以，看个人喜好
+博主选择***[万网](https://wanwang.aliyun.com/)***购买的域名，可以淘宝账号登陆，之后支付宝付款
+至于怎么**实名认证**博主就略过了～
+搜索自己想好的域名，没被注册的话，点击购买，top顶级域名第一年只要四元，选其他更高逼格的也可以，看个人喜好
 ## 域名解析
 购买玩以后进入工作台，点击域名，然后解析
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/yumingjiexi.png)
-第一次可能需要填写个人信息，填完了，点击上面的域名解析->解析设置->添加解析，记录类型选`A`或`CNAME`，`A`记录的记录值就是ip地址，Github提供了两个IP地址，`192.30.252.153`和`192.30.252.154`，随便填一个就行，解析记录设置两个www和不填，线路就默认就行了，`CNAME`记录值填你的`Coding`的博客网址。如果选择`A`记录，就要在**网站根目录**新建`CNAME`文件，里面填写注册的域名`ookamiantd.top`
+第一次可能需要填写个人信息，填完了，点击上面的域名解析->解析设置->添加解析，记录类型选`A`或`CNAME`，`A`记录的记录值就是ip地址，Github提供了两个IP地址，`192.30.252.153`和`192.30.252.154`，随便填一个就行，解析记录设置两个www和不填，线路就默认就行了，`CNAME`记录值填你的`Coding`的博客网址。
+如果选择`A`（下图的Github地址）记录，就要在**网站根目录**新建`CNAME`文件，里面填写注册的域名`ookamiantd.top`，之后修改`站点配置文件`，把站点地址更新成新的绑定的域名即可
+```
+# URL
+## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
+url: http://www.ookamiantd.top
+```
 
 博主的是这样的↓
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/DNSyumingjiexi.png)
@@ -897,8 +905,12 @@ npm install hexo-reference --save
 ```
 
 # 最后
-一路摸爬滚打下来也挺折腾的，不过确实满满的成就感
+一路摸爬滚打下来也挺折腾的，不过确实满满的成就感，学到了很多
 同时还要感谢很多很多的大神们的文章，有一些都忘了收藏记录下来，由衷地感谢
+> **参考**
+> ***[http://codepub.cn/2015/04/06/Github-Pages-personal-blog-from-Octopress-to-Hexo/](http://codepub.cn/2015/04/06/Github-Pages-personal-blog-from-Octopress-to-Hexo/)***
+> ***[http://codepub.cn/2016/03/20/Hexo-blog-theme-switching-from-Jacman-to-NexT-Mist/](http://codepub.cn/2016/03/20/Hexo-blog-theme-switching-from-Jacman-to-NexT-Mist/)*** 
+> ***[http://www.shellsec.com/news/34054.html](http://www.shellsec.com/news/34054.html)***
 
 
 [^1]: basic footnote content
