@@ -1,5 +1,5 @@
 ---
-title: Ubuntu的Java开发环境基本搭建(JDK+IDE+Tomcat+MySQL+Navicat)
+title: Ubuntu的Java开发环境基本搭建(JDK+IDE+Tomcat+MySQL+Navicat+Redis)
 date: 2017-01-20 11:31:22
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
@@ -59,8 +59,8 @@ source /etc/profile.d/jdk.sh
 ```
 4. 查看`jdk`是否安装成功，一下两条命令成功则安装成功
 ```
-sudo java -version
-sudo javac -version
+java -version
+javac -version
 ```
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/javaVersion.png)
 
@@ -102,10 +102,19 @@ Name[en]=Eclipse Mars.2
 MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](http://ookamiantd.top/20170111/ubuntu-myeclipse-crack/)***
 
 ## IntelliJ IDEA
-之前听说过idea[^1]，都是大公司用的，并没有用过
+之前听说过IDE[^1]，都是大公司用的，并没有用过
 日后再研究补上
 官网：*[http://www.jetbrains.com/idea/](http://www.jetbrains.com/idea/)*
 
+新公司好多大牛，用的都是IDEA，于是乎“近墨者黑”，那么既然有机会跟大牛接触，我也开始真正意义上的学习IDEA了
+
+### 安装
+进过查阅，我选择官方的盒子下载：***[http://www.jetbrains.com/toolbox/app/?fromMenu](http://www.jetbrains.com/toolbox/app/?fromMenu)***
+优点是可以自动更新
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/idea.png)
+
+### 激活
+问度娘，博主也是度娘要的激活码
 
 
 # 部署Tomcat
@@ -219,6 +228,7 @@ sudo chmod 644 /etc/profile.d/mysql.sh
 ## 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
+default-character-set=utf8
 lower_case_table_names=1
 character_set_server=utf8
 ```
@@ -278,6 +288,30 @@ Categories=Application;Database;MySQL;navicat
 Version=1.0
 Type=Application
 Terminal=0
+```
+
+# 安装Redis
+## 安装
+终端执行：
+```
+sudo apt-get update
+sudo apt-get install redis-server
+```
+
+## 启动
+```
+redis-server
+```
+
+## 查看是否启动成功
+```
+redis-cli
+```
+
+## HelloWorld
+```
+set k1 helloword
+get k1
 ```
 
 [^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主

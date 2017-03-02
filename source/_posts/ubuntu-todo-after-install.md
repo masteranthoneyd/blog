@@ -157,6 +157,34 @@ sudo apt-get install fonts-wqy-microhei
 
 # 软件篇
 
+## 安装 wechat for Ubuntu
+下载地址：***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
+
+下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
+
+
+## git
+上面也提到过安装`git`
+```
+sudo apt-get install git
+```
+
+## 安装版本控制系统GUI-SmartGit
+```
+sudo add-apt-repository ppa:eugenesan/ppa
+sudo apt-get update
+sudo apt-get install smartgithg
+```
+卸载：
+```
+sudo apt-get remove smartgithg
+```
+
+## 安装chm阅读器-kchmViewer
+```
+sudo apt-get install kchmviewer
+```
+
 ## wiznote(为知笔记)
 
 一款`linux`下强大的笔记软件
