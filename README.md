@@ -1,2 +1,2 @@
 # Hexo
-backup of hexo 
+> 个人博客搭建源码以及配置文件、资源文件等
