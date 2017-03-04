@@ -681,6 +681,8 @@ baidusitemap:
 百度sitemap提交如下↓
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/sitemap.png)
 
+验证成功之后就可以开始推送了，这里说一下，Google的收录真的快的不要不要的，第二天就能搜得到，百度就不想说了，不知道要等到猴年马月
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/GoogleSearch.png)
 
 ## 主动推送
 安装主动推送插件：

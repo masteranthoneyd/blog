@@ -88,7 +88,7 @@ baidusitemap:
   path: baidusitemap.xml
 
 baidu_url_submit:
-  count: 5 ## 比如3，代表提交最新的三个链接
+  count: 3 ## 比如3，代表提交最新的三个链接
   host: www.ookamiantd.top ## 在百度站长平台中注册的域名
   token: sKIjGrW5IgkkDrVu ## 请注意这是您的秘钥， 请不要发布在公众仓库里!
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
@@ -121,7 +121,7 @@ index_generator:
   per_page: 6
 
 archive_generator:
-  per_page: 6 ##归档页面默认20篇文章标题
+  per_page: 10 ##归档页面默认20篇文章标题
   yearly: true  ##生成年视图
   monthly: true ##生成月视图
 

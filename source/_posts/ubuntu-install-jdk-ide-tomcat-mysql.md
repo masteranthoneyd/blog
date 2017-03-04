@@ -99,7 +99,7 @@ Name[en]=Eclipse Mars.2
 * 作者签名：java → code style → code templates → types  签名快捷键：`alt + shift + j`
 
 ## MyEclipse
-MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](http://ookamiantd.top/20170111/ubuntu-myeclipse-crack/)***
+MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](http://ookamiantd.top/2017/ubuntu-myeclipse-crack/)***
 
 ## IntelliJ IDEA
 之前听说过idea[^1]，都是大公司用的，并没有用过
