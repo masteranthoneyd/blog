@@ -228,7 +228,6 @@ sudo chmod 644 /etc/profile.d/mysql.sh
 ## 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
-default-character-set=utf8
 lower_case_table_names=1
 character_set_server=utf8
 ```
