@@ -463,6 +463,56 @@ menu:
 guestbook: 留言
 ```
 
+## 添加字数统计和阅读时间
+### 安装插件
+```
+npm install hexo-wordcount --save
+```
+
+> 通过以上安装后，你可以在你的模板文件后者.md文件加入以下相关的标签实现本插件的功能
+> 字数统计:WordCount
+> 阅读时长预计:Min2Read
+> 总字数统计: TotalCount
+
+### 修改post.swig模板
+找到`themes\next\layout\_macro\post.swig`并打开插入以下代码：
+```
+{# LeanCould PageView #}
+         {% if theme.leancloud_visitors.enable %}
+            <span id="{{ url_for(post.path) }}" class="leancloud_visitors" data-flag-title="{{ post.title }}">
+		 &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">{{__('post.visitors')}} </span>
+              <span class="leancloud-visitors-count"></span>
+             </span>
+         {% endif %}
+
+	  
+#以下部分为：字数统计、阅读时长插入代码
+         <span class="post-time">
+	   &nbsp; | &nbsp;
+           <span class="post-meta-item-icon">
+             <i class="fa fa-calendar-o"></i>
+           </span>
+           <span class="post-meta-item-text">字数统计:</span>
+           <span class="post-count">{{ wordcount(post.content) }}(字)</span>
+           
+         </span>
+	  
+      <span class="post-time">
+	   &nbsp; | &nbsp;
+           <span class="post-meta-item-icon">
+             <i class="fa fa-calendar-o"></i>
+           </span>
+           <span class="post-meta-item-text">阅读时长:</span>
+           <span class="post-count">{{ min2read(post.content) }}(分)</span>
+           
+         </span>
+#以上部分为：字数统计、阅读时长插入代码
+```
+
 # 元素微调自定义篇
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
 那就是通过浏览器元素定位，调到自己喜欢的样式，然后加到`themes/next/source/css/_custom/custom.styl`文件下面。

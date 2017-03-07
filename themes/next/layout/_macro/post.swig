@@ -194,12 +194,23 @@
              </span>
           {% endif %}
 
+       <span class="post-time">
+	   &nbsp; | &nbsp;
+           <span class="post-meta-item-icon">
+             <i class="fa fa-edit"></i>
+           </span>
+           <span class="post-meta-item-text">WordCount:</span>
+           <span class="post-count">{{ wordcount(post.content) }}字</span>
+           
+         </span>
+
           {% if not is_index and theme.busuanzi_count.enable and theme.busuanzi_count.page_pv %}
             <span class="post-meta-divider">|</span>
             <span class="page-pv">{{ theme.busuanzi_count.page_pv_header }}
             <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>{{ theme.busuanzi_count.page_pv_footer }}
             </span>
           {% endif %}
+
 
           {% if post.description and (not theme.excerpt_description or not is_index) %}
               <div class="post-description">

@@ -1,7 +1,7 @@
 ---
 title: Start My Blog Trip — Power By Hexo
 date: 2017-01-10 23:49:28
-categories: DiaryOfMine
+categories: Essay
 tags: [Hexo]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/hello-world/start-trip.png)
