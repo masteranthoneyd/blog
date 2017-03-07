@@ -228,11 +228,47 @@ sudo chmod 644 /etc/profile.d/mysql.sh
 ## 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
-default-character-set=utf8
 lower_case_table_names=1
 character_set_server=utf8
 ```
 
+## 查看以及修改MySQL字符编码
+### 查看
+```
+mysql> show variables like 'collation_%';
+
+mysql> show variables like 'character_set_%';
+```
+
+### 修改
+```
+mysql> set character_set_client=utf8;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set character_set_connection=utf8;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set character_set_database=utf8;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set character_set_results=utf8;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set character_set_server=utf8;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set character_set_system=utf8;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> set collation_connection=utf8_general_ci;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> set collation_database=utf8mb4_general_ci;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> set collation_server=utf8mb4_general_ci;
+Query OK, 0 rows affected (0.01 sec)
+```
 
 ## 如果登录mysql出现以下错误
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/mysql-problom.png)
