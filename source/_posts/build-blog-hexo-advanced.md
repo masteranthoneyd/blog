@@ -949,11 +949,16 @@ admin:
       bucketHost: 'you BK Host'
 ```
 
-## 注脚
+## 注脚插件
 
 ```
 npm install hexo-reference --save
 
+```
+
+## 字数与阅读时间插件
+```
+npm install hexo-wordcount --save
 ```
 
 # 最后
