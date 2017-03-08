@@ -35,7 +35,7 @@ return set.contains(targetValue);
 
 在判断一个数组是否包含某个值的时候，推荐使用**`for`循环遍历**的形式或者使用`Apache Commons`类库中提供的`ArrayUtils`类的`contains`方法。
 
-## 三、在循环中删除列表中的元素
+# 三、在循环中删除列表中的元素
 在讨论这个问题之前，先考虑以下代码的输出结果：
 ```java
 ArrayList<String> list = new ArrayList<String>(Arrays.asList("a","b","c","d"));
@@ -141,9 +141,9 @@ for(String s: arr){
 所以，编译器试图调用Super类中的无参构造函数。但是父类默认的构造函数未定义，编译器就会报出这个错误信息。
 要解决这个问题，可以简单的通过
 * 1)在父类中添加一个Super()构造方法，就像这样：
-
+```
 public Super(){}
-
+```
 * 2)移除自定义的父类构造函数
 
 * 3)在子类的构造函数中调用父类的super(value)。
