@@ -1,13 +1,13 @@
 ---
 title: Java开发人员最常犯的10个错误
 date: 2017-03-07 20:40:46
-categories: [ProgrammingNote,Java]
+categories: [Programming,Java]
 tags: Java
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/java/mistake.jpg)
 # 前言
-人非圣贤孰能无过，编程更是一门要求非常严谨的学问，难免会在敲代码时一个不留神就产生一个BUG。
-下面博主就分享一下Java开发人员最常犯的10个错误。
+> 人非圣贤孰能无过，编程更是一门要求非常严谨的学问，难免会在敲代码时一个不留神就产生一个BUG。
+> 下面博主就分享一下Java开发人员最常犯的10个错误。
 <!--more-->
 
 > 本文出自于[http://www.hollischuang.com/archives/1360](http://www.hollischuang.com/archives/1360)
