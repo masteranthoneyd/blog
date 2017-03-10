@@ -728,9 +728,10 @@ System.out.println(obj.getClass().getClassLoader());//打印出我们的自定�
 至此关于自定义`ClassLoader`的内容总结完毕。
 
 # 最后
+个人觉得以上原文写的很好，起码博主可以看得懂= =
 看了之后廓然开朗，学习了
 
-> **转载于：***
+> **转载于：**
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/51892567](http://blog.csdn.net/seu_calvin/article/details/51892567)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/52301541](http://blog.csdn.net/seu_calvin/article/details/52301541)***
