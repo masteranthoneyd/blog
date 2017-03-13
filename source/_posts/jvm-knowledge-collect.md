@@ -4,17 +4,38 @@ date: 2017-03-09 13:04:51
 categories: [Programming,Java]
 tags: [Java,JVM]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/comic/zuiewangguang1.jpeg)
-(此图与文章无关，只是想看一下不一样的景色 =.=)
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/structure.png)
+
 # 前言
-> 想要深刻地理解Java，那么就要从深入地理解底层——JVM(Java Virtual Machine | Java虚拟机)。
-> 博主经过一番查阅，找到了自认为写的好的一些文章，并记录下载，方便不定时的看。
+> 想要深刻地理解Java，那么就要深入地理解底层——JVM(Java Virtual Machine | Java虚拟机)。
+> JVM（Java Virtual Machine）Java 虚拟机是整个 java 平台的基石，是 java 系统实现硬件无关与操作系统无关的关键部分，是保障用户机器免于恶意代码损害的屏障。Java开发人员不需要了解JVM是如何工作的，但是，了解 JVM 有助于我们更好的开（通）发（过） java（公司） 程（面）序（试）
+> 博主经过一番查阅，找到了自认为写的好的一些文章，并记录总结，方便不定时的看。
 > 希望每次看都会有新的领悟，不断提高自己。
 
 <!--more-->
 
 # Java虚拟机架构
-Java虚拟机（Java Virtual Machine）实现了Java语言最重要的特征：即平台无关性。
+
+## 什么是JVM
+要想说明白什么 JVM 就不得不提另外两个概念，JRE 和 JDK，初学者总是把这几个概念搞混。
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/java-tutorial.png)
+JVM，JRE，JDK 都是 Java 语言的支柱，他们分工协作。但不同的是 **JDK 和 JRE 是真实存在的**，而 JVM 是一个**抽象**的概念，并不真实存在。
+
+### JDK
+JDK(Java Development Kit) 是 Java 语言的软件开发工具包（SDK）。JDK 物理存在，是 programming tools、JRE 和 JVM 的一个集合。
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/jdk.png)
+
+### JRE
+JRE（Java Runtime Environment）Java 运行时环境，JRE 物理存在，主要由Java API 和 JVM 组成，提供了用于执行 Java 应用程序最低要求的环境。
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/jre.png)
+
+### JVM（Java Virtual Machine）
+JVM(Java Virtual Machine) 是一种软件实现，执行像物理机程序的机器（即电脑）。
+本来，Java被设计基于从物理机器分离实现WORA（ 写一次，随处运行 ）的虚拟机上运行，虽然这个目标已经几乎被遗忘。
+JVM 并不是专为 Java 所实现的运行时，实际上只要有其他编程语言的编译器能生成正确 Java bytecode 文件，则这个语言也能实现在JVM上运行。
+因此，JVM 通过执行 Java bytecode 可以使 java 代码在不改变的情况下运行在各种硬件之上。
+
+JVM实现了Java语言最重要的特征：即平台无关性。
 **平台无关性原理**：编译后的 Java程序（`.class`文件）由**JVM执行**。JVM**屏蔽了与具体平台相关的信息**，使程序可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。因此实现**Java平台无关性**。
 ## JVM结构图
 ![](http://ojoba1c98.bkt.clouddn.com/img/jvm/jvm-frame-diagram.png)
@@ -517,6 +538,7 @@ G1搜集器是当今搜集器技术发展最前沿的成果，它是一款**面�
 -XX:ParallelGCThreads=n: //设置并发搜集器年轻代搜集方式为并行搜集时，使用的CPU数。并行搜集线程数 
 ```
 # Java类加载机制总结
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/class.png)
 ## 类加载器的组织结构
 类加载器 `ClassLoader`是具有层次结构的，也就是父子关系。其中，**`Bootstrap`是所有类加载器的父亲**。
 （1）`Bootstrapclass loader`： **启动类加载器**
@@ -593,6 +615,7 @@ ClassLoader.loadClass(name, false);//第二个参数指Class是否被链接，�
 **通过上面的描述，如果程序依赖于`Class`是否被初始化，就必须用`Class.forName(name)`了**
 
 # 自定义类加载器
+![](http://ojoba1c98.bkt.clouddn.com/img/jvm/calssloader.png)
 ## 为什么需要自定义类加载器
 网上的大部分自定义类加载器文章，几乎都是贴一段实现代码，然后分析一两句自定义ClassLoader的原理。但是个人觉得首先得把为什么需要自定义加载器这个问题搞清楚，因为如果不明白它的作用的情况下，还要去学习它显然是很让人困惑的。
 首先介绍自定义类的**应用场景**：
@@ -745,14 +768,82 @@ System.out.println(obj.getClass().getClassLoader());//打印出我们的自定�
 
 至此关于自定义`ClassLoader`的内容总结完毕。
 
-# 最后
-个人觉得以上原文写的很好，起码博主可以看得懂= =
-看了之后廓然开朗，学习了
+# Tomcat与Eclipse性能调优
+## Tomcat服务器优化
+### JDK内存优化
+根据服务器物理内容情况配置相关参数优化tomcat性能。当应用程序需要的内存超出堆的最大值时虚拟机就会提示内存溢出，并且导致应用服务崩溃。因此一般建议堆的最大值设置为可用内存的最大值的80%。 Tomcat默认可以使用的内存为128MB，在较大型的应用项目中，这点内存是不够的，需要调大。
+Tomcat默认可以使用的内存为128MB,Windows下,在文件/bin/catalina.bat，Unix下，在文件/bin/catalina.sh的前面，增加如下设置： JAVA_OPTS=’-Xms【初始化内存大小】 -Xmx【可以使用的最大内存】 -XX:PermSize=64M -XX:MaxPermSize=128m’ 需要把几个参数值调大。例如： JAVA_OPTS=’-Xms256m -Xmx512m’ 表示初始化内存为256MB，可以使用的最大内存为512MB。
+ 参数详解：
+```
+-server  启用jdk 的 server 版；
+-Xms    java虚拟机初始化时的最小内存；
+-Xmx    java虚拟机可使用的最大内存；
+-XX:PermSize    内存永久保留区域
+-XX:MaxPermSize   内存最大永久保留区域 
+-Xmn    jvm最小内存
+```
+32G 内存配置示例：
+```
+JAVA_OPTS="$JAVA_OPTS  -Xms10g -Xmx10g -XX:PermSize=1g -XX:MaxPermSize=2g -Xshare:off -Xmn1024m
+```
 
-> **转载于：**
+### Tomcat线程优化
+在Tomcat配置文件`server.xml`中的配置中，和连接数相关的参数有：
+`maxThreads`： Tomcat使用线程来处理接收的每个请求。这个值表示Tomcat可创建的最大的线程数。默认值150。
+`acceptCount`： 指定当所有可以使用的处理请求的线程数都被使用时，可以放到处理队列中的请求数，超过这个数的请求将不予处理。默认值10。
+`minSpareThreads`： Tomcat初始化时创建的线程数。默认值25。
+`maxSpareThreads`： 一旦创建的线程超过这个值，Tomcat就会关闭不再需要的socket线程。默认值75。
+`enableLookups`： 是否反查域名，默认值为true。为了提高处理能力，应设置为false
+`connnectionTimeout`： 网络连接超时，默认值60000，单位：毫秒。设置为0表示永不超时，这样设置有隐患的。通常可设置为30000毫秒。
+`maxKeepAliveRequests`： 保持请求数量，默认值100。 bufferSize： 输入流缓冲大小，默认值2048 bytes。
+`compression`： 压缩传输，取值on/off/force，默认值off。 其中和最大连接数相关的参数为maxThreads和`acceptCount`。如果要加大并发连接数，应同时加大这两个参数。
+32G 内存配置示例：
+```
+<Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000" maxThreads="1000" minSpareThreads="60" maxSpareThreads="600"  acceptCount="120" 
+               redirectPort="8443" URIEncoding="utf-8"/>
+```
+
+## Eclipse调优
+eclipse.ini配置：
+```
+-startup
+plugins/org.eclipse.equinox.launcher_1.3.100.v20150511-1540.jar
+--launcher.library
+plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.300.v20150602-1417
+-product
+org.eclipse.epp.package.jee.product
+--launcher.defaultAction
+openFile
+--launcher.XXMaxPermSize
+512M
+-showsplash
+org.eclipse.platform
+--launcher.XXMaxPermSize
+512m
+--launcher.defaultAction
+openFile
+--launcher.appendVmargs
+-vmargs
+-Dosgi.requiredJavaVersion=1.7
+-Xms2048m
+-Xmx2048m
+-Xverify:none
+-XX:+PrintGCDetails                 
+-XX:+PrintGCDateStamps
+-Xloggc:gc.log
+```
+
+# 最后
+个人觉得以上原文写的很好，起码自己看得懂。
+下面附上参考
+
+> **参考并转载于：**
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/51892567](http://blog.csdn.net/seu_calvin/article/details/51892567)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/52301541](http://blog.csdn.net/seu_calvin/article/details/52301541)***
+> ***[http://www.importnew.com/23774.html](http://www.importnew.com/23774.html)***
+> ***[http://www.importnew.com/23774.html](http://www.importnew.com/23780.html)***
 
 
 
