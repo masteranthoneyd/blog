@@ -4,7 +4,7 @@ date: 2017-02-21 23:07:34
 categories: Hexo
 tags: [Hexo, Node.js, Github, Coding, Git]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/next-organ.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/next.png)
 # 前言
 好久没更新了，因为懒- -
 前面介绍了Hexo的一些基本搭建→***[基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)](http://www.ookamiantd.top/2017/build-blog-hexo-base/)***

@@ -24,6 +24,8 @@
     "hexo-renderer-stylus": "^0.3.1",
     "hexo-server": "^0.2.0",
     "hexo-wordcount": "^2.0.1",
-    "this-is-compress-plugin": {"hexo-all-minifier": "0.0.14"}
+    "this-is-compress-plugin": {
+      "hexo-all-minifier": "0.0.14"
+    }
   }
 }
