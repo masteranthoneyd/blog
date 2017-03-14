@@ -11,8 +11,6 @@ tags: Java
 > 下面博主就分享一下Java开发人员最常犯的10个错误以及一些代码优化，也希望自己把这些优化当成习惯融入平时。
 <!--more-->
 
-> 本文出自于[http://www.hollischuang.com/archives/1360](http://www.hollischuang.com/archives/1360)
-
 # 一、把数组转成ArrayList
 为了将数组转换为ArrayList，开发者经常会这样做：
 ```
@@ -480,7 +478,7 @@ YYY.close();
 # 参考
 
 > ***[Top 10 Mistakes Java Developers Make](http://www.programcreek.com/2014/05/top-10-mistakes-java-developers-make/)***
-
+> ***[http://www.hollischuang.com/archives/1360](http://www.hollischuang.com/archives/1360)***
 > ***[http://www.jianshu.com/p/436943216526](http://www.jianshu.com/p/436943216526)***
 
 
