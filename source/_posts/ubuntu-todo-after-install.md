@@ -185,6 +185,11 @@ sudo apt-get remove smartgithg
 sudo apt-get install kchmviewer
 ```
 
+## 安装虚拟机
+```
+sudo apt-get install virtualbox
+```
+
 ## wiznote(为知笔记)
 
 一款`linux`下强大的笔记软件
@@ -287,6 +292,27 @@ mv a /usr/share/stardict/dic
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
 ```
+## rar安装与使用
+### 安装
+```
+sudo apt-get install rar
+```
+### 使用
+解压到当前目录：
+```
+unrar e update.rar
+```
+
+解压到指定目录：
+```
+unrar x update.rar update/
+```
+
+压缩：
+```
+rar a pg_healthcheck.rar1 pg_healthcheck/
+```
+
 # 其他设置篇
 ## 点击图标最小化
 `Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。

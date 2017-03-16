@@ -350,6 +350,63 @@ set k1 helloword
 get k1
 ```
 
+# 安装Maven
+## 下载
+官网下载或者***[点击镜像获取](http://mirror.bit.edu.cn/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz)***
+
+## 配置
+1、下载解压到自己的指定的目录后，将命令放到`/bin`下：
+```
+sudo ln -s /自定义目录/apache-maven-3.3.9/bin/mvn /bin/mvn
+```
+
+2、添加环境变量
+老规矩，在`/etc/profile.d`下创建一个`maven.sh`的文件：
+```
+sudo touch /etc/profile.d/maven.sh
+sudo vi /etc/profile.d/maven.sh
+```
+
+输入以下内容：
+```
+export M2_HOME=/自定义目录/apache-maven-3.3.9
+export PATH=${M2_HOME}/bin:$PATH
+```
+
+然后`source`一下：
+```
+source source /etc/profile.d/maven.sh
+```
+
+查看是否配置成功：
+```
+mvn -v
+```
+
+输入内容如下：
+```
+Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-11T00:41:47+08:00)
+Maven home: /home/ybd/Data/application/maven/apache-maven-3.3.9
+Java version: 1.8.0_65, vendor: Oracle Corporation
+Java home: /usr/local/jdk1.8.0_65/jre
+Default locale: zh_CN, platform encoding: UTF-8
+OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
+```
+
+## 淘宝镜像
+
+```
+<mirrors>
+	<mirror>
+	  <id>alimaven</id>
+	  <name>aliyun maven</name>
+	  <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+	  <mirrorOf>central</mirrorOf> 
+	</mirror>
+</mirrors>
+```
+
+
 [^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主
 
 
