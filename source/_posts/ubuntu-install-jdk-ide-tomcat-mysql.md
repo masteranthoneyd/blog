@@ -375,7 +375,7 @@ export PATH=${M2_HOME}/bin:$PATH
 
 然后`source`一下：
 ```
-source source /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
 ```
 
 查看是否配置成功：

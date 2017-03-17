@@ -313,6 +313,13 @@ unrar x update.rar update/
 rar a pg_healthcheck.rar1 pg_healthcheck/
 ```
 
+## 备份工具
+```
+sudo add-apt-repository ppa:nemh/systemback
+sudo apt-get update
+sudo apt-get install systemback
+```
+
 # 其他设置篇
 ## 点击图标最小化
 `Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。
