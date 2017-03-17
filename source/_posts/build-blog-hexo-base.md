@@ -34,16 +34,16 @@ Git: 2.7.4
 ## 方法一：二进制包直接解压配置
 在node.js的*[官网](https://nodejs.org/en/)* 下载二进制包来安装的，下载过后，解压，设置软链接，要不然每次都执行命令都要加上路径，好麻烦
 ```shell
-ln -s /home/ybd/Data/soft/application/node-v6.2.0-linux-x64/bin/node /usr/local/bin/node
+sudo ln -s /home/ybd/Data/soft/application/node-v6.2.0-linux-x64/bin/node /usr/local/bin/node
 
-ln -s /home/ybd/Data/soft/application/node-v6.2.0-linux-x64/bin/npm /usr/local/bin/npm
+sudo ln -s /home/ybd/Data/soft/application/node-v6.2.0-linux-x64/bin/npm /usr/local/bin/npm
 ```
 **注意**！源文件要写**<font color=red>绝对路径</font>**，否则会报错：**链接层数过多**。也可以直接将node可执行文件拷贝到 `/usr/local/bin` 目录下。
 
 接下来就可以查看是否成功配置了
 ```
-node -version
-npm -version
+node -v
+npm -v
 ```
 
 ## 方法二：源文件编译安装
