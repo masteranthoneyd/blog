@@ -157,13 +157,37 @@ sudo apt-get install fonts-wqy-microhei
 
 # 软件篇
 
-## 安装 wechat for Ubuntu
-下载地址：***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
+## 安装 Wechat for Ubuntu
+下载地址：
+***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
+***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>wechat4Ubuntu`)
+
 
 下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
 
+## 安装QQ轻聊版
+虽然不太想安装QQ，但工作时候团队交流需要，QQ国际版又太难看，所以装个Deepin的轻聊版。
+工具包下载：***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>qq4Ubuntu`)
+内含文件：`crossover_16.0.0-1.deb`、`crossover16crack.tar.gz`、`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
 
-## git
+### crossover安装与破解
+这个轻聊版是Deepin的作品，要在Ubuntu上使用，就要安装**crossover**，很不幸这玩意是收费的，很幸运的是这玩意是可以破解的。
+1、安装的工具包下载下来解压后会有三个文件，首先先安装`crossover_16.0.0-1.deb`，缺少依赖就执行一下`sudo apt-get -f install`，安装完后**先不要打开**crossover。
+2、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
+3、把破解文件 (`crossover16crack`->`winewrapper.exe.so`) 替换路径: `/opt/cxoffice/lib/wine`下的`winewrapper.exe.so`文件。提示已有文件，点“替换”破解完成。
+
+### 安装Deepin QQ轻聊版
+1、用归档管理器打开`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
+2、点开 `data.tar.xz` 找到 `./opt/cxoffice/support`
+3、把 `apps.com.qq.im.light` 这个文件夹提取出来
+4、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
+5、然后将这个文件夹复制到系统的 `/opt/cxoffice/support` 下 
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/crossover-file.png)
+6、然后打开 `crossover` ，发现多了一个容器 ，点击图标即可运行QQ轻聊版 
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/crossover.png)
+7、如果运行后出现乱码，把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
+
+## 安装Git
 上面也提到过安装`git`
 ```
 sudo apt-get install git
@@ -190,7 +214,7 @@ sudo apt-get install kchmviewer
 sudo apt-get install virtualbox
 ```
 
-## wiznote(为知笔记)
+## 安装wiznote(为知笔记)
 
 一款`linux`下强大的笔记软件
 
@@ -200,12 +224,12 @@ sudo apt-get update
 sudo apt-get install wiznote
 ```
 
-## vim
+## 安装Vim
 系统并没有集成`vim`，可以执行以下代码安装：
 ```
 sudo apt-get install vim
 ```
-## wps
+## 安装Wps
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
 下载后，打开终端，运行一下命令
 ```
@@ -216,19 +240,20 @@ sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
 sudo apt-get install -f
 ```
 
-## chrome
-去*[chrome官网](https://www.google.com/chrome/browser/desktop/index.html)* 下载linux版的chrome。
+## 安装Chrome
+到*[chrome官网](https://www.google.com/chrome/browser/desktop/index.html)* 下载linux版的chrome。
+不能翻墙的小朋友可以到***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
 ```
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 ```
 
-## xmind
+## 安装Xmind
 一款思维导图软件，再*[xmind官网](http://www.xmindchina.net/xiazai.html)下载deb安装包*
 ```
 sudo dpkg -i xmind-7.5-linux_amd64.deb
 ```
 
-## shutter
+## 安装Shutter
 `Ubuntu`下很强大的一款截图软件
 ```
 sudo apt-get install shutter
@@ -275,7 +300,7 @@ sudo apt-get update
 sudo apt-get install smplayer smplayer-skins smplayer-themes
 ```
 
-## stardict火星译王
+## 安装Stardict火星译王
 ```
 sudo apt-get install stardict
 ```
@@ -287,7 +312,7 @@ tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
 ```
 
-## filezilla
+## 安装Filezilla
 ```
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
@@ -319,6 +344,17 @@ sudo add-apt-repository ppa:nemh/systemback
 sudo apt-get update
 sudo apt-get install systemback
 ```
+
+## 键盘输入声音特效（Tickys）
+***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
+下载`tickys`之后执行:
+```
+sudo apt-get install tickys
+```
+然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/tickeys_v0.2.5.png)
+
+
 
 # 其他设置篇
 ## 点击图标最小化
