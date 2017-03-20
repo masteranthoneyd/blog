@@ -194,13 +194,13 @@ sidebar:
 
 
 # Blogrolls
-links_title: Link
-#links_layout: block
-links_layout: inline
+links_title: 大神们的博客
+links_layout: block
+#links_layout: inline
 links:
-  Hexo: https://hexo.io/zh-cn/docs/
-  NexT: http://http://theme-next.iissnan.com/
-  Segmentfault: https://segmentfault.com/
+  IT草根: http://codepub.cn
+  crossoverJie's Blog: http://crossoverjie.top/
+  Giraffe's Home: http://yemengying.com/
 
 # ---------------------------------------------------------------
 # Post Settings
