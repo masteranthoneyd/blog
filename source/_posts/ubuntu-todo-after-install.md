@@ -345,6 +345,11 @@ sudo update-grub2
 gnome-session-properties
 ```
 
+## 好玩的Docky
+```
+sudo apt-get install docky
+```
+
 ## 提高逼格
 ```
 sudo apt-get install cmatrix
