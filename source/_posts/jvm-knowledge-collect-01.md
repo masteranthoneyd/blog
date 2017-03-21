@@ -1,5 +1,5 @@
 ---
-title: JVM知识汇总——内存管理
+title: JVM知识汇总——内存管理与GC
 date: 2017-03-09 13:04:51
 categories: [Programming,Java]
 tags: [Java,JVM]
