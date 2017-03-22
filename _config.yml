@@ -67,7 +67,7 @@ theme: next
 
 # Duoshuo
 ## duoshuo_shortname: {duoshuo_shortname}
-duoshuo_shortname: ookamiantd
+## duoshuo_shortname: ookamiantd
 
 # baidu tongji
 baidu_analytics: e9505ac4e11d464329d615553a72b526
