@@ -281,6 +281,20 @@ sudo service mysql start
 ```
 sudo service mysql stop
 ```
+
+## 开启远程链接
+链接mysql后：
+```
+use mysql
+
+// 下面两个root分别是帐号密码
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+// 刷新特权
+flush privileges;
+// 查看修改是否成功
+select host,user from user;
+```
+
 # 安装Navicat For Mysql
 到*[官网](https://www.navicat.com/download)*下载对应系统版本
 解压到适应文件夹
@@ -349,6 +363,37 @@ redis-cli
 set k1 helloword
 get k1
 ```
+
+## 配置相关
+`/etc/redis`：存放redis配置文件
+`/var/redis/端口号`：存放redis的持久化文件
+
+通过下面的命令停止/启动/重启redis：
+```
+/etc/init.d/redis-server stop
+/etc/init.d/redis-server start
+/etc/init.d/redis-server restart
+```
+
+如果是通过源码安装的redis，则可以通过redis的客户端程序`redis-cli`的`shutdown`命令来重启redis
+```
+redis-cli -h 127.0.0.1 -p 6379 shutdown
+```
+如果上述方式都没有成功停止redis，则可以使用终极武器 `kill -9`
+
+## 开启远程访问
+找到`redis.conf`文件，一般在`/etc`下面：
+```
+➜  ~ sudo find /etc -name redis.conf
+/etc/redis/redis.conf
+➜  ~ sudo gedit /etc/redis/redis.conf
+```
+找到`bind localhost`注释掉
+注释掉本机,局域网内的所有计算机都能访问。
+`band localhost` 只能本机访问,局域网内计算机不能访问。
+`bind 局域网IP` 只能局域网内IP的机器访问, 本地localhost都无法访问。
+
+博主选择将`bind 127.0.0.1` 改成了`bind 0.0.0.0`
 
 # 安装Maven
 ## 下载
