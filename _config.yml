@@ -94,14 +94,8 @@ baidu_url_submit:
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
 
 
-# 多说分享服务
-duoshuo_share: true
-
 # 多说热评文章 true 或者 false
-duoshuo_hotartical: true
-
-# JiaThis 分享服务
-jiathis: false
+duoshuo_hotartical: false
 
 # Algolia 搜索
 algolia:

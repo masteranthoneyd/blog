@@ -295,10 +295,13 @@ disqus_shortname: ookamiantd
 #baidushare:
 ##  type: button
 
+
 # Share
 #jiathis:
 # Warning: JiaThis does not support https.
 #add_this_id:
+# JiaThis 分享服务
+jiathis: true
 
 # Share
 #duoshuo_share: true
