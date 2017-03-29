@@ -276,7 +276,7 @@ mathjax:
 #duoshuo_shortname:
 
 # Disqus
-disqus_shortname: ookamiantd
+## disqus_shortname: ookamiantd
 
 # Hypercomments
 #hypercomments_id:
