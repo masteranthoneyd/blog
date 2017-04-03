@@ -240,7 +240,7 @@ display: none;
 eg :
 
 ```
-<script type="text/javascript" color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+<script type="text/javascript" color="255,132,0" opacity='0.6' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
 ```
 
 不足: CPU占用过高

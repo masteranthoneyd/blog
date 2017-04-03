@@ -76,7 +76,7 @@
   {% include '_components/algolia-search/assets.swig' %}
 
   {% if theme.canvas_nest %}
-  <script type="text/javascript" color="255,132,0" opacity='0.6' zIndex="-2" count="66" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+  <script type="text/javascript" color="255,132,0" opacity='0.6' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
   {% endif %}
 
 </body>
