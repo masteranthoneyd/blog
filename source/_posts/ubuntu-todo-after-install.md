@@ -204,6 +204,23 @@ sudo apt-get install smartgithg
 sudo apt-get remove smartgithg
 ```
 
+## 安装Typora(Markdown编辑器)
+```
+# optional, but recommended
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
+
+# add Typora's repository
+
+sudo add-apt-repository 'deb https://typora.io ./linux/'
+
+sudo apt-get update
+
+# install typora
+
+sudo apt-get install typora
+```
+
 ## 安装chm阅读器-kchmViewer
 ```
 sudo apt-get install kchmviewer

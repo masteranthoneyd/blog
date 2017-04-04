@@ -1,14 +1,4 @@
 
-<div align="center">
-	  {% if not is_index %}
-	    <div class="">
-	   <b>本文基于<a target="_blank" title="Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)" href="http://creativecommons.org/licenses/by-sa/4.0/"> 知识共享署名-相同方式共享 4.0 </a>国际许可协议发布</b>
-	    <p><span>
-	    <b>本文地址：</b><a href="{{ url_for(page.path) }}" title="{{ page.title }}">{{ page.permalink }}</a><br/><b>转载请注明出处，谢谢！</b>
-	    </span></p>
-	    </div>
-	  {% endif %}
-	</div>
 
 {% if theme.alipay or theme.wechatpay %}
   <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">

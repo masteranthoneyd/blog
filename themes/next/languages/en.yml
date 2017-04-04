@@ -37,8 +37,8 @@ page:
   tags: tags
 
 footer:
-  powered: "Powered by %s"
-  theme: Theme
+  powered: " %s Personal Site"
+  theme: Blog
 
 counter:
   tag_cloud:

@@ -123,59 +123,7 @@
        	
 
           {% if post.comments %}
-            {% if (theme.duoshuo and theme.duoshuo.shortname) or theme.duoshuo_shortname %}
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="{{ post.path }}" itemprop="commentCount"></span>
-                </a>
-              </span>
-            {% elseif theme.facebook_comments_plugin.enable %}
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count fb-comments-count" data-href="{{ post.permalink }}" itemprop="commentCount">0</span> comments
-                </a>
-              </span>
-            {% elseif theme.disqus_shortname %}
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="{{ post.path }}" itemprop="commentCount"></span>
-                </a>
-              </span>
-            {% elseif theme.hypercomments_id %}
-            <!--noindex-->
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count hc-comment-count" data-xid="{{ post.path }}" itemprop="commentsCount"></span>
-                </a>
-              </span>
-              <!--/noindex-->
-            {% elseif is_post() and theme.gentie_productKey %}
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a class="cloud-tie-join-count" href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
-                </a>
-              </span>
-            {% endif %}
+           
           {% endif %}
 
           {% if not is_index and theme.facebook_sdk.enable and theme.facebook_sdk.like_button %}
@@ -196,6 +144,15 @@
                  <span class="leancloud-visitors-count"></span>
              </span>
           {% endif %}
+          
+          <br/><span class="post-time">
+           <span class="post-meta-item-icon">
+             <i class="fa fa-edit"></i>
+           </span>
+           <span class="post-meta-item-text">WordCount:</span>
+           <span class="post-count">{{ wordcount(post.content) }}字</span>
+           
+         </span>
 
           {% if not is_index and theme.busuanzi_count.enable and theme.busuanzi_count.page_pv %}
             <span class="post-meta-divider">|</span>
@@ -278,6 +235,8 @@
       {% endif  %}
     </div>
 
+<div style="text-align:center;color: #ccc;font-size:14px;">---------------- The End ----------------</div>
+
     <div>
       {% if not is_index %}
         {% include 'wechat-subscriber.swig' %}
@@ -289,6 +248,16 @@
         {% include 'reward.swig' %}
       {% endif %}
     </div>
+<div>
+	  {% if not is_index %}
+	    <p id="div-border-left-red">
+	   <b>本文基于<a target="_blank" title="Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)" href="http://creativecommons.org/licenses/by-sa/4.0/"> 知识共享署名-相同方式共享 4.0 </a>国际许可协议发布</b><br/>
+	    <span>
+	    <b>本文地址：</b><a href="{{ url_for(page.path) }}" title="{{ page.title }}">{{ page.permalink }}</a><br/><b>转载请注明出处，谢谢！</b>
+	    </span>
+	    </p>
+	  {% endif %}
+	</div>
 
 
     <footer class="post-footer">

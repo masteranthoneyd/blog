@@ -43,17 +43,22 @@ $code-foreground                = $my-code-foreground
 $code-border-radius             = 4px
 ```
 ## 文章末尾追加版权信息
-找到`themes/next/layout/_macro/reward.swig`，在最上面添加如下代码：
+找到`themes/next/layout/_macro/post.swig`，在`footer`之前添加如下代码(添加之前确保已添加***[样式](#%E5%A5%BD%E7%8E%A9%E7%9A%84%E6%A0%B7%E5%BC%8F)***)：
 ```
-<div align="center">
- {% if not is_index %}
-   <div class="">
-   <p><span>
-   <b>本文地址：</b><a href="{{ url_for(page.path) }}" title="{{ page.title }}">{{ page.permalink }}</a><br/><b>转载请注明出处，谢谢！</b>
-   </span></p>
-   </div>
- {% endif %}
+<div>
+	    <p id="div-border-left-red">
+	   <b>本文基于<a target="_blank" title="Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)" href="http://creativecommons.org/licenses/by-sa/4.0/"> 知识共享署名-相同方式共享 4.0 </a>国际许可协议发布</b><br/>
+	    <span>
+	    <b>本文地址：</b><a href="{{ url_for(page.path) }}" title="{{ page.title }}">{{ page.permalink }}</a><br/><b>转载请注明出处，谢谢！</b>
+	    </span>
+	    </p>
 </div>
+```
+
+## 添加文章结束标记
+同样在`themes/next/layout/_macro/post.swig`中，在`wechat-subscriber.swig`之前添加如下代码：
+```
+<div style="text-align:center;color: #ccc;font-size:14px;">---------------- The End ----------------</div>
 ```
 
 ## 添加热度
@@ -513,6 +518,26 @@ npm install hexo-wordcount --save
 #以上部分为：字数统计、阅读时长插入代码
 ```
 
+## 修改footer
+修改之后的样子大概是这样的：
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/result.png)
+
+1、找到 \themes\next\layout\_partials\下面的footer.swig文件，打开会发现，如下图的语句：
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/footer.png)
+
+- 第一个框 是下面侧栏的“日期❤ XXX”
+如果想像我一样加东西，一定要在双大括号外面写。如：xxx{{config.author}},当然你要是想改彻底可以变量都删掉，看个人意愿。
+
+- 第二个，是图一当中 “由Hexo驱动” 的Hexo链接，先给删掉防止跳转，如果想跳转当然也可以自己写地址，至于中文一会处理。注意删除的时候格式不能错，只把`<a>...</a>`标签这部分删除即可，留着两个单引号'',否则会出错哦。
+
+- 第三个框也是最后一个了，这个就是更改图一后半部分“主题-Next.XX”,这个比较爽直接将<a>..</a>都删掉，同样中文“主题”一会处理，删掉之后在上一行 ‘-’后面可以随意加上你想显示的东西，不要显示敏感信息哟，请自重。
+
+2、接下来，处理剩余的中文信息。找到这个地方\themes\next\languages\ 下面的语言文件zh-Hans.yml（这里以中文为例，有的习惯用英文的配置文件，道理一样，找对应位置即可）
+打开之后，如图：
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/languages.png)
+
+看到了吧，这个就是传值传过去的，你想显示什么就在这里面大肆的去改动吧。其实在第二个框中，就可以把值都改掉，不用接受传值的方式，完全自己可以重写。不过我不建议那样做，因为传值这样只要是后续页面需要这几个值那么就都会通过取值去传过去，要是在刚才footer文件中直接写死，后续不一定哪个页面需要传值，但是值为空了或者还是原来的，可就尴尬了。所以还是这样改动吧。
+
 # 元素微调自定义篇
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
 那就是通过浏览器元素定位，调到自己喜欢的样式，然后加到`themes/next/source/css/_custom/custom.styl`文件下面。
@@ -622,7 +647,281 @@ body {
     font-size: 16px;
 }
 ```
-但并不是所有的样式都能调，像页宽，多说评论的样式在`custom.styl`文件是无效的
+但并不是所有的样式都能调，像页宽，多说评论的样式在`custom.styl`文件是无效的。
+
+## 好玩的样式
+先在`themes/next/source/css/_custom/custom.styl`中添加以下样式：
+```
+// 下载样式
+a#download {
+display: inline-block;
+padding: 0 10px;
+color: #000;
+background: transparent;
+border: 2px solid #000;
+border-radius: 2px;
+transition: all .5s ease;
+font-weight: bold;
+&:hover {
+background: #000;
+color: #fff;
+}
+}
+/ /颜色块-黄
+span#inline-yellow {
+display:inline;
+padding:.2em .6em .3em;
+font-size:80%;
+font-weight:bold;
+line-height:1;
+color:#fff;
+text-align:center;
+white-space:nowrap;
+vertical-align:baseline;
+border-radius:0;
+background-color: #f0ad4e;
+}
+// 颜色块-绿
+span#inline-green {
+display:inline;
+padding:.2em .6em .3em;
+font-size:80%;
+font-weight:bold;
+line-height:1;
+color:#fff;
+text-align:center;
+white-space:nowrap;
+vertical-align:baseline;
+border-radius:0;
+background-color: #5cb85c;
+}
+// 颜色块-蓝
+span#inline-blue {
+display:inline;
+padding:.2em .6em .3em;
+font-size:80%;
+font-weight:bold;
+line-height:1;
+color:#fff;
+text-align:center;
+white-space:nowrap;
+vertical-align:baseline;
+border-radius:0;
+background-color: #2780e3;
+}
+// 颜色块-紫
+span#inline-purple {
+display:inline;
+padding:.2em .6em .3em;
+font-size:80%;
+font-weight:bold;
+line-height:1;
+color:#fff;
+text-align:center;
+white-space:nowrap;
+vertical-align:baseline;
+border-radius:0;
+background-color: #9954bb;
+}
+// 左侧边框红色块级
+p#div-border-left-red {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-left-width: 5px;
+border-radius: 3px;
+border-left-color: #df3e3e;
+}
+// 左侧边框黄色块级
+p#div-border-left-yellow {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-left-width: 5px;
+border-radius: 3px;
+border-left-color: #f0ad4e;
+}
+// 左侧边框绿色块级
+p#div-border-left-green {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-left-width: 5px;
+border-radius: 3px;
+border-left-color: #5cb85c;
+}
+// 左侧边框蓝色块级
+p#div-border-left-blue {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-left-width: 5px;
+border-radius: 3px;
+border-left-color: #2780e3;
+}
+// 左侧边框紫色块级
+p#div-border-left-purple {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-left-width: 5px;
+border-radius: 3px;
+border-left-color: #9954bb;
+}
+// 右侧边框红色块级
+p#div-border-right-red {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-right-width: 5px;
+border-radius: 3px;
+border-right-color: #df3e3e;
+}
+// 右侧边框黄色块级
+p#div-border-right-yellow {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-right-width: 5px;
+border-radius: 3px;
+border-right-color: #f0ad4e;
+}
+// 右侧边框绿色块级
+p#div-border-right-green {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-right-width: 5px;
+border-radius: 3px;
+border-right-color: #5cb85c;
+}
+// 右侧边框蓝色块级
+p#div-border-right-blue {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-right-width: 5px;
+border-radius: 3px;
+border-right-color: #2780e3;
+}
+// 右侧边框紫色块级
+p#div-border-right-purple {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-right-width: 5px;
+border-radius: 3px;
+border-right-color: #9954bb;
+}
+// 上侧边框红色
+p#div-border-top-red {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-top-width: 5px;
+border-radius: 3px;
+border-top-color: #df3e3e;
+}
+// 上侧边框黄色
+p#div-border-top-yellow {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-top-width: 5px;
+border-radius: 3px;
+border-top-color: #f0ad4e;
+}
+// 上侧边框绿色
+p#div-border-top-green {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-top-width: 5px;
+border-radius: 3px;
+border-top-color: #5cb85c;
+}
+// 上侧边框蓝色
+p#div-border-top-blue {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-top-width: 5px;
+border-radius: 3px;
+border-top-color: #2780e3;
+}
+// 上侧边框紫色
+p#div-border-top-purple {
+display: block;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-top-width: 5px;
+border-radius: 3px;
+border-top-color: #9954bb;
+}
+```
+
+** 用法如下**：
+### 文字增加背景色块
+<span id="inline-blue">站点配置文件</span> ，<span id="inline-purple">主题配置文件</span>
+```
+<span id="inline-blue">站点配置文件</span>， 
+<span id="inline-purple">主题配置文件</span>
+```
+### 引用边框变色
+<p id="div-border-left-red">如果没有安装成功，那可能就是墙的原因。建议下载 `Node.js` 直接安装。</p>
+<p id="div-border-top-blue">关于更多基本操作和基础知识，请查阅 [Hexo](https://hexo.io/zh-cn/) 与 [NexT](http://theme-next.iissnan.com/) 官方文档.</p>
+```
+<p id="div-border-left-red">如果没有安装成功，那可能就是墙的原因。建议下载 `Node.js` 直接安装。</p>
+<p id="div-border-top-blue">关于更多基本操作和基础知识，请查阅 [Hexo](https://hexo.io/zh-cn/) 与 [NexT](http://theme-next.iissnan.com/) 官方文档.</p>
+```
+
+### 在文档中增加图标
+
+- <i class="fa fa-pencil"></i>支持Markdown
+<i>Hexo 支持 GitHub Flavored Markdown 的所有功能，甚至可以整合 Octopress 的大多数插件。</i>
+- <i class="fa fa-cloud-upload"></i>一件部署
+<i>只需一条指令即可部署到Github Pages，或其他网站</i>
+- <i class="fa fa-cog"></i>丰富的插件
+<i>Hexo 拥有强大的插件系统，安装插件可以让 Hexo 支持 Jade, CoffeeScript。</i>
+
+```
+- <i class="fa fa-pencil"></i>支持Markdown
+<i>Hexo 支持 GitHub Flavored Markdown 的所有功能，甚至可以整合 Octopress 的大多数插件。</i>
+- <i class="fa fa-cloud-upload"></i>一件部署
+<i>只需一条指令即可部署到Github Pages，或其他网站</i>
+- <i class="fa fa-cog"></i>丰富的插件
+<i>Hexo 拥有强大的插件系统，安装插件可以让 Hexo 支持 Jade, CoffeeScript。</i>
+```
+
+<i class="fa fa-github"></i>`<i class="fa fa-github"></i>`
+<i class="fa fa-github fa-lg"></i>`<i class="fa fa-github fa-lg"></i>`
+<i class="fa fa-github fa-2x"></i>`<i class="fa fa-github fa-2x"></i>`
+
+采用的是***[Font Awesome](http://fontawesome.io/examples/)***的图标。
+
+### 图形边框效果
+<a id="download" href="https://git-scm.com/download/win"><i class="fa fa-download"></i><span> Download Now</span>
+</a>
+```
+<a id="download" href="https://git-scm.com/download/win"><i class="fa fa-download"></i><span> Download Now</span>
+</a>
+```
+这也是调用了***[Font Awesome](http://fontawesome.io/examples/)***的方法。
 
 # 域名绑定篇
 博客托管在Github和Coding，所以个人博客地址是Github或Coding的二级域名，不容易让人记住，也很难让百度收录，所以很多人都自己注册域名，和博客地址绑定，这样只要输入自己申请的域名，就能跳转到博客首页，也算是真正拥有了个人网站了
