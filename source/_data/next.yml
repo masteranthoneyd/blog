@@ -282,7 +282,7 @@ wechatpay: /images/donate/wechat.png
 alipay: /images/donate/alipay.jpg
 
 # Canvas-nest
-canvas_nest:  true
+canvas_nest: true
 
 # baidu tongji
 baidu_analytics: e9505ac4e11d464329d615553a72b526

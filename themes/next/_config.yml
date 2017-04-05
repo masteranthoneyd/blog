@@ -216,7 +216,7 @@ vendors:
 
   # Internal version: 1.0.0
   # https://github.com/hustcc/canvas-nest.js
-  canvas_nest: 
+  canvas_nest: http://cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js
 
 
 
