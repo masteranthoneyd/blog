@@ -95,6 +95,32 @@ algolia:
   indexName: blogIndex
   chunkSize: 5000
 
+  # ---------------下面选项需要对应插件的支持---------------
+# npm install hexo-generator-index --save
+# npm install hexo-generator-archive --save
+# npm install hexo-generator-category --save
+# npm install hexo-generator-tag --save
+
+index_generator:
+  per_page: 6
+
+archive_generator:
+  per_page: 10 ##归档页面默认20篇文章标题
+  yearly: true  ##生成年视图
+  monthly: true ##生成月视图
+
+tag_generator:
+  per_page: 10
+
+# 七牛插件
+admin:
+  qiniuCfg:
+      imageslim: false
+      AccessKey: 6vqwQIxzil7a0Py-NHKMRFCPkoZUTH3P-ATxLJbX
+      SecretKey: daB4sQ9PpvTcmBZ98S4YZ2h6yoggoAQBUkHZ59ij
+      BucketName: blog
+      bucketHost: ojoba1c98.bkt.clouddn.com
+
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
