@@ -454,6 +454,13 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 
 [^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主
 
+# 搭建ngrok配置
+参考地址：***![Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***
+搞了一上午，服务运行起来了，客户端也运行起来了，浏览器就是访问不到！！
+不知道是不是因为个人电脑没有域名所以才访问不到，日后再深究。
+无奈，还好互联网开源精神无处不在，某大神搭建的ngrok：
+***![http://www.qydev.com/](http://www.qydev.com/)***
+客户端和教程都在里面哦。
 
 
 
