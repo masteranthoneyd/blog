@@ -456,6 +456,8 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 
 # 搭建ngrok配置
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/ngrok_p1.jpg)
+>ngrok 是一个反向代理，通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道。ngrok 可捕获和分析所有通道上的流量，便于后期分析和重放。可以被使用来进行微信借口的本地调试。在ngrok被墙之后，我们需要通过ngrok开源的源码自行搭建ngrok服务。
+
 参考地址：***[Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***
 搞了一上午，服务运行起来了，客户端也运行起来了，浏览器就是访问不到！！
 不知道是不是因为个人电脑没有域名所以才访问不到，日后再深究。
