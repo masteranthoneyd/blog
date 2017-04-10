@@ -149,6 +149,9 @@
            </span>
            <span class="post-meta-item-text">WordCount:</span>
            <span class="post-count">{{ wordcount(post.content) }}字</span>
+			<span class="post-meta-divider">|</span>
+			<span class="post-meta-item-text">min2read:</span>
+           <span class="post-count">{{ min2read(post.content) }}分钟</span>
            
          </span>
 

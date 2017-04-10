@@ -15,6 +15,7 @@
 
 <div class="theme-info">
   {{ __('footer.theme') }} -
-ookamiAntD
+ookamiAntD | <span class="post-count">共{{ totalcount(site) }}字</span>
 </div>
+
 {% endif %}

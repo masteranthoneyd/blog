@@ -292,7 +292,7 @@ sudo apt-get install bleachbit
 
 ## 多线程下载器
 `XTREME`下载管理器旨在为您提供一个快速和安全的工具，用于管理所有的下载。采用了先进的动态分割算法，应用程序可以加快下载过程。 下载管理器支持`HTTP`，`HTTPS`，`FTP`协议，代理服务器需要授权的网站。此外，它可以无缝地集成到`Xtreme`下载管理器安装的浏览器发送任何下载。由于它是用`Java`编写的，它是兼容所有主要平台。
- 
+
 最终版本 `Xtreme Download Manager` (`XDMAN`) 4.7 已经发布。
 安装方法，因为有`PPA`可用，支持`Ubuntu 14.10`、`14.04`、`12.04`用户，打开终端，输入一下命令：
 ```
@@ -334,7 +334,34 @@ mv a /usr/share/stardict/dic
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
 ```
+## 按转proxychains
+安装：
+```
+sudo apt install proxychains
+```
+配置：
+```
+编辑/etc/proxychains.conf，最下面有一行socks4 127.0.0.1 9050，把这一行注释掉，添加一行socks5 127.0.0.1 1080
+```
+测试：
+```
+proxychains curl www.google.com
+```
+如果能看到一堆输出，说明设置成功，如果一直等待或者无法访问则代表设置失败。
+使用：
+用命令行启动软件，在前面加上proxychains，如：
+```
+proxychains firefox
+```
+使用shadowsocks+proxychains代理打开新的firefox实现浏览器翻墙。
+也可以通过输入proxychains bash建立一个新的shell，基于这个shell运行的所有命令都将使用代理。
+
+
+
+
+
 ## rar安装与使用
+
 ### 安装
 ```
 sudo apt-get install rar
