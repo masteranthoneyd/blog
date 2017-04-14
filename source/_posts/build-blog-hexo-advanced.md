@@ -371,7 +371,7 @@ npm install hexo-wordcount --save
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/footer.png)
 
 - 第一个框 是下面侧栏的“日期❤ XXX”
-如果想像我一样加东西，一定要在双大括号外面写。如：xxx{{config.author}},当然你要是想改彻底可以变量都删掉，看个人意愿。
+  如果想像我一样加东西，一定要在双大括号外面写。如：xxx{{config.author}},当然你要是想改彻底可以变量都删掉，看个人意愿。
 
 - 第二个，是图一当中 “由Hexo驱动” 的Hexo链接，先给删掉防止跳转，如果想跳转当然也可以自己写地址，至于中文一会处理。注意删除的时候格式不能错，只把`<a>...</a>`标签这部分删除即可，留着两个单引号'',否则会出错哦。
 
@@ -738,11 +738,11 @@ border-top-color: #9954bb;
 ### 在文档中增加图标
 
 - <i class="fa fa-pencil"></i>支持Markdown
-<i>Hexo 支持 GitHub Flavored Markdown 的所有功能，甚至可以整合 Octopress 的大多数插件。</i>
+  <i>Hexo 支持 GitHub Flavored Markdown 的所有功能，甚至可以整合 Octopress 的大多数插件。</i>
 - <i class="fa fa-cloud-upload"></i>一件部署
-<i>只需一条指令即可部署到Github Pages，或其他网站</i>
+  <i>只需一条指令即可部署到Github Pages，或其他网站</i>
 - <i class="fa fa-cog"></i>丰富的插件
-<i>Hexo 拥有强大的插件系统，安装插件可以让 Hexo 支持 Jade, CoffeeScript。</i>
+  <i>Hexo 拥有强大的插件系统，安装插件可以让 Hexo 支持 Jade, CoffeeScript。</i>
 
 ```
 - <i class="fa fa-pencil"></i>支持Markdown
@@ -1113,7 +1113,17 @@ npm install hexo-reference --save
 npm install hexo-wordcount --save
 ```
 
+# 主题升级备份
+
+对于升级主题，我们需要重新配置主题配置文件，那么每次升级都要这么干吗？超麻烦！
+
+NexT作者给我们的建议就是使用***[Data Files](https://hexo.io/docs/data-files.html)***，具体详情请戳进 ***[Theme configurations using Hexo data files            #328](https://github.com/iissnan/hexo-theme-next/issues/328)***
+
+
+
+
 # 最后
+
 一路摸爬滚打下来也挺折腾的，不过确实满满的成就感，学到了很多
 同时还要感谢很多很多的大神们的文章，有一些都忘了收藏记录下来，由衷地感谢
 > **参考**

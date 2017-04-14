@@ -10,6 +10,7 @@
     "hexo-admin-qiniu": "^2.1.1",
     "hexo-algolia": "^0.2.0",
     "hexo-baidu-url-submit": "0.0.5",
+    "hexo-all-minifier": "0.0.14",
     "hexo-deployer-git": "^0.2.0",
     "hexo-generator-archive": "^0.1.4",
     "hexo-generator-baidu-sitemap": "^0.1.2",
