@@ -17,6 +17,7 @@ tags: [Ubuntu, IDE]
 至于*注册码*，嘿嘿，度娘你懂的。
 
 # Keyboard shortcuts
+个人感觉Ubuntu下使用IDEA最大的一个难题就是快捷键了，各种没反应，原来是快捷键冲突，本来想改成Eclipse的风格，但想了想好像不太合适。
 
 
 # Plugin
