@@ -26,6 +26,6 @@ Life is a generic method like [ public <T> Life doSomething(T t){} ],T is the pa
 &emsp;&emsp; *[这是项编译后代码，用于部署外网](https://github.com/masteranthoneyd/masteranthoneyd.github.io)*
 
 # About contact
-&emsp;&emsp; email:masteranthoneyd@163.com
+&emsp;&emsp; email:yangbingdong1994@gmail.com
 
 
