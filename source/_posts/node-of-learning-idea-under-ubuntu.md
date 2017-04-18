@@ -16,9 +16,33 @@ tags: [Ubuntu, IDE]
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
 至于*注册码*，嘿嘿，度娘你懂的。
 
-# Keyboard shortcuts
-个人感觉Ubuntu下使用IDEA最大的一个难题就是快捷键了，各种没反应，原来是快捷键冲突，本来想改成Eclipse的风格，但想了想好像不太合适。
+# Setting
+以下是博主个人的配置
+## 修改字体和字号
+Ubuntu下默认的字体还是让人看了有点~~不爽~~，三个地方，分别是窗口字体，代码字体和控制台字体：
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-font.png)
 
+# Keyboard shortcuts
+> JetBrains官方快捷键手册：***[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)***
+
+个人感觉Ubuntu下使用IDEA最大的一个不爽就是**快捷键**了，~~想屎的感觉有木有~~，各种没反应，原来是快捷键冲突，本来想改成Eclipse的风格，但想了想好像不太合适。
+快捷键风格可以在`setting` -> `Keymap` 里面这是，博主使用安装时候idea默认配置的`Default for XWin`。
+先来大致分各类（纯属个人看法= =）：
+
+导航/查找（一般都可以在Navigate里面和Edit的find里面找到）：
+1、查找Java类：`Ctrl+N`
+2、查找非Java文件：`Ctrl+Shift+N`
+3、查找类中的方法或变量：`Ctrl+Shift+Alt+N`
+
+编辑：
+1、复制当前行：`Ctrl+D`
+2、删除当前行：`Ctrl+Y`
+
+重构：
+
+其他：
+1、后退（上次编辑或停留的地方）：`Ctrl+Alt+左箭头`
+2、前进（跟上面相反）：`Ctrl+Alt++右箭头`
 
 # Plugin
 ## 热部署插件JRebel安装与激活
@@ -67,11 +91,11 @@ gsettings set org.gnome.desktop.wm.keybindings begin-move "[]"
 ```
 
 **目前发现的快捷键冲突：**
-1、`ctrl+alt+方向`，直接到系统设置里面改：
+1、`Ctrl+Alt+方向`，直接到系统设置里面改：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
 
-2、安装了搜狗之后，按`ctrl+alt+b`会启动虚拟键盘，所以在输入法里面打开Fcitx设置，在附加组件里面，点击高级，再把虚拟键盘的选项去掉：
+2、安装了搜狗之后，按`Ctrl+Alt+B`会启动虚拟键盘，所以在输入法里面打开Fcitx设置，在附加组件里面，点击高级，再把虚拟键盘的选项去掉：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
 然后注销或重启电脑。
 
-3、`ctrl+alt+s`，同样，键盘里面找到，然后禁用掉。
+3、`Ctrl+Alt+S`，同样，键盘里面找到，然后禁用掉。

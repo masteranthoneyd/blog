@@ -187,6 +187,26 @@ sudo apt-get install fonts-wqy-microhei
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/crossover.png)
 7、如果运行后出现乱码，把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
 
+## 搜狗输入法安装与崩溃处理
+### 安装
+点击下载 Sogou For Linux -> <a id="download" href="http://pinyin.sogou.com/linux/"><i class="fa fa-download"></i><span> Download Now</span>
+</a>
+然后`dpkg -i` 就可以安装了，中间如有冲突就`sudo apt-get -f install`进行修复。
+
+### 搜狗输入法不能输入中文解决（linux下常见软件崩溃问题解决方案） 
+先关闭`fcitx`：
+```bash
+killall fcitx
+killall sogou-qinpanel
+```
+然后**删除搜狗配置文件**，ubuntu下搜狗的配置文件在 ~/.config下的3个文件夹里：
+`SogouPY`、`SogouPY.users`、`sogou-qimpanel`
+删除这3个文件夹，然后重启搜狗：
+```bash
+fcitx
+```
+解决！
+
 ## 安装Git
 上面也提到过安装`git`
 ```
@@ -334,7 +354,7 @@ mv a /usr/share/stardict/dic
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
 ```
-## 按转proxychains
+## proxychains的安装与使用
 安装：
 ```
 sudo apt install proxychains
