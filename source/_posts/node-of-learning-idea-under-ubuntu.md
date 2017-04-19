@@ -17,10 +17,31 @@ tags: [Ubuntu, IDE]
 至于*注册码*，嘿嘿，度娘你懂的。
 
 # Setting
-以下是博主个人的配置
-## 修改字体和字号
-Ubuntu下默认的字体还是让人看了有点~~不爽~~，三个地方，分别是窗口字体，代码字体和控制台字体：
+以下是博主个人的常用配置：
+1、文件修改后，设置左边目录出现颜色变化
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/version-control-change.png)
+2、如果只有一行方法的代码默认要展开，去掉这个勾
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/one-line-methods.png)
+3、修改字体和字号
+Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu默认的字体工具栏可能会出现乱码。
+下面三个地方，分别是窗口字体，代码字体和控制台字体：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-font.png)
+4、修改VM参数
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
+通过`Toolbox`可以简单地设置VM参数，博主16G内存的主机的VM参数设置为
+```
+-Xms512m
+-Xmx1500m
+-XX:ReservedCodeCacheSize=500m
+```
+5、设置代码不区分大小写
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
+6、自动导包
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-auto-import.png)
+第一个钩：IntelliJ IDEA 将在我们书写代码的时候自动帮我们优化导入的包，比如自动去掉一些没有用到的包。
+第二个钩：IntelliJ IDEA 将在我们书写代码的时候自动帮我们导入需要用到的包。但是对于那些同名的包，还是需要手动Alt + Enter 进行导入的，IntelliJ IDEA 目前还无法智能到替我们做判断。
+7、设置不自动打开上一次最后关闭的项目
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
 # Keyboard shortcuts
 > JetBrains官方快捷键手册：***[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)***
@@ -98,4 +119,15 @@ gsettings set org.gnome.desktop.wm.keybindings begin-move "[]"
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
 然后注销或重启电脑。
 
-3、`Ctrl+Alt+S`，同样，键盘里面找到，然后禁用掉。
+3、`Ctrl+Alt+S`，这个在键盘设置里面找了很久，原来这玩意在输入法设置里面，点开输入法全局配置，把**显示高级选项**钩上，就会看到很多快捷键，我都把它们干掉了。
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/shurufa.png)
+
+
+
+
+
+
+
+
+
+
