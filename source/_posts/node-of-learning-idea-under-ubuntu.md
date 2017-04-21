@@ -6,7 +6,7 @@ tags: [Ubuntu, IDE]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/java/idea.png)
 # Preface
-> 公司里的大牛们用的IDE基本都是IDEA，~~所为近墨者黑~~早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用IDEA就要被OUT了，此篇把IDEA的学习经验记录下来，以便日好老了记性不好方便查看...
+> 公司里的大牛们用的IDE基本都是IDEA，~~所为近墨者黑~~早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用IDEA就要被OUT了，此篇把IDEA的学习经验记录下来，以便老了记性不好方便查看...
 
 
 <!--more-->
