@@ -289,7 +289,7 @@ baidu_analytics: e9505ac4e11d464329d615553a72b526
 
 # Duoshuo
 ## duoshuo_shortname: {duoshuo_shortname}
-duoshuo_shortname: ookamiantd
+## duoshuo_shortname: ookamiantd
 
   
 
@@ -298,10 +298,7 @@ duoshuo_shortname: ookamiantd
 duoshuo_hotartical: false
 
 # Disqus
-disqus:
-  enable: false
-  shortname:
-  count: true
+disqus_shortname: ookamiantd
 
 # Declare license on posts
 post_copyright:

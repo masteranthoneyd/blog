@@ -4,13 +4,13 @@ date: 2017-04-17 18:00:00
 categories: IDE
 tags: [Ubuntu, IDE]
 ---
+![](http://ojoba1c98.bkt.clouddn.com/img/java/idea.png)
 # Preface
-> 使用IDEA
+> 公司里的大牛们用的IDE基本都是IDEA，~~所为近墨者黑~~早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用IDEA就要被OUT了，此篇把IDEA的学习经验记录下来，以便日好老了记性不好方便查看...
 
 
 <!--more-->
 # Install
-
 博主采用***[Toolbox App](https://www.jetbrains.com/toolbox/app/)*** 方式安装，方便管理更新。
 安装的时候注意**配置安装路径**：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-path.png)

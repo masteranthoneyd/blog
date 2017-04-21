@@ -14,6 +14,41 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 <!--more-->
 # 高度定制优化篇
 
+## 博客更换Disqus评论
+由于多说即将关闭，本站启用Disqus。
+既然Disqus已被墙，那么为了对没有梯子的同学标示友好，我们可以选择点击加载Disqus评论的方式，这个问题貌似也得到了主题作者的关注-> ***(NexT5.2.0)[https://github.com/iissnan/hexo-theme-next/milestone/7]***
+具体做法如下：
+打开`themes/next/layout/_partials/comments.swig`，在文件内容 `<div id="disqus_thread">`前面加入下面内容：
+```
+<div style="text-align:center;">
+  <button class="btn" id="load-disqus" onclick="disqus.load();">加载 Disqus 评论</button>
+</div>
+```
+再打开`themes/next/layout/_scripts/third-party/comments/disqus.swig`，需要替换原本的 Disqus 的加载的内容，如果希望显示评论数量，就保留 run_disqus_script('count.js') 这一行，这样页面载入时还会加载 disqus 的资源：
+```
+run_disqus_script('count.js');
+{% if page.comments %}
+  run_disqus_script('embed.js');
+{% endif %}
+```
+替换为下面的内容：
+```
+var disqus = {
+  load : function disqus(){
+      if(typeof DISQUS !== 'object') {
+        (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+        $('#load-disqus').remove(); ///加载后移除按钮
+      }
+  }
+}
+```
+前面的 `function run_disqus_script(disqus_script){} `这一段，不打算显示评论数量的话，可以一起删掉，不显示评论数量的话，那么点击加载按钮之前，网页是不会加载来自 Disqus 的资源的。
+
 ## 修改文章页宽
 打开`themes/next/source/css/_variables/base.styl`，找到以下字段并修改为合适的宽度：
 ```

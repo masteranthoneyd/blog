@@ -17,19 +17,16 @@
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
       }
 
-      var disqus = {
-  load : function disqus(){
-      if(typeof DISQUS !== 'object') {
-        (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-        }());
-        $('#load-disqus').html("评论加载中，请确保你有梯子...").fadeOut(5000); ///加载后移除按钮
-      }
-  }
-}
+      run_disqus_script('count.js');
+
+      {% if page.comments %}
+        var disqus_config = function () {
+            this.page.url = disqus_url;
+            this.page.identifier = disqus_identifier;
+            this.page.title = disqus_title;
+        };
+        run_disqus_script('embed.js');
+      {% endif %}
 
     </script>
   {% endif %}
