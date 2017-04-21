@@ -125,62 +125,7 @@ $code-border-radius             = 4px
 我们在`/themes/hexo-theme-next/layout/_macro/`目录下新建`post-article.swig`,把这些`post.swig`中的内容复制过去，而且加上上面的统计代码，然后在`/themes/hexo-theme-next/layout/post.swig`上面`% import '_macro/post.swig' as post_template %`中的`post.swig`改成`post-article.swig`，这样子就解决啦。就是在主页上的博客名字下面不会有阅读人数，进入博客才能看见
 
 ## 添加最近访客
-往你想添加的页面增加下面的一小段代码即可
-```
-<div class="ds-recent-visitors" data-num-items="28" data-avatar-size="42" id="ds-recent-visitors"></div>
-```
-其中
-```
-class=“ds-recent-visitors”    //指定显示最近访客容器
-data-num-items=“28”    //显示最近访客的数量
-data-avatar-size=“42”    //显示最近访客头像尺寸大小
-id=“ds-recent-visitors”    //为了调节最近访客样式加的
-```
-直接生成`guestbook`的`page`，然后直接在`/guestbook/`目录下的`index.md`添加了上面那段代码实现的
-
-**修改hexo最近访客样式**
-```
-#ds-reset .ds-avatar img,
-#ds-recent-visitors .ds-avatar img {
-width: 54px;
-height: 54px;     /*设置图像的长和宽，这里要根据自己的评论框情况更改*/
-border-radius: 27px;     /*设置图像圆角效果,在这里我直接设置了超过width/2的像素，即为圆形了*/
--webkit-border-radius: 27px;     /*圆角效果：兼容webkit浏览器*/
--moz-border-radius: 27px;
-box-shadow: inset 0 -1px 0 #3333sf;     /*设置图像阴影效果*/
--webkit-box-shadow: inset 0 -1px 0 #3333sf;
--webkit-transition: 0.4s;
--webkit-transition: -webkit-transform 0.4s ease-out;
-transition: transform 0.4s ease-out;     /*变化时间设置为0.4秒(变化动作即为下面的图像旋转360读）*/
--moz-transition: -moz-transform 0.4s ease-out;
-}
-
-#ds-reset .ds-avatar img:hover,
-#ds-recent-visitors .ds-avatar img:hover {
-
-/*设置鼠标悬浮在头像时的CSS样式*/    box-shadow: 0 0 10px #fff;
-rgba(255, 255, 255, .6), inset 0 0 20px rgba(255, 255, 255, 1);
--webkit-box-shadow: 0 0 10px #fff;
-rgba(255, 255, 255, .6), inset 0 0 20px rgba(255, 255, 255, 1);
-transform: rotateZ(360deg);     /*图像旋转360度*/
--webkit-transform: rotateZ(360deg);
--moz-transform: rotateZ(360deg);
-}
-
-#ds-thread #ds-reset .ds-textarea-wrapper textarea {
-background: url(http://ww4.sinaimg.cn/small/649a4735gw1et7gnhy5fej20zk0m8q3q.jpg) right no-repeat;
-}
-
-#ds-recent-visitors .ds-avatar {
-float: left
-}
-/*隐藏多说底部版权*/
-#ds-thread #ds-reset .ds-powered-by {
-display: none;
-}
-
-```
-通过`多说后台管理>设置>基本设置>自定义CSS`修改最近访客css样式
+**多说评论关闭**
 
 ## 添加Fork me on GitHub
 去网址*[https://github.com/blog/273-github-ribbons](https://github.com/blog/273-github-ribbons)*挑选自己喜欢的样式，并复制代码，添加到`themes\next\layout\_layout.swig`的`body`标签之内即可
