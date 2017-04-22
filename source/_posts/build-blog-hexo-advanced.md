@@ -347,7 +347,7 @@ npm install hexo-wordcount --save
 修改之后的样子大概是这样的：
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/result.png)
 
-1、找到 \themes\next\layout\_partials\下面的footer.swig文件，打开会发现，如下图的语句：
+1、找到 \themes\next\layout\partials\下面的footer.swig文件，打开会发现，如下图的语句：
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/footer.png)
 
 - 第一个框 是下面侧栏的“日期❤ XXX”

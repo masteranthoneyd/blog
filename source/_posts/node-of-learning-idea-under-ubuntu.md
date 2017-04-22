@@ -6,7 +6,7 @@ tags: [Ubuntu, IDE]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/java/idea.png)
 # Preface
-> 公司里的大牛们用的IDE基本都是IDEA，~~所为近墨者黑~~早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用IDEA就要被OUT了，此篇把IDEA的学习经验记录下来，以便老了记性不好方便查看...
+> 公司里的大牛们用的IDE基本都是IDEA，~~所为近墨者黑~~早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用IDEA就要被OUT了，此篇把IDEA的学习经验记录下来，以便老了记性不好可以看一看...
 
 
 <!--more-->
@@ -43,6 +43,15 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 7、设置不自动打开上一次最后关闭的项目
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
+8、Postfix Completion
+这个本来就是默认开启的
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/postfix-completion.png)
+
+9、可生成SreializableID
+在 `setting>Editor>Inspections>Java>Serializtion Issues>`:
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
+钩上之后在需要生成的类上`Alt+Enter`就会出现了。
+
 # Keyboard shortcuts
 > JetBrains官方快捷键手册：***[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)***
 
@@ -50,16 +59,47 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 快捷键风格可以在`setting` -> `Keymap` 里面这是，博主使用安装时候idea默认配置的`Default for XWin`。
 先来大致分各类（纯属个人看法= =）：
 
-导航/查找（一般都可以在Navigate里面和Edit的find里面找到）：
-1、查找Java类：`Ctrl+N`
-2、查找非Java文件：`Ctrl+Shift+N`
-3、查找类中的方法或变量：`Ctrl+Shift+Alt+N`
+## 导航（一般都可以在Navigate里面找到）
 
-编辑：
-1、复制当前行：`Ctrl+D`
-2、删除当前行：`Ctrl+Y`
+| Keyboard shortcut           | Declaration    |
+| :-------------------------- | :------------- |
+| **Ctrl+N**                  | 查找Java类        |
+| **Ctrl+Shift+N**            | 查找非Java文件      |
+| **Ctrl+Shift+Alt+N**        | 查找类中的方法或变量     |
+| **Double Shift**            | 查找所有           |
+| **Ctrl+Alt+Left/Right**     | 跳到光标的上/下一个位置   |
+| **F2/Shift+F2**             | 光标移动到下/上一个错误   |
+| **Ctrl+Shift+Backspace**    | 跳到上一个编辑处       |
+| **Ctrl+Alt+B**              | 跳到实现类/方法       |
+| **Ctrl+U**                  | 跳到父类/方法        |
+| **Alt+Up/Down**             | 光标移动到上/下一个方法   |
+| **Ctrl+F12**                | 搜索当前文件方法       |
+| **Ctrl+Shift+H/Ctrl+Alt+H** | 显示类/方法调用层级     |
+| **F11/Shift+F11**           | 当前行设置书签/显示所有书签 |
+| **Ctrl+Shift+Backspace**    | 跳到上一个编辑处       |
 
-重构：
+## 查找/替换（一般在Edit的find里面）
+
+| Keyboard shortcut | Declaration |
+| :---------------- | :---------- |
+| **Ctrl+F**        | 文件内查找       |
+| **Ctrl+R**        | 文件内替换       |
+| **F3/Shift+F3**   | 查找下/上一个     |
+| **Ctrl+Shift+F**  | 目录内查找       |
+| **Ctrl+Shift+R**  | 目录内替换       |
+| **Ctrl+F7**       | 查找当前文件中的使用处 |
+| **Alt+F7**        | 查找被使用处      |
+| **Ctrl+Alt+F7**   | 显示被使用处      |
+
+
+## 编辑
+
+1、基本代码补全：`Ctrl+Space`
+2、复制当前行：`Ctrl+D`
+3、删除当前行：`Ctrl+Y`
+4、显示注释文档
+
+## 重构：
 
 其他：
 1、后退（上次编辑或停留的地方）：`Ctrl+Alt+左箭头`
