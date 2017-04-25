@@ -8,10 +8,10 @@ tags:
 > 我们经常会有「把本机开发中的 web 项目给朋友看一下」或「测试一下支付宝、微信的支付功能」这种临时需求，为此**专门**购买个域名然后在 VPS或云主机 上**部署一遍**就有点太**浪费**了。那么这时候，**ngrok**就是个很好的东西，它可以实现我们的这种需求。而且 ngrok 官网本身还提供了公共服务，只需要注册一个帐号，运行它的客户端，就可以快速把内网映射出去。不过这么好的服务，没多久就被**墙**了~幸好ngrok是**开源**的，那么我们可以自己搭建一个ngrok！
 
 <!--more-->
-# 一、安装GO环境
+# 安装GO环境
 ```shell
 apt-get update
-apt-get install build-essential mercurial git
+apt-get -y install build-essential mercurial git
 wget https://storage.googleapis.com/golang/go1.8.1.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.8.1.linux-amd64.tar.gz
 mkdir $HOME/go
@@ -21,16 +21,16 @@ echo 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin' >> ~/.bashrc
 source $HOME/.bashrc
 ```
 
-# 二、安装Ngrok
+# 安装Ngrok
 ```shell
 cd /usr/local/src/
 git clone https://github.com/tutumcloud/ngrok.git ngrok
 export GOPATH=/usr/local/src/ngrok/
-export NGROK_DOMAIN="ngrok.yangbingdong.com"
 ```
 生成自签名SSL证书，ngrok为ssl加密连接：
 ```shell
 cd ngrok
+NGROK_DOMAIN="ngrok.yangbingdong.com"
 openssl genrsa -out rootCA.key 2048
 openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=$NGROK_DOMAIN" -days 5000 -out rootCA.pem
 openssl genrsa -out device.key 2048
@@ -67,14 +67,15 @@ scp -P26850 ~/ngrokbuild.sh root@45.78.26.212:/root
 
 # 下载客户端
 ```shell
-scp -P33033 root@45.78.26.212:/usr/local/src/ngrok/bin/ngrok ~/
+scp -P 26850 root@45.78.26.212:/usr/local/src/ngrok/bin/ngrok ~/
 ```
 
 # 开机启动
 ```shell
 vim /etc/init.d/ngrok_start:
-cd /root/goproj/src/github.com/inconshreveable
-./bin/ngrokd -tlsKey=server.key -tlsCrt=server.crt -domain="tunnel.imike.me" -httpAddr=":8081" -httpsAddr=":8082"
+cd /usr/local/src/ngrok/bin
+./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8080" -httpsAddr=":8081" -tunnelAddr=":443"
+
 chmod 755 /etc/init.d/ngrok_start
 ```
 
@@ -87,6 +88,7 @@ trust_host_root_certs: false
 ```
 ./ngrok -subdomain ybd -proto=http -config=ngrok.cfg 80
 ```
+其中`ybd`是自定义的域名前缀，`http`是协议，`ngrok.cfg`是上面创建的配置文件，`80`是本地需要映射到外网的端口。
 
 # Nginx添加server
 ```
@@ -130,6 +132,11 @@ go-bindata被安装到了$GOBIN下了，go编译器找不到了。修正方法�
 
 $cp /home/ubuntu/.bin/go14/bin/go-bindata ./bin
 ```
+
+# Shell
+source命令与shell scripts的区别是：
+我们在test.sh设置了AA环境变量，它只在fork出来的这个子shell中生效，子shell只能继承父shell的环境变量，而不能修改父shell的环境变量，所以test.sh结束后，父进程的环境就覆盖回去。
+source在当前bash环境下执行命令，而scripts是启动一个子shell来执行命令。这样如果把设置环境变量（或alias等等）的命令写进scripts中，就只会影响子shell,无法改变当前的BASH,所以通过文件（命令列）设置环境变量时，要用source 命令。
 
 
 
