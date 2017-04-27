@@ -1,6 +1,6 @@
 ---
 title: VPS自搭建Ngrok内网穿透服务
-date: 2017-04-24 18:44:20
+date: 2017-04-26 18:44:20
 categories: [VPS]
 tags: [VPS,Ngrok]
 ---
@@ -17,6 +17,7 @@ tags: [VPS,Ngrok]
 # 服务端安装
 ## 安装GO环境
 > 这里博主选择通过下载最新版解压安装。
+
 ```shell
 apt-get update
 apt-get -y install build-essential mercurial git
@@ -52,12 +53,12 @@ make clean
 make release-server release-client
 ```
 注意：**上面的`ngrok.yangbingdong.com`换成自己的域名**。
-如果是32位系统,`GOARCH=386`; 如果是64为系统，`GOARCH=amd64`
-如果要编译linux,`GOOS=linux`;如果要编译window,`GOOS=windows`
+* 如果是32位系统,`GOARCH=386`; 如果是64为系统，`GOARCH=amd64`
+* 如果要编译linux,`GOOS=linux`;如果要编译window,`GOOS=windows`
 
 ## 启动server
 ```shell
-cd /usr/local/src/ngrok/bin && ./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8010" -httpsAddr=":8011" -tunnelAddr=":4000"
+cd /usr/local/src/ngrok/bin && ./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8002" -httpsAddr=":8003" -tunnelAddr=":4000"
 ```
 **`ngrok.yangbingdong.com`换成自己的域名**。其他端口可自己配置。
 顺利的话，可以正常编译，在`bin`下面可以看到「ngrokd」和「ngrok」，其中「ngrokd」是服务端执行程序，「ngrok」是客户端执行程序
@@ -65,7 +66,7 @@ cd /usr/local/src/ngrok/bin && ./ngrokd -domain="ngrok.yangbingdong.com" -httpAd
 
 ## 后台运行：
 ```shell
-cd /usr/local/src/ngrok/bin && nohup ./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8010" -httpsAddr=":8011" -tunnelAddr=":4000"  > /dev/null 2>&1 &
+cd /usr/local/src/ngrok/bin && nohup ./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8002" -httpsAddr=":8003" -tunnelAddr=":4000"  > /dev/null 2>&1 &
 ```
 
 ```shell
@@ -81,7 +82,7 @@ ctrl+A+D
 ```shell
 vim /etc/init.d/ngrok_start:
 cd /usr/local/src/ngrok/bin
-./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8010" -httpsAddr=":8011" -tunnelAddr=":4000"
+./ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8002" -httpsAddr=":8003" -tunnelAddr=":4000"
 
 chmod 755 /etc/init.d/ngrok_start
 ```
@@ -92,8 +93,6 @@ chmod 755 /etc/init.d/ngrok_start
 scp -P 26850 root@12.34.56.78:/usr/local/src/ngrok/bin/ngrok ~/
 ```
 **将`12.34.56.78`换成自己的VPS ip**。
-![](http://ojoba1c98.bkt.clouddn.com/ngrok-client-startup.png)
-
 
 ## 启动客户端
 写一个简单的配置文件，随意命名如 ngrok.cfg：
@@ -103,18 +102,56 @@ trust_host_root_certs: false
 ```
 然后启动：
 ```
-./ngrok -subdomain ybd -proto=http -config=ngrok.cfg 8080
+./ngrok -subdomain ybd -config=ngrok.cfg 8080
 ```
-其中`ybd`是自定义的域名前缀，`http`是协议，`ngrok.cfg`是上面创建的配置文件，`8080`是本地需要映射到外网的端口。
-没有意外的话访问`ybd.ngrok.yangbingdong.com:8010`就会映射到本机的`8080`端口了。
+其中`ybd`是自定义的域名前缀，`ngrok.cfg`是上面创建的配置文件，`8080`是本地需要映射到外网的端口。
+没有意外的话访问`ybd.ngrok.yangbingdong.com:8002`就会映射到本机的`8080`端口了。
+![](http://ojoba1c98.bkt.clouddn.com/ngrok-client-startup01.png)
+
+控制台：
+
+就是上图的`Web Interface`，通过这个界面可以看到远端转发过来的 http 详情，包括完整的 request/response 信息，相当于附带了一个抓包工具。
+
+
+
+另外，Ngrok支持多种协议，启动的时候可以指定通过`-proto`指定协议，例如：
+
+**http协议**：
+
+```shell
+./ngrok -subdomain ybd -config=ngrok.cfg -proto=http 8080
+```
+
+**tcp协议**：
+
+```shell
+./ngrok -subdomain ybd -config=ngrok.cfg -proto=tcp 8080
+```
+
+应该会看到：
+
+```shell
+ngrok                                               (Ctrl+C to quit)
+
+Tunnel Status                 online
+Version                       1.7/1.7
+Forwarding                    tcp://ybd.ngrok.yangbingdong.com:8002-> 127.0.0.1:8080
+Web Interface                 127.0.0.1:4040
+# Conn                        0
+Avg Conn Time                 0.00ms
+
+```
+
+
 
 # Nginx添加server
+
 虽然可以访问，但是带着端口就让人不舒服，80端口又被Nginx占用，那么可以用过Nginx反向代理Ngrok。
-Nginx的配置一般在`/etc/nginx`或者`/usr/local/nginx`里面：
+Nginx的配置一般在`/etc/nginx/conf.d`或者`/usr/local/nginx/conf.d`里面：
 ```
 #ngrok.yangbingdong.com.conf
 upstream ngrok {
-    server 127.0.0.1:8002; # 此处端口要跟 启动服务端ngrok时指定的端口一致
+    server 127.0.0.1:8002;
     keepalive 64;
 }
 
@@ -122,22 +159,36 @@ server {
     listen 80;
     server_name *.ngrok.yangbingdong.com;
     access_log /var/log/nginx/ngrok_access.log;
+    proxy_set_header "Host" $host:8002;
     location / {
-        proxy_set_essay-header X-Real-IP $remote_addr;
-        proxy_set_essay-header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_essay-header Host  $http_host:8002; #此处端口要跟 启动服务端ngrok 时指定的端口一致
-        proxy_set_essay-header X-Nginx-Proxy true;
-        proxy_set_essay-header Connection "";
-        proxy_pass      http://ngrok;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host:8002;
+        proxy_pass_header Server;
+        proxy_redirect off;
+        proxy_pass      http://127.0.0.1:8002;
 
     }
-
+    access_log off;
+    log_not_found off;
 }
 ```
+
 
 重启Nginx：
 ```shell
 nginx -s reload 
+```
+# 维护脚本
+在网上看到的某大神写的维护脚本：
+
+```shell
+wget https://gist.githubusercontent.com/IvanChou/1be8b15b1b41bf0ce2e9d939866bbfec/raw/1a2445599fe7fd706505a6e103a9dc60b4d3a0ed/ngrokd -O ngrokd
+
+##修改 脚本中的配置
+vi ngrokd
+
+chomd +x ngrokd
+sudo mv ngrokd /etc/init.d/ngrokd
 ```
 
 # 常见错误
@@ -159,7 +210,7 @@ $cp /home/ubuntu/.bin/go14/bin/go-bindata ./bin
 ```
 
 # 遇到的问题：source与./
-写了一个Ngrok的安装脚本，然后`chmod +x ngrok-installation.sh`赋权，再`./ngrok-installation.sh`执行。
+写了一个Ngrok的***[安装脚本](https://github.com/masteranthoneyd/about-shell/blob/master/ngrok-installation.sh)***，然后`chmod +x ngrok-installation.sh`赋权，再`./ngrok-installation.sh`执行。
 但是遇到了一个奇怪的问题：在脚本里面设置了环境变量并source让其生效，然而出现的结果是由于**没有加载**到环境变量导致找不到命令，百思不得解，Google了一把，发现了原因：
 >`source`命令与`shell scripts`的区别是：
 >我们在test.sh设置了AA环境变量，它只在fork出来的这个子shell中生效，子shell只能继承父shell的环境变量，而不能修改父shell的环境变量，所以test.sh结束后，父进程的环境就覆盖回去。

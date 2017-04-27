@@ -1,14 +1,15 @@
 ---
-title: Nginx菜鸟指南(安装与简单配置)
-date: 2017-04-26 16:56:15
+title: NGINX初学指南(安装与简单配置)
+date: 2017-04-24 16:56:15
 categories: [Nginx]
 tags: [VPS,Nginx]
 ---
+![](http://ojoba1c98.bkt.clouddn.com/NGINX.png)
 # 前言
-> 走上了VPS这条不归路，就意味着需要会维护以及运营自己的服务器。那么这一章记录一下学习Nginx的一些东西...
+> 走上了VPS这条~~不归路~~，就意味着需要会维护以及运营自己的服务器。那么这一章记录一下学习Nginx的一些东西...
 > 本文绝大部分内容来自NGINX 网站的官方手册：
-> [https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/](https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/)
-> [http://nginx.org/en/docs/beginners_guide.html](http://nginx.org/en/docs/beginners_guide.html)
+> ***[https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/](https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/)***
+> ***[http://nginx.org/en/docs/beginners_guide.html](http://nginx.org/en/docs/beginners_guide.html)***
 
 <!--more-->
 # 安装NGINX部分
@@ -41,7 +42,8 @@ cd /usr/local/src && wget http://zlib.net/zlib-1.2.11.tar.gz && tar -zxf zlib-1.
 ```
 
 3、***[OpenSSL](https://www.openssl.org/)*** 库：被 NGINX SSL 模块需求用以支持 HTTPS 协议：
-这里博主并不选择源码安装=.=，而是通过apt安装：
+> 这里博主并不选择源码安装=.=，而是通过apt安装：
+
 ```shell
 apt-get install -y libssl0.9.8 libssl-dev openssl
 ```
@@ -221,8 +223,8 @@ make && make install
 到此NGINX已经安装完成，但是，此时直接敲`nginx`可能会显示没有找到命令，因为**还没有配置环境变量**：
 ```shell
 touch /etc/profile.d/nginx.sh
-echo PATH=$PATH:/usr/local/nginx/sbin >> /etc/profile.d/nginx.sh
-echo export PATH >> /etc/profile.d/nginx.sh
+echo "PATH=$PATH:/usr/local/nginx/sbin" >> /etc/profile.d/nginx.sh
+echo "export PATH" >> /etc/profile.d/nginx.sh
 source /etc/profile.d/nginx.sh
 ```
 完成！查看NGINX:
@@ -236,8 +238,8 @@ nginx -v
 
 ### 添加源
 ```shell
-echo deb http://nginx.org/packages/ubuntu/ trusty nginx >> /etc/apt/sources.list
-echo deb-src http://nginx.org/packages/ubuntu/ trusty nginx >> /etc/apt/sources.list
+echo "deb http://nginx.org/packages/ubuntu/ trusty nginx" >> /etc/apt/sources.list
+echo "deb-src http://nginx.org/packages/ubuntu/ trusty nginx" >> /etc/apt/sources.list
 ```
 
 ### 更新并导入升级Key完成安装
@@ -249,6 +251,163 @@ wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key &&
 ```shell
 nginx -V
 ```
+
+# NGINX初学
+## 启动，停止和重新加载配置
+```shell
+nginx -s stop|quit|reload|reopen
+```
+
+也可以是这样：
+```shell
+kill -s QUIT 1888 #1888是nginx的PID
+```
+要获取全部正在运行中的 nginx 进程列表，可以使用 ps 工具，就像下面这样：
+```shell
+ps -ax | grep nginx
+```
+如果要了解更多的有关信号发送的信息，请查看***[控制nginx](http://nginx.org/en/docs/control.html)***。
+
+
+
+## 配置文件的结构
+
+nginx 由被配置文件指定的指令控制的模块组成。指令被分为简单指令和块指令。简单指令有名称和参数组成，通过空格来分隔开，以 `;` 号来结束。块指令拥有和简单指令一样的结构，但是不用 `;` 结束而是使用一组被 `{}` 环绕的额外指令。如果一个块指令在其内部包含了其他指令，则被称为上下文（context），比如：***[events](http://nginx.org/en/docs/ngx_core_module.html#events)***,***[http](http://nginx.org/en/docs/http/ngx_http_core_module.html#http)***,***[server](http://nginx.org/en/docs/http/ngx_http_core_module.html#server)*** 和***[location](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)***。
+
+被放置在配置文件中却不在任何上下文中的指令被认为是在主上下文之内的。`events` 和 `http` 指令就属于主上下文， `server` 在 `http` 之内，`location` 在 `server` 之内。
+
+单行之中在 `#` 号之后的剩余内容被认为是注释。
+
+
+
+## 静态内容服务
+
+一个重要的 web 服务器任务就是提供文件（比如图片或者静态 HTML 页面）。你将会实现一个例子，依赖于 request 请求，文件将被从不同的本地目录（/data/www 和 /data/images）中提供。这需要编辑配置文件并在 `http` 块之内使用两个 `location` 块来设置一个 `server` 块。
+
+首先，创建 `/data/www` 目录并且将一个名为 `index.html` 文件放进去，然后在创建一个 `/data/images` 目录并放置一些图片在里面。
+
+接下来，打开配置文件。默认的配置文件已经包含了一些 `server` 块的例子，通常都被注释掉了。那么现在，注释掉全部块并且编写一个新的 `server`块吧：
+
+```shell
+http {
+    server {
+    }
+}
+```
+
+通常地，配置文件可能包含了一些 `server` 块，通过***[监听](http://nginx.org/en/docs/http/ngx_http_core_module.html#listen)***端口和***[服务器名字](http://nginx.org/en/docs/http/server_names.html)***来***[区分](http://nginx.org/en/docs/http/request_processing.html)***。一旦 nginx 决定哪个服务处理请求，将会试着添加以下 `location` 块到 `server` 块中：
+
+```shell
+location / {
+    root /data/www;
+}
+```
+
+这个 `location` 块说明了 `/` 前缀和请求中的 URI 进行比较。对于匹配的请求，URI 将会被添加到被 [root](http://nginx.org/en/docs/http/ngx_http_core_module.html#root) 指令说明的路径中去，就是到 `/data/www` 中，形成一个在本地文件系统中的请求文件路径。如果有多个匹配了 `location` 的块，nginx 会**选择前缀最长的那个**。上面的那个 `location` 块是最短的前缀，长度只有 1，所以只有其他 `location` 块匹配都失败了，这个块才会被使用。
+
+接下来，添加第二个 `location` 块：
+
+```
+location /images/ {
+    root /data;
+}
+```
+
+这将匹配以 `/images/` 开始的请求（location / 也会匹配这个请求，但他的前缀最短）。
+
+最终 `server` 块的配置看起来是像下面这样的：
+
+```
+server {
+    location / {
+        root /data/www ;
+    }
+
+    location /iamges/ {
+        root /data;
+    }
+}
+```
+
+配置一个监听标准 80 端口并且可在本机访问的服务器的工作就是这样了。在响应使用以 `/images/` 为开头的 URI 的请求中，服务器会从 `/data/images` 目录中中发送文件。例如，在响应 `http://localhost/images/example.png` 的请求中，nginx 会发送 `/data/images/exmaple.png` 文件。如果这个文件不存在，nginx 会发送一个  404 错误的响应。URI 不以 `/images/` 开头的请求将被映射到 `/data/www` 目录中。例如，在响应 `http://localhost/some/example.html` 的请求中，nginx 将发送 `/data/www/some/example.html` 文件。
+
+要想应用新的配置，请启动 nginx（如果还没启动的话）或者发送 `reload` 信号到 nginx 主进程，通过执行如下命令：
+
+```
+nginx -s reload
+```
+
+> 本例中，有些不会像期望中的那样工作，你可以在 `access.log` 和 `error.log` 文件中尝试找到原因，这些文件的位置在 `/usr/local/nginx/logs` 或 `/var/log/nginx` 中。
+
+
+
+## 设置一个简单的代理服务器
+
+nginx 的一个频繁的用法是被设置作为代理服务器，这意味着接收请求的服务器，通过他们到被代理的服务器，再通过他们取回相应，并且通过他们发送给客户端。
+
+下面我们来配置一个基本的代理服务器，来为本地图片请求提供服务并将其他请求转到被代理的服务器上。本例中，两个服务器将被定义在一个 nginx 实例中。
+
+首先，通过增加一个 `server` 块到 nginx 配置文件的方式定义被代理的服务，配置内容如下：
+
+```
+server {
+    listen 8080;
+    root /data/up1;
+
+    location / {
+    }
+}
+```
+
+这是一个监听 8080 端口并且映射全部请求到本地 `/data/up1` 目录的简单服务器。创建这个目录并放一个 `index.html` 在里面。注意， `root` 指令被放置在 `server` 上下文中，这样的 `root` 指令被用在当 `location` 块被选中提供服务的时候。
+
+接下来，使用上一节的服务器配置并修改为一个代理服务器的配置。在第一 `location` 块中，放入使用由协议，名字以及被代理服务器的端口描述的参数的 `proxy_pass` 指令（在我们的例子中，就是 http://localhost:8080）：
+
+```
+server {
+    localtion / {
+        proxy_pass http://localhost:8080;
+    }
+    localtion /images/ {
+        root /data;
+    }
+}
+```
+
+我们将修改第二个 `location` 块，它当前使用 `/images/` 前缀来映射请求到 `/data/images/` 下的文件，我们现在想要让他匹配一些典型的图片类型扩展名的请求。修改后的 `localtion` 块看起来像这样的：
+
+```
+localtion ~ \.(gif|jpg|png)$ {
+    root /data/images;
+}
+```
+
+参数是匹配了全部以 `.gif` `.jpg` `.png` 结尾的 URI 的正则表达式。一个正则表达式应被 `~` 开始。这样，相关的请求就会被映射到 `/data/images/` 目录中了。
+
+当 nginx 选取一个 `localtion` 块来为请求提供服务的时候，首先要检查 `location` 指令说明的前缀，**记住最长前缀**的 `location`，**然后再检查正则表达式**。如果匹配了一个正则表达式，nginx 挑出这个 `localtion`，否则，它就会挑选之前被记录的。
+
+代理服务器的配置结果看起来将会是下面这样：
+
+```
+server{
+    location / {
+        proxy_pass http://localhost:8080/;
+    }
+    localtion ~ \.(gif|jpg|png)$ {
+        root /data/images;
+    }
+}
+```
+
+这个服务器将过滤以 `.gif` `.jpg` `.png` 结尾的请求，并映射他们到 `/data/images` 目录（通过添加 URI 到 `root` 指令的参数），还会传递其他请求到被之前配置的被代理服务器上。
+
+要应用新配置，要像前面章节提到的发送 `reload` 信号给 nginx。
+
+这里有***[更多](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)***的可能更加有用的配置代理连接的指令。
+
+
+
+
 
 # 最后
 > 参考：
