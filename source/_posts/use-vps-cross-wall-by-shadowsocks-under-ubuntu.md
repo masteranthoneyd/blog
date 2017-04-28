@@ -318,6 +318,9 @@ proxychains firefox
 使用`shadowsocks`+`proxychains`代理打开新的firefox实现浏览器翻墙。 
 也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个shell运行的所有命令都将使用代理。
 
+# ShadowSocks优化
+***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
+
 # 黑科技系列
 ## FinalSpeed
 ***[91yun发布的finalspeed一键安装包](https://www.91yun.org/archives/2775)***
@@ -326,6 +329,7 @@ proxychains firefox
 ***[锐速破解版linux一键自动安装包](https://www.91yun.org/archives/683)***
 
 ## Google BBR
+BBR 目的是要尽量跑满带宽, 并且尽量不要有排队的情况, 效果并不比速锐差。
 ***[Centos/Ubuntu/Debian BBR加速一键安装包](https://www.91yun.org/archives/5174)***
 
 ## Kcptun

@@ -165,7 +165,7 @@ server {
         proxy_set_header Host $host:8002;
         proxy_pass_header Server;
         proxy_redirect off;
-        proxy_pass      http://127.0.0.1:8002;
+        proxy_pass  http://ngrok;
 
     }
     access_log off;

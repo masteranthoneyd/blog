@@ -45,7 +45,8 @@ cd /usr/local/src && wget http://zlib.net/zlib-1.2.11.tar.gz && tar -zxf zlib-1.
 > 这里博主并不选择源码安装=.=，而是通过apt安装：
 
 ```shell
-apt-get install -y libssl0.9.8 libssl-dev openssl
+apt-get upgrade
+apt-get install -y libssl-dev openssl
 ```
 ### 下载源码
 NGINX 同时提供了稳定版本和主干版本的源码文件。源码文件可以从 NGINX Open Source 下载页面下载：
