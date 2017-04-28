@@ -245,7 +245,7 @@ echo "deb-src http://nginx.org/packages/ubuntu/ trusty nginx" >> /etc/apt/source
 
 ### 更新并导入升级Key完成安装
 ```shell
-wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key && apt-get update && apt-get install nginx
+wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key && apt-get update && apt-get upgrade && apt-get install openssl nginx
 ```
 
 ### 查看
