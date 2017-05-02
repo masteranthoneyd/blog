@@ -251,7 +251,7 @@ sudo gedit /etc/rc.local
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/proxy01.png)
 
 ### 设置自动切换
-接着点击自动切换 ( Auto switch）上面的不用管，在按照规则列表匹配请求后面选择刚才新建的SS，默认情景模式选择直接连接。点击应用选项保存。再往下规则列表设置选择`AutoProxy` 然后将***[这个地址](https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)**填进去，点击下面的立即更新情景模式，会有提示更新成功！
+接着点击自动切换 ( Auto switch）上面的不用管，在按照规则列表匹配请求后面选择刚才新建的SS，默认情景模式选择直接连接。点击应用选项保存。再往下规则列表设置选择`AutoProxy` 然后将***[这个地址](https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)***填进去，点击下面的立即更新情景模式，会有提示更新成功！
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/proxy03.png)
 
 点击浏览器右上角的SwitchyOmega图标，下面选择自动切换，然后打开google.com试试，其他的就不在这贴图了。
