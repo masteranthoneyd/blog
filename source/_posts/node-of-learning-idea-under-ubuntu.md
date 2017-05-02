@@ -61,22 +61,23 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 
 ## 导航（一般都可以在Navigate里面找到）
 
-| Keyboard shortcut           | Declaration    |
-| :-------------------------- | :------------- |
-| **Ctrl+N**                  | 查找Java类        |
-| **Ctrl+Shift+N**            | 查找非Java文件      |
-| **Ctrl+Shift+Alt+N**        | 查找类中的方法或变量     |
-| **Double Shift**            | 查找所有           |
-| **Ctrl+Alt+Left/Right**     | 跳到光标的上/下一个位置   |
-| **F2/Shift+F2**             | 光标移动到下/上一个错误   |
-| **Ctrl+Shift+Backspace**    | 跳到上一个编辑处       |
-| **Ctrl+Alt+B**              | 跳到实现类/方法       |
-| **Ctrl+U**                  | 跳到父类/方法        |
-| **Alt+Up/Down**             | 光标移动到上/下一个方法   |
-| **Ctrl+F12**                | 搜索当前文件方法       |
-| **Ctrl+Shift+H/Ctrl+Alt+H** | 显示类/方法调用层级     |
-| **F11/Shift+F11**           | 当前行设置书签/显示所有书签 |
-| **Ctrl+Shift+Backspace**    | 跳到上一个编辑处       |
+| Keyboard shortcut        | Declaration    |
+| :----------------------- | :------------- |
+| **Ctrl+N**               | 查找Java类        |
+| **Ctrl+Shift+N**         | 查找非Java文件      |
+| **Ctrl+Shift+Alt+N**     | 查找类中的方法或变量     |
+| **Double Shift**         | 查找所有           |
+| **Ctrl+Alt+Left/Right**  | 跳到光标的上/下一个位置   |
+| **F2/Shift+F2**          | 光标移动到下/上一个错误   |
+| **Ctrl+Shift+Backspace** | 跳到上一个编辑处       |
+| **Ctrl+Alt+B**           | 跳到实现类/方法       |
+| **Ctrl+U**               | 跳到父类/方法        |
+| **Alt+Up/Down**          | 光标移动到上/下一个方法   |
+| **Ctrl+F12**             | 搜索当前文件方法       |
+| **Ctrl+H/Ctrl+Shift+H**  | 显示类/方法层级       |
+| **F11/Shift+F11**        | 当前行设置书签/显示所有书签 |
+| **Ctrl+Shift+Backspace** | 跳到上一个编辑处       |
+| **Ctrl+G**               | 跳到指定行          |
 
 ## 查找/替换（一般在Edit的find里面）
 
@@ -98,6 +99,14 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 2、复制当前行：`Ctrl+D`
 3、删除当前行：`Ctrl+Y`
 4、显示注释文档
+
+## 调试
+
+1、
+
+2、
+
+
 
 ## 重构：
 

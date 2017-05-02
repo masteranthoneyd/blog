@@ -240,10 +240,10 @@ sudo gedit /etc/rc.local
 
 # 使用ShadowSocks代理实现穿墙
 ## 方式一：配置浏览器代理
-假如你上面任选一种方式已经开始运行`sslocal`了，火狐那个代理插件老是订阅不了gfwlist所以配置自动模式的话不好使。这里用的是chrome，你可以在Ubuntu软件中心下载得到。
+假如你上面任选一种方式已经开始运行`sslocal`了，火狐那个代理插件老是订阅不了`gfwlist`所以配置自动模式的话不好使。这里用的是chrome，你可以在Ubuntu软件中心下载得到。
 
 ### 安装插件
-我们需要给chrome安装SwitchyOmega插件，但是没有代理之前是不能从谷歌商店安装这个插件的，但是我们可以从Github上直接下载最新版 ***[https://github.com/FelisCatus/SwitchyOmega/releases/](https://github.com/FelisCatus/SwitchyOmega/releases/) （这个是chrome的）然后浏览器地址打开chrome://extensions/，将下载的插件托进去安装。
+我们需要给chrome安装`SwitchyOmega`插件，但是没有代理之前是不能从谷歌商店安装这个插件的，但是我们可以从Github上直接下载最新版***[https://github.com/FelisCatus/SwitchyOmega/releases/](https://github.com/FelisCatus/SwitchyOmega/releases/)***（这个是chrome的）然后浏览器地址打开`chrome://extensions/`，将下载的插件托进去安装。
 
 ### 设置代理地址
 安装好插件会自动跳到设置选项，有提示你可以跳过。左边新建情景模式-选择代理服务器-比如命名为shadowProxy（叫什么无所谓）其他默认之后创建，之后在代理协议选择SOCKS5，地址为`127.0.0.1`,端口默认`1080` 。然后保存即应用选项。
@@ -251,7 +251,7 @@ sudo gedit /etc/rc.local
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/proxy01.png)
 
 ### 设置自动切换
-接着点击自动切换 ( Auto switch）上面的不用管，在按照规则列表匹配请求后面选择刚才新建的SS，默认情景模式选择直接连接。点击应用选项保存。再往下规则列表设置选择AutoProxy 然后将***[这个地址](https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)**填进去，点击下面的立即更新情景模式，会有提示更新成功！
+接着点击自动切换 ( Auto switch）上面的不用管，在按照规则列表匹配请求后面选择刚才新建的SS，默认情景模式选择直接连接。点击应用选项保存。再往下规则列表设置选择`AutoProxy` 然后将***[这个地址](https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)**填进去，点击下面的立即更新情景模式，会有提示更新成功！
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/proxy03.png)
 
 点击浏览器右上角的SwitchyOmega图标，下面选择自动切换，然后打开google.com试试，其他的就不在这贴图了。
