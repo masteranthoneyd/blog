@@ -168,7 +168,8 @@ sudo apt-get install fonts-wqy-microhei
 ## 安装QQ轻聊版
 虽然不太想安装QQ，但工作时候团队交流需要，QQ国际版又太难看，所以装个Deepin的轻聊版。
 工具包下载：***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>qq4Ubuntu`)
-内含文件：`crossover_16.0.0-1.deb`、`crossover16crack.tar.gz`、`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
+
+内含文件： `crossover_16.0.0-1.deb` 、 `crossover16crack.tar.gz` 和 `apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
 
 ### crossover安装与破解
 这个轻聊版是Deepin的作品，要在Ubuntu上使用，就要安装**crossover**，很不幸这玩意是收费的，很幸运的是这玩意是可以破解的。
