@@ -1,5 +1,5 @@
 ---
-title: Ubuntu下IntelliJ IDEA使用笔记
+优化 Importstitle: Ubuntu下IntelliJ IDEA使用笔记
 date: 2017-04-17 18:00:00
 categories: IDE
 tags: [Ubuntu, IDE]
@@ -36,10 +36,11 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 ```
 5、设置代码不区分大小写
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
-6、自动导包
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-auto-import.png)
-第一个钩：IntelliJ IDEA 将在我们书写代码的时候自动帮我们优化导入的包，比如自动去掉一些没有用到的包。
-第二个钩：IntelliJ IDEA 将在我们书写代码的时候自动帮我们导入需要用到的包。但是对于那些同名的包，还是需要手动Alt + Enter 进行导入的，IntelliJ IDEA 目前还无法智能到替我们做判断。
+
+6、优化导包
+IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，需要哪个就`import`哪个。
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/import-optimizing.png)
+
 7、设置不自动打开上一次最后关闭的项目
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
@@ -53,7 +54,7 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 钩上之后在需要生成的类上`Alt+Enter`就会出现了。
 
 # Keyboard shortcuts
-> JetBrains官方快捷键手册：***[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)***
+> JetBrains官方快捷键手册： *[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)*
 
 个人感觉Ubuntu下使用IDEA最大的一个不爽就是**快捷键**了，~~想屎的感觉有木有~~，各种没反应，原来是快捷键冲突，本来想改成Eclipse的风格，但想了想好像不太合适。
 快捷键风格可以在`setting` -> `Keymap` 里面这是，博主使用安装时候idea默认配置的`Default for XWin`。
@@ -95,24 +96,51 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 
 ## 编辑
 
-1、基本代码补全：`Ctrl+Space`
-2、复制当前行：`Ctrl+D`
-3、删除当前行：`Ctrl+Y`
-4、显示注释文档
+| Keyboard shortcut              | Declaration                |
+| ------------------------------ | -------------------------- |
+| **Ctrl+D/Ctrl+Y**              | 重复代码,未选择代码时重复当前行/删除当前行     |
+| **Ctrl+Shift+Enter**           | 补全语句                       |
+| **Ctrl+P**                     | 显示方法参数                     |
+| **Ctrl+Q**                     | 显示注释文档                     |
+| **Alt+Insert**                 | 生成代码,生成 Getter、Setter、构造器等 |
+| **Ctrl+O/Ctrl+I**              | 重写父类方法/实现接口方法              |
+| **Ctrl+W**                     | 选择代码块,连续按会增加选择外层的代码块       |
+| **Ctrl+Shift+W**               | 与“Ctrl+W”相反,减少选择代码块        |
+| **Ctrl+Alt+L**                 | 格式化代码                      |
+| **Ctrl+Alt+O**                 | 优化 Imports                 |
+| **Ctrl+Shift+J**               | 合并多行为一行                    |
+| **Ctrl+Shift+U**               | 对选中内容进行大小写切换               |
+| **Ctrl+Shift+]/[**             | 选中到代码块的开始/结束               |
+| **Ctrl+Delete/Ctrl+Backspace** | 删除从光标所在位置到单词结束/开头处         |
+| **Ctrl+F4**                    | 关闭当前编辑页                    |
+| **Alt+J/Ctrl+Alt+Shift+J**     | 匹配下一个/全部与当前选中相同的代码         |
 
 ## 调试
 
-1、
-
-2、
+| Keyboard shortcut | Declaration         |
+| ----------------- | ------------------- |
+| **F8/F7**         | 单步调试,不进入函数内部/进入函数内部 |
+| **Shift+F8**      | 跳出函数                |
+| **Alt+F9**        | 运行到断点               |
+| **Alt+F8**        | 执行表达式查看结果           |
+| **F9**            | 继续执行,进入下一个断点或执行完程序  |
+| **Ctrl+Shift+F8** | 查看断点                |
 
 
 
 ## 重构：
 
-其他：
-1、后退（上次编辑或停留的地方）：`Ctrl+Alt+左箭头`
-2、前进（跟上面相反）：`Ctrl+Alt++右箭头`
+| Keyboard shortcut    | Declaration        |
+| -------------------- | ------------------ |
+| **F6**               | 移动类                |
+| **Alt+Delete**       | 安全删除,删除前会提示调用处     |
+| **Shift+F6**         | 重命名                |
+| **Ctrl+F6**          | 重构方法参数、Exception 等 |
+| **Ctrl+Alt+M**       | 提取为新方法             |
+| **Ctrl+Alt+V**       | 提取为新变量             |
+| **Ctrl+Alt+F**       | 提取为对象新属性           |
+| **Ctrl+Alt+C**       | 提取为新静态常量           |
+| **Ctrl+Alt+Shift+T** | 重构一切               |
 
 # Plugin
 ## 热部署插件JRebel安装与激活
