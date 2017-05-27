@@ -1,12 +1,13 @@
 ---
-title: java-8-tutorial
+title: Java8 & 简洁の道
 date: 2017-05-03 18:23:06
-categories:
-tags:
+categories: [Programming, Java]
+tags: [Java]
 ---
+![](http://ojoba1c98.bkt.clouddn.com/img/java/java8.jpg)
 # Preface
 > "Java is still not dead—and people are starting to figure that out."
-> Java 8是自Java  5（2004年）发布以来Java语言最大的一次版本升级，Java 8带来了很多的新特性，包括Lambda 表达式、方法引用、流(Stream API)、默认方法、Optional、组合式异步编程、新的时间 API，等等各个方面。利用这些特征，我们可以写出如同清泉般的简洁代码= =,虽然现在才开始认真去阅读这些新特征，希望也不会太晚，本文主要记录博主的学习笔记吧...
+> Java 8是自Java  5（2004年）发布以来Java语言最大的一次版本升级，Java 8带来了很多的新特性，包括Lambda 表达式、方法引用、流(Stream API)、默认方法、Optional、组合式异步编程、新的时间 API，等等各个方面。利用这些特征，我们可以写出如同清泉般的简洁代码= =,虽然现在才开始认真去阅读这些新特征，希望也不会太晚...
 
 <!--more-->
 
