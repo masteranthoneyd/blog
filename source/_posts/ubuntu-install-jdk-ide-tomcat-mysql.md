@@ -308,16 +308,27 @@ OK，这样就完啦
 1.查看系统支持的字符集: `locale -a` 
 2.到start_navicat修改字符集: `export LANG=zh_CN.utf8`
 
-## <font color=red>破解方案</font> 
+## 破解方案
+### 懒人式破解 
 第一次执行`start_navicat`时，会在用户主目录下生成一个名为`.navicat`的隐藏文件夹。
 ```
-cd /home/ybd/.navicat/  
+cd /home/ybd/.navicat/ 
 ```
 此文件夹下有一个system.reg文件
 ```
 rm system.reg
 ```
-把此文件删除后，下次启动`navicat` 会重新生成此文件，30天试用期会按新的时间开始计算。
+把此文件删除后，下次启动`navicat` 会重新生成此文件，15天试用期会按新的时间开始计算。
+**这个是最简单暴力的方法！不过也是最麻烦的，因为每次到期删除了文件，再重新试用所有的配置。**
+
+### 完全破解
+这个方法对Navicat For Mysql和Premium都有效，但貌似只能对111版本起效，其他更高版本需要另找锤子。
+<a id="download" href="https://pan.baidu.com/s/1i5EB3yX"><i class="fa fa-download"></i><span> Download Now</span>
+点击上面跳到云盘，里面有111版的Navicat解压文件(Ubuntu版的)，还有一个`PatchNavicat.exe`，把压缩包解压出来，然后照上面的安装，完成后把里面的`Navicat.exe`拷贝到windows虚拟机(博主用的VirtualBox)，然后在虚拟机里面打开`PatchNavicat.exe`，选择`Navicat.exe`破解，再把破解的`Navicat.exe`放回到安装目录，完美破解！
+</a>
+
+
+
 ## 创建快捷方式
 
 ```
@@ -464,6 +475,8 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 无奈，还好互联网开源精神无处不在，某大神搭建的ngrok：
 ***[http://www.qydev.com/](http://www.qydev.com/)***
 客户端和教程都在里面哦。
+
+**Update:**Ngrok已搭建成功～ ，记录于***[http://ookamiantd.top/2017/self-hosted-build-ngrok-server/](http://ookamiantd.top/2017/self-hosted-build-ngrok-server/)***
 
 
 <p id="div-border-left-purple">**其他tunnel的代理服务器**：
