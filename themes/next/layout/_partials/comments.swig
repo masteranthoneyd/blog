@@ -13,14 +13,33 @@
       </div>
     {% elseif theme.disqus_shortname %}
 <div style="text-align:center;">
-  <button class="btn" id="load-disqus" onclick="disqus.load();">加载 Disqus 评论</button>
+  <!-- <button class="btn" id="load-disqus" onclick="disqus.load();">加载 Disqus 评论</button> -->
+
 </div>
-      <div id="disqus_thread">
-        <noscript>
-          Please enable JavaScript to view the
-          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
-        </noscript>
-      </div>
+      <div id="disqus_proxy_thread"></div>
+      <div id="disqus_thread"></div>
+
+        <script type="text/javascript">
+            window.disqusProxy = {
+              username: 'ookamiAntD',
+              server: 'disqus-proxy.yangbingdong.com',
+              port: 5509,
+              defaultAvatar: '/images/avatar/default-avatar.png',
+              adminAvatar: '/images/avatar/avatar02.jpeg',
+              identifier: '{{ page.path }}'
+            };
+            window.disqus_config = function () {
+              this.page.url = '{{ page.permalink }}';
+              this.page.identifier = '{{ page.path }}';
+            };
+            var s = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '/static/js/main.0d0338ae.js';
+            s.async = true;
+            document.body.appendChild(s);
+        </script>
+        <link rel="stylesheet" href="/static/css/main.0603c539.css">
+
     {% elseif theme.hypercomments_id %}
       <div id="hypercomments_widget"></div>
     {% elseif theme.gentie_productKey %}
