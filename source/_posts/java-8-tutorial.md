@@ -1,5 +1,5 @@
 ---
-title: Java8 & 简洁の道
+title: Java8 Noob Tutorial
 date: 2017-05-03 18:23:06
 categories: [Programming, Java]
 tags: [Java]
@@ -7,7 +7,7 @@ tags: [Java]
 ![](http://ojoba1c98.bkt.clouddn.com/img/java/java8.jpg)
 # Preface
 > "Java is still not dead—and people are starting to figure that out."
-> Java 8是自Java  5（2004年）发布以来Java语言最大的一次版本升级，Java 8带来了很多的新特性，包括Lambda 表达式、方法引用、流(Stream API)、默认方法、Optional、组合式异步编程、新的时间 API，等等各个方面。利用这些特征，我们可以写出如同清泉般的简洁代码= =,虽然现在才开始认真去阅读这些新特征，希望也不会太晚...
+> Java 8是自Java  5（2004年）发布以来Java语言最大的一次版本升级，Java 8带来了很多的新特性，包括Lambda 表达式、方法引用、流(Stream API)、默认方法、Optional、组合式异步编程、新的时间 API，等等各个方面。利用这些特征，我们可以写出如同清泉般的简洁代码= =...
 
 <!--more-->
 
@@ -22,7 +22,7 @@ interface Formula {
     }
 }
 ```
-在接口Formula中，除了抽象方法caculate以外，还定义了一个默认方法sqrt。Formula的实现类只需要实现抽象方法caculate就可以了。默认方法sqrt可以直接使用。
+在接口Formula中，除了抽象方法caculate以外，还定义了一个默认方法sqrt.Formula的实现类只需要实现抽象方法caculate就可以了。默认方法sqrt可以直接使用。
 ```java
 Formula formula = new Formula() {
     @Override
@@ -91,14 +91,13 @@ Collections.sort(names, (String a, String b) -> b.compareTo(a));
 Collections.sort(names, (a, b) -> b.compareTo(a));
 ```
 
-
+在IDEA里面，对于可以写成Lambda表达式的，按下Alt+Enter 它会智能地提示转换
 
 
 # Functional Interfaces
 
 
 # Method and Constructor References
-
 
 # Streams
 
