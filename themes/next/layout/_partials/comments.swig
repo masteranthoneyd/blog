@@ -23,7 +23,7 @@
               username: 'ookamiantd',
               server: 'disqus-proxy.yangbingdong.com',
               port: 5509,
-              defaultAvatar: '/images/avatar/default-avatar.png',
+              defaultAvatar: '/images/avatar/avatar01.jpeg',
               adminAvatar: '/images/avatar/avatar02.jpeg',
               identifier: '{{ page.path }}'
             };
