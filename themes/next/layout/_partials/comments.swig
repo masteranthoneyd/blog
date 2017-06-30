@@ -18,10 +18,9 @@
 </div>
       <div id="disqus_proxy_thread"></div>
       <div id="disqus_thread"></div>
-
         <script type="text/javascript">
             window.disqusProxy = {
-              username: 'ookamiAntD',
+              username: 'ookamiantd',
               server: 'disqus-proxy.yangbingdong.com',
               port: 5509,
               defaultAvatar: '/images/avatar/default-avatar.png',
@@ -32,11 +31,12 @@
               this.page.url = '{{ page.permalink }}';
               this.page.identifier = '{{ page.path }}';
             };
-            var s = document.createElement('script');
-            s.type = 'text/javascript';
-            s.src = '/static/js/main.0d0338ae.js';
-            s.async = true;
-            document.body.appendChild(s);
+            window.onload=function(){
+              var s = document.createElement('script');
+              s.src = '/static/js/main.0d0338ae.js';
+              s.async = true;
+              document.body.appendChild(s);
+            }
         </script>
         <link rel="stylesheet" href="/static/css/main.0603c539.css">
 
