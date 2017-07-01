@@ -18,27 +18,29 @@
 </div>
       <div id="disqus_proxy_thread"></div>
       <div id="disqus_thread"></div>
-        <script type="text/javascript">
-            window.disqusProxy = {
-              username: 'ookamiantd',
-              server: 'disqus-proxy.yangbingdong.com',
-              port: 5509,
-              defaultAvatar: '/images/avatar/avatar01.jpeg',
-              adminAvatar: '/images/avatar/avatar02.jpeg',
-              identifier: '{{ page.path }}'
-            };
-            window.disqus_config = function () {
-              this.page.url = '{{ page.permalink }}';
-              this.page.identifier = '{{ page.path }}';
-            };
-            window.onload=function(){
-              var s = document.createElement('script');
-              s.src = '/static/js/main.0d0338ae.js';
-              s.async = true;
-              document.body.appendChild(s);
-            }
-        </script>
-        <link rel="stylesheet" href="/static/css/main.0603c539.css">
+      {% if theme.disqus_proxy.enable %}
+          <script type="text/javascript">
+              window.disqusProxy = {
+                username: '{{ theme.disqus_proxy.username }}',
+                server: '{{ theme.disqus_proxy.server }}',
+                port: '{{ theme.disqus_proxy.port }}',
+                defaultAvatar: '{{ theme.disqus_proxy.defaultAvatar }}',
+                adminAvatar: '{{ theme.disqus_proxy.adminAvatar }}',
+                identifier: '{{ page.path }}'
+              };
+              window.disqus_config = function () {
+                this.page.url = '{{ page.permalink }}';
+                this.page.identifier = '{{ page.path }}';
+              };
+              window.onload=function(){
+                var s = document.createElement('script');
+                s.src = "{{ theme.disqus_proxy.js }}";
+                s.async = true;
+                document.body.appendChild(s);
+              }
+          </script>
+          <link rel="stylesheet" href="{{ theme.disqus_proxy.css }}">
+      {% endif %}
 
     {% elseif theme.hypercomments_id %}
       <div id="hypercomments_widget"></div>

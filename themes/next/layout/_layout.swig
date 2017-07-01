@@ -75,9 +75,7 @@
   {% include '_scripts/baidu-push.swig' %}
   {% include '_components/algolia-search/assets.swig' %}
 
-  {% if theme.canvas_nest %}
-  <script type="text/javascript" color="255,132,0" opacity='0.5' zIndex="-2" count="55" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
-  {% endif %}
+  <script type="text/javascript" color="255,0,0" opacity='0.5' zIndex="-2" count="80" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
 
 </body>
 </html>

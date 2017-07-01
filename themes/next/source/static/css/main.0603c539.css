@@ -27,6 +27,48 @@
   padding: 0
 }
 
+#disqus_proxy_thread .post .avatar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  /* start*/
+  webkit-transition: 1s all;
+  moz-transition: 1s all;
+  ms-transition: 1s all;
+  transition: 1s all;
+  border:solid 0px #55DAE1;
+  /* end */
+}
+
+#disqus_proxy_thread .post .avatar img:hover {
+  webkit-transform: rotate(360deg) scale(1.5);
+  moz-transform: rotate(360deg) scale(1.5);
+  ms-transform: rotate(360deg) scale(1.5);
+  transform: rotate(360deg) scale(1.5);
+  border:solid 0.5px #55DAE1;
+}
+
+#disqus_proxy_thread .comment-box .comment-info .avatar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  /* start*/
+  webkit-transition: 1s all;
+  moz-transition: 1s all;
+  ms-transition: 1s all;
+  transition: 1s all;
+  border:solid 0px #55DAE1;
+  /* end */
+}
+
+#disqus_proxy_thread .comment-box .comment-info .avatar img:hover {
+  webkit-transform: rotate(360deg) scale(1.5);
+  moz-transform: rotate(360deg) scale(1.5);
+  ms-transform: rotate(360deg) scale(1.5);
+  transform: rotate(360deg) scale(1.5);
+  border:solid 0.5px #55DAE1;
+}
+
 @media screen and (max-width: 500px) {
   #disqus_proxy_thread .disqus-proxy ul, #disqus_proxy_thread .disqus-proxy ul.post-reply {
     margin-left: 10px
@@ -37,8 +79,8 @@
   }
 
   #disqus_proxy_thread .disqus-proxy .comment-box .comment-info .avatar img {
-    width: 40px;
-    height: 40px
+    width: 50px;
+    height: 50px
   }
 
   #disqus_proxy_thread .disqus-proxy .comment-box .comment-info textarea {

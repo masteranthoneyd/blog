@@ -284,7 +284,7 @@ wechatpay: /images/donate/wechat.png
 alipay: /images/donate/alipay.jpg
 
 # Canvas-nest
-canvas_nest: true
+canvas_nest:
 
 # baidu tongji
 baidu_analytics: e9505ac4e11d464329d615553a72b526
@@ -307,6 +307,16 @@ post_copyright:
   enable: true
   license: CC BY-NC-SA 3.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+disqus_proxy:
+  enable: true
+  username: ookamiantd
+  server: disqus-proxy.yangbingdong.com
+  port: 5509
+  defaultAvatar: /images/avatar/avatar01.jpeg
+  adminAvatar: /images/avatar/avatar02.jpeg
+  js: /static/js/main.0d0338ae.js
+  css: /static/css/main.0603c539.css
 
 
 
