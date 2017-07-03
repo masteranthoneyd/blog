@@ -121,6 +121,32 @@ admin:
       BucketName: blog
       bucketHost: ojoba1c98.bkt.clouddn.com
 
+# 文件压缩选项
+html_minifier:
+  enable: true
+  exclude: 
+
+css_minifier:
+  enable: true
+  exclude: 
+    - '/home/ybd/GitRepo/blog/themes/next/source/static/css/main.0603c539.css'
+
+js_minifier:
+  enable: true
+  mangle: true
+  output:
+  compress:
+  exclude: 
+    - '/home/ybd/GitRepo/blog/themes/next/source/static/js/*.*.js'
+
+image_minifier:
+  enable: true
+  interlaced: false
+  multipass: false
+  optimizationLevel: 2
+  pngquant: false
+  progressive: false
+
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
