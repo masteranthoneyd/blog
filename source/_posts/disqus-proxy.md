@@ -19,9 +19,9 @@ tags: [Hexo, Disqus-Proxy]
 具体请看***[https://ycwalker.com/2017/06/01/about-diqus-proxy/](https://ycwalker.com/2017/06/01/about-diqus-proxy/)***
 
 # Deploy Disqus-Proxy
-首先你得有一台**可以访问[disqus](https://disqus.com/)**的vps...博主用的是[linode](www.linode.com)
+首先你得有一台**可以访问[Disqus](https://disqus.com/)**的VPS[^1]...博主用的是***[Linode](www.linode.com)***
 
 
 
 
-
+[^1]: 虚拟专用服务器(Virtual private server)
