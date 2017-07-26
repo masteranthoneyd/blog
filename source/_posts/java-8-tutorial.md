@@ -70,7 +70,7 @@ Lambda的基本语法大概就是下面这样子的了：
 来看个例子：
 
 ```java
-List<String> names = Arrays.asList("peter", "anna", "mike", "xenia");
+List<String> names = Arrays.asList("D", "B", "C", "A");
 Collections.sort(names, new Comparator<String>() {
     @Override
     public int compare(String a, String b) {
@@ -93,7 +93,6 @@ Collections.sort(names, (a, b) -> b.compareTo(a));
 
 在IDEA里面，对于可以写成Lambda表达式的，按下Alt+Enter 它会智能地提示转换
 
-
 # Functional Interfaces
 
 
@@ -101,7 +100,8 @@ Collections.sort(names, (a, b) -> b.compareTo(a));
 
 # Streams
 
-# Finally
+# Summary
+关于java8的介绍与使用网上有太多太多了，如***[java8最佳技巧](https://zhuanlan.zhihu.com/p/27424997)***等等...
 > 参考
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***
 >
