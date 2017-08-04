@@ -217,7 +217,7 @@ image_minifier:
 
 这是翻墙状态：
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/comment02.png)
-这是disqus_proxy
+这是disqus_proxy：
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/comment01.png)
 
 # Summary
