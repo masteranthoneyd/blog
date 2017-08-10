@@ -1,5 +1,5 @@
 ---
-title: NexT主题启用Disqus-Proxy 妈妈再也不用担心需要翻墙了
+title: NexT启用Disqus-Proxy 不翻墙也能使用Disqus
 date: 2017-07-4 20:44:05
 categories: Hexo
 tags: [Hexo, Disqus-Proxy]
