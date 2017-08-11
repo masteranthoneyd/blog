@@ -32,7 +32,7 @@ return set.contains(targetValue);
 ```
 在在***[Java中如何高效的判断数组中是否包含某个元素](http://www.hollischuang.com/archives/1269)***一文中，深入分析过，以上方式虽然可以实现功能，但是效率却比较低。因为将数组压入`Collection`类型中，首先要将数组元素遍历一遍，然后再使用集合类做其他操作。
 
-在判断一个数组是否包含某个值的时候，推荐使用**`for`循环遍历**的形式或者使用`Apache Commons`类库中提供的`ArrayUtils`类的`contains`方法。
+在判断一个数组是否包含某个值的时候，推荐使用**`for`循环遍历**的形式或者使用`Apache` `Commons`类库中提供的`ArrayUtils`类的`contains`方法。
 
 # 三、在循环中删除列表中的元素
 在讨论这个问题之前，先考虑以下代码的输出结果：
@@ -87,7 +87,7 @@ while (iter.hasNext()) {
 `next()`方法必须在调用`remove()`方法之前调用。如果在循环过程中先调用`remove()`，再调用`next()`，就会导致异常`ConcurrentModificationException`。原因如上。
 
 # 四、HashTable 和 HashMap 的选择
-了解算法的人可能对`HashTable`比较熟悉，因为他是一个数据结构的名字。但在Java里边，用`HashMap`来表示这样的数据结构。`Hashtable`和 `HashMap`的一个关键性的不同是，`HashTable`是同步的，而`HashMap`不是。所以通常不需要`HashTable`，`HashMap`用的更多。
+了解算法的人可能对`HashTable`比较熟悉，因为他是一个数据结构的名字。但在Java里边，用`HashMap`来表示这样的数据结构。`Hashtable`和`HashMap`的一个关键性的不同是，`HashTable`是同步的，而`HashMap`不是。所以通常不需要`HashTable`，`HashMap`用的更多。
 
 ***[HashMap完全解读](http://www.hollischuang.com/archives/82)***、***[Java中常见亲属比较](http://www.hollischuang.com/archives/442)***等文章中介绍了他们的区别和如何选择。
 
