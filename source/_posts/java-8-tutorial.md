@@ -48,27 +48,43 @@ private interface DefaulableFactory {
 }
 ```
 
+## Conflict
 
+因为一个类可以**实现多个接口**，所以当一个类实现了多个接口，而这些接口中**存在两个或两个以上方法签名相同的默认方法时**就会产生冲突，java8定义如下三条原则来解决冲突：
 
-# Lambda expressions
+1. **类或父类中显式声明的方法，其优先级高于所有的默认方法**；
+2. **如果1规则失效，则选择与当前类距离最近的具有具体实现的默认方法**；
+3. **如果2规则也失效，则需要显式指定接口**。
 
-Lambda 表达式：简洁地表示可传递的匿名函数的一种方式
+# Lambda Expressions
+先来看一段代码：
+
+```java
+public interface ActionListener {
+  void actionPerformed(ActionEvent e);
+}
+
+button.addActionListener(new ActionListener) {
+  public void actionPerformed(ActionEvent e) {
+    ui.dazzle(e.getModifiers());
+  }
+}
+```
+
+匿名类型最大的问题就在于其冗余的语法。有人戏称匿名类型导致了“高度问题”（**height problem**）：比如前面ActionListener的例子里的五行代码中仅有一行在做实际工作。
+Lambda表达式（又被成为“闭包”或“匿名方法”）是简洁地表示可传递的匿名函数的一种方式，它提供了轻量级的语法，从而解决了匿名内部类带来的“高度问题”。
 
 重点留意这四个关键词：**匿名**、**函数**、**传递**、**简洁**
-
 Lambda的三个部分：
-
 * 参数列表
 * 箭头
 * Lambda 主体
 
 Lambda的基本语法大概就是下面这样子的了：
-
 * `(parameters) -> expression`
 * `(parameters) -> { statements; }`
 
 来看个例子：
-
 ```java
 List<String> names = Arrays.asList("D", "B", "C", "A");
 Collections.sort(names, new Comparator<String>() {
@@ -80,7 +96,6 @@ Collections.sort(names, new Comparator<String>() {
 ```
 
 使用Lambda来表示：
-
 ```java
 Collections.sort(names, (String a, String b) -> {
     return b.compareTo(a);
@@ -90,21 +105,215 @@ Collections.sort(names, (String a, String b) -> b.compareTo(a));
 亦或是
 Collections.sort(names, (a, b) -> b.compareTo(a));
 ```
-
 在IDEA里面，对于可以写成Lambda表达式的，按下Alt+Enter 它会智能地提示转换
+
+## Lexiacal Scope
+### 访问局部变量
+1. 可以直接在Lambda表达式中访问外层的局部变量，但是和匿名对象不同的是，Lambda表达式的局部变量可以**不用声明为`final`**，不过局部变量必须不可被后面的代码修改（**即隐性的具有final的语义**）。
+  eg：下面代码无法编译
+```java
+int num = 1; 
+Converter<Integer, String> s =  
+	(param) -> String.valueOf(param + num);  
+num = 5; 
+```
+在Lambda表达式中试图修改局部变量是不允许的！
+2. 在 Lambda 表达式当中被引用的变量的值**不可以被更改**。
+3. 在 Lambda 表达式当中**不允许**声明一个与局部变量同名的参数或者局部变量。
+4. ​
+### 访问对象字段与静态变量
+和局部变量不同的是，Lambda内部对于实例的字段（即：成员变量）以及静态变量是**即可读又可写**。
+
+### 不能访问接口的默认方法
+Lambda表达式中是**无法访问到默认方法**的。
+
+### Lambda表达式中的this
+Lambda 表达式中使用 `this` 会引用创建该 Lambda 表达式的方法的 `this` 参数。
+eg：
+```java
+public class Test2 {  
+    public static void main(String[] args) {  
+        Test2 test = new Test2();  
+        test.method();  
+    }  
+    @Override  
+    public String toString() {  
+        return "Lambda";  
+    }  
+    public void method() {  
+        Runnable runnable = () -> {  
+            System.out.println(this.toString());  
+        };  
+        new Thread(runnable).start();  
+    }  
+}  
+```
+显示结果：Lambda
+
+**补充**：Lambda表达式对**值**封闭，对**变量**开放的原文是：lambda expressions close over **values**, not **variables**，在这里增加一个例子以说明这个特性：
+
+```java
+int sum = 0;
+list.forEach(e -> { sum += e.size(); }); // Illegal, close over values
+
+List<Integer> aList = new List<>();
+list.forEach(e -> { aList.add(e); }); // Legal, open over variables
+```
+
+
 
 # Functional Interfaces
 
+任意只包含一个抽象方法的接口，我们都可以用来做成Lambda表达式。为了让你定义的接口满足要求，你应当在接口前加上`@FunctionalInterface` 标注。编译器会注意到这个标注，如果你的接口中定义了第二个抽象方法的话，编译器会抛出异常。
+eg:
+```java
+@FunctionalInterface
+interface Converter<F, T> {
+    T convert(F from);
+}
+ 
+Converter<String, Integer> converter = (from) -> Integer.valueOf(from);
+Integer converted = converter.convert("123");
+System.out.println(converted);    // 123
+```
+**注意**，如果你不写@FunctionalInterface 标注，程序也是正确的。
+下面是Java SE 7中已经存在的函数式接口：
+· [java.lang.Runnable](http://download.oracle.com/javase/7/docs/api/java/lang/Runnable.html)
+· [java.util.concurrent.Callable](http://download.oracle.com/javase/7/docs/api/java/util/concurrent/Callable.html)
+· [java.security.PrivilegedAction](http://download.oracle.com/javase/7/docs/api/java/security/PrivilegedAction.html)
+· [java.util.Comparator](http://download.oracle.com/javase/7/docs/api/java/util/Comparator.html)
+· [java.io.FileFilter](http://download.oracle.com/javase/7/docs/api/java/io/FileFilter.html)
+· [java.beans.PropertyChangeListener](http://www.fxfrog.com/docs_www/api/java/beans/PropertyChangeListener.html)
+
+除此之外，Java SE 8中增加了一个新的包：`java.util.function`，它里面包含了常用的函数式接口，例如：
+· `Predicate<T>`——接收`T`对象并返回`boolean`
+· `Consumer<T>`——接收`T`对象，不返回值
+· `Function<T, R>`——接收`T`对象，返回`R`对象
+· `Supplier<T>`——提供`T`对象（例如工厂），不接收值
+· `UnaryOperator<T>`——接收`T`对象，返回`T`对象
+· `BinaryOperator<T>`——接收两个`T`对象，返回`T`对象
+
+除了上面的这些基本的函数式接口，我们还提供了一些针对原始类型（Primitive type）的特化（Specialization）函数式接口，例如`IntSupplier`和`LongBinaryOperator`。（我们只为`int`、`long`和`double`提供了特化函数式接口，如果需要使用其它原始类型则需要进行类型转换）同样的我们也提供了一些针对多个参数的函数式接口，例如`BiFunction<T, U, R>`，它接收`T`对象和`U`对象，返回`R`对象。
 
 # Method and Constructor References
 
+Lambda表达式允许我们定义一个匿名方法，并允许我们以函数式接口的方式使用它。我们也希望能够在**已有的**方法上实现同样的特性。
+方法引用和Lambda表达式拥有相同的特性（例如，它们都需要一个目标类型，并需要被转化为函数式接口的实例），不过我们并不需要为方法引用提供方法体，我们可以直接通过方法名称引用已有方法。
+
+方法引用就是替代那些转发参数的 Lambda 表达式的语法糖。
+方法引用有很多种，它们的语法如下：
+· 静态方法引用：`ClassName::methodName`
+· 实际上的实例方法引用：`instanceReference::methodName`
+· 超类上的实例方法引用：`super::methodName`
+· 类型上的实例方法引用：`ClassName::methodName`
+· 构造方法引用：`Class::new`
+· 数组构造方法引用：`TypeName[]::new`
+
+对于静态方法引用，我们需要在类名和方法名之间加入::分隔符，例如`Integer::sum`。
+结合Lambda可以使我们的代码更加简洁：
+```java
+List<String> strings = Arrays.asList("a", "b");
+strings.stream().map(String::toUpperCase).forEach(System.out::println);
+
+List<Character> chars = Arrays.asList('a', 'b');	System.out.println(chars.stream().map(String::valueOf).collect(Collectors.joining(",")));
+```
+
+# Optional
+
+`NullPointException`可以说是所有Java程序员都遇到过的一个异常，虽然Java从设计之初就力图让程序员脱离指针的苦海，但是指针确实是实际存在的，而java设计者也只能是让指针在Java语言中变得更加简单、易用，而不能完全的将其剔除，所以才有了我们日常所见到的关键字`null`。
+
+空指针异常是一个运行时异常，对于这一类异常，如果没有明确的处理策略，那么最佳实践在于让程序早点挂掉，但是很多场景下，**不是开发人员没有具体的处理策略**，**而是根本没有意识到空指针异常的存在**。当异常真的发生的时候，处理策略也很简单，在存在异常的地方添加一个`if`语句判定即可，但是这样的应对策略会让我们的程序出现越来越多的`null`判定，我们知道一个良好的程序设计，应该让代码中尽量少出现`null`关键字，而Java8所提供的`Optional`类则在减少`NullPointException`的同时，也提升了代码的美观度。但首先我们需要明确的是，它并 **不是对`null`关键字的一种替代，而是对于`null`判定提供了一种更加优雅的实现，从而避免`NullPointException`**。
+
+`java.util.Optional<T>` 对可能缺失的值建模,引入的目的并非是要消除每一个 `null` 引用，而是帮助你更好地设计出普适的 API。
+
+创建 `Optional` 对象,三个静态工厂方法：
+- `Optional.empty`：创建空的 `Optional` 对象
+- `Optional.of`：依据非空值创建 `Optional` 对象，若传空值会抛 `NPE`
+- `Optianal.ofNullable`：创建 `Optional` 对象，允许传空值
+
+`Optional` API：
+- `isPresent`: 变量存在返回`true`
+- `get()`: 返回封装的变量值，或者抛出 `NoSuchElementException`
+- `orElse(T other)`: 提供默认值
+- `orElseGet(Supplier<? extends T> other)`: `orElse` 方法的延迟调用版
+- `orElseThrow(Supplier<> extends X> exceptionSupplier)`: 类似 `get`，但可以定制希望抛出的异常类型
+- `ifPresent(Consumer<? super T>)`: 变量存在时可以执行一个方法
+
+值得注意的是：`Optional`是一个**`final`类**，未实现任何接口，所以当我们在利用该类包装定义类的属性的时候，如果我们定义的类有序列化的需求，那么因为`Optional`**没有实现`Serializable`接口**，这个时候执行序列化操作就会有问题：
+```java
+public class User implements Serializable{
+
+    /** 用户编号 */
+    private long id;
+    private String name;
+    private int age;
+    private Optional<Long> phone;  // 不能序列化
+    private Optional<String> email;  // 不能序列化
+```
+
+不过我们可以采用如下替换策略：
+```java
+private long phone;
+
+public Optional<Long> getPhone() {
+    return Optional.ofNullable(this.phone);
+}
+```
+Optional 类设计的初衷仅仅是要支持能返回 Optional 对象的方法，没有考虑将它作为类的字段使用...
+
 # Streams
+
+# Annotations
+
+Java 8中的注解是可重复的。
+首先，我们定义一个包装注解，它包括了一个实际注解的数组:
+```java
+@interface Hints {
+    Hint[] value();
+}
+
+@Repeatable(Hints.class)
+@interface Hint {
+    String value();
+}
+```
+
+只要在前面加上注解名：`@Repeatable`，Java 8 允许我们对同一类型使用多重注解
+变体1：使用注解容器（老方法）
+```
+@Hints({@Hint("hint1"), @Hint("hint2")})
+class Person {}
+
+```
+
+变体2：使用可重复注解（新方法）
+```
+@Hint("hint1")
+@Hint("hint2")
+class Person {}
+```
+
+使用变体2，Java编译器能够在内部自动对@Hint进行设置。这对于通过反射来读取注解信息来说，是非常重要的。
+```
+Hint hint = Person.class.getAnnotation(Hint.class);
+System.out.println(hint);                   // null
+
+Hints hints1 = Person.class.getAnnotation(Hints.class);
+System.out.println(hints1.value().length);  // 2
+
+Hint[] hints2 = Person.class.getAnnotationsByType(Hint.class);
+System.out.println(hints2.length);          // 2
+```
+
+尽管我们绝对不会在`Person`类上声明`@Hints`注解，但是它的信息仍然可以通过`getAnnotation(Hints.class)`来读取。并且，`getAnnotationsByType`方法会更方便，因为它赋予了所有`@Hints`注解标注的方法直接的访问权限。
+```
+@Target({ElementType.TYPE_PARAMETER, ElementType.TYPE_USE})
+@interface MyAnnotation {}
+```
 
 # Summary
 关于java8的介绍与使用网上有太多太多了，如***[java8最佳技巧](https://zhuanlan.zhihu.com/p/27424997)***等等...
 > 参考
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***
->
 > ***[http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api](http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api)***
->
 > ***[http://ifeve.com/java-8-features-tutorial/](http://ifeve.com/java-8-features-tutorial/)***
