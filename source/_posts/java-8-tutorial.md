@@ -232,7 +232,7 @@ List<Character> chars = Arrays.asList('a', 'b');	System.out.println(chars.stream
 - `Optianal.ofNullable`：创建 `Optional` 对象，允许传空值
 
 `Optional` API：
-- `isPresent`: 变量存在返回`true`
+- `isPresent()`: 变量存在返回`true`
 - `get()`: 返回封装的变量值，或者抛出 `NoSuchElementException`
 - `orElse(T other)`: 提供默认值
 - `orElseGet(Supplier<? extends T> other)`: `orElse` 方法的延迟调用版
@@ -262,6 +262,132 @@ public Optional<Long> getPhone() {
 Optional 类设计的初衷仅仅是要支持能返回 Optional 对象的方法，没有考虑将它作为类的字段使用...
 
 # Streams
+
+## 流是什么
+
+先来一段代码：
+
+```java
+Arrays.asList("a1", "a2", "b1", "c2", "c1").stream()
+                                           .filter(s -> s.startsWith("c"))
+                                           .map(String::toUpperCase)
+                                           .sorted()
+                                           .forEach(System.out::println);
+```
+流是Java SE 8类库中新增的关键抽象，它被定义于`java.util.stream`（这个包里有若干流类型：`Stream<T>`代表对象引用流，此外还有一系列特化（specialization）流，比如`IntStream`代表整形数字流）。每个流代表一个值序列，流提供一系列常用的聚集操作，使得我们可以便捷的在它上面进行各种运算。集合类库也提供了便捷的方式使我们可以以操作流的方式使用集合、数组以及其它数据结构。流的操作可以被组合成流水线（Pipeline）。
+
+引入的原因：
+- 声明性方式处理数据集合
+- 透明地并行处理，提高性能
+
+**流** 的定义：从支持数据处理操作的源生成的元素序列
+两个重要特点：
+- 流水线
+- 内部迭代
+
+流与集合：
+- 集合与流的差异就在于什么时候进行计算    
+  - 集合是内存中的数据结构，包含数据结构中目前所有的值
+  - 流的元素则是按需计算/生成
+- 另一个关键区别在于遍历数据的方式    
+  - 集合使用 Collection 接口，需要用户去做迭代，称为外部迭代
+  - 流的 Streams 库使用内部迭代
+
+流的使用：
+- 一个数据源（如集合）来执行一个查询；
+- 一个中间操作链，形成一条流的流水线；
+- 一个终端操作，执行流水线，并能生成结果。
+
+流的流水线背后的理念类似于构建器模式。常见的中间操作有`filter`,`map`,`limit`,`sorted`,`distinct`；常见的终端操作有 `forEach`,`count`,`collect`。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/java/stream.png)
+流的操作类型分为两种：
+* `Intermediate`：一个流可以后面跟随零个或多个 `intermediate` 操作。其目的主要是**打开流**，做出某种程度的数据映射/过滤，然后返回一个新的流，交给下一个操作使用。这类操作都是**惰性化的**（**lazy**），就是说，仅仅调用到这类方法，**并没有真正开始流的遍历**。
+* `Terminal`：一个流只能有一个 `terminal` 操作，当这个操作执行后，流就被使用“光”了，无法再被操作。所以这必定是流的**最后一个操作**。`Terminal` 操作的执行，**才会真正开始流的遍历**，并且会生成一个结果，或者一个 **side effect**。
+
+## 流的使用
+### 构建流
+- 由值创建流：`Stream.of`、`Stream.empty`、`IntStream.range`
+- 由集合创建流：`Collection.stream`、`Collection.parallelStream`
+- 由数组创建流：`Arrays.stream(数组变量)`
+- 由文件生成流：`Files.lines`、`Files.walk`
+- 由BufferedReader创建流：`java.io.BufferedReader.lines`
+- 由函数生成流：创建无限流，    
+  - 迭代： `Stream.iterate`
+  - 生成：`Stream.generate`
+
+### 使用流
+
+#### Intermediate（中间操作）：
+
+- 筛选:    
+  - 谓词筛选：`filter`
+  - 筛选互异的元素：`distinct`
+  - 忽略头几个元素：`skip`
+  - 截短至指定长度：`limit`
+  - 排序：`sorted`
+  - 偷瞄（输出）：`peek`
+  - 平行化：`parallel`
+  - 串行化：`sequential`
+- 映射:
+  - 对流中每个元素应用函数：`map`
+  - 流的扁平化：`flatMap`
+- 数值范围：
+  - `range`:`[起始值，结束值)`
+  - `rangeClosed`:`[起始值，结束值]`
+
+#### Terminal（终结操作）
+- 查找和匹配:
+  - 检查谓词是否至少匹配一个元素：`anyMatch`
+  - 检查谓词是否匹配所有元素：`allMatch`/`noneMatch`
+  - 查找元素：`findAny`
+  - 查找第一个元素：`findFirst`
+- 归约（折叠）：`reduce`(初值，结合操作)
+  - 元素求和：`count`、`sum`
+  - 最大值和最小值：`min`、 `max`
+- 遍历：`forEach`、 `forEachOrdered`
+
+`anyMatch`,`allMatch`,`noneMatch` 都用到了短路；`distinct`,`sorted`是有状态且无界的，`skip`,`limit`,`reduce`是有状态且有界的。
+原始类型流特化：`IntStream`,`DoubleStream`,`LongStream`，避免暗含的装箱成本。
+- 映射到数值流：`mapToInt`,`mapToDouble`,`mapToLong`
+- 转换回流对象：`boxed`
+- 默认值：`OptionalInt`,`OptionalDouble`,`OptionalLong`
+
+
+
+### 用流收集数据
+对流调用 `collect` 方法将对流中的元素触发归约操作（由 `Collector` 来参数化）。
+Collectors 实用类提供了许多静态工厂方法，用来创建常见收集器的实例，主要提供三大功能：
+- 将流元素归约和汇总为一个值
+- 元素分组
+- 元素分区
+
+
+归约和汇总(`Collectors` 类中的工厂方法)：
+- 统计个数：`Collectors.counting`
+- 查找流中最大值和最小值：`Collectors.maxBy`,`Collectors.minBy`
+- 汇总：`Collectors.summingInt`,`Collectors.averagingInt`,`summarizingInt`/`IntSummaryStatistics`。还有对应的 long 和 double 类型的函数
+- 连接字符串：`joining`
+- 广义的归约汇总：`Collectors.reducing(起始值，映射方法，二元结合)`/`Collectors.reducing(二元结合)`。`Collectors.reducing` 工厂方法是所有上述特殊情况的一般化。
+
+`collect vs. reduce`，两者都是 `Stream` 接口的方法，区别在于：
+- 语意问题    
+  - reduce 方法旨在把两个值结合起来生成一个新值，是不可变的归约；
+  - collect 方法设计就是要改变容器，从而累积要输出的结果
+- 实际问题    
+  - 以错误的语义使用 reduce 会导致归约过程不能并行工作
+
+分组和分区
+- 分组：`Collectors.groupingBy`
+  - 多级分组
+  - 按子数组收集数据: `maxBy`
+    - 把收集器的结果转换为另一种结果 `collectingAndThen`
+    - 与 groupingBy 联合使用的其他收集器例子：`summingInt`,`mapping`
+
+- 分区：是分组的特殊情况，由一个谓词作为分类函数(分区函数)
+
+## Notice And Optimization
+
 
 # Annotations
 
