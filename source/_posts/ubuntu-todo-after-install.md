@@ -269,13 +269,20 @@ sudo apt-get install vim
 ```
 ## 安装Wps
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
-下载后，打开终端，运行一下命令
+先不要执行dpkg -i 去执行安装。这个地方有个问题，就是ubuntu 16 版本不支持32位的支持库，所以需要安装一下支持库。
+32位的支持库名为：ia32-libs
+安装的时候会提示有替代包，需要安装替代包。
+```bash
+sudo apt install lib32ncurses5 lib32z1
 ```
+还是不要执行dpkg -i ，因为即使现在安装还是会缺少一个依赖。这个依赖是libpng-12.0。不过这个在默认的apt 仓库里没有。所以需要手动下载一下。
+下载地址：***[https://packages.debian.org/zh-cn/wheezy/amd64/libpng12-0/download](https://packages.debian.org/zh-cn/wheezy/amd64/libpng12-0/download)***
+```bash
+sudo dpkg -i libpng12-0_1.2.49-1+deb7u2_amd64.deb
+```
+最后：
+```bash
 sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
-```
-***如果缺少依赖包，可以先执行一下命令(后面的软件安装过程中如出现依赖包问题，一样可以采用这种方式解决)***
-```
-sudo apt-get install -f
 ```
 
 ## 安装Chrome
