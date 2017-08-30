@@ -157,7 +157,7 @@ sudo apt-get install fonts-wqy-microhei
 
 # 软件篇
 
-## 安装 Wechat for Ubuntu
+## Wechat for Ubuntu
 下载地址：
 ***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>wechat4Ubuntu`)
@@ -165,7 +165,7 @@ sudo apt-get install fonts-wqy-microhei
 
 下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
 
-## 安装QQ轻聊版
+## QQ轻聊版
 虽然不太想安装QQ，但工作时候团队交流需要，QQ国际版又太难看，所以装个Deepin的轻聊版。
 工具包下载：***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>qq4Ubuntu`)
 
@@ -177,7 +177,7 @@ sudo apt-get install fonts-wqy-microhei
 2、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
 3、把破解文件 (`crossover16crack`->`winewrapper.exe.so`) 替换路径: `/opt/cxoffice/lib/wine`下的`winewrapper.exe.so`文件。提示已有文件，点“替换”破解完成。
 
-### 安装Deepin QQ轻聊版
+### Deepin QQ轻聊版
 1、用归档管理器打开`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
 2、点开 `data.tar.xz` 找到 `./opt/cxoffice/support`
 3、把 `apps.com.qq.im.light` 这个文件夹提取出来
@@ -208,13 +208,13 @@ fcitx
 ```
 解决！
 
-## 安装Git
+## Git
 上面也提到过安装`git`
 ```
 sudo apt-get install git
 ```
 
-## 安装版本控制系统GUI-SmartGit
+## 版本控制系统GUI-SmartGit
 ```
 sudo add-apt-repository ppa:eugenesan/ppa
 sudo apt-get update
@@ -225,7 +225,7 @@ sudo apt-get install smartgithg
 sudo apt-get remove smartgithg
 ```
 
-## 安装Typora(Markdown编辑器)
+## Typora(Markdown编辑器)
 ```
 # optional, but recommended
 
@@ -242,17 +242,12 @@ sudo apt-get update
 sudo apt-get install typora
 ```
 
-## 安装chm阅读器-kchmViewer
-```
-sudo apt-get install kchmviewer
-```
-
-## 安装虚拟机
+## 虚拟机
 ```
 sudo apt-get install virtualbox
 ```
 
-## 安装wiznote(为知笔记)
+## wiznote(为知笔记)
 
 一款`linux`下强大的笔记软件
 
@@ -262,12 +257,12 @@ sudo apt-get update
 sudo apt-get install wiznote
 ```
 
-## 安装Vim
+## Vim
 系统并没有集成`vim`，可以执行以下代码安装：
 ```
 sudo apt-get install vim
 ```
-## 安装Wps
+## Wps
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
 先不要执行dpkg -i 去执行安装。这个地方有个问题，就是ubuntu 16 版本不支持32位的支持库，所以需要安装一下支持库。
 32位的支持库名为：ia32-libs
@@ -285,20 +280,20 @@ sudo dpkg -i libpng12-0_1.2.49-1+deb7u2_amd64.deb
 sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
 ```
 
-## 安装Chrome
+## Chrome
 到*[chrome官网](https://www.google.com/chrome/browser/desktop/index.html)* 下载linux版的chrome。
 不能翻墙的小朋友可以到***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
 ```
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 ```
 
-## 安装Xmind
+## Xmind
 一款思维导图软件，再*[xmind官网](http://www.xmindchina.net/xiazai.html)下载deb安装包*
 ```
 sudo dpkg -i xmind-7.5-linux_amd64.deb
 ```
 
-## 安装Shutter
+## Shutter
 `Ubuntu`下很强大的一款截图软件
 ```
 sudo apt-get install shutter
@@ -345,7 +340,7 @@ sudo apt-get update
 sudo apt-get install smplayer smplayer-skins smplayer-themes
 ```
 
-## 安装Stardict火星译王
+## Stardict火星译王
 ```
 sudo apt-get install stardict
 ```
@@ -357,7 +352,7 @@ tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
 ```
 
-## 安装Filezilla
+## Filezilla
 ```
 sudo apt-get install filezilla
 sudo apt-get install filezilla-locales
@@ -383,9 +378,6 @@ proxychains firefox
 ```
 使用shadowsocks+proxychains代理打开新的firefox实现浏览器翻墙。
 也可以通过输入proxychains bash建立一个新的shell，基于这个shell运行的所有命令都将使用代理。
-
-
-
 
 
 ## rar安装与使用

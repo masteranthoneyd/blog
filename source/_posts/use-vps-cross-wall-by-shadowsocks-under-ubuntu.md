@@ -225,6 +225,13 @@ sudo gedit /etc/rc.local
 ```
 在这个配置文件的`exit 0`**前面**一行加上 `service supervisor start` 保存。看你是否配置成功你可以在现在关机重启之后直接打开浏览器看是否代理成功。
 
+还有一种方法就是：
+```bash
+sudo systemctl enable supervisor
+```
+然后重启即可
+
+
 ## 番外篇一：搬瓦工一键安装
 搬瓦工早就知道广大使用者的~~阴谋~~意图，所以特意提供了**一键无脑安装Shadowsocks**。
 注意：**目前只支持CentOS**。

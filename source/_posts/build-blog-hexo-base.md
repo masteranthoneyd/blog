@@ -46,7 +46,25 @@ node -v
 npm -v
 ```
 
-## 方法二：源文件编译安装
+## 方法二：换源下载
+安装 6.x 版本：
+```
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+安装 8.x 版本：
+```
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+npm 更换淘宝镜像：
+```
+npm config set registry https://registry.npm.taobao.org/
+```
+
+## 方法三：源文件编译安装
 在安装前，首先需要配置安g++编译器
 ```
 sudo apt-get install build-essential
