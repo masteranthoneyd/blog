@@ -25,9 +25,7 @@
     "hexo-server": "^0.2.0",
     "hexo-wordcount": "^2.0.1",
     "this-is-compress-plugin": [
-      {
-        "hexo-all-minifier": "0.0.14"
-      },
+      {"hexo-all-minifier": "0.0.14"},
       {
         "gulp": "^3.9.1",
         "gulp-htmlclean": "^2.7.6",
