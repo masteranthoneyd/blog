@@ -324,9 +324,8 @@ rm system.reg
 ### 完全破解
 这个方法对Navicat For Mysql和Premium都有效，但貌似只能对111版本起效，其他更高版本需要另找锤子。
 <a id="download" href="https://pan.baidu.com/s/1i5EB3yX"><i class="fa fa-download"></i><span> Download Now</span>
-点击上面跳到云盘，里面有111版的Navicat解压文件(Ubuntu版的)，还有一个`PatchNavicat.exe`，把压缩包解压出来，然后照上面的安装，完成后把里面的`Navicat.exe`拷贝到windows虚拟机(博主用的VirtualBox)，然后在虚拟机里面打开`PatchNavicat.exe`，选择`Navicat.exe`破解，再把破解的`Navicat.exe`放回到安装目录，完美破解！
 </a>
-
+点击上面跳到云盘，里面有111版的Navicat解压文件(Ubuntu版的)，还有一个`PatchNavicat.exe`，把压缩包解压出来，然后照上面的安装，完成后把里面的`Navicat.exe`拷贝到windows虚拟机(博主用的VirtualBox)，然后在虚拟机里面打开`PatchNavicat.exe`，选择`Navicat.exe`破解，再把破解的`Navicat.exe`放回到安装目录，完美破解！
 
 
 ## 创建快捷方式
@@ -399,12 +398,15 @@ redis-cli -h 127.0.0.1 -p 6379 shutdown
 /etc/redis/redis.conf
 ➜  ~ sudo gedit /etc/redis/redis.conf
 ```
-找到`bind localhost`注释掉
+找到`bind 127.0.0.1`注释掉
 注释掉本机,局域网内的所有计算机都能访问。
 `band localhost` 只能本机访问,局域网内计算机不能访问。
 `bind 局域网IP` 只能局域网内IP的机器访问, 本地localhost都无法访问。
 
 博主选择将`bind 127.0.0.1` 改成了`bind 0.0.0.0`
+
+## 开启发布订阅监听
+还是修改`redis.conf`文件，找到`notify-keyspace-events ""`，修改为`notify-keyspace-events Ex`或者`notify-keyspace-events AKE`，然后重启。
 
 # 安装Maven
 ## 下载
