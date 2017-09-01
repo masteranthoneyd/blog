@@ -61,6 +61,9 @@ sudo dpkg -i lantern.deb
 sudo chmod -R 777 /usr/bin/lantern
 ```
 
+## 方式三：搭建SS
+***[使用VPS搭建ShadowSocks实现Access Blocked Sites(俗称翻墙)并使用黑科技加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
+
 ***
 
 
@@ -130,6 +133,12 @@ cat /etc/shells
 ```
 chsh -s /bin/zsh
 ```
+
+或者一键安装...
+```
+sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+```
+
 
 最后，修改以下配色，会让你的终端样式看起来更舒服，在终端任意地方右键，进入配置文件(`profile`)->外观配置(`profile Preferences`)，弹出如下界面，进入`colors`一栏:
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh.png)
@@ -227,18 +236,9 @@ sudo apt-get remove smartgithg
 
 ## Typora(Markdown编辑器)
 ```
-# optional, but recommended
-
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
-
-# add Typora's repository
-
 sudo add-apt-repository 'deb https://typora.io ./linux/'
-
 sudo apt-get update
-
-# install typora
-
 sudo apt-get install typora
 ```
 

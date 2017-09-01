@@ -1,5 +1,5 @@
 ---
-title: Ubuntu的Java开发环境基本搭建(JDK+IDE+Tomcat+MySQL+Navicat+Redis)
+title: Ubuntu的Java开发环境基本搭建
 date: 2017-01-20 11:31:22
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
@@ -463,9 +463,70 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 	</mirror>
 </mirrors>
 ```
+# MongoDB
+## 安装
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
 
+#下面命令针对ubuntu16.04版本，在其他ubuntu版本系统请查看MongoDB官网
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
 
-[^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主
+sudo apt-get update
+
+sudo apt-get install -y mongodb-org
+```
+
+安装完成后查看版本：
+```
+mongo -version
+```
+![](http://ojoba1c98.bkt.clouddn.com/img/mongodb/mongodb-version.png)
+
+启动、重新启动和关闭mongodb命令:
+```
+sudo service mongod start
+sudo service mongod stop
+sudo service mongod restart
+```
+
+查看是否启动成功:
+```
+sudo cat /var/log/mongodb/mongod.log
+```
+在 `mongod.log` 日志中若出现如下信息，说明启动成功:
+```
+[initandlisten] waiting for connections on port 27017
+```
+
+## MongoDB 卸载
+删除 mongodb 包
+```
+sudo apt-get purge mongodb-org*
+```
+删除 MongoDB 数据库和日志文件
+```
+sudo rm -r /var/log/mongodb
+sudo rm -r /var/lib/mongodb
+```
+## MongoDB 使用
+shell命令模式 
+输入`mongo`进入shell命令模式，默认连接的数据库是test数据库，命令如下：
+```
+➜  ~ mongo
+```
+常用操作命令：
+
+`show dbs`：显示数据库列表 
+`show collections`：显示当前数据库中的集合（类似关系数据库中的表table） 
+`show users`：显示所有用户 
+`use yourDB`：切换当前数据库至yourDB 
+`db.help()` ：显示数据库操作命令 
+`db.yourCollection.help()` ：显示集合操作命令，yourCollection是集合名
+
+官方文档：***[https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/](https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/)***
+
+## GUI客户端
+***[Robomongo](https://www.mongodb.com/download-center#community)***
 
 # 搭建ngrok配置
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/ngrok_p1.jpg)
@@ -486,6 +547,8 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 ***[www.ngrok.cc](http://www.ngrok.cc)***
 </p>
 
+
+[^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主
 
 
 

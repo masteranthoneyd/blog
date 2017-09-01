@@ -313,8 +313,8 @@ Arrays.asList("a1", "a2", "b1", "c2", "c1").stream()
 - 由文件生成流：`Files.lines`、`Files.walk`
 - 由BufferedReader创建流：`java.io.BufferedReader.lines`
 - 由函数生成流：创建无限流，    
-  - 迭代： `Stream.iterate`
-  - 生成：`Stream.generate`
+  - 迭代： `Stream.iterate`（接受一个种子值，和一个`UnaryOperator`）
+  - 生成：`Stream.generate`（接收一个`Supplier`接口）
 
 ### 使用流
 
@@ -387,6 +387,9 @@ Collectors 实用类提供了许多静态工厂方法，用来创建常见收集
 - 分区：是分组的特殊情况，由一个谓词作为分类函数(分区函数)
 
 ## Notice And Optimization
+
+* 流不可被复用
+* 一般先`filter`、`limit`、`skip`操作后再进行`map`、`sorted`、`peek`等操作以达到`short-circuiting` 目的
 
 
 # Annotations
