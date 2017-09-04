@@ -60,9 +60,62 @@ Vultr的服务器托管在全球14个数据中心，即时开通使用。大陆�
 ***[Linode](https://www.linode.com)*** 是VPS 服务商中的大哥，高富帅般的存在。价格相对较高，但是性能，稳定性等各方面也非常给力。 VPS 采用 Xen 架构，不过最近的周年庆开始升级到 KVM 架构，VPS 性能进一步提升。推荐给对连接速度和网络延迟有极致追求的用户。
 Linode只能使用**信用卡支付**，官方会随机手工抽查，被抽查到的话需要上传信用卡正反面照片以及可能还需要身份证正反面照片，只要材料真实齐全，审核速度很快，一般一个小时之内就可以全部搞定。账户成功激活以后，就可以安心使用了。
 
+# SSH无密码登录VPS
+## 生成SSH密钥和公钥
+打开终端，使用下面的ssh-keygen来生成RSA密钥和公钥。`-t`表示type，就是说要生成`RSA`加密的钥匙：
+```shell
+ssh-keygen -t rsa -C "your_email@youremail.com"
+```
+`RSA`也是默认的加密类型，所以你也可以只输入`ssh-keygen`，默认的`RSA`长度是2048位，如果你非常注重安全，那么可以指定4096位的长度：
+```shell
+ssh-keygen -b 4096 -t rsa -C "your_email@youremail.com"
+```
+生成SSH Key的过程中会要求你指定一个文件来保存密钥，按Enter键使用默认的文件就行了，然后需要输入一个密码来加密你的SSH Key，密码至少要20位长度，SSH密钥会保存在home目录下的`.ssh/id_rsa`文件中，SSH公钥保存在`.ssh/id_rsa.pub`文件中。
+```
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/matrix/.ssh/id_rsa): 　#按Enter键
+Enter passphrase (empty for no passphrase): 　　#输入一个密码
+Enter same passphrase again: 　　#再次输入密码
+Your identification has been saved in /home/matrix/.ssh/id_rsa.
+Your public key has been saved in /home/matrix/.ssh/id_rsa.pub.
+The key fingerprint is:
+e1:dc:ab:ae:b6:19:b0:19:74:d5:fe:57:3f:32:b4:d0 matrix@vivid
+The key's randomart image is:
++---[RSA 4096]----+
+| .. |
+| . . |
+| . . .. . |
+| . . o o.. E .|
+| o S ..o ...|
+| = ..+...|
+| o . . .o .|
+| .o . |
+| .++o |
++-----------------+
+```
 
+## 将SSH公钥上传到Linux服务器
+### 方式一
+使用`scp`把公钥上传到服务器，然后：
+```shell
+cat id_rsa.pub >> ~/.ssh/authorized_keys
+```
+### 方式二
+可以使用`ssh-copy-id`命令来完成：
+```shell
+ssh-copy-id username@remote-server -p serverPort
+```
+输入远程用户的密码后，SSH公钥就会自动上传了，SSH公钥保存在远程Linux服务器的`.ssh/authorized_keys`文件中。
 
-# ShadowSocks服务端
+## alias别名简化登录命令
+只需要在当前用户目录加上别名命令，但博主用的是`zsh`，所有配置在`.zshrc`而不是`.bashrc`
+```shell
+echo "alias vps='ssh -o ServerAliveInterval=30 root@172.104.65.190 -p 2333'" >> ~/.zshrc
+source ~/.zshrc
+```
+然后直接输入`vps`就可以登陆了。
+
+# ShadowSocks服务端安装
 > 这里博主选择的VPS的操作系统是**Ubuntu14.04**,因为16.04不明原因安装失败。
 > 另外，**搬瓦工**可以一键安装Shadowsocks和OpenVPN（只支持CentOS），但处于爱折腾，手动安装。
 
@@ -122,10 +175,12 @@ vi /etc/rc.local
 ```
 粘贴完成后，和上面编辑配置文件一样，选按键盘左上角的“ESC”键，然后输入”:wq”，保存退出。这样，开机就会自动启动ShadowSocks了。不信，你可以试一下。
 
+## 或者一键安装...
+***[一键安装脚本](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/#番外篇二：一键安装脚本)***
 
 
 
-# ShadowSocks客户端
+# ShadowSocks客户端安装
 ## 安装与启动
 Ubuntu使用ShadowSocks客户端有两种方式：
 1、安装ShadowSocks命令行程序，配置命令。
@@ -326,7 +381,7 @@ proxychains firefox
 也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个shell运行的所有命令都将使用代理。
 
 # ShadowSocks优化
-开启TCP Fast Open：
+## 开启TCP Fast Open
 **这个需要服务器和客户端都是Linux 3.7+的内核**
 在服务端和客户端的`/etc/sysctl.conf`都加上：
 ```
@@ -334,6 +389,20 @@ proxychains firefox
 net.ipv4.tcp_fastopen = 3
 ```
 然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`
+
+## 使用特殊端口
+GFW会通过某些手段来减轻数据过滤的负荷，例如特殊的端口如ssh，ssh默认端口给ss用了那么久必须修改我们登录服务器的端口。
+修改SSH配置文件：
+```shell
+vi /etc/ssh/sshd_config
+```
+找到`#port 22`，将前面的`#`去掉，然后修改端口 `port 2333`（自己设定）。
+然后重启SSH：
+```shell
+service ssh restart
+```
+
+
 跟多详情请见：***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
 
 # 黑科技系列
@@ -350,6 +419,11 @@ BBR 目的是要尽量跑满带宽, 并且尽量不要有排队的情况, 效果
 ## Kcptun
 ***[Kcptun 服务端一键安装脚本](https://blog.kuoruan.com/110.html)***
 
+# Denyhosts防暴力攻击
+这个方法比较省时省力。denyhosts 是 Python 语言写的一个程序，它会分析 sshd 的日志文件，当发现重复的失败登录时就会记录 IP 到 /etc/hosts.deny 文件，从而达到自动屏 IP 的功能：
+```shell
+apt-get install denyhosts
+```
 
 [^1]: 防火长城（英语：Great Firewall( of China)，常用简称：GFW，中文也称中国国家防火墙，中国大陆民众俗称防火墙等），是对中华人民共和国政府在其互联网边界审查系统（包括相关行政审查系统）的统称。此系统起步于1998年，其英文名称得自于2002年5月17日Charles R. Smith所写的一篇关于中国网络审查的文章《The Great Firewall of China》，取與Great Wall（长城）相谐的效果，简写为Great Firewall，缩写GFW。隨着使用的拓广，中文「墙」和英文「GFW」有时也被用作动词，网友所說的「被墙」即指被防火长城所屏蔽，「翻墙」也被引申为浏览国外网站、香港等特区网站的行为。
 
