@@ -231,7 +231,7 @@ sudo systemctl enable supervisor
 ```
 然后重启即可
 
-
+# 番外篇：服务端一键安装
 ## 番外篇一：搬瓦工一键安装
 搬瓦工早就知道广大使用者的~~阴谋~~意图，所以特意提供了**一键无脑安装Shadowsocks**。
 注意：**目前只支持CentOS**。
@@ -326,7 +326,15 @@ proxychains firefox
 也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个shell运行的所有命令都将使用代理。
 
 # ShadowSocks优化
-***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
+开启TCP Fast Open：
+**这个需要服务器和客户端都是Linux 3.7+的内核**
+在服务端和客户端的`/etc/sysctl.conf`都加上：
+```
+# turn on TCP Fast Open on both client and server side
+net.ipv4.tcp_fastopen = 3
+```
+然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`
+跟多详情请见：***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
 
 # 黑科技系列
 ## FinalSpeed
