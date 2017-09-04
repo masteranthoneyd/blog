@@ -61,8 +61,8 @@ sudo dpkg -i lantern.deb
 sudo chmod -R 777 /usr/bin/lantern
 ```
 
-## 方式三：搭建SS
-***[使用VPS搭建ShadowSocks实现Access Blocked Sites(俗称翻墙)并使用黑科技加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
+## 方式三：自搭建Shadowsocks
+***[Access Blocked Sites(翻墙):VPS自搭建ShadowSocks与加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
 
 ***
 
@@ -134,7 +134,7 @@ cat /etc/shells
 chsh -s /bin/zsh
 ```
 
-或者一键安装...
+或者**一键安装**...
 ```
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 ```

@@ -12,7 +12,7 @@ tags: [Java]
 <!--more-->
 
 # Default Methods for Interfaces
-Java 8 允许我们使用default关键字，为接口声明添加非抽象的方法实现。这个特性又被称为扩展方法。下面是我们的第一个例子：
+Java 8 允许我们使用`default`关键字，为接口声明添加非抽象的方法实现。这个特性又被称为扩展方法。下面是我们的第一个例子：
 ```java
 interface Formula {
     double calculate(int a);
@@ -22,7 +22,7 @@ interface Formula {
     }
 }
 ```
-在接口Formula中，除了抽象方法caculate以外，还定义了一个默认方法sqrt.Formula的实现类只需要实现抽象方法caculate就可以了。默认方法sqrt可以直接使用。
+在接口Formula中，除了抽象方法`caculate`以外，还定义了一个默认方法`sqrt.Formula`的实现类只需要实现抽象方法`caculate`就可以了。默认方法`sqrt`可以直接使用。
 ```java
 Formula formula = new Formula() {
     @Override
@@ -71,7 +71,7 @@ button.addActionListener(new ActionListener) {
 }
 ```
 
-匿名类型最大的问题就在于其冗余的语法。有人戏称匿名类型导致了“高度问题”（**height problem**）：比如前面ActionListener的例子里的五行代码中仅有一行在做实际工作。
+匿名类型**最大的问题**就在于其**冗余的语法**。有人戏称匿名类型导致了“高度问题”（**height problem**）：比如前面`ActionListener`的例子里的五行代码中仅有一行在做实际工作。
 Lambda表达式（又被成为“闭包”或“匿名方法”）是简洁地表示可传递的匿名函数的一种方式，它提供了轻量级的语法，从而解决了匿名内部类带来的“高度问题”。
 
 重点留意这四个关键词：**匿名**、**函数**、**传递**、**简洁**
@@ -105,7 +105,7 @@ Collections.sort(names, (String a, String b) -> b.compareTo(a));
 亦或是
 Collections.sort(names, (a, b) -> b.compareTo(a));
 ```
-在IDEA里面，对于可以写成Lambda表达式的，按下Alt+Enter 它会智能地提示转换
+在IDEA里面，对于可以写成Lambda表达式的，按下`Alt`+`Enter` 它会智能地提示转换
 
 ## Lexiacal Scope
 ### 访问局部变量
@@ -259,7 +259,7 @@ public Optional<Long> getPhone() {
     return Optional.ofNullable(this.phone);
 }
 ```
-Optional 类设计的初衷仅仅是要支持能返回 Optional 对象的方法，没有考虑将它作为类的字段使用...
+`Optional` 类设计的初衷仅仅是要支持能返回 `Optional` 对象的方法，没有考虑将它作为类的字段使用...
 
 # Streams
 
@@ -332,6 +332,8 @@ Arrays.asList("a1", "a2", "b1", "c2", "c1").stream()
 - 映射:
   - 对流中每个元素应用函数：`map`
   - 流的扁平化：`flatMap`
+  - 转为原始流：`mapToInt`、`mapToInt`、`mapToInt`
+  - 从原始流转为普通流：`boxed`
 - 数值范围：
   - `range`:`[起始值，结束值)`
   - `rangeClosed`:`[起始值，结束值]`
@@ -383,13 +385,12 @@ Collectors 实用类提供了许多静态工厂方法，用来创建常见收集
   - 按子数组收集数据: `maxBy`
     - 把收集器的结果转换为另一种结果 `collectingAndThen`
     - 与 groupingBy 联合使用的其他收集器例子：`summingInt`,`mapping`
-
-- 分区：是分组的特殊情况，由一个谓词作为分类函数(分区函数)
+- 分区：`Collectors.partitioningBy`是分组的特殊情况，由一个谓词作为分类函数(分区函数)，返回一个Map，只有两个Boolean类型的key。
 
 ## Notice And Optimization
 
 * 流不可被复用
-* 一般先`filter`、`limit`、`skip`操作后再进行`map`、`sorted`、`peek`等操作以达到`short-circuiting` 目的
+* 一般先`filter`、`limit`、`skip`操作后再进行`sorted`、`peek`、`map`等操作以达到`short-circuiting` 目的
 
 
 # Annotations
@@ -443,6 +444,7 @@ System.out.println(hints2.length);          // 2
 # Summary
 关于java8的介绍与使用网上有太多太多了，如***[java8最佳技巧](https://zhuanlan.zhihu.com/p/27424997)***等等...
 > 参考
+> ***[Java8简明教程](http://blog.didispace.com/books/java8-tutorial/)***
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***
 > ***[http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api](http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api)***
 > ***[http://ifeve.com/java-8-features-tutorial/](http://ifeve.com/java-8-features-tutorial/)***
