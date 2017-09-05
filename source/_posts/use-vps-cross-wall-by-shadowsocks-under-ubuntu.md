@@ -115,6 +115,12 @@ source ~/.zshrc
 ```
 然后直接输入`vps`就可以登陆了。
 
+## 保持长连接
+只需要在ssh命令后加上发送心跳即可：
+```
+ssh -o ServerAliveInterval=30 user@ip
+```
+
 # ShadowSocks服务端安装
 > 这里博主选择的VPS的操作系统是**Ubuntu14.04**,因为16.04不明原因安装失败。
 > 另外，**搬瓦工**可以一键安装Shadowsocks和OpenVPN（只支持CentOS），但处于爱折腾，手动安装。
@@ -405,7 +411,7 @@ service ssh restart
 
 跟多详情请见：***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
 
-# 黑科技系列
+# 黑科技加速系列
 ## FinalSpeed
 ***[91yun发布的finalspeed一键安装包](https://www.91yun.org/archives/2775)***
 ***[锐速替代品双边加速FinalSpeed客户端下载及教程 ，Openvz福音](https://www.91yun.org/archives/615)***
