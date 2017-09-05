@@ -1,5 +1,5 @@
 ---
-title: 从Ubuntu GNOME安装主题与美化
+title: Ubuntu GNOME安装主题与美化
 date: 2017-09-04 15:55:07
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,GNOME]
