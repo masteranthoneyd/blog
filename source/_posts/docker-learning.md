@@ -111,7 +111,7 @@ sudo usermod -aG docker $USER
 sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["https://vioqnt7w.mirror.aliyuncs.com"]
+  "registry-mirrors": ["https://vioqnt8w.mirror.aliyuncs.com"]
 }
 EOF
 sudo systemctl daemon-reload
