@@ -42,7 +42,7 @@ sudo sh get-docker.sh --mirror Aliyun
 ```
 执行这个命令后，脚本就会自动的将一切准备工作做好，并且把 Docker 安装在系统中
 
-##使用 APT 镜像源 安装
+## 使用 APT 镜像源 安装
 ```
 sudo apt-get update
 sudo apt-get install \

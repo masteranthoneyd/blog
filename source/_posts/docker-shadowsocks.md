@@ -22,7 +22,8 @@ chmod +x bbr.sh
 ```
 
 # Install Docker
-详细教程不在本篇范围内，以下是最简单快捷高效的安装方式：
+详细教程不在本篇范围内，请看***[Docker入门笔记](/2017/docker-learning)***
+以下是最简单快捷高效的安装方式：
 ```
 curl -fsSL get.docker.com -o get-docker.sh
 sh get-docker.sh
@@ -73,12 +74,12 @@ kcptun命令自行度娘=.=
 # Shadowsocks Client
 **With Kcptun**
 ```
-docker run -dt --name ssclient --restart=always -p 1080:1080 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-local" -s "-s 127.0.0.1 -p 6500 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpclient" -k "-r {{server-ip}}:6500 -l :6500 -mode fast2"
+docker run -dt --name ssclient --restart=always -p 1080:1080 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-local" -s "-s 127.0.0.1 -p 6500 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpclient" -k "-r server-ip:6500 -l :6500 -mode fast2"
 ```
 
 **Without Kcptun**
 ```
-docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:latest -m "ss-local" -s "-s {{server-ip}} -p 6443 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open"
+docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:latest -m "ss-local" -s "-s server-ip -p 6443 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open"
 ```
 
 **注意：**
