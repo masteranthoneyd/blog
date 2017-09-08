@@ -82,7 +82,7 @@ docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:l
 ```
 
 **注意：**
-如果使用了**With Kcptun**，ss的监听ip填本地 `127.0.0.1`，`{{server-ip}}`填服务器`ip`。
+如果使用了**With Kcptun**，ss的监听ip填本地 `127.0.0.1`，`server-ip`填服务器`ip`。
 
 # Last
 测试了一下，在开启了BBR情况下，**without kcptun**更快。
