@@ -4,7 +4,7 @@ date: 2017-04-17 18:00:00
 categories: IDE
 tags: [Ubuntu, IDE]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/java/idea.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea2.png)
 # Preface
 > 公司里的大牛们用的IDE基本都是IDEA~~近墨者黑~~，早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用就要被OUT了
 > 此篇把在Ubuntu下使用IDEA的学习经验记录下来(网上还是比较少资料解决Ubuntu下IDEA的问题Orz)，以便老了记性不好可以看一看...
@@ -23,15 +23,19 @@ tags: [Ubuntu, IDE]
 以下是博主个人的常用配置：
 一般会选择打开项目时最外层的窗口打开`setting`，对全局生效。
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting.png)
-1、文件修改后，设置左边目录出现颜色变化
+
+## 文件修改后，设置左边目录出现颜色变化
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/version-control-change.png)
-2、如果只有一行方法的代码默认要展开，去掉这个勾
+
+## 如果只有一行方法的代码默认要展开，去掉这个勾
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/one-line-methods.png)
-3、修改字体和字号
+
+## 修改字体和字号
 Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu默认的字体工具栏可能会出现乱码。
 下面三个地方，分别是窗口字体，代码字体和控制台字体：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-font.png)
-4、修改VM参数
+
+## 修改VM参数
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
 通过`Toolbox`可以简单地设置VM参数，博主16G内存的主机的VM参数设置为
 ```
@@ -39,24 +43,37 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 -Xmx1500m
 -XX:ReservedCodeCacheSize=500m
 ```
-5、设置代码不区分大小写
+## 设置代码不区分大小写
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
 
-6、优化导包
+## 优化导包
 IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，需要哪个就`import`哪个。
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/import-optimizing.png)
 
-7、设置不自动打开上一次最后关闭的项目
+## 设置不自动打开上一次最后关闭的项目
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
-8、Postfix Completion
+## Postfix Completion
 这个本来就是默认开启的
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/postfix-completion.png)
 
-9、可生成SreializableID
+## 可生成SreializableID
 在 `setting>Editor>Inspections>Java>Serializtion Issues>`:
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
 钩上之后在需要生成的类上`Alt+Enter`就会出现了。
+
+## 关闭代码拖拽功能
+一不小心手抖就改了代码...禁用！
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/dorp-function.png)
+
+## 显示内存使用情况
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/show-memory.png)
+点击内存信息展示的那个条可以进行部分的内存回收
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/menory.png)
+
+
+## 优化 Java 注释
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-optimize.png)
 
 # Keyboard shortcuts
 > JetBrains官方快捷键手册： *[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)*
@@ -145,7 +162,7 @@ IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，�
 | **Ctrl+Alt+V**       | 提取为新变量             |
 | **Ctrl+Alt+F**       | 提取为对象新属性           |
 | **Ctrl+Alt+C**       | 提取为新静态常量           |
-| **Ctrl+Alt+P**       | 提取为方法参数           |
+| **Ctrl+Alt+P**       | 提取为方法参数            |
 | **Ctrl+Shift+Alt+P** | 提取为函数式参数           |
 | **Ctrl+Alt+Shift+T** | 重构一切               |
 
@@ -198,7 +215,7 @@ Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-
 
 
 ### IDEA创建项目
-在IDEA里创建一个Java项目，且目录**必须**为`com.vladsch.idea.multimarkdown.license`,要不然编译出来的package属性就变了哦
+在IDEA里创建一个Java项目，且目录**必须**为`com.vladsch.idea.multimarkdown.license`,要不然编译出来的`package`属性就变了哦
 把上面找到的`LicenseAgent.java`扔进去
 ![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/crack-java-file.png)
 
@@ -216,9 +233,9 @@ Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-
 * `isValidActivation()` 删除方法体，只留返回值，返回值改为 `return true`;
 * `getLicenseType()` 删除方法体，只留返回值，返回值改为 `return "License"` 或 `return "license"`;
 * `getLicenseExpiringIn()` 删除方法体，只留返回值，返回值改为 `return 36000`;(单位是天)
-* `isActivationExpired()` 删除方法体，只留返回值，返回值改为 `return false`;
+* `isActivationExpired()` 删除方法体，只留返回值，返回值改为 `return false`.
 
-改完后右键`java`文件compile编译一下得到`class`文件
+改完后右键`java`文件`compile`编译一下得到`class`文件
 
 ### 替换
 用上面得到的`LicenseAgent.class`文件替换掉`idea-multimarkdown.jar/com/vladsch/idea/multimarkdown/license`里面的文件`LicenseAgent.class`文件：
