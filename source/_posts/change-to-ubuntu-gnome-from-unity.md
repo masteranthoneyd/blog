@@ -21,7 +21,7 @@ sudo apt-get install gnome-session-flashback
 但考虑到会不会有兼容性的问题，就直接下载Ubuntu GNOME重装了=.=
 <a id="download" href="https://ubuntugnome.org/download"><i class="fa fa-download"></i><span> Download Now</span>
 </a>
-安装过程博主就省略了。
+安装过程就省略了。
 
 # Theme
 博主选择一款叫 Arc-Theme 的主题，包括了 GNOME Shell 主题和 GTK 主题。
@@ -41,6 +41,11 @@ git clone https://github.com/horst3180/arc-theme --depth 1 && cd arc-theme
 ```
 ./autogen.sh --prefix=/usr
 sudo make install
+{
+  "registry-mirrors": ["https://vioqnt7w.mirror.aliyuncs.com"]
+}
+EOF
+
 ```
 
 ## 其它选项
@@ -61,6 +66,8 @@ sudo make install
 
 ## 选择主题
 安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
 
 **注意** :对于高分屏，可能使用 `Arc-Theme` 显示 GNOME Shell 的字体过小，可通过修改 `/usr/share/themes/[对应 Arc 主题]/gnome-shell/gnome-shell.css` 修改 **stage** 的 `font-size` 。
 
@@ -95,9 +102,22 @@ sudo apt-get install papirus-icon-theme
 **[项目地址](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme)**
 
 # GNOME Shell Extensions
+
+先上图...
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop1.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop2.png)
+
 [**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
 
 [**System Monitor**](https://extensions.gnome.org/extension/1064/system-monitor/) 系统监视器
+
+这个先要安装依赖：
+
+```
+sudo apt install gir1.2-gtop-2.0 libgtop2-dev
+```
 
 [**Topicons Plus**](https://extensions.gnome.org/extension/1031/topicons/) 任务图标栏
 
@@ -118,4 +138,35 @@ hardcode-tray --conversion-tool Inkscape
 
 [**Dash To Dock**](https://extensions.gnome.org/extension/307/dash-to-dock/) 可定制的 Dock
 
+# Zsh Theme
+
+在`~/.oh-my-zsh/themes`中查看主题。
+
+然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可。
+
+# Fix Curl
+
+装了GNOME后，发现没有`curl`...
+对，下载源码安装：***[https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)***
+装好之后又尴尬了，不支持`https`！！！
+一番查阅后，已解决：
+step1，安装`openssl`：
+```
+sudo apt-get install openssl
+sudo apt-get install libssl-dev
+```
+安装默认路径：
+`/usr/lib/ssl`
+
+step2，进入解压的`curl`源码包：
+```
+./configure --with-ssl=/usr/lib/ssl
+make
+sudo make install
+```
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/configure.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/have-https.png)
+
+搞定～
 
