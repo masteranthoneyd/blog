@@ -242,6 +242,12 @@ sudo apt-get update
 sudo apt-get install typora
 ```
 
+## StarUml
+这个一款绘图工具
+下载：***[http://staruml.io/download](http://staruml.io/download)***
+安装依赖：***[https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5](https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5)***
+然后`dpkg`安装就好了，如果还有依赖直接`apt install -f`修复一下就好。
+
 ## 虚拟机
 ```
 sudo apt-get install virtualbox
