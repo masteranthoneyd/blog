@@ -247,6 +247,55 @@ sudo apt-get install typora
 下载：***[http://staruml.io/download](http://staruml.io/download)***
 安装依赖：***[https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5](https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5)***
 然后`dpkg`安装就好了，如果还有依赖直接`apt install -f`修复一下就好。
+安装好之后修改`LicenseManagerDomain.js`
+查找：
+```
+dpkg -S staruml | grep LicenseManagerDomain.js
+```
+修改：
+```
+sudo gedit /opt/staruml/www/license/node/LicenseManagerDomain.js
+```
+如下：
+```
+(function () {
+    "use strict";
+
+    var NodeRSA = require('node-rsa');
+    
+    function validate(PK, name, product, licenseKey) {
+        var pk, decrypted;
+		return {  
+            name: "yangbingdong",  
+            product: "StarUML",  
+            licenseType: "vip",  
+            quantity: "yangbingdong.com",  
+            licenseKey: "later equals never!"  
+        };  
+        try {
+            pk = new NodeRSA(PK);
+            decrypted = pk.decrypt(licenseKey, 'utf8');
+        } catch (err) {
+            return false;
+        }
+        var terms = decrypted.trim().split("\n");
+        if (terms[0] === name && terms[1] === product) {
+            return { 
+                name: name, 
+                product: product, 
+                licenseType: terms[2],
+                quantity: terms[3],
+                licenseKey: licenseKey
+            };
+        } else {
+            return false;
+        }
+    }
+    ......
+```
+改完打开StarUml -> `Help` -> `Enter License`，不是输入任何东西直接确定
+
+
 
 ## 虚拟机
 ```
