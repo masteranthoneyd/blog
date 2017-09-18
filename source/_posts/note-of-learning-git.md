@@ -153,6 +153,58 @@ git push
 git git@github.com:your-name/repo-name.git
 ```
 
+# 标签管理
+## 查看tag
+列出所有tag：
+```
+git tag
+```
+这样列出的tag是按字母排序的，和创建时间没关系。如果只是想查看某些tag的话，可以加限定：
+```
+git tag -l v1.*
+```
+这样就只会列出1.几的版本。
+
+## 创建tag
+
+创建轻量级`tag`：
+```
+git tag 1.0.1
+```
+这样创建的`tag`没有附带其他信息，与之相应的是带信息的`tag`,`-m`后面带的就是注释信息，这样在日后查看的时候会很有用，这种是普通`tag`，还有一种有签名的`tag`：
+```
+git tag -a 1.0.1 -m 'first version'
+```
+
+除了可以为当前的进度添加`tag`，我们还可以为以前的`commit`添加`tag`：
+首先查看以前的`commit`
+```
+git log --oneline
+```
+假如有这样一个`commit`：8a5cbc2 updated readme
+这样为他添加`tag`
+```
+git tag -a v1.1 8a5cbc2
+```
+
+## 删除tag
+很简单，知道`tag`名称后：
+```
+git tag -d v1.0
+```
+删除远程分支：
+```
+git push origin --delete tag <tagname>
+
+```
+
+## 共享tag
+我们在执行`git push`的时候，`tag`是不会上传到服务器的，比如现在的`github`，创建`tag`后`git push`，在`github`网页上是看不到`tag`的，为了共享这些`tag`，你必须这样：
+```
+git push origin --tags
+```
+
+
 # 分支管理
 分支相当与平行宇宙，互不干扰，哪天合并了就拥有了所有平行宇宙的特性
 ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitBranch.png)
@@ -162,7 +214,7 @@ git git@github.com:your-name/repo-name.git
 * 当我们创建新的分支，例如 `dev` 时，Git新建了一个指针叫 `dev` ，指向 `master` 相同的提交，再把 `HEAD` 指向 `dev` ，就表示当前分支在 `dev` 上
 * Git创建一个分支很快，因为除了增加一个 `dev` 指针，改改 `HEAD` 的指向，工作区的文件都没有任何变化
 * 当 `HEAD` 指向 `dev` ，对工作区的修改和提交就是针对 `dev` 分支了，比如新提交一次后， `dev` 指针往前移动一步，而 `master` 指针不变
-![](http://ojoba1c98.bkt.clouddn.com/img/git/gitBranch01.png)
+  ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitBranch01.png)
 
 查看分支：`git branch`
 创建分支：`git branch <name>`
