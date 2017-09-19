@@ -1,5 +1,5 @@
 ---
-title: 解决Hexo命令出现fs.SyncWriteStream问题
+title: 解决Hexo命令fs.SyncWriteStream问题
 date: 2017-09-19 11:56:18
 categories: [Hexo]
 tags: [Hexo]
@@ -11,11 +11,8 @@ tags: [Hexo]
 
 > （↑ 图文无关 ↑）
 > `nodejs`版本更新到`8.0`之后，运行`hexo`相关命令总会出现这么一行鬼东西：
->
-> ```shell
-> (node:538) [DEP0061] DeprecationWarning: fs.SyncWriteStream is deprecated.
-> ```
-> 虽然不怎么影响大局，当对于强迫症来说是一个**噩梦**，于是决定把它干掉！
+> `(node:538) [DEP0061] DeprecationWarning: fs.SyncWriteStream is deprecated.`
+> 虽然不怎么影响大局，当对于强迫症来说是一个**噩梦**！
 
 <!--more-->
 

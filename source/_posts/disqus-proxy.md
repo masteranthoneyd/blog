@@ -182,7 +182,7 @@ disqus_proxy:
   -webkit-box-shadow: none !important;
 }
 ```
-博主也对评论框乱入了一些样式例如头像旋转...具体请看***[main.0603c539.css](http://ookamiantd.top/static/css/main.0603c539.css)***
+博主也对评论框乱入了一些样式例如头像旋转...具体请看***[main.0603c539.css](/static/css/main.0603c539.css)***
 
 # Problem
 博主使用了`hexo-all-minifier`进行静态文件压缩，不明原因导致那两个评论框的js和css压缩之后会报错，所以对压缩选项作设置，在**站点配置文件**中添加：

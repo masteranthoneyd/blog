@@ -7,7 +7,7 @@ tags: [Java,JVM]
 ![](http://ojoba1c98.bkt.clouddn.com/img/jvm/class.png)
 # 前言
 
-> [上一篇](http://ookamiantd.top/2017/jvm-knowledge-collect-01/)记录了JVM内存管理相关知识，这一篇来写一下类加载相关以及一些优化
+> [上一篇](/2017/jvm-knowledge-collect-01/)记录了JVM内存管理相关知识，这一篇来写一下类加载相关以及一些优化
 
 <!--more-->
 # Java类加载机制总结

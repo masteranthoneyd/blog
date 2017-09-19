@@ -7,7 +7,7 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/hexoGoverment.png)
 
 # 前言
-搭建此博客的动机以及好处在此就不多谈了，之前已经表达过，详情请看*[Start My Blog Trip — Power By Hexo](http://ookamiantd.top/20170110/hello-world/)*
+搭建此博客的动机以及好处在此就不多谈了，之前已经表达过，详情请看*[Start My Blog Trip — Power By Hexo](/2017/hello-world/)*
 记录一下搭建的基本过程以及遇到的一些问题，仅供参考
 = =废话不多说，进入主题
 <!--more-->
@@ -287,7 +287,7 @@ git config --global user.email your_email@youremail.com
 ```
 关于git可参考：
 *[史上最全github使用方法：github入门到精通](http://blog.csdn.net/v123411739/article/details/44071059/)*
-*[Git学习笔记](http://www.ookamiantd.top/20170118/note-of-learning-git/)*
+*[Git学习笔记](/2017/note-of-learning-git/)*
 
 # 部署到Github与Coding
 在此之前，先安装**Git部署插件**

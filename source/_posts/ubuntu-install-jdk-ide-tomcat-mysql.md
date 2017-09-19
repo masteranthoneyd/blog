@@ -99,7 +99,7 @@ Name[en]=Eclipse Mars.2
 * 作者签名：java → code style → code templates → types  签名快捷键：`alt + shift + j`
 
 ## MyEclipse
-MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](http://ookamiantd.top/2017/ubuntu-myeclipse-crack/)***
+MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-myeclipse-crack/)***
 
 ## IntelliJ IDEA
 之前听说过IDE[^1]，都是大公司用的，并没有用过
@@ -539,7 +539,7 @@ shell命令模式
 ***[http://www.qydev.com/](http://www.qydev.com/)***
 客户端和教程都在里面哦。
 
-**Update:**Ngrok已搭建成功～ ，记录于***[http://ookamiantd.top/2017/self-hosted-build-ngrok-server/](http://ookamiantd.top/2017/self-hosted-build-ngrok-server/)***
+**Update:**Ngrok已搭建成功～ ，记录于***[self-hosted-build-ngrok-server](/2017/self-hosted-build-ngrok-server/)***
 
 
 <p id="div-border-left-purple">**其他tunnel的代理服务器**：

@@ -7,7 +7,7 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/next.png)
 # 前言
 好久没更新了，因为懒- -
-前面介绍了Hexo的一些基本搭建→***[基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)](http://www.ookamiantd.top/2017/build-blog-hexo-base/)***
+前面介绍了Hexo的一些基本搭建→***[基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)](/2017/build-blog-hexo-base/)***
 对于追求装X的博主来说，基本的搭建是满足不了的，接下来整理了一下各方面的细节优化，包括页面字体大小、配色、背景、SEO(搜索引擎优化)、域名绑定、DNS域名解析实现负载均衡等。
 关于`NexT`主题的很多配置、插件都可以在***[官方文档](theme-next.iissnan.com/getting-started.html)***找到答案，那么博主只是整理了一些官方没怎么提及的细节优化。
 
@@ -788,7 +788,7 @@ font:
 ```
 ## 使用云盘存放图片资源
 由于Github的服务器在海外，那么如果把图片也放到Github显然是不科学的，而且Github的存储空间也有局限，那么在这里博主推荐使用*[七牛云储存](http://www.qiniu.com/)*
-具体怎么做在之前的基础篇已经介绍过了，详情请看→*[传送门](http://www.ookamiantd.top/2017/build-blog-hexo-base/#%E6%96%B9%E5%BC%8F%E4%B8%89)*
+具体怎么做在之前的基础篇已经介绍过了，详情请看→*[传送门](/2017/build-blog-hexo-base/#%E6%96%B9%E5%BC%8F%E4%B8%89)*
 
 ## 压缩代码
 安装插件：
