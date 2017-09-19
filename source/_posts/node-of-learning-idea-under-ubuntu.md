@@ -167,6 +167,54 @@ IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，�
 | **Ctrl+Alt+Shift+T** | 重构一切               |
 
 # Plugin
+## 简洁代码风格Lombok
+1.首先在IDEA里面安装使用lombok编写简略风格代码的插件，
+打开IDEA的Settings面板，并选择Plugins选项，然后点击 “Browse repositories..” 
+![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok01.png)
+在输入框输入”lombok”，得到搜索结果，选择第二个，点击安装，然后安装提示重启IDEA，安装成功; 
+![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok02.png)
+
+ 2.在自己的项目里添加lombok的编译支持(maven项目),在pom文件里面添加如下
+indenpence
+```xml
+<dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.16.18</version>
+    </dependency>
+```
+
+3.然后就可以尽情在自己项目里面编写简略风格的Java代码咯
+```java
+    package com.lombok;
+
+    import lombok.Data;
+    import lombok.EqualsAndHashCode;
+
+    import java.util.List;
+
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    public class Student {
+
+        String name;
+        int sex;
+        Integer age;
+        String address;
+
+        List<String> books;
+
+    }
+    //使用Student类对象
+    Student student = new Student();
+    student.setName(name);
+    student.setAge(age);
+    student.setAddress(address);
+    student.setBooks(Arrays.asList(books));
+```
+
+4.Lombok的功能不仅如此，更详细请看***[features](https://projectlombok.org/features/all)***
+
 ## 热部署插件JRebel安装与激活
 > 每次修改java文件都需要重启tomcat，很痛苦有木有？ 推荐给大家一个很好用的热部署插件，JRebel，目前是最好的，在使用过程中应该90%的编辑操作都是可以reload的，爽歪歪，节约我们大量的开发时间，提高开发效率。
 
