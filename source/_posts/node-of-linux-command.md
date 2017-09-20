@@ -15,7 +15,7 @@ tags: [Ubuntu]
 ## 保持长连接
 只需要在ssh命令后加上发送心跳即可：
 ```
-ssh -o ServerAliveInterval=30 root@123.456.88 -p
+ssh -o ServerAliveInterval=30 root@123.456.88 -p 2333
 ```
 
 ## 生成SSH密钥和公钥
@@ -75,7 +75,7 @@ cat id_rsa.pub >> ~/.ssh/authorized_keys
 ### 姿势二
 可以使用`ssh-copy-id`命令来完成：
 ```shell
-ssh-copy-id username@remote-server -p serverPort
+ssh-copy-id <用户名>@<服务器ip> -p <端口>
 ```
 输入远程用户的密码后，SSH公钥就会自动上传了，SSH公钥保存在远程Linux服务器的`.ssh/authorized_keys`文件中。
 
@@ -87,8 +87,30 @@ source ~/.zshrc
 ```
 然后直接输入`vps`就可以登陆远程服务器了。
 
+# 切换用户
+
+使用`su`命令切换用户，ex：
+```
+su ybd
+```
+
+这样就切换到了`ybd`用户，如果不加用户名，默认是 `su root`切换`root`用户。
+**注意**：`su` 和 `su -`的区别
+
+- 前者是直接切换，还**保留了当前位置以及变量**
+- 而后者不单单切换了用户，而且还**切换到了用户目录**，并且之前用户的**环境变量没有了**！
 
 
+> 之前就因为这个原因，写Dockerfile困扰了好一段时间...囧
+
+还有`su`也可以使用某个用户的身份执行一些命令，ex：
+
+```
+su - ${USER_NAME} -c "npm install -g hexo-cli"
+su - ${USER_NAME} -c shell.sh
+```
+
+执行完之后还是保持当前用户。
 
 
 
