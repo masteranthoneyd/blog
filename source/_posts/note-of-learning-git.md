@@ -33,6 +33,46 @@ git config --global user.email "email@example.com"
 每次提交，都会记录这两个值，`--global` 参数，表示你这台机器上所有的Git仓库都会使用这个配置
 可使用 `git config -l` 查看全局配置信息
 
+# 运行前配置
+一般在新的系统上，我们都需要先配置下自己的 Git 工作环境。配置工作只需一次，以后升级时还会沿用现在的配置。
+
+## 配置文件如何生效
+
+对于 Git 来说，配置文件的权重是**仓库>全局>系统**。Git 会使用这一系列的配置文件来存储你定义的偏好，它首先会查找 `/etc/gitconfig` 文件（系统级），该文件含有对系统上所有用户及他们所拥有的仓库都生效的配置值。接下来 Git 会查找每个用户的 `~/.gitconfig` 文件（全局级）。最后 Git 会查找由用户定义的各个库中Git目录下的配置文件 `.git/config`（仓库级），该文件中的值只对当前所属仓库有效。以上阐述的三 层配置从一般到特殊层层推进，如果定义的值有冲突，以后面层中定义的为准，例如：`.git/config` 和 `/etc/gitconfig` 的较量中， `.git/config` 取得了胜利。
+
+## 查看配置
+
+格式：`git config [--local|--global|--system] -l`
+
+example:
+
+```
+# 查看当前生效的配置
+git config -l
+
+# 查看仓库级的配置
+git config --local -l
+
+# 查看全局级的配置
+git config --global -l
+
+# 查看系统级的配置
+git config --system -l
+```
+
+## 修改配置
+
+格式：`git config [--local|--global|--system] key value`
+
+example:
+
+```
+git config --global user.name ybd
+git config --global user.email yangbingdong1994@gmail.com
+```
+
+
+
 # 创建仓库（Repository）
 创建一个目录并进入，进行初始化仓库
 ```
@@ -99,7 +139,7 @@ git reset HEAD read
 ```
 git checkout -- read
 ```
-git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本
+`git reset`命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本
 
 ## 删除文件
 如果把工作区中的文件删除了，那么工作区和版本库就不一致，`git status` 命令会立刻告诉你哪些文件被删除了
@@ -126,7 +166,7 @@ ssh-keygen -t rsa -C "youremail@example.com"
 你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码
 如果一切顺利的话，可以在用户主目录里找到 `.ssh` 目录，里面有 `id_rsa` 和 `id_rsa.pub` 两个文件，这两个就是SSH Key的秘钥对，` id_rsa` 是私钥，不能泄露出去，`id_rsa.pub` 是公钥，可以放心地告诉任何人
 
-2\. 登陆GitHub，打开“Account settings”，“SSH Keys”页面，然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容，最后点“Add Key”
+2\. 登陆GitHub，打开“Account settings”，“SSH Keys”页面，然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴`id_rsa.pub`文件的内容，最后点“Add Key”
 
 ## 添加远程仓库
 首先到Github创建一个仓库
@@ -134,7 +174,7 @@ ssh-keygen -t rsa -C "youremail@example.com"
 ```
 git remote add origin git@github.com:your-name/repo-name.git
 ```
-远程库的名字就是origin，这是Git默认的叫法，也可以改成别的，但是origin这个名字一看就知道是远程库
+远程库的名字就是`origin`，这是Git默认的叫法，也可以改成别的，但是`origin`这个名字一看就知道是远程库
 
 下一步，就可以把本地库的所有内容推送到远程库上：
 ```

@@ -61,65 +61,7 @@ Vultr的服务器托管在全球14个数据中心，即时开通使用。大陆�
 Linode只能使用**信用卡支付**，官方会随机手工抽查，被抽查到的话需要上传信用卡正反面照片以及可能还需要身份证正反面照片，只要材料真实齐全，审核速度很快，一般一个小时之内就可以全部搞定。账户成功激活以后，就可以安心使用了。
 
 # SSH无密码登录VPS
-## 生成SSH密钥和公钥
-打开终端，使用下面的ssh-keygen来生成RSA密钥和公钥。`-t`表示type，就是说要生成`RSA`加密的钥匙：
-```shell
-ssh-keygen -t rsa -C "your_email@youremail.com"
-```
-`RSA`也是默认的加密类型，所以你也可以只输入`ssh-keygen`，默认的`RSA`长度是2048位，如果你非常注重安全，那么可以指定4096位的长度：
-```shell
-ssh-keygen -b 4096 -t rsa -C "your_email@youremail.com"
-```
-生成SSH Key的过程中会要求你指定一个文件来保存密钥，按Enter键使用默认的文件就行了，然后需要输入一个密码来加密你的SSH Key，密码至少要20位长度，SSH密钥会保存在home目录下的`.ssh/id_rsa`文件中，SSH公钥保存在`.ssh/id_rsa.pub`文件中。
-```
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/matrix/.ssh/id_rsa): 　#按Enter键
-Enter passphrase (empty for no passphrase): 　　#输入一个密码
-Enter same passphrase again: 　　#再次输入密码
-Your identification has been saved in /home/matrix/.ssh/id_rsa.
-Your public key has been saved in /home/matrix/.ssh/id_rsa.pub.
-The key fingerprint is:
-e1:dc:ab:ae:b6:19:b0:19:74:d5:fe:57:3f:32:b4:d0 matrix@vivid
-The key's randomart image is:
-+---[RSA 4096]----+
-| .. |
-| . . |
-| . . .. . |
-| . . o o.. E .|
-| o S ..o ...|
-| = ..+...|
-| o . . .o .|
-| .o . |
-| .++o |
-+-----------------+
-```
-
-## 将SSH公钥上传到Linux服务器
-### 方式一
-使用`scp`把公钥上传到服务器，然后：
-```shell
-cat id_rsa.pub >> ~/.ssh/authorized_keys
-```
-### 方式二
-可以使用`ssh-copy-id`命令来完成：
-```shell
-ssh-copy-id username@remote-server -p serverPort
-```
-输入远程用户的密码后，SSH公钥就会自动上传了，SSH公钥保存在远程Linux服务器的`.ssh/authorized_keys`文件中。
-
-## alias别名简化登录命令
-只需要在当前用户目录加上别名命令，但博主用的是`zsh`，所有配置在`.zshrc`而不是`.bashrc`
-```shell
-echo "alias vps='ssh -o ServerAliveInterval=30 root@172.104.65.190 -p 2333'" >> ~/.zshrc
-source ~/.zshrc
-```
-然后直接输入`vps`就可以登陆了。
-
-## 保持长连接
-只需要在ssh命令后加上发送心跳即可：
-```
-ssh -o ServerAliveInterval=30 user@ip
-```
+参考 ***[免密码登录远程服务器](/2017/node-of-linux-command/#免密码登录远程服务器)***
 
 # ShadowSocks服务端安装
 > 这里博主选择的VPS的操作系统是**Ubuntu14.04**,因为16.04不明原因安装失败。
