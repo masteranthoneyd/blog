@@ -1,5 +1,5 @@
 ---
-title: Linux 常用命令
+title: Ubuntu 常用命令
 date: 2017-09-20 18:05:10
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
@@ -91,27 +91,54 @@ source ~/.zshrc
 
 使用`su`命令切换用户，ex：
 ```
-su ybd
+su - ybd
 ```
-
-这样就切换到了`ybd`用户，如果不加用户名，默认是 `su root`切换`root`用户。
+这样就切换到了ybd用户
+`su -`就是`su -l`(l为login的意思)，`l`可以省略，所以一般写成`su -`.....
+如果不加用户名，默认是 `su root`切换`root`用户。
 **注意**：`su` 和 `su -`的区别
 
 - 前者是直接切换，还**保留了当前位置以及变量**
 - 而后者不单单切换了用户，而且还**切换到了用户目录**，并且之前用户的**环境变量没有了**！
 
-
 > 之前就因为这个原因，写Dockerfile困扰了好一段时间...囧
 
 还有`su`也可以使用某个用户的身份执行一些命令，ex：
-
 ```
+# 执行单个命令
 su - ${USER_NAME} -c "npm install -g hexo-cli"
-su - ${USER_NAME} -c shell.sh
+# 执行shell脚本
+su - ${USER_NAME} -s /bin/bash shell.sh
 ```
 
 执行完之后还是保持当前用户。
+可以通过`exit`退出当前用户。
 
+# 防火墙
+1、查看端口是否开启：
+```
+telnet 192.168.1.103 80
+```
+
+2、查看本地的端口开启情况：
+```
+sudo ufw status
+```
+
+3、打开80端口：
+```
+sudo ufw allow 80
+```
+
+4、防火墙开启：
+```
+sudo ufw enable
+```
+
+5、防火墙重启：
+```
+sudo ufw reload
+```
 
 
 
