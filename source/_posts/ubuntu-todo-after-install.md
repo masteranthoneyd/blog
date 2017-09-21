@@ -147,6 +147,11 @@ sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install
 其中，文字和背景采用系统主题，透明度设为10%，下面的`palette`样式采用`Tango`，这样一通设置后，效果如下：
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh-show.png)
 
+**配色**：
+
+- 文本颜色：`#00FF00`
+- 粗体字颜色：与文本颜色相同
+- 背景颜色：`#002B36`
 
 ## 安装字体
 

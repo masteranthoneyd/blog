@@ -5,9 +5,12 @@ categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
 
-# preface
-> =.= 这里只记录一些个人比较常用到的命令
-> 那些太基本以及太高深的就。。。。。
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/ubuntu-logo.png)
+
+# Preface
+
+> =.= 这里只记录一些个人比较常用到的[*Ubuntu*](https://www.ubuntu.com)命令
+> 那些太基本以及太高深的就......
 
 
 <!--more-->
@@ -19,7 +22,7 @@ ssh -o ServerAliveInterval=30 root@123.456.88 -p 2333
 ```
 
 ## 生成SSH密钥和公钥
-打开终端，使用下面的ssh-keygen来生成RSA密钥和公钥。`-t`表示type，就是说要生成`RSA`加密的钥匙：
+打开终端，使用下面的`ssh-keygen`来生成`RSA`密钥和公钥。`-t`表示type，就是说要生成`RSA`加密的钥匙：
 ```shell
 ssh-keygen -t rsa -C "your_email@youremail.com"
 ```
@@ -27,7 +30,7 @@ ssh-keygen -t rsa -C "your_email@youremail.com"
 ```shell
 ssh-keygen -b 4096 -t rsa -C "your_email@youremail.com"
 ```
-生成SSH Key的过程中会要求你指定一个文件来保存密钥，按Enter键使用默认的文件就行了，然后需要输入一个密码来加密你的SSH Key，密码至少要20位长度，SSH密钥会保存在home目录下的`.ssh/id_rsa`文件中，SSH公钥保存在`.ssh/id_rsa.pub`文件中。
+生成SSH Key的过程中会要求你指定一个文件来保存密钥，按`Enter`键使用默认的文件就行了，然后需要输入一个密码来加密你的SSH Key，密码至少要20位长度，SSH密钥会保存在`home`目录下的`.ssh/id_rsa`文件中，SSH公钥保存在`.ssh/id_rsa.pub`文件中。
 ```
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/matrix/.ssh/id_rsa): 　#按Enter键
@@ -101,7 +104,7 @@ su - ybd
 - 前者是直接切换，还**保留了当前位置以及变量**
 - 而后者不单单切换了用户，而且还**切换到了用户目录**，并且之前用户的**环境变量没有了**！
 
-> 之前就因为这个原因，写Dockerfile困扰了好一段时间...囧
+> 之前就因为这个原因，写`Dockerfile`困扰了好一段时间...囧
 
 还有`su`也可以使用某个用户的身份执行一些命令，ex：
 ```

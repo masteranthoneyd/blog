@@ -116,14 +116,14 @@
             </span>
           {% endif %}
 
-  
+
        <span id="busuanzi_container_page_pv">
        &nbsp; | &nbsp; 热度&nbsp; <span id="busuanzi_value_page_pv"></span>°C
        </span>
-       	
+
 
           {% if post.comments %}
-           
+
           {% endif %}
 
           {% if not is_index and theme.facebook_sdk.enable and theme.facebook_sdk.like_button %}
@@ -144,7 +144,7 @@
                  <span class="leancloud-visitors-count"></span>
              </span>
           {% endif %}
-          
+
           <br/><span class="post-time">
            <span class="post-meta-item-icon">
              <i class="fa fa-edit"></i>
@@ -154,7 +154,7 @@
 			<span class="post-meta-divider">|</span>
 			<span class="post-meta-item-text">min2read:</span>
            <span class="post-count">{{ min2read(post.content) }}分钟</span>
-           
+
          </span>
 
           {% if not is_index and theme.busuanzi_count.enable and theme.busuanzi_count.page_pv %}
