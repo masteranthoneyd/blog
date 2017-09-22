@@ -16,7 +16,7 @@ tags: [Ubuntu]
 <!--more-->
 # SSH相关
 ## 保持长连接
-只需要在ssh命令后加上发送心跳即可：
+只需要在`ssh`命令后加上发送心跳即可：
 ```
 ssh -o ServerAliveInterval=30 root@123.456.88 -p 2333
 ```
@@ -63,6 +63,7 @@ scp -P <端口> <源文件> <目标文件>
 # 传输文件夹
 scp -P <端口> -r <源文件夹> <目标文件夹>
 ```
+**注意**`-P`要在前面
 ex：
 ```
 scp -P 2333 /home/ybd/file root@123.456.78:/root/file
@@ -143,7 +144,49 @@ sudo ufw enable
 sudo ufw reload
 ```
 
+# 用户与用户组相关
+
+## 添加用户useradd
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-useradd.png)
+
+ex：
+创建ybd用户并且加入ybd用户组并且创建用户目录：
+
+```
+useradd -g ybd -m ybd
+# 或者
+user add -m -U ybd
+```
+
+## 修改密码
+
+```
+passwd ybd
+```
 
 
 
+## 修改用户usermod
 
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-usermod.png)
+
+## 添加用户组groupadd
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-groupadd.png)
+
+
+## 修改用户组
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-groupmod.png)
+
+## 查看组
+查看当前登录用户所在的组：
+```
+groups
+```
+查看用户test所在组：
+```
+groups test
+```
+查看所有组：
+```
+cat /etc/group
+```
