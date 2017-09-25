@@ -12,6 +12,11 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 关于`NexT`主题的很多配置、插件都可以在***[官方文档](theme-next.iissnan.com/getting-started.html)***找到答案，那么博主只是整理了一些官方没怎么提及的细节优化。
 
 <!--more-->
+
+# 解决Hexo命令fs.SyncWriteStream问题
+
+请看***[解决Hexo命令fs.SyncWriteStream问题](/2017/build-blog-hexo-base/#解决Hexo命令fs-SyncWriteStream问题)***
+
 # 高度定制优化篇
 
 ## 博客更换Disqus评论
