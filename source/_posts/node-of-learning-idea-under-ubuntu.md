@@ -135,7 +135,8 @@ IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，�
 | **Ctrl+Shift+]/[**             | 选中到代码块的开始/结束               |
 | **Ctrl+Delete/Ctrl+Backspace** | 删除从光标所在位置到单词结束/开头处         |
 | **Ctrl+F4**                    | 关闭当前编辑页                    |
-| **Alt+J/Ctrl+Alt+Shift+J**     | 匹配下一个/全部与当前选中相同的代码         |
+| **Alt+J/Ctrl+Alt+Shift+J**     | 匹配下一个/全部与当前选中相同的代码      |
+|  **Alt+Shift+Insert,然后Shift+Up/Down**   | 同时编辑多行    |
 
 ## 调试
 
