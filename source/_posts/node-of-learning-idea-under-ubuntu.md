@@ -20,7 +20,7 @@ tags: [Ubuntu, IDE]
 至于*注册码*，嘿嘿嘿，度娘你懂的。
 
 # Personal Setting
-以下是博主个人的常用配置：
+博主的常用配置：
 一般会选择打开项目时最外层的窗口打开`setting`，对全局生效。
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting.png)
 
@@ -75,7 +75,28 @@ IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，�
 ## 优化 Java 注释
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-optimize.png)
 
+## 优化方法链
+在Java8中特别是使用Stream API，ex：
+```java
+list.stream().filter(func).distinct().skip(num).limit(num).map(func).peek(func).collect(func);
+```
+写成一行太长了！！
+勾上这个选项idea将自动帮我们优化：
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
+
+会变成这样
+
+```
+list = list.stream()
+		   .filter(func)
+		   .distinct()
+		   .....
+```
+
+
+
 # Keyboard shortcuts
+
 > JetBrains官方快捷键手册： *[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)*
 
 个人感觉Ubuntu下使用IDEA最大的一个不爽就是**快捷键**了，~~想屎的感觉有木有~~，各种没反应，原来是快捷键冲突，本来想改成Eclipse的风格，但想了想好像不太合适。
@@ -118,25 +139,26 @@ IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，�
 
 ## 编辑
 
-| Keyboard shortcut              | Declaration                |
-| ------------------------------ | -------------------------- |
-| **Ctrl+D/Ctrl+Y**              | 重复代码,未选择代码时重复当前行/删除当前行     |
-| **Ctrl+Shift+Enter**           | 补全语句                       |
-| **Ctrl+P**                     | 显示方法参数                     |
-| **Ctrl+Q**                     | 显示注释文档                     |
-| **Alt+Insert**                 | 生成代码,生成 Getter、Setter、构造器等 |
-| **Ctrl+O/Ctrl+I**              | 重写父类方法/实现接口方法              |
-| **Ctrl+W**                     | 选择代码块,连续按会增加选择外层的代码块       |
-| **Ctrl+Shift+W**               | 与“Ctrl+W”相反,减少选择代码块        |
-| **Ctrl+Alt+L**                 | 格式化代码                      |
-| **Ctrl+Alt+O**                 | 优化 Imports                 |
-| **Ctrl+Shift+J**               | 合并多行为一行                    |
-| **Ctrl+Shift+U**               | 对选中内容进行大小写切换               |
-| **Ctrl+Shift+]/[**             | 选中到代码块的开始/结束               |
-| **Ctrl+Delete/Ctrl+Backspace** | 删除从光标所在位置到单词结束/开头处         |
-| **Ctrl+F4**                    | 关闭当前编辑页                    |
-| **Alt+J/Ctrl+Alt+Shift+J**     | 匹配下一个/全部与当前选中相同的代码      |
-|  **Alt+Shift+Insert,然后Shift+Up/Down**   | 同时编辑多行    |
+| Keyboard shortcut                    | Declaration                              |
+| ------------------------------------ | ---------------------------------------- |
+| **Ctrl+D/Ctrl+Y**                    | 重复代码,未选择代码时重复当前行/删除当前行                   |
+| **Ctrl+Shift+Enter**                 | 补全语句                                     |
+| **Ctrl+P**                           | 显示方法参数                                   |
+| **Ctrl+Q**                           | 显示注释文档                                   |
+| **Alt+Insert**                       | 生成代码,生成 Getter、Setter、构造器等               |
+| **Ctrl+O/Ctrl+I**                    | 重写父类方法/实现接口方法                            |
+| **Ctrl+W**                           | 选择代码块,连续按会增加选择外层的代码块                     |
+| **Ctrl+Shift+W**                     | 与“Ctrl+W”相反,减少选择代码块                      |
+| **Ctrl+Alt+L**                       | 格式化代码                                    |
+| **Ctrl+Alt+O**                       | 优化 Imports                               |
+| **Ctrl+Shift+J**                     | 合并多行为一行                                  |
+| **Ctrl+Shift+U**                     | 对选中内容进行大小写切换                             |
+| **Ctrl+Shift+]/[**                   | 选中到代码块的开始/结束                             |
+| **Ctrl+Delete/Ctrl+Backspace**       | 删除从光标所在位置到单词结束/开头处                       |
+| **Ctrl+F4**                          | 关闭当前编辑页                                  |
+| **Alt+J/Ctrl+Alt+Shift+J**           | 匹配下一个/全部与当前选中相同的代码                       |
+| **Alt+Shift+J**                      | “Alt+J”的反选                               |
+| **Alt+Shift+Insert,然后Shift+Up/Down** | 同时编辑多行(退出此`Column`模式也是“Alt+Shift+Insert”) |
 
 ## 调试
 
