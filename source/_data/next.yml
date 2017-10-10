@@ -231,13 +231,20 @@ wechat_subscriber:
 highlight_theme: normal
 
 # JiaThis 分享服务
-jiathis: true
+# jiathis: true
 
-duoshuo_info:
-  ua_enable: false
-  admin_enable: true
-  user_id: 6373153144901207000
-  admin_nickname: 博主大人
+# add this 分享服务
+add_this_id: ra-59dc1dbd4e67768d
+
+# 百度分享服务
+# baidushare: true
+
+# 多说信息
+#duoshuo_info:
+#  ua_enable: false
+#  admin_enable: true
+#  user_id: 6373153144901207000
+#  admin_nickname: 博主大人
   
   # Show number of visitors to each article.
 # You can visit https://leancloud.cn get AppID and AppKey.
@@ -279,7 +286,7 @@ algolia_search:
     hits_stats: "${hits} results found in ${time} ms"
 
 ## 文章末尾是否显示打赏按钮
-reward_comment: 赏我买点狗粮！
+reward_comment: 谢谢大爷～
 wechatpay: /images/donate/wechat.png
 alipay: /images/donate/alipay.jpg
 
@@ -297,7 +304,7 @@ baidu_analytics: e9505ac4e11d464329d615553a72b526
 
       
 # 多说热评文章 true 或者 false
-duoshuo_hotartical: false
+# duoshuo_hotartical: false
 
 # Disqus
 disqus_shortname: ookamiantd

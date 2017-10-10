@@ -1,5 +1,5 @@
 ---
-title: 学习Dockerfile以及构建Hexo镜像
+title: Dockerfile学习And构建Hexo镜像
 date: 2017-10-09 09:14:57
 categories: [Docker, Base]
 tags: [Docker, Dockerfile]

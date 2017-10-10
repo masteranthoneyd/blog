@@ -12,7 +12,7 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://ookamiantd.top
+url: http://yangbingdong.com
 root: /
 permalink: :year/:title/
 permalink_defaults:
@@ -82,8 +82,8 @@ baidusitemap:
   path: baidusitemap.xml
 
 baidu_url_submit:
-  count: 4 ## 比如3，代表提交最新的三个链接
-  host: ookamiantd.top ## 在百度站长平台中注册的域名
+  count: 23 ## 比如3，代表提交最新的三个链接
+  host: yangbingdong.com ## 在百度站长平台中注册的域名
   token: sKIjGrW5IgkkDrVu ## 请注意这是您的秘钥， 请不要发布在公众仓库里!
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
   
