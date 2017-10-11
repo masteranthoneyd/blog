@@ -1,5 +1,5 @@
 ---
-title: Access Blocked Sites(翻墙):VPS自搭建ShadowSocks与加速
+title: Access Blocked Sites(科学上网):VPS自搭建ShadowSocks与加速
 date: 2017-04-19 18:15:57
 categories: [VPS]
 tags: [VPS,ShadowSocks]

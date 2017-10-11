@@ -705,7 +705,7 @@ border-top-color: #9954bb;
 }
 ```
 
-** 用法如下**：
+**用法如下**：
 ### 文字增加背景色块
 <span id="inline-blue">站点配置文件</span> ，<span id="inline-purple">主题配置文件</span>
 ```
