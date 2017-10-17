@@ -9,10 +9,8 @@
 **DDD**: Domain-Driver Design 领域驱动设计
 
 **CQRS**: Command Query Responsibility Segregation 命令查询职责分离
-*[AxonFramework](https://github.com/AxonFramework/AxonFramework)*: CQRS实现框架
 
 **[Event Sourcing](http://microservices.io/patterns/data/event-sourcing.html)**: 事件溯源
-*[Eventuate Local](https://github.com/eventuate-local/eventuate-local)*: 溯源实现框架
 
 **Event-driven Architecture**: 事件驱动架构，使用事件来实现跨多个服务的业务逻辑
 
@@ -84,7 +82,7 @@ Aggregate(聚合)：
 
 实践微服务之后，除了事务之外，查询是又是另外一个挑战。在传统架构中，我们可以JOIN多个表进行查询，但在微服务当中，数据库已经分开，如果是通过Event Sourcing实现的架构就更加困难了（因为存储的是事件）。
 
-解决之道：CQRS
+解决之道：**CQRS**
 
 
 
@@ -117,3 +115,7 @@ Aggregate(聚合)：
 *[一个微服务架构的在线购物网站（CQRS+Event Sourcing）](https://github.com/chaokunyang/microservices-event-sourcing)*
 
 *[spring-cloud-event-sourcing-example](https://github.com/kbastani/spring-cloud-event-sourcing-example)*
+
+*[CQRS实现框架AxonFramework](https://github.com/AxonFramework/AxonFramework)*
+
+*[溯源实现框架Eventuate Local](https://github.com/eventuate-local/eventuate-local)*

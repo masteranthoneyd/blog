@@ -29,7 +29,7 @@
     "hexo-wordcount": "^2.0.1",
     "this-is-compress-plugin": [
       {
-        "hexo-all-minifier": "0.0.14"
+        "hexo-all-minifier": "^0.4.0"
       },
       {
         "gulp": "^3.9.1",
