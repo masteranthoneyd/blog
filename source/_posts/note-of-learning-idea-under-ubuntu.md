@@ -190,6 +190,15 @@ list = list.stream()
 | **Ctrl+Alt+Shift+T** | 重构一切               |
 
 # Plugin
+
+## Ali规约插件 P3C
+插件地址：***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
+文档：***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***
+
+## FindBugs
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/find-bug.png)
+装完之后右键最下面会多出一个`FindBugs`的选项
+
 ## 简洁代码风格Lombok
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件，
 打开IDEA的Settings面板，并选择Plugins选项，然后点击 “Browse repositories..” 

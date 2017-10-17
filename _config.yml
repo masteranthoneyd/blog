@@ -93,7 +93,11 @@ algolia:
   apiKey: 3d33fa60ba30d3b17f37220bb1a36749
   adminApiKey: 313c96267a13129641a1203ac402e172
   indexName: blogIndex
-  chunkSize: 5000
+  chunkSize: 10000
+
+# 所有外部链接添加nofollow
+nofollow:
+  enable: true
 
   # ---------------下面选项需要对应插件的支持---------------
 # npm install hexo-generator-index --save
@@ -122,8 +126,11 @@ admin:
       bucketHost: ojoba1c98.bkt.clouddn.com
 
 # 文件压缩选项
+all_minifier: true
+
 html_minifier:
   enable: true
+  ignore_error: false
   exclude: 
 
 css_minifier:
