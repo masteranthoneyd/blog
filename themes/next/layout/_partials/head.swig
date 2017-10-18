@@ -8,6 +8,22 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 <meta http-equiv="content-language" content="zh-cn">
 
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #ff009e;
+        height: 2px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #e6006b, 0 0 5px #ff009e;
+    }
+    .pace .pace-activity {
+        border-top-color: #ff009e;
+        border-left-color: #ff009e;
+    }
+</style>
+
 
 {% if theme.google_site_verification %}
   <meta name="google-site-verification" content="{{ theme.google_site_verification }}" />

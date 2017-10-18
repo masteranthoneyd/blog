@@ -449,7 +449,5 @@ docker run -p 6380:6379 --name redis-master --restart=always -v /home/ybd/docker
 # Last
 
 > 参考：
->
 > ***[Docker — 从入门到实践](https://www.gitbook.com/book/yeasy/docker_practice/details)***
->
 > ***[Docker命令大全](https://kamisec.github.io/2017/06/docker%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/)***

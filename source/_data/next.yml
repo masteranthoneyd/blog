@@ -230,11 +230,17 @@ wechat_subscriber:
 # https://github.com/chriskempson/tomorrow-theme
 highlight_theme: normal
 
+################ 分享模块
+
+mob_share:
+  enable: true
+  appkey: 21aa3b13ad233
+
 # JiaThis 分享服务
 # jiathis: true
 
 # add this 分享服务
-add_this_id: ra-59dc1dbd4e67768d
+# add_this_id: ra-59dc1dbd4e67768d
 
 # 百度分享服务
 # baidushare: true

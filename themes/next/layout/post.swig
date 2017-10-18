@@ -22,6 +22,8 @@
         {% include '_partials/share/add-this.swig' %}
       {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
         {% include '_partials/share/duoshuo_share.swig' %}
+      {% elseif theme.mob_share.enable %}
+        {% include '_partials/share/mob_share.swig' %}
       {% endif %}
     </div>
   </div>
