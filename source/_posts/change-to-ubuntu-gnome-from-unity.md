@@ -41,10 +41,6 @@ git clone https://github.com/horst3180/arc-theme --depth 1 && cd arc-theme
 ```
 ./autogen.sh --prefix=/usr
 sudo make install
-{
-  "registry-mirrors": ["https://vioqnt7w.mirror.aliyuncs.com"]
-}
-EOF
 
 ```
 

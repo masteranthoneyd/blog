@@ -8,7 +8,6 @@
   "dependencies": {
     "hexo": "^3.3.9",
     "hexo-algolia": "^1.2.3",
-    "hexo-all-minifier": "^0.4.0",
     "hexo-autonofollow": "^1.0.1",
     "hexo-baidu-url-submit": "0.0.5",
     "hexo-deployer-git": "^0.3.1",
