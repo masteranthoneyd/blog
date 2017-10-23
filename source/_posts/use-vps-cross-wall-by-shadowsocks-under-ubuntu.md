@@ -302,6 +302,14 @@ fetch gfwlist fail. online: https://raw.githubusercontent.com/gfwlist/gfwlist/ma
 ```shell
 sudo genpac --proxy="SOCKS5 127.0.0.1:1080" -o autoproxy.pac --gfwlist-url="https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
 ```
+
+如果出现`base64 decoding fail .`，安装其他版本：
+```
+sudo pip install https://github.com/JinnLynn/genpac/archive/master.zip
+sudo pip install --upgrade https://github.com/JinnLynn/genpac/archive/master.zip
+sudo pip uninstall genpac
+```
+
 3、全局代理
 系统设置 –> 网络 –> 网络代理
 “方法”选择“自动”
