@@ -295,7 +295,33 @@ flush privileges;
 select host,user from user;
 ```
 
+
+## 附加：基于Docker
+### 拉取镜像
+
+```
+docker pull mysql:5.7
+```
+
+### 运行实例
+
+```
+MYSQL=/home/ybd/data/docker/mysql && docker run --name=mysql -p 3306:3306  -v $MYSQL/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION --lower-case-table-names=1
+```
+
+### 终端客户端
+
+```
+sudo apt-get install mysql-client
+
+// 链接
+mysql -h 127.0.0.1 -P 3306 -u root -p
+```
+
+
+
 # 安装Navicat For Mysql
+
 到*[官网](https://www.navicat.com/download)*下载对应系统版本
 解压到适应文件夹
 解压后，进入解压后的目录运行命令：
@@ -307,6 +333,7 @@ OK，这样就完啦
 连接上数据库后里面的中文数据是乱码,把`Ubuntu`的字符集修改为`zh_CN.utf8`就行了,修改方法:
 1.查看系统支持的字符集: `locale -a` 
 2.到start_navicat修改字符集: `export LANG=zh_CN.utf8`
+
 
 ## 破解方案
 ### 懒人式破解 
@@ -408,7 +435,33 @@ redis-cli -h 127.0.0.1 -p 6379 shutdown
 ## 开启发布订阅监听
 还是修改`redis.conf`文件，找到`notify-keyspace-events ""`，修改为`notify-keyspace-events Ex`或者`notify-keyspace-events AKE`，然后重启。
 
+## 附加：基于Docker
+
+拉取镜像：
+
+```
+docker pull redis:latest
+```
+
+运行实例：
+
+```
+REDIS=/home/ybd/data/docker/redis && docker run -p 6379:6379 --restart=always -v $REDIS/redis.conf:/usr/local/etc/redis/redis.conf -v $REDIS/data:/data --name redis -d redis redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+```
+
+安装链接工具：
+
+```
+sudo apt-get install redis-tool
+
+// 链接
+redis-cli
+```
+
+
+
 # 安装Maven
+
 ## 下载
 官网下载或者***[点击镜像获取](http://mirror.bit.edu.cn/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz)***
 

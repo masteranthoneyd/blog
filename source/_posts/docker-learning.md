@@ -436,14 +436,24 @@ docker ps -a -q
 ```
 
 # Dev Env In Docker
+## MySql
+
 [**mysql**](https://hub.docker.com/_/mysql/):
+
 ```
-docker run -p 6033:3306 --name mysql-master --restart=always -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/var/log/mysql -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -idt mysql:5.7.19
+MYSQL=/home/ybd/data/docker/mysql && docker run --name=mysql -p 3306:3306  -v $MYSQL/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION --lower-case-table-names=1
 ```
 
+## Redis
+
 [**redis**](https://hub.docker.com/_/redis/):
+
 ```
-docker run -p 6380:6379 --name redis-master --restart=always -v /home/ybd/docker/redis:/data -v /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf -d redis:4.0.1 redis-server --appendonly yes
+REDIS=/home/ybd/data/docker/redis && docker run -p 6379:6379 --restart=always -v $REDIS/redis.conf:/usr/local/etc/redis/redis.conf -v $REDIS/data:/data --name redis -d redis redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+```
+安装终端链接工具：
+```
+sudo apt-get install redis-tool
 ```
 
 # Last
