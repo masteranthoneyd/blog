@@ -281,15 +281,19 @@ busuanzi_count:
 # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO
 baidu_push: true
 
+############## 搜索服务 ###############
 # Algolia Search
 algolia_search:
-  enable: true
+  enable: false
   hits:
     per_page: 10
   labels:
     input_placeholder: Search for Posts
     hits_empty: "We didn't find any results for the search: ${query}"
     hits_stats: "${hits} results found in ${time} ms"
+
+local_search:
+  enable: true
 
 ## 文章末尾是否显示打赏按钮
 reward_comment: 谢谢大爷～

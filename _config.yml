@@ -86,14 +86,22 @@ baidu_url_submit:
   host: yangbingdong.com ## 在百度站长平台中注册的域名
   token: sKIjGrW5IgkkDrVu ## 请注意这是您的秘钥， 请不要发布在公众仓库里!
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
-  
-  # Algolia 搜索
+
+################## 搜索服务 #####################  
+# Algolia 搜索
 algolia:
   applicationID: RI3NF6GUI0
   apiKey: 3d33fa60ba30d3b17f37220bb1a36749
   adminApiKey: 313c96267a13129641a1203ac402e172
   indexName: blogIndex
   chunkSize: 10000
+
+# Local Search
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
 
 # 所有外部链接添加nofollow
 nofollow:
