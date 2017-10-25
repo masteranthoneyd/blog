@@ -298,6 +298,126 @@ class Runtime {
 ## UML
 ![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/simple-factory.png)
 
+## 什么是简单工厂模式
+简单工厂模式又被称为**静态工厂方法模式**，由**一个**工厂类根据传入的参数，动态决定应该创建哪一个产品类（这些产品类继承自一个父类或接口）的实例。
+
+将“类实例化的操作”与“使用对象的操作”分开，让使用者不用知道具体参数就可以实例化出所需要的“产品”类，从而避免了在客户端代码中显式指定，实现了**解耦**；
+即使用者可直接消费产品而不需要知道其生产的细节
+
+## 上代码
+
+定义人类接口：
+```
+public interface Human {
+	/**
+	 * 是个人都会讲话
+	 */
+	void talk();
+}
+```
+
+实现类（男人和女人）：
+```
+public class Man implements Human {
+	@Override
+	public void talk() {
+		System.out.println("I'm man! \n");
+	}
+}
+
+public class Woman implements Human {
+	@Override
+	public void talk() {
+		System.out.println("I'm woman! \n");
+	}
+}
+```
+
+工厂类：
+```
+package com.yangbingdong.simplefactory;
+
+import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.MAN;
+import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.WOMAN;
+
+/**
+ * @author ybd
+ * @date 17-10-19.
+ * If you have any questions please contact yangbingdong@1994.gmail
+ */
+public class HumanFactory {
+
+	private HumanFactory() {}
+
+	/**
+	 * 工厂获取实例静态方法
+	 * @param humanEnum 根据传进来的枚举获取对应的实例
+	 * @return 返回的实例
+	 */
+	public static Human getInstance(HumanEnum humanEnum) {
+		if (MAN.equals(humanEnum)) {
+			System.out.println("生产了男人");
+			return new Man();
+		}else if (WOMAN.equals(humanEnum)) {
+			System.out.println("生产了女人");
+			return new Woman();
+		}else {
+			System.out.println("什么都没有生产");
+			return null;
+		}
+	}
+
+	public enum HumanEnum {
+		MAN,WOMAN
+	}
+
+}
+```
+
+现在来测试一下：
+```
+package com.yangbingdong.simplefactory;
+
+import java.util.Optional;
+
+import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.*;
+
+/**
+ * @author ybd
+ * @date 17-10-19.
+ * If you have any questions please contact yangbingdong@1994.gmail
+ */
+public class SimpleFactoryTest {
+	public static void main(String[] args) {
+		invokeTalkIfNotNull(MAN);
+
+		invokeTalkIfNotNull(WOMAN);
+
+		invokeTalkIfNotNull(null);
+	}
+
+	private static void invokeTalkIfNotNull(HumanFactory.HumanEnum man) {
+		Optional.ofNullable(HumanFactory.getInstance(man)).ifPresent(Human::talk);
+	}
+}
+
+```
+
+运行结果：
+```
+生产了男人
+I'm man! 
+
+生产了女人
+I'm woman! 
+
+什么都没有生产
+```
+
+## 特点
+
+将创建实例的工作与使用实例的工作分开，使用者不必关心类对象如何创建，只需要传入工厂需要的参数即可，但也有**弊端**：工厂类集中了所有实例（产品）的创建逻辑，一旦这个工厂不能正常工作，整个系统都会受到影响，违背“开放 - 关闭原则”，一旦添加新产品就不得不修改工厂类的逻辑，这样就会造成工厂逻辑过于复杂，对于系统维护和扩展不够友好。
+
 ## Java标准库中的简单工厂模式
 
 ```
@@ -308,4 +428,228 @@ java.util.Calendar - getInstance(TimeZone zone, Locale aLocale)
 java.text.NumberFormat - getInstance()
 java.text.NumberFormat - getInstance(Locale inLocale)
 ```
+
+# Factory Method
+
+## UML
+
+![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/factory-method.png)
+
+## 什么是工厂方法
+
+工厂方法模式，又称工厂模式、多态工厂模式和虚拟构造器模式，通过定义工厂父类负责定义创建对象的公共接口，而子类则负责生成具体的对象。就是一个工厂生产一个专一产品。
+
+## 代码
+
+人类接口与实现类与上面的一样
+
+主要是把工厂抽象成了接口，具体的人类由具体的工厂实现类创建。
+
+工厂接口定义统一的创建人类的借口
+
+```
+public interface HumanFactory {
+	/**
+	 * 定义抽象工厂方法
+	 * @return
+	 */
+	Human createHuman();
+}
+```
+
+两个工厂实现类
+
+```
+public class ManFactory implements HumanFactory {
+	@Override
+	public Human createHuman() {
+		System.out.println("生产了男人");
+		return new Man();
+	}
+}
+
+public class WomanFactory implements HumanFactory {
+	@Override
+	public Human createHuman() {
+		System.out.println("生产了女人");
+		return new Woman();
+	}
+}
+```
+
+测试类：
+
+```
+package com.yangbingdong.factorymethod;
+
+/**
+ * @author ybd
+ * @date 17-10-25.
+ * If you have any questions please contact yangbingdong@1994.gmail
+ */
+public class FactoryMethodTest {
+   public static void main(String[] args) {
+      HumanFactory humanFactory = new ManFactory();
+      humanFactory.createHuman().talk();
+
+      humanFactory = new WomanFactory();
+      humanFactory.createHuman().talk();
+   }
+}
+```
+
+运行结果：
+
+```
+生产了男人
+I'm man! 
+
+生产了女人
+I'm woman! 
+```
+
+## 特点
+
+工厂方法模式把具体产品的创建推迟到工厂类的子类（具体工厂）中，此时工厂类不再负责所有产品的创建，而只是给出具体工厂必须实现的接口，这样工厂方法模式在添加新产品的时候就不修改工厂类逻辑而是添加新的工厂子类，符合**开放封闭原则**，克服了简单工厂模式中缺点。工厂模式可以说是简单工厂模式的进一步抽象和拓展，在保留了简单工厂的封装优点的同时，让扩展变得简单，让继承变得可行，增加了多态性的体现。
+
+同时**缺点**也很明显，多一个产品就多一个工厂，开销变大了，不适用与创建多种产品。
+
+## Java中的工厂方法
+
+查找了一下，数据库链接驱动就是一个典型的工厂方法模式，Java定义链接数据库以及其他操作的接口，数据库厂商必须实现这些接口，比如Mysql、Oracle。
+
+# Abstract Factory
+
+## UML
+
+![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/abstract-factory.png)
+
+## 什么是抽象工厂模式
+
+抽象工厂模式为创建一组对象提供了一种解决方案。与工厂方法模式相比，抽象工厂模式中的具体工厂不只是创建一种产品，它负责创建一族产品。比如AMD工厂负责生产AMD全家桶，Intel工厂负责生产Intel全家桶。
+
+## 代码
+
+首先定义CPU接口以及实现类
+
+```
+public interface CPU {
+}
+
+public class AMDCPU implements CPU {
+}
+
+public class IntelCPU implements CPU {
+}
+```
+
+主板接口以及实现类
+
+```
+public interface MainBoard {
+}
+
+public class AMDMainBoard implements MainBoard {
+}
+
+public class IntelMainBoard implements MainBoard {
+}
+```
+
+定义抽象工厂与实现类
+
+```
+public interface AbstractFactory {
+	CPU createCPU();
+
+	MainBoard createMainBoard();
+}
+
+public class AMDFactory implements AbstractFactory {
+	@Override
+	public CPU createCPU() {
+		System.out.println("生产了AMD的CPU");
+		return new AMDCPU();
+	}
+
+	@Override
+	public MainBoard createMainBoard() {
+		System.out.println("生产了AMD的主板");
+		return new AMDMainBoard();
+	}
+}
+
+public class IntelFactory implements AbstractFactory {
+	@Override
+	public CPU createCPU() {
+		System.out.println("生产了Intel的CPU");
+		return new IntelCPU();
+	}
+
+	@Override
+	public MainBoard createMainBoard() {
+		System.out.println("生产了Intel的主板");
+		return new IntelMainBoard();
+	}
+}
+```
+
+测试类
+
+```
+public class AbstractFactoryTest {
+	public static void main(String[] args) {
+		AbstractFactory abstractFactory = new AMDFactory();
+		abstractFactory.createCPU();
+		abstractFactory.createMainBoard();
+
+		abstractFactory = new IntelFactory();
+		abstractFactory.createCPU();
+		abstractFactory.createMainBoard();
+	}
+}
+```
+
+运行结果
+
+```
+生产了AMD的CPU
+生产了AMD的主板
+生产了Intel的CPU
+生产了Intel的主板
+```
+
+## 优缺点
+
+**优点**：
+
+**分离接口和实现**：客户端使用抽象工厂来创建需要的对象，而客户端根本就不知道具体的实现是谁，客户端只是面向产品的接口编程而已。也就是说，客户端从具体的产品实现中解耦。
+
+**使切换产品族变得容易**：因为一个具体的工厂实现代表的是一个产品族，比如上面例子的从Intel系列到AMD系列只需要切换一下具体工厂。
+
+缺点：
+
+**不太容易扩展新的产品**：如果需要给整个产品族添加一个新的产品，那么就需要修改抽象工厂，这样就会导致修改所有的工厂实现类
+
+## Java标准类库中的抽象工厂模式
+
+```
+package java.util;
+
+public interface List<E> extends Collection<E> {
+    
+    Iterator<E> iterator();//一种产品
+
+    Object[] toArray();
+
+    <T> T[] toArray(T[] a);
+
+    ListIterator<E> listIterator();//另外一种产品
+
+    ListIterator<E> listIterator(int index);
+
+}
+```
+
+
 
