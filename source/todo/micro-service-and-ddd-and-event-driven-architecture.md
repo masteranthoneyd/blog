@@ -76,7 +76,7 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 颠覆传统存储概念，不持久化对象数据，而是持久化对象变更的Event，通过溯源，遍历事件拿到对象的最新状态。在我看来，类似文件系统的概念，一个操作是一层，删除并不是减掉一层，而是添加一层删除操作（类似Git中的版本，可回滚，有记录追踪）。
 
 ### 阿里云GTS全局事务
-***[GTS（Global Transaction Service）官方文档](https://help.aliyun.com/document_detail/48726.html)***
+***[GTS（Global Transaction Service）官方文档](https://help.aliyun.com/document_detail/48726.html)***（需要捆绑Ali全家桶。。。）
 
 ## 查询
 
