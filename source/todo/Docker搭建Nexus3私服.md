@@ -51,18 +51,36 @@ mkdir /some/dir/nexus-data && chown -R 200 /some/dir/nexus-data
 
 使用 `data volume`：
 ```
-docker run -d -p 8090:8081 --name nexus -v nexus-data:/nexus-data sonatype/nexus3
+docker run --restart=always -d -p 8090:8081 --name nexus -v nexus-data:/nexus-data sonatype/nexus3
 ```
 
 使用本地目录：
 ```
-docker run -d -p 8090:8081 --name nexus -v /some/dir/nexus-data:/nexus-data sonatype/nexus3
+docker run --restart=always -d -p 8090:8081 --name nexus -v /some/dir/nexus-data:/nexus-data sonatype/nexus3
 ```
 
 
 通过`docker logs nexus` 可以查看启动日志。
 
 启动过程需要稍等几分钟，之后可以访问`localhost:8090`，默认的 用户名／密码是admin／admin123，需要自己修改密码。
+
+# Repositories
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-nexus3/nexus-repo.png)
+
+有几个默认仓库分别是：
+
+1. maven-central：maven中央库，默认从[https://repo1.maven.org/maven2/](https://repo1.maven.org/maven2/)拉取jar
+2. maven-releases：私库发行版jar，初次安装请将`Deployment policy`设置为`Allow redeploy`
+3. maven-snapshots：私库快照（调试版本）jar
+4. maven-public：仓库分组，把上面三个仓库组合在一起对外提供服务，在本地maven基础配置`settings.xml`中使用。
+
+Nexus默认的仓库类型有以下四种：
+
+1. group(仓库组类型)：又叫组仓库，用于方便开发人员自己设定的仓库
+2. hosted(宿主类型)：内部项目的发布仓库（内部开发人员，发布上去存放的仓库
+3. proxy(代理类型)：从远程中央仓库中寻找数据的仓库（可以点击对应的仓库的Configuration页签下Remote Storage属性的值即被代理的远程仓库的路径
+4. virtual(虚拟类型)：虚拟仓库（这个基本用不到，重点关注上面三个仓库的使用）
 
 # Proxy
 
@@ -75,10 +93,10 @@ docker run -d -p 8090:8081 --name nexus -v /some/dir/nexus-data:/nexus-data sona
 ## 备份
 
 ```
-docker run --rm -v nexus-data:/vdata -v $(pwd):/backup ubuntu:latest tar cvf /backup/vdata-bak.tar /vdata
+docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar cvf /backup/backup-data-bak.tar /backup-data
 
 # or
-docker run --rm -v nexus-data:/vdata -v $(pwd):/backup ubuntu:latest tar zcvf /backup/vdata-bak.tar.gz /vdata 
+docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar zcvf /backup/backup-data-bak.tar.gz /backup-data 
 ```
 ## 还原
 ```
