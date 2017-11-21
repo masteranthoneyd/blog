@@ -3,11 +3,14 @@
 # Preface
 > 作为一种新兴的虚拟化方式,Docker跟传统的虚拟化方式相比具有众多的优势
 
-# 容器化 VS 虚拟化
+- [x] Container
+- [x] ​
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-diff-virtual.jpg)
+# Containerization VS Virtualization
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/container-and-virtual.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker2.jpg)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker.jpg)
 
 **服务器**好比运输码头：拥有场地和各种设备（服务器硬件资源）
 
@@ -15,17 +18,68 @@
 
 (仓库之间完全独立，独立的应用系统和操作系统）
 
-# What is Docker
+# Story
 
-Docker是容器化的一种实现，
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/old-dev-ops.jpg)
 
-安装和配置MySQL、Memcatched、MongoDB、Hadoop、GlusterFS、RabbitMQ、Node.js、Nginx
+Long long ago...
 
-Pouch
+Ops: "开发的这群傻叉新给的发布包又把系统CPU搞到100%了，应用又夯住了，都是些什么水平的人啊..."
+
+Dev: "运维的这帮傻鸟技术太差，维护的是些什么稀烂的系统，在我这跑得好好的，上他们那应用就挂..."
+
+Ops: "这是开发的锅..."
+
+Dev: "这是运维的盘..."
+
+Q：
+
+- 线上线下环境不一致，线上JDK1.8.01,线下JDK1.8.02
+- 单机安装和配置MySQL、Memcatched、MongoDB、Hadoop、GlusterFS、RabbitMQ、Node.js、Nginx已经够复杂，集群更不用说
+
+
+
+最终引发的问题就是，我们的服务方是用户，受害方也是用户...
+
+各司其职的同时也在两者之间形成了一面无形的墙，阻碍了开发和运维之间的沟通和协作，而**DevOps**的出现就是为了击碎这堵无形之墙。
+
+# Docker
+
+**核心理念**：**Build once, run anywhere**
+
+(Java的核心理念：Write once, run anywhere)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/container-history.jpg)
+
+**Docker是`GO`语言编写的容器化的一种实现**，是一个**分布式**应用**构建**、**迁移**和**运行**的开放平台，它允许开发或运维人员将应用和运行应用所**依赖的文件打包到一个标准化的单元**（容器）中运行。其他的容器实现有**OpenVZ**，**Pouch**(`Ali`出品)等。
+
+**实现的核心技术**: lcx、cgroup、namespaces...（Linux内核级别隔离技术）
+
+# Docker实现DevOps的优势
+
+## 优势一
+
+开发、测试和生产环境的**统一化**和**标准化**。镜像作为标准的交付件，可在开发、测试和生产环境上以容器来运行，最终实现三套环境上的应用以及运行所**依赖内容的完全一致**。
+
+## 优势二
+
+**解决底层基础环境的异构问题**。基础环境的多元化造成了从Dev到Ops过程中的阻力，而使用Docker Engine可无视基础环境的类型。不同的物理设备，不同的虚拟化类型，不同云计算平台，只要是运行了Docker Engine的环境，最终的应用都会以容器为基础来提供服务。
+
+## 优势三
+
+易于**构建**、**迁移**和**部署**。Dockerfile实现镜像构建的标准化和可复用，镜像本身的分层机制也提高了镜像构建的效率。使用Registry可以将构建好的镜像迁移到任意环境，而且环境的部署仅需要将静态只读的镜像转换为动态可运行的容器即可。
+
+## 优势四
+
+**轻量**和**高效**。和需要封装操作系统的虚拟机相比，容器仅需要封装应用和应用需要的依赖文件，实现轻量的应用运行环境，且拥有比虚拟机更高的硬件资源利用率。
+
+## 优势五
+
+工具链的标准化和快速部署。将实现DevOps所需的多种工具或软件进行Docker化后，可在任意环境实现一条或多条工具链的快速部署。
 
 # Concept
 
-以下是Docker的三个基本概念。
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-component.jpg)
 
 ## Image(镜像)
 官方而言，Docker 镜像是一个**特殊的文件系统**，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。镜像不包含任何动态数据，其内容在构建之后也不会被改变。
@@ -44,9 +98,9 @@ Pouch
 仓库没啥好说的了，以 `Ubuntu` 镜像 为例，`ubuntu` 是仓库的名字，其内包含有不同的版本标签，如，`14.04`, `16.04`。我们可以通过 `ubuntu:14.04`，或者 `ubuntu:16.04` 来具体指定所需哪个版本的镜像。如果忽略了标签，比如 `ubuntu`，那将视为 `ubuntu:latest`
 
 # Install
-这里以Ubuntu为例（当然是因为博主用的是Ubuntu= =），版本的话Docker目前支持的Ubuntu版本最低为12.04LTS,但从稳定性上考虑,推荐使用14.04LTS或更高的版本。
+这里以Ubuntu为例，版本的话Docker目前支持的Ubuntu版本最低为12.04LTS,但从稳定性上考虑,推荐使用14.04LTS或更高的版本。
 
-## 使用脚本自动安装
+## 使用脚本自动安装（推荐）
 在测试或开发环境中 Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Ubuntu 系统上可以使用这套脚本安装：
 ```
 curl -fsSL get.docker.com -o get-docker.sh
@@ -445,6 +499,97 @@ docker ps -n 5
 列出所有创建的容器ID：
 ```
 docker ps -a -q
+```
+
+# Upload Image
+
+## 上传到Docker Hub
+
+**Step1**、登录***[Docker Hub](https://hub.docker.com)***并创建一个`Repository`，如下图点击`Create Repository`
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-repo-create.png)
+
+然后输入仓库名
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-repo-create-name.png)
+
+创建好之后是一个空仓库：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-repo-create-done.png)
+
+**Step2**、登录终端Docker镜像仓库（这个仓库可以是官方或第三方的）：
+
+```
+docker login [OPTIONS] [SERVER]
+```
+
+`OPTIONS`说明：
+
+- **-u :**登陆的用户名
+- **-p :**登陆的密码
+
+ex：
+
+```
+docker login -u yangbingdong
+// 回车后输入密码
+```
+
+**Step3**、镜像名需要与仓库名一样
+
+以上面创建的仓库为例，我们的需要上传的镜像必须是`yangbingdong/test:tag`，其中`tag`可以自定义，不一样则需要更改一下：
+
+```
+docker tag [imageId] yangbingdong/test:latest
+```
+
+**Step4**、上传
+
+完成上述步骤之后，上传很简单：
+
+```
+docker push yangbingdong/test:latest
+```
+
+## 上传到阿里云镜像仓库
+
+**Step1**、首先你需要有一个阿里云的帐号
+
+**Step2**、管理Docker Hub镜像站点：配置***[Docker加速器](https://cr.console.aliyun.com/?#/accelerator)***
+
+**Step3**、创建镜像仓库的***[命名空间](https://cr.console.aliyun.com/?#/namespace/index)***
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/ali-hub-nagespace.png)
+
+**Step4**、创建***[镜像仓库](https://cr.console.aliyun.com/?#/imageList)***
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/ali-hub-create1.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/ali-hub-create2.png)
+
+创建好之后点击**管理**会看到**操作指南**
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/ali-hub-guide.png)
+
+**Step5**、更改镜像名：
+
+```
+docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/ybd/ngrok:[镜像版本号]
+```
+
+**Step6**、推送
+
+```
+docker push registry.cn-hangzhou.aliyuncs.com/ybd/ngrok:[镜像版本号]
+```
+
+之后可以在**镜像版本**里面看到刚刚上传的镜像了
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/ali-hub-repo.png)
+
+**拉取镜像**：
+```
+docker pull registry.cn-hangzhou.aliyuncs.com/ybd/ngrok:[镜像版本号]
 ```
 
 # Dev Env In Docker
