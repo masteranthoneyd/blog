@@ -218,7 +218,73 @@ $cp /home/ubuntu/.bin/go14/bin/go-bindata ./bin
 
 然后直接`source ngrok-installation.sh`，安装成功！
 
+# Docker搭建Ngrok
 
+> 安装Docker请看***[这里](/2017/docker-learning/)***
+
+## 构建镜像
+
+```
+git clone https://github.com/hteen/docker-ngrok.git
+cd docker-ngrok
+docker build -t hteen/ngrok .
+```
+
+##  运行镜像
+
+```
+docker run -idt --name ngrok-server \
+-p 8082:80 -p 4432:443 -p 4443:4443 \
+-v /root/docker/ngrok/data:/myfiles \
+-e DOMAIN='ngrok.yangbingdong.com' hteen/ngrok /bin/sh /server.sh
+```
+
+- `-p`: 80端口为http端口，433端口为https端口，4443端口为tunnel端口
+- `-v`: 生成的各种配置文件和客户端都在里面
+- `-e`: 泛化的域名
+
+
+稍等片刻，会在挂在的目录（`/root/docker/ngrok/data`）下面生成对应的配置文件以及客户端
+
+```
+bin/ngrokd                  服务端
+bin/ngrok                   linux客户端
+bin/darwin_amd64/ngrok      osx客户端
+bin/windows_amd64/ngrok.exe windows客户端
+```
+
+## Nginx Conf
+
+```
+server {
+     listen       80;
+     server_name  *.ngrok.yangbingdong.com;
+     location / {
+             proxy_redirect off;
+             proxy_set_header Host $host;
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_pass http://172.17.0.1:8082;
+     }
+ }
+ server {
+     listen       443;
+     server_name  *.ngrok.yangbingdong.com;
+     location / {
+             proxy_redirect off;
+             proxy_set_header Host $host;
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_pass http://172.17.0.1:4432;
+     }
+ }
+```
+
+- `172.17.0.1`为内网ip
+
+**注意**：大概每个星期会产生100M的日志文件。
+查年docker日志文件位置`docker inspect <id> | grep LogPath`
+查看大小`ls -lh /var/lib/docker/containers/<id>/<id>-json.log`
 
 
 
