@@ -245,7 +245,29 @@ indenpence
     student.setBooks(Arrays.asList(books));
 ```
 
-4.Lombok的功能不仅如此，更详细请看***[features](https://projectlombok.org/features/all)***
+4.常用注解
+
+- `@Getter` and `@Setter`：生成`getter` / `setter`方法，默认生成的方法是public的，如果要修改方法修饰符可以设置**AccessLevel**的值，例如：`@Getter(access = AccessLevel.PROTECTED)`
+
+- `@ToString`：生成toString()方法，可以这样设置不包含哪些字段`@ToString(exclude = "id")` / `@ToString(exclude = {"id","name"})`，如果继承的有父类的话，可以设置**callSuper** 让其调用父类的toString()方法，例如：`@ToString(callSuper = true)`
+
+- `@NoArgsConstructor`, `@RequiredArgsConstructor`, `@AllArgsConstructor`：`@NoArgsConstructor`生成一个无参构造方法。当类中有final字段没有被初始化时，编译器会报错，此时可用`@NoArgsConstructor(force = true)`，然后就会为没有初始化的`final`字段设置默认值 `0` / `false` / `null`。对于具有约束的字段（例如`@NonNul`l字段），不会生成检查或分配，因此请注意，正确初始化这些字段之前，这些约束无效。`@RequiredArgsConstructor`会生成构造方法（可能带参数也可能不带参数），如果带参数，这参数只能是以final修饰的未经初始化的字段，或者是以`@NonNull`注解的未经初始化的字段`@RequiredArgsConstructor(staticName = "of")`会生成一个`of()`的静态方法，并把构造方法设置为私有。`@AllArgsConstructor` 生成一个全参数的构造方法。
+
+- `@Data`：`@Data` 包含了`@ToString`，`@EqualsAndHashCode`，`@Getter` / `@Setter`和`@RequiredArgsConstructor`的功能。
+
+- `@Accessors`：主要用于控制生成的`getter`和`setter`，此注解有三个参数：`fluent boolean`值，默认为`false`。此字段主要为控制生成的`getter`和`setter`方法前面是否带`get/set`；`chain boolean`值，默认`false`。如果设置为`true`，`setter`返回的是此对象，方便链式调用方法`prefix` 设置前缀 例如：`@Accessors(prefix = "abc") private String abcAge`  当生成`get`/`set`方法时，会把此前缀去掉。
+
+- `@Synchronized`：给方法加上同步锁。
+
+- `@Builder`：`@Builder`注释为你的类生成复杂的构建器`API`：
+
+  ```
+  Person.builder().name("Adam Savage").city("San Francisco").job("Mythbusters").job("Unchained Reaction").build();
+  ```
+
+  ​
+
+`Lombok`的功能不仅如此，更详细请看***[features](https://projectlombok.org/features/all)***
 
 ## 热部署插件JRebel安装与激活
 > 每次修改java文件都需要重启tomcat，很痛苦有木有？ 推荐给大家一个很好用的热部署插件，JRebel，目前是最好的，在使用过程中应该90%的编辑操作都是可以reload的，爽歪歪，节约我们大量的开发时间，提高开发效率。
