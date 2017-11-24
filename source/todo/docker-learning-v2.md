@@ -1,10 +1,22 @@
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker.png)
-# Preface
-> 作为一种新兴的虚拟化方式,Docker跟传统的虚拟化方式相比具有众多的优势
 
-- [x] Container
-- [x] ​
+# Preface
+> ***[Docker is the world’s leading software containerization platform.](https://www.docker.com/what-docker)***
+
+- [√] What is container
+- [√] Container vs VM
+- [√] Problem between dev & ops
+- [√] What is Docker
+- [√] Docker Concept
+- [√] Docker hello world
+- [√] Advantage & disadvantage
+- [√] Integration with spring boot
+- [ ] Dockerfile
+- [ ] Docker link
+- [ ] Cluster
+- [ ] Backup
+- [ ] K8s
 
 # Containerization VS Virtualization
 
@@ -12,17 +24,19 @@
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker.jpg)
 
-**服务器**好比运输码头：拥有场地和各种设备（服务器硬件资源）
-
-**服务器虚拟化**好比作码头上的仓库：拥有独立的空间堆放各种货物或集装箱
-
-(仓库之间完全独立，独立的应用系统和操作系统）
-
 # Story
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/old-dev-ops.jpg)
 
 Long long ago...
+
+Dev: "帮我构建几台跟生产环境一样的测试服务器"
+
+Ops: "给我一个星期时间"
+
+Dev: "明天用..."
+
+
 
 Ops: "开发的这群傻叉新给的发布包又把系统CPU搞到100%了，应用又夯住了，都是些什么水平的人啊..."
 
@@ -32,20 +46,30 @@ Ops: "这是开发的锅..."
 
 Dev: "这是运维的盘..."
 
+
+
+Dev: "为什么破玩意在我机子上跑不起来了？"
+
+Ops: "这个只支持CentOS"
+
+Dev: "....."
+
+
+
 Q：
 
-- 线上线下环境不一致，线上JDK1.8.01,线下JDK1.8.02
+- 线上线下环境不一致，线上JDK1.8.01,线下JDK1.8.02，数据库版本不统一等环境问题
 - 单机安装和配置MySQL、Memcatched、MongoDB、Hadoop、GlusterFS、RabbitMQ、Node.js、Nginx已经够复杂，集群更不用说
 
 
 
 最终引发的问题就是，我们的服务方是用户，受害方也是用户...
 
-各司其职的同时也在两者之间形成了一面无形的墙，阻碍了开发和运维之间的沟通和协作，而**DevOps**的出现就是为了击碎这堵无形之墙。
+各司其职的同时也在两者之间形成了一面无形的墙，阻碍了开发和运维之间的沟通和协作，而**Docker**、**DevOps**的出现就是为了击碎这堵无形之墙。
 
 # Docker
 
-**核心理念**：**Build once, run anywhere**
+**核心理念**：Build，Ship，and Run Any App，Anywhere
 
 (Java的核心理念：Write once, run anywhere)
 
@@ -53,7 +77,15 @@ Q：
 
 **Docker是`GO`语言编写的容器化的一种实现**，是一个**分布式**应用**构建**、**迁移**和**运行**的开放平台，它允许开发或运维人员将应用和运行应用所**依赖的文件打包到一个标准化的单元**（容器）中运行。其他的容器实现有**OpenVZ**，**Pouch**(`Ali`出品)等。
 
+**服务器**好比运输码头：拥有场地和各种设备（服务器硬件资源）
+
+**服务器容器化**好比作码头上的仓库：拥有独立的空间堆放各种货物或集装箱
+
+(仓库之间完全独立，独立的应用系统和操作系统）
+
 **实现的核心技术**: lcx、cgroup、namespaces...（Linux内核级别隔离技术）
+
+**注意点**: 不能乱玩...遵循**单一职责**，**无状态**。
 
 # Docker实现DevOps的优势
 
@@ -77,11 +109,15 @@ Q：
 
 工具链的标准化和快速部署。将实现DevOps所需的多种工具或软件进行Docker化后，可在任意环境实现一条或多条工具链的快速部署。
 
+适合**敏捷开发**、**持续交付**
+
 # Concept
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-component.jpg)
 
 ## Image(镜像)
+![](http://ojoba1c98.bkt.clouddn.com/img/note-of-dockerfile/dockerfile.jpg)
+
 官方而言，Docker 镜像是一个**特殊的文件系统**，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。镜像不包含任何动态数据，其内容在构建之后也不会被改变。
 对博主而言，它相当于就是个`Java Class`(类)=.=
 
@@ -96,6 +132,29 @@ Q：
 
 ## Repository(仓库)
 仓库没啥好说的了，以 `Ubuntu` 镜像 为例，`ubuntu` 是仓库的名字，其内包含有不同的版本标签，如，`14.04`, `16.04`。我们可以通过 `ubuntu:14.04`，或者 `ubuntu:16.04` 来具体指定所需哪个版本的镜像。如果忽略了标签，比如 `ubuntu`，那将视为 `ubuntu:latest`
+
+# Hello World
+
+**Step1**、添加`Dockerfile`：
+
+```
+FROM ubuntu:16.04
+ENTRYPOINT [ "sh", "-c", "echo 'Hello World'" ]
+```
+
+**Step2**、构建镜像：
+
+```
+docker build -t iba/hello-world .
+```
+
+**Step3**、运行：
+
+```
+docker run --rm iba/hello-world:latest
+```
+
+
 
 # Install
 这里以Ubuntu为例，版本的话Docker目前支持的Ubuntu版本最低为12.04LTS,但从稳定性上考虑,推荐使用14.04LTS或更高的版本。
@@ -594,9 +653,28 @@ docker pull registry.cn-hangzhou.aliyuncs.com/ybd/ngrok:[镜像版本号]
 
 # Spring Boot Integration
 
-meven插件：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
+集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
-1、在`main`下面新建`docker`文件夹，并创建`Dockerfile`：
+**Step1**、利用IDEA的Spring Initializr编写Hello World Web工程：
+
+```
+@SpringBootApplication
+@EnableWebFlux
+@RestController
+public class DockerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DockerApplication.class, args);
+	}
+
+	@GetMapping
+	public Publisher<String> hello() {
+		return Mono.just("Hello World!!!");
+	}
+}
+```
+
+**Step2**、在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
 
 ```
 FROM frolvlad/alpine-oraclejdk8:slim
@@ -609,10 +687,17 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 # ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
 ```
 
-2、在`pom.xml`添加maven插件：
+**Step3**、在`pom.xml`添加maven插件：
 
 ```
- <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
+  #### 配置信息
+   <properties>
+        <docker.image.prefix>iba</docker.image.prefix>
+        <docker.plugin.version>0.4.14</docker.plugin.version>
+        <resources.plugin.version>3.0.2</resources.plugin.version>
+        <dockerfile.compiled.position>${project.build.directory}/docker</dockerfile.compiled.position>
+    </properties>
+<!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${resources.plugin.version}</version>
@@ -659,29 +744,19 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
                 </configuration>
             </plugin>
             
-            
-  #### 配置信息
-   <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <docker.image.prefix>iba</docker.image.prefix>
-        <docker.plugin.version>0.4.14</docker.plugin.version>
-        <resources.plugin.version>3.0.2</resources.plugin.version>
-        <dockerfile.compiled.position>${project.build.directory}/docker</dockerfile.compiled.position>
-    </properties>
 ```
 
-3、打包并构建镜像：
+**Step4**、打包并构建镜像：
 
 ```
 mvn clean package docker:build 
 ```
 
-4、运行程序：
+**Step5**、运行程序：
 
 ```
 docker run --name spring-demo -d -p 8080:8080 iba/demo:latest
+# 限制内存加上：-e "JAVA_OPTS=-Xmx128m"
 ```
 
 就是这么简单粗暴。
@@ -715,5 +790,4 @@ sudo apt-get install redis-tool
 > 参考：
 > ***[Docker — 从入门到实践](https://www.gitbook.com/book/yeasy/docker_practice/details)***
 > ***[Docker命令大全](https://kamisec.github.io/2017/06/docker%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/)***
-
 
