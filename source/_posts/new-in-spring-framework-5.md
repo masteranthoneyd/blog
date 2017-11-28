@@ -5,15 +5,17 @@ categories: [Java]
 tags: [Java, Spring5]
 ---
 
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-framework-5/spring-framework-5.png)
+
 # Preface
 
 > Spring 5 于 2017 年 9 月发布了通用版本 (`GA`)，它标志着自 2013 年 12 月以来第一个主要 Spring Framework 版本。它提供了一些人们期待已久的改进，还采用了一种全新的编程范例，以***[反应式宣言](http://www.reactivemanifesto.org/)***中陈述的反应式原则为基础。
 >
-> 这个版本是很长时间以来最令人兴奋的 Spring Framework 版本。Spring 5 兼容 Java™8 和 JDK 9，它集成了**反应式流**，以便提供一种颠覆性方法来实现端点和 Web 应用程序开发。
+> 这个版本是很长时间以来最令人兴奋的 Spring Framework 版本。Spring 5 兼容 `Java™8` 和 `JDK 9`，它集成了**反应式流**，以便提供一种颠覆性方法来实现端点和 Web 应用程序开发。
 >
 > 诚然，反应式编程不仅是此版本的主题，还是令许多开发人员激动不已的重大特性。人们对能够针对负载波动进行无缝扩展的灾备和响应式服务的需求在不断增加，Spring 5 很好地满足了这一需求。
 >
-> 本文将全面介绍 Spring 5。我将介绍 Java SE 8 和 Java EE 7 API 的基准升级、Spring 5 的新反应式编程模型、[HTTP/2](https://www.ibm.com/developerworks/library/wa-http2-under-the-hood/index.html) 支持，以及 Spring 通过 Kotlin 对函数式编程的全面支持。我还会简要介绍测试和性能增强，最后介绍对 Spring 核心和容器的一般性修订。
+> 本文将全面介绍 Spring 5。我将介绍 Java SE 8 和 Java EE 7 API 的基准升级、Spring 5 的新反应式编程模型、[HTTP/2](https://www.ibm.com/developerworks/library/wa-http2-under-the-hood/index.html) 支持，以及 Spring 通过 `Kotlin` 对函数式编程的全面支持。我还会简要介绍测试和性能增强，最后介绍对 Spring 核心和容器的一般性修订。
 
 <!--more-->
 
@@ -248,6 +250,8 @@ Spring 5 的首要特性是新的反应式编程模型，这代表着对提供�
 总之，Spring 5 代表着一次大受 Spring 开发人员欢迎的范例转变，同时也为其他框架指出了一条发展之路。
 
 # 使用 Spring 5 的 WebFlux 开发反应式 Web 应用
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-framework-5/spring-webflux-reactive-mongodb-rest-api-example.png)
 
 ## WebFlux 简介
 

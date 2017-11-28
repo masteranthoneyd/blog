@@ -1,18 +1,114 @@
 ---
-title: Docker入门笔记
+title: Docker入门 & 与Spring Boot集成
 date: 2017-09-07 15:55:07
 categories: [Docker,Base]
 tags: [Docker]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker.png)
 # Preface
-> 为什么选择Docker？网上已经给出了很多说法，总结而言就是，趋势（~~这不是废话吗~~） 哈哈，词穷
-> 作为一种新兴的虚拟化方式,Docker跟传统的虚拟化方式相比具有众多的优势，这里也不详细列举了
-> Docker对于持续交付和部署的DevOps人员来说也有着重要的意义...
+> Docker是什么？下面是官方的一段说明：
+> ***[Docker is the world’s leading software containerization platform.](https://www.docker.com/what-docker)***
+> 恩，很`niubility`，引领世界软件容器化的平台...
 > 本篇主要记录Docker的基础学习（安装、简单使用）
 
 <!--more-->
+# Containerization VS Virtualization
+了解Docker之前，我们有必要了解一下容器化
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker2.jpg)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker.jpg)
+
+**容器相当于轻量级的虚拟机，但隔离性不如虚拟机**。
+
+# Story
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/old-dev-ops.jpg)
+
+Long long ago...
+
+Dev: "帮我构建几台跟生产环境一样的测试服务器"
+
+Ops: "给我一个星期时间"
+
+Dev: "明天用..."
+
+
+
+Ops: "开发的这群傻叉新给的发布包又把系统CPU搞到100%了，应用又夯住了，都是些什么水平的人啊..."
+
+Dev: "运维的这帮傻鸟技术太差，维护的是些什么稀烂的系统，在我这跑得好好的，上他们那应用就挂..."
+
+Ops: "这是开发的锅..."
+
+Dev: "这是运维的盘..."
+
+
+
+Dev: "为什么破玩意在我机子上跑不起来了？"
+
+Ops: "这个只支持CentOS"
+
+Dev: "....."
+
+
+
+Q：
+
+- 线上线下环境不一致，线上JDK1.8.01,线下JDK1.8.02，数据库版本不统一等环境问题
+- 单机安装和配置MySQL、Memcatched、MongoDB、Hadoop、GlusterFS、RabbitMQ、Node.js、Nginx已经够复杂，集群更不用说
+
+
+
+最终引发的问题就是，我们的服务方是用户，受害方也是用户...
+
+各司其职的同时也在两者之间形成了一面无形的墙，阻碍了开发和运维之间的沟通和协作，而**Docker**、**DevOps**的出现就是为了击碎这堵无形之墙。
+
+# Docker
+
+**核心理念**：Build，Ship，and Run Any App，Anywhere
+
+(Java的核心理念：Write once, run anywhere)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/container-history.jpg)
+
+**Docker是`GO`语言编写的容器化的一种实现**，是一个**分布式**应用**构建**、**迁移**和**运行**的开放平台，它允许开发或运维人员将应用和运行应用所**依赖的文件打包到一个标准化的单元**（容器）中运行。其他的容器实现有**OpenVZ**，**Pouch**(`Ali`出品)等。
+
+**服务器**好比运输码头：拥有场地和各种设备（服务器硬件资源）
+
+**服务器容器化**好比作码头上的仓库：拥有独立的空间堆放各种货物或集装箱
+
+(仓库之间完全独立，独立的应用系统和操作系统）
+
+**实现的核心技术**: lcx、cgroup、namespaces...（Linux内核级别隔离技术）
+
+**注意点**: 不能乱玩...遵循**单一职责**，**无状态**。
+
+# Docker实现DevOps的优势
+
+## 优势一
+
+开发、测试和生产环境的**统一化**和**标准化**。镜像作为标准的交付件，可在开发、测试和生产环境上以容器来运行，最终实现三套环境上的应用以及运行所**依赖内容的完全一致**。
+
+## 优势二
+
+**解决底层基础环境的异构问题**。基础环境的多元化造成了从Dev到Ops过程中的阻力，而使用Docker Engine可无视基础环境的类型。不同的物理设备，不同的虚拟化类型，不同云计算平台，只要是运行了Docker Engine的环境，最终的应用都会以容器为基础来提供服务。
+
+## 优势三
+
+易于**构建**、**迁移**和**部署**。Dockerfile实现镜像构建的标准化和可复用，镜像本身的分层机制也提高了镜像构建的效率。使用Registry可以将构建好的镜像迁移到任意环境，而且环境的部署仅需要将静态只读的镜像转换为动态可运行的容器即可。
+
+## 优势四
+
+**轻量**和**高效**。和需要封装操作系统的虚拟机相比，容器仅需要封装应用和应用需要的依赖文件，实现轻量的应用运行环境，且拥有比虚拟机更高的硬件资源利用率。
+
+## 优势五
+
+工具链的标准化和快速部署。将实现DevOps所需的多种工具或软件进行Docker化后，可在任意环境实现一条或多条工具链的快速部署。
+
+适合**敏捷开发**、**持续交付**
+
 # Concept
+
 以下是Docker的三个基本概念。
 
 ## Image(镜像)
@@ -22,6 +118,8 @@ tags: [Docker]
 但它的存储结构类似`Git`，一层一层地网上盖，**删除一个文件并不会真的删除**，只是在那个文件上面做了一个标记为已删除。在最终容器运行的时候，虽然不会看到这个文件，但是实际上该文件会**一直跟随镜像**。因此，在构建镜像的时候，需要额外小心，**每一层尽量只包含该层需要添加的东西**，任何额外的东西应该在该层构建结束前清理掉。
 
 ## Container(容器)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-component.jpg)
 
 通俗来说，如果镜像是类，那么容器就是这个类的实例了，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
 
@@ -435,7 +533,118 @@ docker ps -n 5
 docker ps -a -q
 ```
 
+# Spring Boot Integration
+
+集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
+
+**Step1**、利用IDEA的Spring Initializr编写Hello World Web工程：
+
+```
+@SpringBootApplication
+@EnableWebFlux
+@RestController
+public class DockerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DockerApplication.class, args);
+	}
+
+	@GetMapping
+	public Publisher<String> hello() {
+		return Mono.just("Hello World!!!");
+	}
+}
+```
+
+**Step2**、在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
+
+```
+FROM frolvlad/alpine-oraclejdk8:slim
+MAINTAINER ybd <yangbingdong1994@gmail.com>
+VOLUME /tmp
+ENV PROJECT_NAME="@project.build.finalName@" JAVA_OPTS=""
+ADD $PROJECT_NAME.jar app.jar
+RUN sh -c 'touch /app.jar'
+CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=docker  -jar /app.jar" ]
+# ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
+```
+
+**Step3**、在`pom.xml`添加maven插件：
+
+```
+  #### 配置信息
+   <properties>
+        <docker.image.prefix>iba</docker.image.prefix>
+        <docker.plugin.version>0.4.14</docker.plugin.version>
+        <resources.plugin.version>3.0.2</resources.plugin.version>
+        <dockerfile.compiled.position>${project.build.directory}/docker</dockerfile.compiled.position>
+    </properties>
+<!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${resources.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-dockerfile</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 编译后Dockerfile的输出位置 -->
+                            <outputDirectory>${dockerfile.compiled.position}</outputDirectory>
+                            <resources>
+                                <!-- Dockerfile位置 -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/docker</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 集成Docker maven 插件 -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.plugin.version}</version>
+                <configuration>
+                    <!-- 配置镜像名称，遵循Docker的命名规范： springio/image -->
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于maven-resources-plugin指定的输出位置 -->
+                    <dockerDirectory>${dockerfile.compiled.position}</dockerDirectory>
+                    <resources>
+                        <!-- 构建时需要的资源文件，这些文件和Dockerfile放在一起，这里只需要Spring Boot生成的jar文件即可 -->
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            
+```
+
+**Step4**、打包并构建镜像：
+
+```
+mvn clean package docker:build 
+```
+
+**Step5**、运行程序：
+
+```
+docker run --name spring-demo -d -p 8080:8080 iba/demo:latest
+# 限制内存加上：-e "JAVA_OPTS=-Xmx128m"
+```
+
+就是这么简单粗暴。
+
 # Dev Env In Docker
+
 ## MySql
 
 [**mysql**](https://hub.docker.com/_/mysql/):
