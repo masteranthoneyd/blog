@@ -501,7 +501,7 @@ System.out.println("代码行数：" + count);
 然后，编译不过 —— 因为 `Files.lines(Path)` 会抛出 `IOException`，如果要编译通过，得这样写：
 
 ```
-long count = Files.walk(Paths.get("D:/Test"))                      // 获得项目目录下的所有文件
+long count = Files.walk(Paths.get("/home/test"))                      // 获得项目目录下的所有文件
                 .filter(file -> !Files.isDirectory(file))          // 筛选出文件
                 .filter(file -> file.toString().endsWith(".java")) // 筛选出 java 文件
                 .flatMap(file -> {
@@ -524,7 +524,7 @@ System.out.println("代码行数：" + count);
 
 ```
 public static void main(String[] args) throws Exception {
-    long count = Files.walk(Paths.get("D:/Test"))                       // 获得项目目录下的所有文件
+    long count = Files.walk(Paths.get("/home/test"))                       // 获得项目目录下的所有文件
                     .filter(file -> !Files.isDirectory(file))           // 筛选出文件
                     .filter(file -> file.toString().endsWith(".java"))  // 筛选出 java 文件
                     .flatMap(file -> getLines(file))                    // 按行获得文件中的文本
@@ -591,7 +591,7 @@ public class Trier {
 然后在原先的代码中，我们使用 `Trier.tryFunction` 方法来对会抛出受检异常的 Lambda 进行包装：
 
 ```
-long count = Files.walk(Paths.get("D:/Test"))              // 获得项目目录下的所有文件
+long count = Files.walk(Paths.get("/home/test"))              // 获得项目目录下的所有文件
                 .filter(file -> !Files.isDirectory(file))          // 筛选出文件
                 .filter(file -> file.toString().endsWith(".java")) // 筛选出 java 文件
         
@@ -626,7 +626,7 @@ private static <R> R logAndReturn(Exception e, R defaultValue) {
 比如我们前面的例子，如果 `file -> Files.lines(file)` 抛出异常了，说明在访问 *file* 类的时候出了问题，我们可以就假设这个文件的行数为 0 ，那么默认值就是个空的 `Stream<String>`：
 
 ```
-long count = Files.walk(Paths.get("D:/Test"))              // 获得项目目录下的所有文件
+long count = Files.walk(Paths.get("/home/test"))              // 获得项目目录下的所有文件
                 .filter(file -> !Files.isDirectory(file))          // 筛选出文件
                 .filter(file -> file.toString().endsWith(".java")) // 筛选出 java 文件
         
@@ -636,7 +636,6 @@ long count = Files.walk(Paths.get("D:/Test"))              // 获得项目目录
                 .count();
 
 System.out.println("代码行数：" + count);
-
 ```
 
 如此类推，我们可以创建`UncheckedConsumer`、`UncheckedSupplier`等：
