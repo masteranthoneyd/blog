@@ -1,3 +1,18 @@
+---
+title: 使用 Reactor 进行反应式编程
+date: 2017-11-30 08:55:12
+categories: [Java]
+tags: [Java, Reactor]
+---
+
+![](http://ojoba1c98.bkt.clouddn.com/img/with-reactor-response-encode/reactor.png)
+
+# Preface
+
+> 反应式编程（`Reactive Programming`）这种新的编程范式越来越受到开发人员的欢迎。在 Java 社区中比较流行的是 `RxJava` 和 `RxJava 2`。本篇要介绍的是另外一个新的反应式编程库 *[Rea](https://github.com/reactor/reactor)[ctor](http://projectreactor.io/)*。
+
+<!--more-->
+
 # 反应式编程介绍
 
 反应式编程来源于数据流和变化的传播，意味着由底层的执行模型负责通过数据流来自动传播变化。比如求值一个简单的表达式 c=a+b，当 a 或者 b 的值**发生变化**时，**传统的编程范式**需要对 a+b 进行**重新计算**来得到 c 的值。如果使用**反应式编程**，当 a 或者 b 的值**发生变化**时，c 的值会**自动更新**。反应式编程最早由 .NET 平台上的 `Reactive Extensions` (`Rx`) 库来实现。后来迁移到 Java 平台之后就产生了著名的 `RxJava` 库，并产生了很多其他编程语言上的对应实现。在这些实现的基础上产生了后来的反应式流（`Reactive Streams`）规范。该规范定义了反应式流的相关接口，并将集成到 **Java 9** 中。
@@ -485,9 +500,9 @@ Flux.range(1, 2).log("YBD").subscribe(System.out::println);
 
 ```
 final Flux<Long> source = Flux.interval(Duration.ofSeconds(1))
-							  .take(10)
-							  .publish()
-							  .autoConnect();
+							.take(10)
+							.publish()
+							.autoConnect();
 source.subscribe();
 Thread.sleep(5000);
 source.toStream()
