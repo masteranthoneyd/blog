@@ -10,6 +10,8 @@ tags: [Java, Reactor]
 # Preface
 
 > 反应式编程（`Reactive Programming`）这种新的编程范式越来越受到开发人员的欢迎。在 Java 社区中比较流行的是 `RxJava` 和 `RxJava 2`。本篇要介绍的是另外一个新的反应式编程库 *[Rea](https://github.com/reactor/reactor)[ctor](http://projectreactor.io/)*。
+> Reactor 框架是 **Pivotal** 公司（开发 Spring 等技术的公司）开发的，实现了 `Reactive Programming` 思想，符合 `Reactive Streams` 规范（`Reactive Streams` 是由 **Netflix**、**TypeSafe**、**Pivotal** 等公司发起的）的一项技术。其名字有反应堆之意，反映了其背后的*强大的性能*。
+
 
 <!--more-->
 
