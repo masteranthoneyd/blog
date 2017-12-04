@@ -115,10 +115,10 @@ Nexus默认的仓库类型有以下四种：
 ## 备份
 
 ```
-docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar cvf /backup/backup-data-bak.tar /backup-data
+docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar cvf /backup/nexus-data.tar /backup-data
 
 # or
-docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar zcvf /backup/backup-data-bak.tar.gz /backup-data 
+docker run --rm -v nexus-data:/backup-data -v $(pwd):/backup ubuntu:latest tar zcvf /backup/nexus-data.tar.gz /backup-data 
 ```
 ## 还原
 ```
@@ -126,10 +126,10 @@ docker volume create --name nexus-data1
 ```
 
 ```
-docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar xvf /backup/vdata-bak.tar -C /vdata --strip-components=1
+docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar xvf /backup/nexus-data.tar -C /vdata --strip-components=1
 
 # or
-docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar zxvf /backup/vdata-bak.tar.gz -C /vdata --strip-components=1
+docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar zxvf /backup/nexus-data.tar.gz -C /vdata --strip-components=1
 ```
 
 `--strip-components=1`是为了不要解压出来的最外层文件夹

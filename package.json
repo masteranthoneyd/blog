@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.4.1"
+    "version": "3.3.9"
   },
   "dependencies": {
     "hexo": "^3.4.1",
     "hexo-autonofollow": "^1.0.1",
-    "hexo-all-minifier": "^0.4.0",
     "hexo-baidu-url-submit": "0.0.5",
     "hexo-deployer-git": "^0.3.1",
     "hexo-fs": "^0.2.2",
