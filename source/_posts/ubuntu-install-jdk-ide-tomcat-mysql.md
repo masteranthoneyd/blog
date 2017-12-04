@@ -452,7 +452,7 @@ REDIS=/home/ybd/data/docker/redis && docker run -p 6379:6379 --restart=always -v
 安装链接工具：
 
 ```
-sudo apt-get install redis-tool
+sudo apt-get install redis-tools
 
 // 链接
 redis-cli

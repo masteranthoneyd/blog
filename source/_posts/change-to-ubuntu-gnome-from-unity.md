@@ -63,6 +63,13 @@ sudo make install
 ## 选择主题
 安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可。
 
+如果没有这个工具那就：
+
+```
+sudo apt install gnome-tweak-tool
+sudo apt install gnome-shell-extensions
+```
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
 
 **注意** :对于高分屏，可能使用 `Arc-Theme` 显示 GNOME Shell 的字体过小，可通过修改 `/usr/share/themes/[对应 Arc 主题]/gnome-shell/gnome-shell.css` 修改 **stage** 的 `font-size` 。
