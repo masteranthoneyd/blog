@@ -45,6 +45,7 @@
     </main>
 
     <footer id="footer" class="footer">
+	<!-- <img style="position: absolute;top: 0;left: 15%;border: 0;width: 200px;height: 200px;" src="http://ojoba1c98.bkt.clouddn.com/img/coding-flag.png" alt="Coding Flag"> -->
       <div class="footer-inner">
         {% include '_partials/footer.swig' %}
         {% include '_scripts/third-party/analytics/busuanzi-counter.swig' %}
@@ -76,6 +77,7 @@
   {% include '_components/algolia-search/assets.swig' %}
 
   <script type="text/javascript" color="255,0,204" opacity='0.5' zIndex="-2" count="80" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+
 
 {% include '_scripts/third-party/mob_share.swig' %}
 
