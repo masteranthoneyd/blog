@@ -206,14 +206,19 @@ list = list.stream()
 在输入框输入”lombok”，得到搜索结果，选择第二个，点击安装，然后安装提示重启IDEA，安装成功; 
 ![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok02.png)
 
- 2.在自己的项目里添加lombok的编译支持(maven项目),在pom文件里面添加如下
+ 还需要在IDEA中开启支持：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/annotation-support.png)
+
+2.在自己的项目里添加lombok的编译支持(maven项目),在pom文件里面添加如下
 indenpence
+
 ```xml
 <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>1.16.18</version>
-    </dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+  <version>1.16.18</version>
+</dependency>
 ```
 
 3.然后就可以尽情在自己项目里面编写简略风格的Java代码咯
@@ -265,7 +270,27 @@ indenpence
   Person.builder().name("Adam Savage").city("San Francisco").job("Mythbusters").job("Unchained Reaction").build();
   ```
 
-  ​
+- `@NonNull`：如其名，不能为空，否则抛出`NullPointException`
+
+- `Log`类：
+
+  ```
+  @CommonsLog
+  Creates private static final org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(LogExample.class);
+  @JBossLog
+  Creates private static final org.jboss.logging.Logger log = org.jboss.logging.Logger.getLogger(LogExample.class);
+  @Log
+  Creates private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(LogExample.class.getName());
+  @Log4j
+  Creates private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LogExample.class);
+  @Log4j2
+  Creates private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger(LogExample.class);
+  @Slf4j
+  Creates private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LogExample.class);
+  @XSlf4j
+  Creates private static final org.slf4j.ext.XLogger log = org.slf4j.ext.XLoggerFactory.getXLogger(LogExample.class);
+  ```
+
 
 `Lombok`的功能不仅如此，更详细请看***[features](https://projectlombok.org/features/all)***
 
@@ -354,6 +379,12 @@ Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-
 之后重启IDEA，搞定~
 虽然有很多功能齐全的md编辑器，但是用IDEA配置和编写Hexo，还要打开别的编辑器那就太不方便了，还是用浑然天成的插件吧。
 改了源码后插件上面的工具栏貌似没有效果了...
+
+## Enso
+
+它可以将测试名转化成一个句子，一目了然地显示测试的内容。这意味着当你在注视任何类的时候， Enso 都会展示其说明文档。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
 
 # Conflict of keyboard shortcuts
