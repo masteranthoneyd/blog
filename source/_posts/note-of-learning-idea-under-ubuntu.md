@@ -397,6 +397,18 @@ gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "[]"
 gsettings set org.gnome.desktop.wm.keybindings begin-move "[]" 
 ```
 
+如果是习惯Windows下的快捷键，那么可以**禁用TTY**（IDEA Ctrl+Alt+F1-6冲突）：
+
+```
+FILE_NAME=/usr/share/X11/xorg.conf.d/50-novtswitch.conf &&\
+sudo touch ${FILE_NAME} && \
+sudo tee ${FILE_NAME} << EOF
+ Section "ServerFlags"
+Option "DontVTSwitch" "true"
+EndSection
+EOF
+```
+
 **目前发现的快捷键冲突：**
 1、`Ctrl+Alt+方向`，直接到系统设置里面改：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
