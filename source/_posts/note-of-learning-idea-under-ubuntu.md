@@ -328,7 +328,34 @@ indenpence
 ### 启动
 点击 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/jrebel-startup.png) JRebel图标，启动项目
 
+## Stackoverflow
+
+看名字就知道这个是干嘛的啦，在plugin repostories直接搜索stackoverflow就找得到
+
+重启后随便选中内容右键就可以看到
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
+
+## Nyan progress bar
+
+这个是彩虹版的进度条...
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/nyan-progress-bar.png)
+
+## Background Image Plus
+
+这是一个设置背景图的插件
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/background-image-plus.png)
+
+## activate-power-mode 或 Power mode ||
+
+这个抖动的窗口老年人实在受不了...
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
+
 ## Markdown Navigator支持md编写
+
 ### 下载
 Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-markdown-navigator](https://plugins.jetbrains.com/plugin/7896-markdown-navigator)***
 下载下来的应该是一个`zip`文件
