@@ -530,7 +530,32 @@ docker stop :停止一个运行中的容器：
 docker stop [OPTIONS] CONTAINER [CONTAINER...]
 ```
 
+## 杀掉容器
+
+docker kill :杀掉一个运行中的容器。
+
+```
+docker kill [OPTIONS] CONTAINER [CONTAINER...]
+
+```
+
+OPTIONS说明：
+
+```
+-s :向容器发送一个信号
+
+```
+
+**实例**
+
+杀掉运行中的容器mynginx
+
+```
+docker kill -s KILL mynginx
+```
+
 ## 进入容器
+
 使用docker exec ：
 ```
 docker exec [OPTIONS] CONTAINER COMMAND [ARG...]

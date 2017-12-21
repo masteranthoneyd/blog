@@ -345,7 +345,35 @@ git checkout -b <branch> origin/<branch>
 git branch --set-upstream <branch> origin/<branch>
 ```
 
+# 同步更新Github Fork的项目
+
+1、`fork`项目并`clone`到本地
+
+2、进入项目根目录
+
+3、添加`remote`指向**上游仓库**
+
+```
+git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+```
+
+4、把上游项目`fetch`下来
+
+```
+git fetch upstream
+```
+
+5、`merge`到`master`
+
+```
+git checkout master
+git merge upstream/master
+```
+
+6、`push`到自己的远程仓库，搞定～
+
 # 最后
+
 Git真的异常强大，但命令繁多，需多加练习
 
 > ***参考：[廖雪峰老师的教程](http://www.liaoxuefeng.com/)***
