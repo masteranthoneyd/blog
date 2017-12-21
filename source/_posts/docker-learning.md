@@ -321,7 +321,6 @@ docker inspect : 获取容器/镜像的元数据。
 
 ```
 docker inspect [OPTIONS] CONTAINER|IMAGE [CONTAINER|IMAGE...]
-
 ```
 
 OPTIONS说明：
@@ -369,7 +368,77 @@ OPTIONS说明：
 172.17.0.3
 ```
 
+查看容器内部IP：
+
+```
+docker inspect --format='{\{.NetworkSettings.IPAddress}}' CONTAINER
+（注：由于代码块解析的问题，上面NetworkSettings前面的 \ 去掉）
+```
+
+## 标签
+
+docker tag：
+
+```
+docker tag IMAGE/CONTAINER TAG
+```
+
+ex：
+
+```
+将同一IMAGE_ID的所有tag，合并为一个新的
+# docker tag 195eb2565349 ybd/ubuntu:rm_test
+新建一个tag，保留旧的那条记录
+# docker tag Registry/Repos:Tag New_Registry/New_Repos:New_Tag
+```
+
+## 保存镜像到归档文件
+
+docker save : 将指定镜像保存成 tar 归档文件。
+
+```
+docker save [OPTIONS] IMAGE [IMAGE...]
+
+```
+
+OPTIONS说明：
+
+```
+-o :输出到的文件。
+```
+
+**实例**
+
+将镜像runoob/ubuntu:v3 生成my_ubuntu_v3.tar文档
+
+```
+runoob@runoob:~$ docker save -o my_ubuntu_v3.tar runoob/ubuntu:v3
+```
+
+## 导入镜像
+
+docker import : 从归档文件中创建镜像。
+
+```
+docker import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]
+```
+
+OPTIONS说明：
+
+```
+-c :应用docker 指令创建镜像；
+
+-m :提交时的说明文字；
+```
+
+例如：
+
+```
+docker import  ubuntu.tar ybd/ubuntu:v1
+```
+
 # Operating Container
+
 ## 开启
 docker run ：创建一个新的容器并运行一个命令 docker create ：创建一个新的容器但不启动它
 ```
@@ -427,7 +496,35 @@ docker run -t -i ubuntu:14.04 /bin/bash
 - 执行用户指定的应用程序
 - 执行完毕后容器被终止
 
+## 暂停
+
+docker pause :暂停容器中所有的进程。
+
+docker unpause :恢复容器中所有的进程。
+
+```
+docker pause [OPTIONS] CONTAINER [CONTAINER...]
+
+docker unpause [OPTIONS] CONTAINER [CONTAINER...]
+```
+
+**实例**
+
+暂停数据库容器db01提供服务。
+
+```
+docker pause db01
+
+```
+
+恢复数据库容器db01提供服务。
+
+```
+docker unpause db01
+```
+
 ## 停止
+
 docker stop :停止一个运行中的容器：
 ```
 docker stop [OPTIONS] CONTAINER [CONTAINER...]
@@ -452,7 +549,16 @@ OPTIONS说明：
 docker exec -it ubuntu /bin/sh
 ```
 
-## 导出和导入容器
+或者使用docker attach：
+
+```
+docker attach --sig-proxy=false CONTAINER
+```
+
+`attach`是可以带上`--sig-proxy=false`来确保`CTRL-D`或`CTRL-C`不会关闭容器。
+
+## 导出容器
+
 **导出容器快照**
 ```
 docker export [OPTIONS] CONTAINER
@@ -460,23 +566,6 @@ docker export [OPTIONS] CONTAINER
 例如：
 ```
 docker export 7691a814370e > ubuntu.tar
-```
-
-**导入容器快照**
-```
-docker import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]
-```
-
-OPTIONS说明：
-```
--c :应用docker 指令创建镜像；
-
--m :提交时的说明文字；
-```
-
-例如：
-```
-docker import  ubuntu.tar ybd/ubuntu:v1
 ```
 
 ## 删除
@@ -532,6 +621,69 @@ docker ps -n 5
 ```
 docker ps -a -q
 ```
+
+## 查看日志
+
+```
+docker logs [OPTIONS] CONTAINER
+```
+
+OPTIONS说明：
+
+```
+-f : 跟踪日志输出
+
+--since :显示某个开始时间的所有日志
+
+-t : 显示时间戳
+
+--tail :仅列出最新N条容器日志
+
+```
+
+## 数据拷贝
+
+docker cp :用于容器与主机之间的数据拷贝。
+
+```
+docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
+
+docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
+
+```
+
+OPTIONS说明：
+
+```
+-L :保持源目标中的链接
+
+```
+
+**实例**
+
+将主机/www/runoob目录拷贝到容器96f7f14e99ab的/www目录下。
+
+```
+docker cp /www/runoob 96f7f14e99ab:/www/
+
+```
+
+将主机/www/runoob目录拷贝到容器96f7f14e99ab中，目录重命名为www。
+
+```
+docker cp /www/runoob 96f7f14e99ab:/www
+
+```
+
+将容器96f7f14e99ab的/www目录拷贝到主机的/tmp目录中。
+
+```
+docker cp  96f7f14e99ab:/www /tmp/
+```
+
+# Operating Volume
+
+
 
 # Spring Boot Integration
 
