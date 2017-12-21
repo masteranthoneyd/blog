@@ -624,7 +624,7 @@ OPTIONS说明：
 ```
 -a :显示所有的容器，包括未运行的。
 
--f :根据条件过滤显示的内容。
+-f, --filter :根据条件过滤显示的内容。
 
 --format :指定返回值的模板文件。
 
@@ -645,6 +645,30 @@ docker ps -n 5
 列出所有创建的容器ID：
 ```
 docker ps -a -q
+```
+
+下面是docker官方的filter参数：
+
+|        Filter         | Description                              |
+| :-------------------: | :--------------------------------------- |
+|         `id`          | Container’s ID                           |
+|        `name`         | Container’s name                         |
+|        `label`        | An arbitrary string representing either a key or a key-value pair. Expressed as `<key>` or `<key>=<value>` |
+|       `exited`        | An integer representing the container’s exit code. Only useful with `--all`. |
+|       `status`        | One of `created`, `restarting`, `running`, `removing`, `paused`, `exited`, or `dead` |
+|      `ancestor`       | Filters containers which share a given image as an ancestor. Expressed as `<image-name>[:<tag>]`, `<image id>`, or `<image@digest>` |
+|  `before` or `since`  | Filters containers created before or after a given container ID or name |
+|       `volume`        | Filters running containers which have mounted a given volume or bind mount. |
+|       `network`       | Filters running containers connected to a given network. |
+| `publish` or `expose` | Filters containers which publish or expose a given port. Expressed as `<port>[/<proto>]` or `<startport-endport>/[<proto>]` |
+|       `health`        | Filters containers based on their healthcheck status. One of `starting`, `healthy`, `unhealthy` or `none`. |
+|      `isolation`      | Windows daemon only. One of `default`, `process`, or `hyperv`. |
+|       `is-task`       | Filters containers that are a “task” for a service. Boolean option (`true` or `false`) |
+
+ex 列出所有状态为退出的容器：
+
+```
+docker ps -q --filter status=exited
 ```
 
 ## 查看日志
@@ -708,7 +732,21 @@ docker cp  96f7f14e99ab:/www /tmp/
 
 # Operating Volume
 
+Usage:	docker volume COMMAND
 
+| Command                                  | Description                              |
+| ---------------------------------------- | ---------------------------------------- |
+| [docker volume create](https://docs.docker.com/engine/reference/commandline/volume_create/) | Create a volume                          |
+| [docker volume inspect](https://docs.docker.com/engine/reference/commandline/volume_inspect/) | Display detailed information on one or more volumes |
+| [docker volume ls](https://docs.docker.com/engine/reference/commandline/volume_ls/) | List volumes                             |
+| [docker volume prune](https://docs.docker.com/engine/reference/commandline/volume_prune/) | Remove all unused volumes                |
+| [docker volume rm](https://docs.docker.com/engine/reference/commandline/volume_rm/) | Remove one or more volumes               |
+
+ex 删除所有悬浮的volume：
+
+```
+docker volume rm $(docker volume ls -q -f dangling=true)
+```
 
 # Spring Boot Integration
 
@@ -847,3 +885,4 @@ sudo apt-get install redis-tool
 > 参考：
 > ***[Docker — 从入门到实践](https://www.gitbook.com/book/yeasy/docker_practice/details)***
 > ***[Docker命令大全](https://kamisec.github.io/2017/06/docker%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/)***
+> ***[Docker命令官方文档](https://docs.docker.com/engine/reference/commandline/cli/)***
