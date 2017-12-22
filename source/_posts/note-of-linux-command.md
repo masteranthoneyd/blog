@@ -15,6 +15,26 @@ tags: [Ubuntu]
 
 <!--more-->
 # SSH相关
+
+# 安装SSH
+
+```
+sudo apt install ssh
+sudo apt install openssh-server
+```
+
+查看启动成功：`ps -e|grep ssh`，如果看到`sshd`那代表成功了，如果没有，执行：
+
+```
+sudo/etc/init.d/ssh start
+```
+
+ssh的配置文件位于`/etc/ssh/sshd_config`，修改后需要重启ssh：
+
+```
+sudo /etc/init.d/sshresart  
+```
+
 ## 保持长连接
 只需要在`ssh`命令后加上发送心跳即可：
 ```
