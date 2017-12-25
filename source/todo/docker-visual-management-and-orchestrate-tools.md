@@ -111,6 +111,8 @@ harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.y
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
 
+**帐号密码默认是** `admin/Harbor12345`，可在配置文件`harbor.conf`中修改
+
 ### 踩坑
 
 多次docker login被refuse
@@ -368,7 +370,7 @@ docker node ls
 ```
 docker service create \
 --name=visualizer \
---publish=8088:8080/tcp \
+--publish 8088:8080 \
 --constraint=node.role==manager \
 --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
 manomarks/visualizer
@@ -466,6 +468,7 @@ curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.
 ```
 docker run -d -p 9000:9000 \
 --name portainer \
+--restart=always
 -v /path/on/host/data:/data  \
 -v /var/run/docker.sock:/var/run/docker.sock \
 portainer/portainer
