@@ -18,6 +18,12 @@ tags: [Docker,Automated]
 在Github上面创建一个项目并把Dockerfile以及上下文需要用到的文件放到里面。
 Dockerfile的讲解不在本篇范围内～
 
+# Integrations
+
+找到项目Settings，添加Docker集成
+
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/github-docker-server.png)
+
 # Link repository service
 首先需要绑定一个仓库服务（Github）：
 

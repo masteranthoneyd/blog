@@ -82,6 +82,8 @@ public class DockerApplication {
 server.port=5001
 spring.application.name=eureka-center-server
 eureka.instance.hostname=peer1
+#eureka.instance.prefer-ip-address=true
+#eureka.instance.instance-id=${spring.cloud.client.ipAddress}:${server.port}
 #eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=true
 eureka.server.enable-self-preservation=false
@@ -89,8 +91,6 @@ eureka.server.enable-self-preservation=false
 spring.output.ansi.enabled=ALWAYS
 eureka.client.serviceUrl.defaultZone=http://peer2:5002/eureka/
 ```
-
-
 
 # Step2、创建Dockerfile
 
@@ -378,6 +378,12 @@ null: null
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/harbor.png)
 
+**此处有个疑问**，很明显看得出来这里上传了两个一样大小的包，不知道是不是同一个jar包，但id又不一样：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/duplicate01.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/duplicate02.png)
+
 # Step5、运行
 
 运行程序
@@ -402,7 +408,6 @@ services:
       - "5001:5001"
     environment:
       - ACTIVE=peer1
-
     network_mode: "host"
   eureka2:
     image: 192.168.6.113:8888/discover-server/eureka-center-server

@@ -17,9 +17,50 @@ tags: [Ubuntu, IDE]
 还有一个好处是可以管理其他的IntelliJ软件（虽然博主只用他们的IDEA = =）...
 安装的时候注意**配置安装路径**：
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
-至于*注册码*，嘿嘿嘿，度娘你懂的。
+
+# License
+
+注册码可以自己读娘，或者使用授权服务器
+
+博主用的是基于docker的授权服务器：
+
+```
+docker pull ilanyu/golang-reverseproxy
+docker run -d -p 6666:8888 ilanyu/golang-reverseproxy
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/license-server.png)
+
+也可以自己搭建一个基于docker的服务 = =
+
+[***https://github.com/masteranthoneyd/docker-jetlicense***](https://github.com/masteranthoneyd/docker-jetlicense)
+
+部署到VPS上，nginx反向代理：
+
+```
+server {  
+    listen 80;  
+    server_name 域名;  
+
+    location / {  
+        proxy_set_header X-Real-IP $remote_addr;  
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+        proxy_set_header Host $http_host;  
+        proxy_set_header X-NginX-Proxy true;  
+        proxy_pass http://127.0.0.1:端口/;  
+        proxy_redirect off;  
+    }
+}
+```
+
+重启nginx：
+
+```
+nginx -s reload
+```
 
 # Personal Setting
+
 博主的常用配置：
 一般会选择打开项目时最外层的窗口打开`setting`，对全局生效。
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting.png)
