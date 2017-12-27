@@ -1,4 +1,4 @@
-# 集成docker-maven-plugin插件构建Docker并提交到私有仓库
+# Spring Cloud集成docker-maven-plugin构建Docker并提交到私有仓库
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
 
@@ -13,6 +13,8 @@
 
 集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
+此篇使用`Spring Cloud Eureka`作为例子
+
 # Maven setting.xml配置
 
 `settings.xml`配置私有库的访问：
@@ -26,8 +28,6 @@ mvn --encrypt-master-password <password>
 
 其次在`settings.xml`文件的同级目录创建`settings-security.xml`文件，将主密码写入：
 
-（可能会提示目录不存在，解决方法是创建一个.m2目录并把`settings-security.xml`复制进去）
-
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <settingsSecurity>
@@ -36,11 +36,13 @@ mvn --encrypt-master-password <password>
 
 ```
 
-最后使用你的私有仓库访问密码生成服务密码，将生成的密码写入到`settings.xml`的`<services>`中：
+最后使用你的私有仓库访问密码生成服务密码，将生成的密码写入到`settings.xml`的`<services>`中（可能会提示目录不存在，解决方法是创建一个.m2目录并把`settings-security.xml`复制进去）
 
 ```
 mvn --encrypt-password <password>
-
+{D9YIyWYvtYsHayLjIenj***********=}
+```
+```
  <server>
       <id>docker-registry</id>
       <username>admin</username>
@@ -51,7 +53,7 @@ mvn --encrypt-password <password>
     </server>
 ```
 
-# Step1、利用IDEA的Spring Initializr编写Hello World Web工程
+# Step1、利用IDEA的Spring Initializr构建高可用Eureka工程
 
 项目结构：
 
@@ -60,17 +62,10 @@ mvn --encrypt-password <password>
 ```
 @SpringBootApplication
 @EnableEurekaServer
-@EnableWebFlux
-@RestController
-public class DockerApplication {
+public class EurekaserverApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DockerApplication.class, args);
-	}
-
-	@GetMapping
-	public Publisher<String> hello() {
-		return Mono.just("Hello World!!!");
+		SpringApplication.run(EurekaserverApplication.class, args);
 	}
 }
 ```
@@ -78,7 +73,6 @@ public class DockerApplication {
 `application-peer1.properties`:
 
 ```
-#使用java -jar xxxx.jar --spring.profiles.active=peer1 进行启动
 server.port=5001
 spring.application.name=eureka-center-server
 eureka.instance.hostname=peer1
@@ -91,6 +85,23 @@ eureka.server.enable-self-preservation=false
 spring.output.ansi.enabled=ALWAYS
 eureka.client.serviceUrl.defaultZone=http://peer2:5002/eureka/
 ```
+
+`application-peer2.properties`:
+```
+server.port=5002
+spring.application.name=eureka-center-server
+eureka.instance.hostname=peer2
+#eureka.instance.prefer-ip-address=true
+#eureka.instance.instance-id=${spring.cloud.client.ipAddress}:${server.port}
+#eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=true
+eureka.server.enable-self-preservation=false
+#eureka.instance.ip-address=true
+spring.output.ansi.enabled=ALWAYS
+eureka.client.serviceUrl.defaultZone=http://peer1:5001/eureka/
+```
+
+
 
 # Step2、创建Dockerfile
 
@@ -117,7 +128,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.yangbingdong.server</groupId>
+	<groupId>com.ybd.server</groupId>
 	<artifactId>eureka-center-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -125,7 +136,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 	<description>统一服务注册中心</description>
 
     <properties>
-    	<resources.plugin.version>3.0.2</resources.plugin.version>
+        <resources.plugin.version>3.0.2</resources.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -170,7 +181,20 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 
     <build>
         <plugins>
-        <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${resources.plugin.version}</version>
@@ -192,18 +216,6 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
                                 </resource>
                             </resources>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -285,6 +297,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
         </snapshotRepository>
     </distributionManagement>
 </project>
+
 ```
 
 **说明**：
@@ -293,7 +306,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 
 
 * Dockerfile构建文件在`src/main/docker`中
-* 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等），则使用`@@`占位符（如@project.build.finalName@）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`，非继承Spring Boot 的pom文件，则使用`${}`占位符
+* 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等），则使用`@@`占位符（如`@project.build.finalName@`）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`，非继承Spring Boot 的pom文件，则使用`${}`占位符
 * 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入docker-maven-plugin插件的`<resources>`配置里
 * `spring-boot-maven-plugin`插件一定要在其他构建插件之上，否则打包文件会有问题。
 
@@ -397,7 +410,7 @@ docker run --name discover-server1 -e ACTIVE=peer1 -p 5001:5001 -d --network hos
 
 # Docker Compose
 
-docker-compose.yml:
+`docker-compose.yml`:
 
 ```
 version: '3'
@@ -418,10 +431,18 @@ services:
     network_mode: "host"
 ```
 
+compose启动 `docker-compse up -d`
 
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up02.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up02.png)
 
 # Finally
 
 > 参考
 >
 > [***http://blueskykong.com/2017/11/02/dockermaven/***](http://blueskykong.com/2017/11/02/dockermaven/)
+>
+> 源码
+>
+> [***https://github.com/masteranthoneyd/spring-boot-docker-demo***](https://github.com/masteranthoneyd/spring-boot-docker-demo ) 
