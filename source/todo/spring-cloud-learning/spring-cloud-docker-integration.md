@@ -13,7 +13,7 @@
 
 集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
-此篇使用`Spring Cloud Eureka`作为例子
+**注意**，此篇使用`Spring Cloud Eureka`作为例子，并实现高可用
 
 # Maven setting.xml配置
 
@@ -36,7 +36,7 @@ mvn --encrypt-master-password <password>
 
 ```
 
-最后使用你的私有仓库访问密码生成服务密码，将生成的密码写入到`settings.xml`的`<services>`中（可能会提示目录不存在，解决方法是创建一个.m2目录并把`settings-security.xml`复制进去）
+最后使用你的私有仓库访问密码生成服务密码，将生成的密码写入到`settings.xml`的`<services>`中（可能会提示目录不存在，解决方法是创建一个`.m2`目录并把`settings-security.xml`复制进去）
 
 ```
 mvn --encrypt-password <password>
@@ -111,10 +111,12 @@ eureka.client.serviceUrl.defaultZone=http://peer1:5001/eureka/
 FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER ybd <yangbingdong1994@gmail.com>
 VOLUME /tmp
-ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS=""
+ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS="" TZ="Asia/Shanghai"
 ADD $PROJECT_NAME app.jar
-RUN sh -c 'touch /app.jar'
-CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker}  -jar /app.jar"]
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    sh -c 'touch /app.jar'
+CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker1}  -jar /app.jar"]
 # ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
 ```
 
@@ -307,7 +309,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 
 * Dockerfile构建文件在`src/main/docker`中
 * 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等），则使用`@@`占位符（如`@project.build.finalName@`）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`，非继承Spring Boot 的pom文件，则使用`${}`占位符
-* 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入docker-maven-plugin插件的`<resources>`配置里
+* 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入`docker-maven-plugin`插件的`<resources>`配置里
 * `spring-boot-maven-plugin`插件一定要在其他构建插件之上，否则打包文件会有问题。
 
 # Step4、构建
@@ -402,46 +404,213 @@ null: null
 运行程序
 
 ```
-docker run --name discover-server1 -e ACTIVE=peer1 -p 5001:5001 -d --network host [IMAGE]
+docker run --name discover-server1 -e ACTIVE=peer1 -p 5001:5001 -d --network=host [IMAGE]
+
+docker run --name discover-server2 -e ACTIVE=peer2 -p 5002:5002 -d --network=host [IMAGE]
 # 限制内存加上：-e "JAVA_OPTS=-Xmx128m"
 ```
 
-就是这么简单粗暴。
+这样一个简单的基于Docker的高可用Eureka就运行起来了。
 
-# Docker Compose
+# HA Eureka
+
+**基于Compose运行高可用的Eureka**
+
+`application.yml`:
+
+```
+spring:
+  application:
+    name: eureka-center-server
+  output:
+    ansi:
+      enabled: always
+#  profiles:
+#    active: eurekaService1
+security:
+  basic:
+    enabled: true     # 开启基于HTTP basic的认证
+  user:
+    name: admin
+    password: admin123
+---
+spring:
+  profiles: docker1
+server:
+  port: 5001
+eureka:
+  instance:
+    hostname: docker-eureka1
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST} #不写死，通过compose file的 Enviroment传递
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker2
+server:
+  port: 5002
+eureka:
+  instance:
+    hostname: docker-eureka2
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker3
+server:
+  port: 5003
+eureka:
+  instance:
+    hostname: docker-eureka3
+    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+```
+
+开启`basic`的认证需要添加依赖：
+
+```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
 
 `docker-compose.yml`:
 
 ```
 version: '3'
 services:
-  eureka1:
-    image: 192.168.6.113:8888/discover-server/eureka-center-server
+  docker-eureka1:
+    image: ${REGISTRY}/discover-server/eureka-center-server
     ports:
       - "5001:5001"
     environment:
-      - ACTIVE=peer1
-    network_mode: "host"
-  eureka2:
-    image: 192.168.6.113:8888/discover-server/eureka-center-server
+      - ACTIVE=docker1
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+  docker-eureka2:
+    image: ${REGISTRY}/discover-server/eureka-center-server
     ports:
       - "5002:5002"
     environment:
-      - ACTIVE=peer2
-    network_mode: "host"
+      - ACTIVE=docker2
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka1:5001/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+  docker-eureka3:
+    image: ${REGISTRY}/discover-server/eureka-center-server
+    ports:
+      - "5003:5003"
+    environment:
+      - ACTIVE=docker3
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka1:5001/eureka/
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 10s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+
+# docker network create -d overlay --subnet 10.0.3.0/24 --attachable eureka-net
+networks:
+  eureka-net:
+    external:
+      name: eureka-net
 ```
 
-compose启动 `docker-compse up -d`
+`.env`
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up02.png)
+```
+REGISTRY=192.168.6.113:8888
+```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up02.png)
+从部署模版中可以看出这三个Eureka实例在网络上的别名(alias)都是`eureka`，对于客户端可以在配置文件中指定这个别名即可，不必指定三个示例的名字。
+
+`application.yml`
+
+```
+eureka.client.serviceUrl.defaultZone=http://${EUREKA_SERVER_ADDRESS}:5001/eureka/
+```
+
+Eureka Server的地址通过`${EUREKA_SERVER_ADDRESS}` 环境变量传入。
+
+```
+services:
+  web:
+    image: demo-web
+    networks:
+      - eureka-net
+    environment:
+      - EUREKA_SERVER_ADDRESS=eureka
+```
+
+另外要注意的是所有依赖于Eureka的应用服务都要挂到`eureka-net`网络上，否则无法和Eureka Server通信。
+
+**启动** ：
+
+```
+docker network create -d=overlay --attachable eureka-net
+docker-compse up -d
+```
+
+此时在`Portainer`中可以看到三个容器已经启动：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/portainer-eureka.png)
+
+随意一个eureka端口都能看到另外两个服务：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up03.png)
 
 # Finally
 
 > 参考
 >
-> [***http://blueskykong.com/2017/11/02/dockermaven/***](http://blueskykong.com/2017/11/02/dockermaven/)
+> ***[http://blueskykong.com/2017/11/02/dockermaven/](http://blueskykong.com/2017/11/02/dockermaven/)***
+>
+> ***[http://blog.csdn.net/timedifier2/article/details/78135970](http://blog.csdn.net/timedifier2/article/details/78135970)***
 >
 > 源码
 >

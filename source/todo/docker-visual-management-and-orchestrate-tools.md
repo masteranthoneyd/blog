@@ -10,6 +10,8 @@
 
 ## Harbor
 
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-arch.png)
+
 Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，通过添加一些企业必需的功能特性，例如安全、标识和管理等，扩展了开源Docker Distribution。作为一个企业级私有Registry服务器，Harbor提供了更好的性能和安全。提升用户使用Registry构建和运行环境传输镜像的效率。Harbor支持安装在多个Registry节点的镜像资源复制，镜像全部保存在私有Registry中， 确保数据和知识产权在公司内部网络中管控。另外，Harbor也提供了高级的安全特性，诸如用户管理，访问控制和活动审计等。
 
 - **基于角色的访问控制** - 用户与Docker镜像仓库通过“项目”进行组织管理，一个用户可以对多个镜像仓库在同一命名空间（project）里有不同的权限。
@@ -20,6 +22,8 @@ Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，
 - **国际化** - 已拥有英文、中文、德文、日文和俄文的本地化版本。更多的语言将会添加进来。
 - **RESTful API** - RESTful API 提供给管理员对于Harbor更多的操控, 使得与其它管理软件集成变得更容易。
 - **部署简单** - 提供在线和离线两种安装工具， 也可以安装到vSphere平台(OVA方式)虚拟设备。
+
+- 集成clair进行镜像安全漏洞扫描
 
 Harbor共由七个容器组成:
 
@@ -91,8 +95,6 @@ token_expiration = 30
 project_creation_restriction = everyone
 ```
 
-
-
 harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.yml`也需要修改`proxy`的端口
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/proxy-port.png)
@@ -109,6 +111,12 @@ harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.y
 ./install.sh
 ```
 
+集成clair漏洞扫描：
+
+```
+./install.sh --with-clair
+```
+
 脚本会自动解压镜像文件并运行docker-compose
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-install.png)
@@ -120,6 +128,13 @@ harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.y
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
 
 **帐号密码默认是** `admin/Harbor12345`，可在配置文件`harbor.conf`中修改
+
+**修改配置文件之后**需要重新生成一些内置配置：
+
+```
+./prepare
+docker-compose up -d
+```
 
 ### 登录被refuse
 
@@ -199,6 +214,36 @@ docker push 192.168.1.102/library/ubuntu:latest
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-push.png)
 
+### 删除
+
+**删除harbor，但保留数据**
+
+```
+docker-compose down -v
+```
+
+**删除harbor数据**（对应docker-compose.yml里面的数据卷）
+
+```
+rm -r /data/database
+rm -r /data/registry
+```
+
+**删除镜像**
+
+UI界面操作删除镜像，只是删除元数据，并未删除真实数据，还需要调用registry的garbage-collect进行清理
+
+```
+docker-compose stop
+
+docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.2-photon garbage-collect --dry-run /etc/registry/config.yml #只是打印过程，并不删除
+
+docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.2-photon garbage-collect  /etc/registry/config.yml
+
+docker-compose start
+```
+
+注意：配置文件`config.yml`挂载在`/etc/registry/`下.
 
 
 # Cluster and Orchestrate Tools
@@ -294,6 +339,8 @@ curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose versio
 
 在`.zshrc`添加：
 
+**注意**：(如果是`oh-my-zsh`，在`$ZSH/oh-my-zsh.sh`中添加)
+
 ```
 fpath=(~/.zsh/completion $fpath)
 ```
@@ -308,7 +355,6 @@ autoload -Uz compinit && compinit -i
 
 ```
 exec $SHELL -l
-source ~/.zshrc
 ```
 
 ### Compose 模板文件
@@ -448,8 +494,8 @@ deploy:
 
 这两个模式的区别是：
 
-- global：每个集群每个服务实例启动一个容器，就像以前启动 Service 时一样。
-- replicated：用户可以指定集群中实例的副本数量。
+- `global`：每个集群每个服务实例启动一个容器，就像以前启动 Service 时一样。
+- `replicated`：用户可以指定集群中实例的副本数量。
 
 以前这个功能是无法在 Compose 中直接实现的，以前需要用户先使用 `docker-compose bundle` 命令将 docker-compose.yml 转换为 .dab 文件，然后才能拿到集群部署，而且很多功能用不了。
 
@@ -474,7 +520,7 @@ docker stack deploy --compose-file docker-compose.yml
 
 ##### placement
 
-这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器，具体有什么用我也不知道，笑。
+这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器。
 
 > 网上能找的资料好少，官方文档只有两句废话，如果我能找到原来的 issue 或者 PR 或许可以理解一些。
 
@@ -590,7 +636,7 @@ tmpfs:
 
 #### `env_file`
 
-从文件中获取环境变量，可以为单独的文件路径或列表。
+从文件中获取环境变量，可以为单独的文件路径或列表，默认读当前目录`.env`。
 
 如果通过 `docker-compose -f FILE` 方式来指定 Compose 模板文件，则 `env_file` 中变量的路径会**基于模板文件路径**。
 
@@ -1173,6 +1219,8 @@ curl -L https://raw.githubusercontent.com/docker/machine/master/contrib/completi
 
 在`~/.zshrc`添加：
 
+**注意**：(如果是`oh-my-zsh`，在`$ZSH/oh-my-zsh.sh`中添加)
+
 ```
 fpath=(~/.zsh/completion $fpath)
 ```
@@ -1182,7 +1230,6 @@ fpath=(~/.zsh/completion $fpath)
 ```
 autoload -Uz compinit && compinit -i
 exec $SHELL -l
-source ~/.zshrc
 ```
 
 ### Usage
@@ -1403,6 +1450,54 @@ manomarks/visualizer
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/visualizer.png)
 
+### 用法
+
+```
+创建服务
+docker service create \
+--image nginx \
+--replicas 2 \
+nginx
+ 
+更新服务
+docker service update \
+--image nginx:alpine \
+nginx
+ 
+删除服务
+docker service rm nginx
+ 
+减少服务实例(这比直接删除服务要好)
+docker service scale nginx=0
+ 
+增加服务实例
+docker service scale nginx=5
+ 
+查看所有服务
+docker service ls
+ 
+查看服务的容器状态
+docker service ps nginx
+ 
+查看服务的详细信息。
+docker service inspect nginx
+```
+
+**实现零宕机部署也非常简单。**这样也可以方便地实现持续部署:
+
+```
+构建新镜像
+docker build -t hub.docker.com/image .
+ 
+将新镜像上传到Docker仓库
+docker push hub.docker.com/image
+ 
+更新服务的镜像
+docker service update --image hub.docker.com/image service
+```
+
+**更新服务要慎重**。 你的容器同时运行在多个主机上。更新服务时，只需要更新Docker镜像。合理的测试和部署流程是保证成功的关键。**Swarm非常容易入门**。分布式系统通常是非常复杂的。与其他容器集群系统(Mesos, Kubernetes)相比，Swarm的学习曲线最低。
+
 # Docker Visual Management
 
 ## Rancher
@@ -1526,4 +1621,8 @@ portainer/portainer \
 
 # Finally
 
-> 参考：***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***
+> 参考：
+>
+> ***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***
+>
+> ***[在生产环境中使用Docker Swarm的一些建议](http://www.jiagoumi.com/virtualization/1464.html)***
