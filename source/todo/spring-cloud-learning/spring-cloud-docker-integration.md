@@ -1,4 +1,4 @@
-# Spring Cloud集成docker-maven-plugin构建Docker并提交到私有仓库
+# docker-maven-plugin构建Docker并提交到私有仓库与HA Eureka
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
 
@@ -422,40 +422,43 @@ docker run --name discover-server2 -e ACTIVE=peer2 -p 5002:5002 -d --network=hos
 spring:
   application:
     name: eureka-center-server
+  cloud:
+    inetutils:
+      preferred-networks: ${PREFERRED_NETWORKS}
   output:
     ansi:
       enabled: always
-#  profiles:
-#    active: eurekaService1
 security:
   basic:
     enabled: true     # 开启基于HTTP basic的认证
   user:
-    name: admin
-    password: admin123
+    name: ${SECURITY_NAME}
+    password: ${SECURITY_PASSWORD}
 ---
 spring:
   profiles: docker1
 server:
-  port: 5001
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka1
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
     serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST} #不写死，通过compose file的 Enviroment传递
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
   server:
     enable-self-preservation: false
 ---
 spring:
   profiles: docker2
 server:
-  port: 5002
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka2
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
@@ -467,10 +470,11 @@ eureka:
 spring:
   profiles: docker3
 server:
-  port: 5003
+  port: ${PORT}
 eureka:
   instance:
     hostname: docker-eureka3
+    leaseRenewalIntervalInSeconds: 15
     prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
@@ -495,15 +499,18 @@ eureka:
 version: '3'
 services:
   docker-eureka1:
-    image: ${REGISTRY}/discover-server/eureka-center-server
-    ports:
-      - "5001:5001"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker1
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+      - PORT=${EUREKA1_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA1_PORT}:${EUREKA1_PORT}
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -515,15 +522,18 @@ services:
           - eureka
 
   docker-eureka2:
-    image: ${REGISTRY}/discover-server/eureka-center-server
-    ports:
-      - "5002:5002"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker2
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka1:5001/eureka/,http://admin:admin123@docker-eureka3:5003/eureka/
+      - PORT=${EUREKA2_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA2_PORT}:${EUREKA2_PORT}
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -535,15 +545,18 @@ services:
           - eureka
 
   docker-eureka3:
-    image: ${REGISTRY}/discover-server/eureka-center-server
-    ports:
-      - "5003:5003"
+    image: ${IMAGE}
+    env_file:
+      - .env
     environment:
       - ACTIVE=docker3
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://admin:admin123@docker-eureka2:5002/eureka/,http://admin:admin123@docker-eureka1:5001/eureka/
+      - PORT=${EUREKA3_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/
+    ports:
+      - ${EUREKA3_PORT}:${EUREKA3_PORT}
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -554,17 +567,23 @@ services:
         aliases:
           - eureka
 
-# docker network create -d overlay --subnet 10.0.3.0/24 --attachable eureka-net
+# docker network create -d=overlay --attachable --subnet 10.0.3.0/24 name
 networks:
   eureka-net:
     external:
-      name: eureka-net
+      name: ${EXTERNAL_NETWORK:-eureka-net}
 ```
 
 `.env`
 
 ```
-REGISTRY=192.168.6.113:8888
+IMAGE=192.168.6.113:8888/discover-server/eureka-center-server
+PREFERRED_NETWORKS=10.0.3
+SECURITY_NAME=admin
+SECURITY_PASSWORD=admin123
+EUREKA1_PORT=5001
+EUREKA2_PORT=5002
+EUREKA3_PORT=5003
 ```
 
 从部署模版中可以看出这三个Eureka实例在网络上的别名(alias)都是`eureka`，对于客户端可以在配置文件中指定这个别名即可，不必指定三个示例的名字。
@@ -592,7 +611,7 @@ services:
 **启动** ：
 
 ```
-docker network create -d=overlay --attachable eureka-net
+docker network create -d=overlay --attachable --subnet 10.0.3.0/24 eureka-net
 docker-compse up -d
 ```
 
@@ -603,6 +622,18 @@ docker-compse up -d
 随意一个eureka端口都能看到另外两个服务：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/compose-up03.png)
+
+如果使用swarm mode：
+
+```
+export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eureka-stack
+```
+
+**注意**：目前使用stack方式启动是无法加载`env_file`的，所以需要预先加载一下。
+
+我们的app通过合适的`network`交互应该是这样的：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/cnm-demo.png)
 
 # Finally
 

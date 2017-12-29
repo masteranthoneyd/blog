@@ -1194,6 +1194,8 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-logo.png)
 
+> Docker Machine 是供给和管理 docker 化主机的工具。有自己的命令行客户端 `docker-machine`。提供多种环境的 docker 主机，可以用 Docker Machine 在一个或者多个虚拟系统（本地或者远程）上安装 Docker Engine。
+
 ### Install
 
 ```
@@ -1255,6 +1257,8 @@ docker-machine create -d virtualbox test
 `--engine-opt dns=114.114.114.114` 配置 Docker 的默认 DNS
 
 `--engine-registry-mirror https://registry.docker-cn.com` 配置 Docker 的仓库镜像
+
+`--engine-insecure-registry`
 
 `--virtualbox-memory 2048` 配置主机内存
 
@@ -1325,6 +1329,67 @@ $ docker-machine COMMAND --help
 
 来查看具体的用法。
 
+### 加入其他物理主机
+
+> ***[https://docs.docker.com/machine/drivers/generic/](https://docs.docker.com/machine/drivers/generic/)***
+
+在使用 docker-machine 进行远程安装前我们需要做一些准备工作：
+**1.    在目标主机上创建一个用户并加入sudo 组**
+**2.    为该用户设置 sudo 操作不需要输入密码**
+**3.    把本地用户的 ssh public key 添加到目标主机上**
+
+**注意**：如果远程物理级已经安装过docker，docker-machine会把远程的docker重置，镜像以及容器都没了...
+
+比如我们要在远程主机上添加一个名为 nick 的用户并加入 sudo 组：
+
+```
+$ sudo adduser nick
+$ sudo usermod -a -G sudo nick
+```
+
+然后设置 sudo 操作不需要输入密码：
+
+```
+$ sudo visudo
+```
+
+把下面一行内容添加到`%sudo ALL=(ALL:ALL) ALL`**之后**并保存文件，否则不生效：
+
+```
+%sudo  ALL=(ALL:ALL) ALL
+nick   ALL=(ALL:ALL) NOPASSWD: ALL
+```
+
+最后把本地用户的 ssh public key 添加到目标主机上：
+
+```
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub nick@xxx.xxx.xxx.xxx
+```
+
+这几步操作的主要目的是获得足够的权限可以远程的操作目标主机。
+
+然后添加machine：
+
+```
+docker-machine create \               
+  --driver generic \
+  --generic-ip-address=192.168.6.105 \
+  --generic-ssh-key ~/.ssh/id_rsa \
+  --generic-ssh-user=dworker \
+  [machine name]
+```
+
+
+
+### 添加镜像加速
+
+```
+$ docker-machine ssh default
+$> sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=$REGISTRY_MIRROR |g" /var/lib/boot2docker/profile
+$> exit
+$ docker-machine restart default
+```
+
 ## Swarm Mode
 
 >  Docker 1.12 [Swarm mode](https://docs.docker.com/engine/swarm/) 已经内嵌入 Docker 引擎，成为了 docker 子命令 `docker swarm`。请注意与旧的 `Docker Swarm` 区分开来。
@@ -1361,6 +1426,8 @@ $ docker-machine COMMAND --help
 
 
 ### 端口监听
+
+（下面的Portainer需要用到）
 
 `Swarm`是通过监听`2375`端口进行通信的，所以在使用`Swarm`进行集群管理之前，需要设置一下`2375`端口的监听。这里有两种方法，一种是通过修改docker配置文件方式，另一种是通过一个轻量级的代理容器进行监听。
 
@@ -1496,7 +1563,7 @@ docker push hub.docker.com/image
 docker service update --image hub.docker.com/image service
 ```
 
-**更新服务要慎重**。 你的容器同时运行在多个主机上。更新服务时，只需要更新Docker镜像。合理的测试和部署流程是保证成功的关键。**Swarm非常容易入门**。分布式系统通常是非常复杂的。与其他容器集群系统(Mesos, Kubernetes)相比，Swarm的学习曲线最低。
+**更新服务要慎重**。 你的容器同时运行在多个主机上。更新服务时，只需要更新Docker镜像。合理的测试和部署流程是保证成功的关键。**Swarm非常容易入门**。分布式系统通常是非常复杂的。与其他容器集群系统(Mesos, Kubernetes)相比，Swarm的学习曲线**最低**。
 
 # Docker Visual Management
 
@@ -1588,8 +1655,7 @@ curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.
 ```
 docker run -d -p 9000:9000 \
 --name portainer \
---restart=always
--v /path/on/host/data:/data  \
+--restart=always \
 -v /var/run/docker.sock:/var/run/docker.sock \
 portainer/portainer
 ```
@@ -1618,6 +1684,12 @@ portainer/portainer \
 镜像仓库：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry.png)
+
+Endpoints：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/end-point.png)
+
+**注意**：添加Endpoints先要暴露节点的2375端口。
 
 # Finally
 
