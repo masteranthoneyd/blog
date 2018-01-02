@@ -1,3 +1,10 @@
+---
+title: Docker可视化与管理工具
+date: 2018-01-02 12:57:52
+categories: [Docker, Management]
+tags: [Docker, Swarm]
+---
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-managerment.png)
 
 # Preface
@@ -5,6 +12,8 @@
 > 在学习了Docker的基本操作之后，接下来就是Docker的管理部分了，这包括Docker的可视化管理以及集群管理。
 >
 > 此篇主要记录Docker私有库的搭建，Docker编排工具的介绍以及使用，可视化管理工具的介绍以及搭建...
+
+<!--more-->
 
 # Docker Registry
 
@@ -158,10 +167,10 @@ DOCKER_OPTS="--insecure-registry 192.168.1.102:8888"
 
 ```
 # 找到ExecStart=/usr/bin/dockerd -H fd:// 
-# 前面添加EnvironmentFile=-/etc/default/docker，后面追加$DOCKER_OPTS8
+# 前面添加EnvironmentFile=-/etc/default/docker，后面追加$DOCKER_OPTS
 
 EnvironmentFile=-/etc/default/docker
-ExecStart=/usr/bin/dockerd -H fd:// $DOCKER_OPTS8
+ExecStart=/usr/bin/dockerd -H fd:// $DOCKER_OPTS
 ```
 
 重启docker：
@@ -1329,6 +1338,8 @@ $ docker-machine COMMAND --help
 
 来查看具体的用法。
 
+**注意：**docker-machine 安装的 Docker 在 `/etc/systemd/system` 目录下多出了一个 Docker 相关的目录：`docker.service.d`。这个目录中只有一个文件 `10-machine.conf`，这个配置文件至关重要，因为它会覆盖 Docker 默认安装时的配置文件，从而以 Docker Machine 指定的方式启动 Docker daemon。至此我们有了一个可以被远程访问的 Docker daemon。
+
 ### 加入其他物理主机
 
 > ***[https://docs.docker.com/machine/drivers/generic/](https://docs.docker.com/machine/drivers/generic/)***
@@ -1376,7 +1387,16 @@ docker-machine create \
   --generic-ip-address=192.168.6.105 \
   --generic-ssh-key ~/.ssh/id_rsa \
   --generic-ssh-user=dworker \
+  --engine-registry-mirror https://vioqnt7w.mirror.aliyuncs.com \
+  --engine-insecure-registry 192.168.6.113:8888 \
+  qww-machine
   [machine name]
+```
+
+如果已安装docker：
+
+```
+docker-machine create -d none --url=tcp://192.168.6.105:2375 vmware_docker01
 ```
 
 
