@@ -503,89 +503,77 @@ eureka:
 `docker-compose.yml`:
 
 ```
-version: '3'
-services:
-  docker-eureka1:
-    image: ${IMAGE}
-    env_file:
-      - .env
-    environment:
-      - ACTIVE=docker1
-      - PORT=${EUREKA1_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
-    ports:
-      - ${EUREKA1_PORT}:${EUREKA1_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 10s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
-
-  docker-eureka2:
-    image: ${IMAGE}
-    env_file:
-      - .env
-    environment:
-      - ACTIVE=docker2
-      - PORT=${EUREKA2_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
-    ports:
-      - ${EUREKA2_PORT}:${EUREKA2_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 10s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
-
-  docker-eureka3:
-    image: ${IMAGE}
-    env_file:
-      - .env
-    environment:
-      - ACTIVE=docker3
-      - PORT=${EUREKA3_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/
-    ports:
-      - ${EUREKA3_PORT}:${EUREKA3_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 10s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
-
-# docker network create -d=overlay --attachable --subnet 10.0.3.0/24 name
-networks:
-  eureka-net:
-    external:
-      name: ${EXTERNAL_NETWORK:-eureka-net}
+spring:
+  application:
+    name: eureka-center-server
+  cloud:
+    inetutils:
+      preferred-networks: ${PREFERRED_NETWORKS}
+  output:
+    ansi:
+      enabled: always
+security:
+  basic:
+    enabled: true     # 开启基于HTTP basic的认证
+  user:
+    name: ${SECURITY_NAME}
+    password: ${SECURITY_PASSWORD}
+---
+spring:
+  profiles: docker1
+server:
+  port: ${PORT}
+eureka:
+  instance:
+    hostname: docker-eureka1
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker2
+server:
+  port: ${PORT}
+eureka:
+  instance:
+    hostname: docker-eureka2
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
+---
+spring:
+  profiles: docker3
+server:
+  port: ${PORT}
+eureka:
+  instance:
+    hostname: docker-eureka3
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
+    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+  server:
+    enable-self-preservation: false
 ```
 
 `.env`
 
 ```
 IMAGE=192.168.6.113:8888/discover-server/eureka-center-server
-PREFERRED_NETWORKS=10.0.3
+PREFERRED_NETWORKS=10.10
+LEASE_RENEWAL_INTERVAL_INSECONDS=15
 SECURITY_NAME=admin
 SECURITY_PASSWORD=admin123
 EUREKA1_PORT=5001

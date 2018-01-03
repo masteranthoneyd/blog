@@ -223,7 +223,9 @@ docker push 192.168.1.102/library/ubuntu:latest
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-push.png)
 
-### 删除
+**注意**：使用`docker stack deploy`时，如果是私有镜像，需要终端登录后加上`--with-registry-auth`选项。
+
+### 删除Harbor
 
 **删除harbor，但保留数据**
 
@@ -231,7 +233,7 @@ docker push 192.168.1.102/library/ubuntu:latest
 docker-compose down -v
 ```
 
-**删除harbor数据**（对应docker-compose.yml里面的数据卷）
+**删除harbor数据**（对应`docker-compose.yml`里面的数据卷）
 
 ```
 rm -r /data/database
@@ -253,6 +255,20 @@ docker-compose start
 ```
 
 注意：配置文件`config.yml`挂载在`/etc/registry/`下.
+
+## Harbor做Mirror加速器
+
+**mirror服务器和私有服务器分开部署，因为mirror服务器只能pull，不能push**
+
+`./prepare`之后修改`config/registry/config.yml`，在config.yml文件的最后追加以下配置：
+
+```
+proxy:
+  remoteurl: https://registry-1.docker.io
+```
+
+这样保证docker pull并不存在于docker harbor中的image时，会从Docker Hub上去pull，并缓存于mirror服务器。
+
 
 
 # Cluster and Orchestrate Tools
@@ -947,7 +963,6 @@ volumes:
  - /var/lib/mysql
  - cache/:/tmp/cache
  - ~/configs:/etc/configs/:ro
-
 ```
 
 #### 其它指令
@@ -1718,3 +1733,5 @@ Endpoints：
 > ***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***
 >
 > ***[在生产环境中使用Docker Swarm的一些建议](http://www.jiagoumi.com/virtualization/1464.html)***
+>
+> ***[使用Docker Harbor搭建私有镜像服务器和Mirror服务器](https://www.jianshu.com/p/8d4fcff97a35)***

@@ -778,29 +778,329 @@ $ docker run -d -P \
     python app.py
 ```
 
-# Dev Env In Docker
+# Self Usage Docker Or Compose
 
-## MySql
+以下是个人使用的一些容器运行命令或者docker-compose.yml，不定时更新
 
-[**mysql**](https://hub.docker.com/_/mysql/):
+## *[Mysql](https://hub.docker.com/_/mysql/)*
 
-```
-MYSQL=/home/ybd/data/docker/mysql && docker run --name=mysql -p 3306:3306  -v $MYSQL/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION --lower-case-table-names=1
-```
-
-## Redis
-
-[**redis**](https://hub.docker.com/_/redis/):
+**运行实例**：
 
 ```
-REDIS=/home/ybd/data/docker/redis && docker run -p 6379:6379 --restart=always -v $REDIS/redis.conf:/usr/local/etc/redis/redis.conf -v $REDIS/data:/data --name redis -d redis redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+MYSQL_DATA=${HOME}/data/docker/mysql/data && \
+MYSQL_PORT=3306 && \
+MYSQL_VERSION=latest && \
+docker run --name=mysql \
+--restart=always \
+-p ${MYSQL_PORT}:3306  \
+-v ${MYSQL_DATA}:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=root \
+-d \
+mysql:${MYSQL_VERSION:-latest} \
+--character-set-server=utf8mb4 \
+--collation-server=utf8mb4_unicode_ci \
+--sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION \
+--lower-case-table-names=1
 ```
-安装终端链接工具：
+
+链接Mysql服务端需要安装终端客户端：
+
 ```
-sudo apt-get install redis-tool
+sudo apt install mysql-client
 ```
+
+链接：
+
+```
+mysql -h 127.0.0.1 -P 3306 -u root -p
+// 然后需要输入密码
+```
+
+## *[Redis](https://hub.docker.com/_/redis/)*
+
+**运行实例**：
+
+```
+REDIS_DATA=${HOME}/data/docker/redis/data && \
+REDIS_CONF=${HOME}/data/docker/redis/redis.conf && \
+REDIS_PORT=6379 && \
+REDIS_VERSION=latest && \
+docker run -p ${REDIS_PORT}:6379 \
+--restart=always \
+-v ${REDIS_DATA}:/usr/local/etc/redis/redis.conf \
+-v ${REDIS_DATA}:/data \
+--name redis \
+-d \
+redis:${REDIS_VERSION:-latest} \
+redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+```
+
+链接Redis服务端需要安装终端客户端：
+
+```
+sudo apt install redis-tools
+```
+
+链接：
+
+```
+redis-cli
+```
+
+## *[Portainer](https://hub.docker.com/r/portainer/portainer/)*
+
+单机版：
+
+```
+docker run -d -p 9000:9000 \
+--name portainer \
+--restart=always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+portainer/portainer:{PORTAINER_VERSION:-latest}
+```
+
+集群版：
+
+```
+PORTAINER_DATA=${HOME}/data/docker/portainer/data
+docker service create \
+--name portainer \
+--publish 9000:9000 \
+--constraint 'node.role == manager' \
+--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+--mount type=bind,src=${PORTAINER_DATA},dst=/data \
+portainer/portainer:{PORTAINER_VERSION:-latest} \
+-H unix:///var/run/docker.sock
+```
+
+## Visualizer
+
+```
+docker service create \
+--name=visualizer \
+--publish 8088:8080 \
+--constraint=node.role==manager \
+--mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+manomarks/visualizer
+```
+
+
+
+## *[Nexus3](https://hub.docker.com/r/sonatype/nexus3/)*
+
+**创建Volume** ：
+
+```
+docker volume create --name nexus-data
+```
+
+**运行实例**：
+
+```
+NEXUS_PORT=8090 && \
+NEXUS_VERSION=3.6.2 && \
+docker run --restart=always \
+-d \
+-p ${NEXUS_PORT}:8081 \
+--name nexus \
+-v nexus-data:/nexus-data \
+sonatype/nexus3:${NEXUS_VERSION}
+```
+
+查看启动日志：
+
+```
+docker logs nexus
+```
+
+**备份**：
+
+```
+BAK_CONTAINER=ubuntu:latest && \
+VOLUME=nexus-data && \
+BAK_PATH=${PWD} && \
+BAK_ARCHIVE_NAME=nexus-data && \
+docker run --rm \
+-v ${BAK_PATH}:/backup \
+-v ${VOLUME}:/backup-data \
+${BAK_CONTAINER} \
+tar zcvf /backup/${BAK_ARCHIVE_NAME}.tar.gz /backup-data 
+```
+
+**还原**：
+
+先要创建还原的Volume：
+
+```
+docker volume create --name nexus-data1
+```
+
+然后：
+
+```
+BAK_CONTAINER=ubuntu:latest && \
+RESTORE_VOLUME=nexus-data1 && \
+BAK_PATH=${PWD} && \
+BAK_ARCHIVE_NAME=nexus-data && \
+docker volume create --name ${RESTORE_VOLUME} && \
+docker run --rm \
+-v ${RESTORE_VOLUME}:/restore \
+-v ${BAK_PATH}:/backup \
+ubuntu:latest \
+tar zxvf /backup/${BAK_ARCHIVE_NAME}.tar.gz -C /restore --strip-components=1
+```
+
+## *[Shadowsocks](https://hub.docker.com/r/mritd/shadowsocks/)*
+
+**服务端**：
+
+```
+SS_PASSWORD=123456 && \
+SS_PORT=22 && \
+docker run -dt \
+--name ssserver \
+--restart=always \
+-p ${SS_PORT}:6443 \
+mritd/shadowsocks:latest \
+-m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k ${PASSWORD} --fast-open"
+```
+
+**客户端**：
+
+```
+SS_IP=127.0.0.1 && \
+SS_PORT=22 && \
+SS_PASSWORD=123456 && \
+docker run -dt \
+--name ssclient \
+--restart=always \
+-p 1080:1080 \
+mritd/shadowsocks:latest \
+-m "ss-local" -s "-s ${SS_IP} -p ${SS_PORT} -b 0.0.0.0 -l 1080 -m aes-256-cfb -k ${SS_PASSWORD} --fast-open"
+```
+
+加速需要开启[***BBR***](https://teddysun.com/489.html)
+
+## *[Ngrok（服务端）](https://hub.docker.com/r/hteen/ngrok/)*
+
+**运行实例**：
+
+```
+NGROK_DATA=/root/docker/ngrok/data && \
+NGROK_PORT=9000 && \
+docker run -idt --name ngrok-server \
+-p ${NGROK_PORT}:80 -p 4432:443 -p 4443:4443 \
+-v ${NGROK_DATA}:/myfiles \
+-e DOMAIN='ngrok.yangbingdong.com' hteen/ngrok /bin/sh /server.sh
+```
+
+> 详情：[***Docker搭建Ngrok***](http://yangbingdong.com/2017/self-hosted-build-ngrok-server/#Docker搭建Ngrok)
+
+## Kafka Zookeeper集群
+
+docker-compose.yml:
+
+```
+version: '3'
+services:
+  kafka1:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 1
+      KAFKA_CREATE_TOPICS: test:6:1
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  kafka2:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9093
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  kafka3:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9094:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9094
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  zoo1:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 1
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2181:2181"
+      - "2888"
+      - "3888"
+
+  zoo2:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 2
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2182:2181"
+      - "2888"
+      - "3888"
+
+  zoo3:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 3
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2183:2181"
+      - "2888"
+      - "3888"
+```
+
+## *[Kafka Manager](https://hub.docker.com/r/sheepkiller/kafka-manager/)*
+
+docker-compose.yml:
+
+```
+version: '3'
+services:
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    environment: 
+      ZK_HOSTS: 192.168.6.113:2181,192.168.6.113:2182,192.168.6.113:2183
+    APPLICATION_SECRET: "letmein"
+    ports:
+      - "9100:9000"
+```
+
+> [http://dearcharles.cn/2017/11/23/%E5%9F%BA%E4%BA%8EDocker%E6%90%AD%E5%BB%BA%E5%88%86%E5%B8%83%E5%BC%8F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97Kafka/](http://dearcharles.cn/2017/11/23/%E5%9F%BA%E4%BA%8EDocker%E6%90%AD%E5%BB%BA%E5%88%86%E5%B8%83%E5%BC%8F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97Kafka/)
 
 # Last
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker/cmd_logic.png)
 
 > 参考：
 > ***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***
