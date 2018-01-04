@@ -1,7 +1,7 @@
 ---
 title: Dockerfile学习And构建Hexo镜像
 date: 2017-10-09 09:14:57
-categories: [Docker, Base]
+categories: [Docker]
 tags: [Docker, Dockerfile]
 ---
 
@@ -251,6 +251,42 @@ RUN groupadd -r redis && useradd -r -g redis redis
 USER redis
 RUN [ "redis-server" ]
 ```
+## HEALTHCHECK 健康检查
+
+格式：
+
+- `HEALTHCHECK [选项] CMD <命令>`：设置检查容器健康状况的命令
+- `HEALTHCHECK NONE`：如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令
+
+`HEALTHCHECK` 支持下列选项：
+
+- `--interval=<间隔>`：两次健康检查的间隔，默认为 30 秒；
+- `--timeout=<间隔>`：健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒；
+- `--retries=<次数>`：当连续失败指定次数后，则将容器状态视为 `unhealthy`，默认 3 次。
+- `--start-period=<间隔>`: 应用的启动的初始化时间，在启动过程中的健康检查失效不会计入，默认 0 秒； (从17.05)引入
+
+在 `HEALTHCHECK [选项] CMD` 后面的命令，格式和 `ENTRYPOINT` 一样，分为 `shell` 格式，和 `exec` 格式。命令的返回值决定了该次健康检查的成功与否：
+
+- `0`：成功；
+- `1`：失败；
+- `2`：保留值，不要使用
+
+容器启动之后，初始状态会为 `starting` (启动中)。Docker Engine会等待 `interval` 时间，开始执行健康检查命令，并周期性执行。如果单次检查返回值非0或者运行需要比指定 `timeout` 时间还长，则本次检查被认为失败。如果健康检查连续失败超过了 `retries` 重试次数，状态就会变为 `unhealthy` (不健康)。
+
+注：
+
+- 一旦有一次健康检查成功，Docker会将容器置回 `healthy` (健康)状态
+- 当容器的健康状态发生变化时，Docker Engine会发出一个 `health_status` 事件。
+
+假设我们有个镜像是个最简单的 Web 服务，我们希望增加健康检查来判断其 Web 服务是否在正常工作，我们可以用 `curl`来帮助判断，其 `Dockerfile` 的 `HEALTHCHECK` 可以这么写：
+
+```
+FROM elasticsearch:5.5
+
+HEALTHCHECK --interval=5s --timeout=2s --retries=12 \
+  CMD curl --silent --fail localhost:9200/_cluster/health || exit 1
+```
+
 # 踩坑
 
 - Dockerfile里也需要注意**权限问题**（nodejs7版本以上不能正常安装hexo，需要创建用户并制定权限去安装）

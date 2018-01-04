@@ -1,7 +1,7 @@
 ---
 title: 基于Docker搭建Shadowsocks Server与Client
 date: 2017-09-08 15:55:07
-categories: [Docker,Shadowsocks]
+categories: [Docker]
 tags: [Docker,Shadowsocks]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-shadowsocks/shadowsocks.png)

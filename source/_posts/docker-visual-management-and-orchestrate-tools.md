@@ -1,7 +1,7 @@
 ---
 title: Docker可视化与管理工具
 date: 2018-01-02 12:57:52
-categories: [Docker, Management]
+categories: [Docker]
 tags: [Docker, Swarm]
 ---
 
@@ -783,7 +783,6 @@ labels:
   com.startupteam.description: "webapp for a startup team"
   com.startupteam.department: "devops department"
   com.startupteam.release: "rc3 for v1.0"
-
 ```
 
 #### `links`
@@ -1431,6 +1430,48 @@ $ docker-machine restart default
 >
 >  `Swarm mode` 内置 kv 存储功能，提供了众多的新特性，比如：具有容错能力的去中心化设计、内置服务发现、负载均衡、路由网格、动态伸缩、滚动更新、安全传输等。使得 Docker 原生的 `Swarm` 集群具备与 Mesos、Kubernetes 竞争的实力。
 
+### 功能特点
+
+#### 与Docker Engine集成的集群管理
+
+使用Docker Engine CLI创建一组Docker引擎，您可以在其中部署应用程序服务。您不需要其他编排软件来创建或管理群集。
+
+#### 节点分散式设计
+
+Docker Engine不是在部署时处理节点角色之间的差异，而是在运行时处理角色变化。您可以使用Docker Engine部署两种类型的节点，管理节点和工作节点。这意味着您可以从单个服务器构建整个群集。
+
+#### 声明性服务模型
+
+Docker Engine使用声明性方法来定义应用程序堆栈中各种服务的所需状态。例如，您可以描述由具有消息队列服务和数据库后端的Web前端服务组成的应用程序。
+
+####  可扩容与缩放容器
+
+对于每个服务，您可以声明要运行的任务数。当您向上或向下缩放时，swarm管理器通过添加或删除任务来自动适应，以保持所需的任务数量来保证集群的可靠状态。
+
+#### 容器容错状态协调
+
+群集管理器节点不断监视群集状态，并协调您表示的期望状态的实际状态之间的任何差异。例如，如果设置一个服务以运行容器的10个副本，并且托管其中两个副本的工作程序计算机崩溃，则管理器将创建两个新副本以替换崩溃的副本。 swarm管理器将新副本分配给正在运行和可用的worker节点上。
+
+#### 多主机网络
+
+您可以为服务指定覆盖网络。当swarm管理器初始化或更新应用程序时，它会自动为覆盖网络上的容器分配地址。
+
+#### 服务发现
+
+Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负载平衡运行的容器。您可以通过嵌入在swarm中的DNS服务器查询在群中运行的每个容器。
+
+#### 负载平衡
+
+您可以将服务的端口公开给外部负载平衡器。在内部，swarm允许您指定如何在节点之间分发服务容器。
+
+#### 缺省安全
+
+群中的每个节点强制执行TLS相互验证和加密，以保护其自身与所有其他节点之间的通信。您可以选择使用自签名根证书或来自自定义根CA的证书。
+
+#### 滚动更新
+
+在已经运行期间，您可以增量地应用服务更新到节点。 swarm管理器允许您控制将服务部署到不同节点集之间的延迟。如果出现任何问题，您可以将任务回滚到服务的先前版本。
+
 ### 概念
 
 #### 节点
@@ -1456,9 +1497,17 @@ $ docker-machine restart default
 
 两种模式通过 `docker service create` 的 `--mode` 参数指定。
 
+**下图解释服务、任务、容器：**
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/services-diagram.png)
 
+**服务的任务及调试说明：**
 
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-task.png)
+
+**服务部署的复制模式和全局模式说明：**
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
 
 ### 端口监听
 
@@ -1466,7 +1515,7 @@ $ docker-machine restart default
 
 `Swarm`是通过监听`2375`端口进行通信的，所以在使用`Swarm`进行集群管理之前，需要设置一下`2375`端口的监听。这里有两种方法，一种是通过修改docker配置文件方式，另一种是通过一个轻量级的代理容器进行监听。
 
-**方式一，修改配置文件**：
+**方式一，修改配置文件**（推荐）：
 
 `/etc/default/docker`中的`DOCKER_OPTS`追加配置：
 
@@ -1487,6 +1536,12 @@ shipyard/docker-proxy
 ```
 
 ### 创建集群
+
+在创建集群前，如果开启了防火墙，请确认三台主机的防火墙能让swarm需求的端口开放，需要打开主机之间的端口，以下端口必须可用。在某些系统上，这些端口默认为打开。
+**2377**：TCP端口2377用于集群管理通信
+**7946**：TCP和UDP端口7946用于节点之间的通信
+**4789**：TCP和UDP端口4789用于覆盖网络流量
+如果您计划使用加密（–opt加密）创建覆盖网络，则还需要确保协议50（ESP）已打开。
 
 docker swarm命令：
 
@@ -1525,18 +1580,115 @@ docker node demote <NODE>
 docker service create --replicas 3 --name helloworld alpine ping docker.com
 ```
 
-### 查看节点信息
+### 节点管理
 
-**查看集群中的docker信息**：
+#### 查看集群中的docker信息
 
 ```
 docker -H 10.0.11.150:2376 info
 ```
 
-**列出节点**：
+#### 列出节点
 
 ```
 docker node ls
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-node-ls.png)
+
+说明：
+**AVAILABILITY列**：
+显示调度程序是否可以将任务分配给节点：
+
+- `Active` 意味着调度程序可以将任务分配给节点。
+- `Pause` 意味着调度程序不会将新任务分配给节点，但现有任务仍在运行。
+- `Drain` 意味着调度程序不会向节点分配新任务。调度程序关闭所有现有任务并在可用节点上调度它们。
+
+**MANAGER STATUS列**
+显示节点是属于manager或者worker
+
+- **没有值** 表示不参与群管理的工作节点。
+- `Leader` 意味着该节点是使得群的所有群管理和编排决策的主要管理器节点。
+- `Reachable` 意味着节点是管理者节点正在参与Raft共识。如果领导节点不可用，则该节点有资格被选为新领导者。
+- `Unavailable` 意味着节点是不能与其他管理器通信的管理器。如果管理器节点不可用，您应该将新的管理器节点加入群集，或者将工作器节点升级为管理器。
+
+#### 查看节点的详细信息
+
+您可以在管理器节点上运行`docker node inspect`来查看单个节点的详细信息。 输出默认为JSON格式，但您可以传递`–pretty`标志以以可读的yml格式打印结果
+
+```
+# ybd @ ybd-PC in ~ [9:37:23] 
+$ docker node inspect --pretty ybd-machine1 
+ID:			f917bibevklfp3xjsjoyx2g2t
+Hostname:              	ybd-machine1
+Joined at:             	2018-01-03 10:00:28.499769713 +0000 utc
+Status:
+ State:			Ready
+ Availability:         	Active
+ Address:		192.168.6.113
+Platform:
+ Operating System:	linux
+ Architecture:		x86_64
+Resources:
+ CPUs:			1
+ Memory:		995.9MiB
+Plugins:
+ Log:		awslogs, fluentd, gcplogs, gelf, journald, json-file, logentries, splunk, syslog
+ Network:		bridge, host, macvlan, null, overlay
+ Volume:		local
+Engine Version:		17.12.0-ce
+Engine Labels:
+ - provider=virtualbox
+TLS Info:
+ TrustRoot:
+-----BEGIN CERTIFICATE-----
+MIIBajCCARCgAwIBAgIUTdhfszkLcL0IC92X4TaOWbQlbZAwCgYIKoZIzj0EAwIw
+EzERMA8GA1UEAxMIc3dhcm0tY2EwHhcNMTcxMjIyMDg0NzAwWhcNMzcxMjE3MDg0
+NzAwWjATMREwDwYDVQQDEwhzd2FybS1jYTBZMBMGByqGSM49AgEGCCqGSM49AwEH
+A0IABEWabJlpAGjNi6x8QWGXnMUFwPe27anM5nHwLX8y05TbgamYvV7Is4CZ1BbU
+ypJ/a9FpSp4FbV/6iYveIwwaHLSjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMB
+Af8EBTADAQH/MB0GA1UdDgQWBBR1K7f/HuhGDD2gzDeejaH2r8ZxIzAKBggqhkjO
+PQQDAgNIADBFAiEApL0o/FwwzLrhalYddR+buFHg0Hg3jKh37t00TmMU7SICIAOz
+YZNcngOkQiY2K2poQqRw+dFU9xOk543G+zDHqX4h
+-----END CERTIFICATE-----
+
+ Issuer Subject:	MBMxETAPBgNVBAMTCHN3YXJtLWNh
+ Issuer Public Key:	MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERZpsmWkAaM2LrHxBYZecxQXA97btqczmcfAtfzLTlNuBqZi9XsizgJnUFtTKkn9r0WlKngVtX/qJi94jDBoctA==
+
+```
+
+#### 更新节点
+
+Usage:	docker node update [OPTIONS] NODE
+
+Options:
+      --availability string   Availability of the node ("active"|"pause"|"drain")
+      --label-add list        Add or update a node label (key=value)
+      --label-rm list         Remove a node label if exists
+      --role string           Role of the node ("worker"|"manager")
+#### 升级或降级节点
+
+您可以将工作程序节点提升为manager角色。这在管理器节点不可用或者您希望使管理器脱机以进行维护时很有用。 类似地，您可以将管理器节点降级为worker角色。
+无论您升级或降级节点，您应该始终在群中维护**奇数个**管理器节点。
+要升级一个节点或一组节点，请从管理器节点运行：
+
+```
+docker node promote [NODE]
+docker node domote [NODE]
+```
+
+#### 退出docker swarm集群
+
+work节点：
+
+```
+docker swarm leave
+```
+
+manager节点：
+
+```
+docker swarm leave -f
 ```
 
 ### 可视化visualizer服务
@@ -1552,7 +1704,7 @@ manomarks/visualizer
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/visualizer.png)
 
-### 用法
+### Service用法
 
 ```
 创建服务

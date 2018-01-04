@@ -1,8 +1,8 @@
 ---
-title: docker-maven-plugin构建HA Eureka并提交到私有仓库
+title: 基于Docker构建高可用Eureka并提交到私有仓库
 date: 2018-01-02 13:00:19
 categories: [Spring Cloud]
-tags: [Docker]
+tags: [Docker, Spring Cloud]
 ---
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
@@ -60,6 +60,33 @@ mvn --encrypt-password <password>
     </server>
 ```
 
+# 构建基础镜像
+
+Dockerfile：
+
+```
+FROM frolvlad/alpine-oraclejdk8:slim
+MAINTAINER ybd <yangbingdong1994@gmail.com>
+ARG TZ 
+ARG HTTP_PROXY
+ENV TZ=${TZ:-"Asia/Shanghai"} http_proxy=${HTTP_PROXY} https_proxy=${HTTP_PROXY}
+RUN apk update && \
+    apk add --no-cache && \
+    apk add curl bash tree tzdata && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone 
+ENV http_proxy=
+ENV https_proxy=
+```
+
+构建：
+
+```
+docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/oraclejdk8 .
+```
+
+其中`HTTP_PROXY`是sock5代理转过来的http代理，通过`--build-arg`参数传入，注意**不能**是`127.0.0.1`或`localhost`。
+
 # Step1、利用IDEA的Spring Initializr构建高可用Eureka工程
 
 项目结构：
@@ -115,15 +142,15 @@ eureka.client.serviceUrl.defaultZone=http://peer1:5001/eureka/
 在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
 
 ```
-FROM frolvlad/alpine-oraclejdk8:slim
+FROM yangbingdong/docker-oraclejdk8
 MAINTAINER ybd <yangbingdong1994@gmail.com>
 VOLUME /tmp
-ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS="" TZ="Asia/Shanghai"
+ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS=""
 ADD $PROJECT_NAME app.jar
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone && \
-    sh -c 'touch /app.jar'
-CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker1}  -jar /app.jar"]
+
+RUN sh -c 'touch /app.jar'
+
+CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker1} -jar /app.jar"]
 # ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
 ```
 
@@ -159,7 +186,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
         <docker.registry.name>discover-server</docker.registry.name>
         <docker.registry.url>192.168.6.113:8888</docker.registry.url>
         <docker.skip.build>false</docker.skip.build>
-        <docker.push.image>true</docker.push.image>
+        <docker.push.image>false</docker.push.image>
     </properties>
 
     <dependencyManagement>
@@ -186,6 +213,11 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka-server</artifactId>
 		</dependency>
+        <!--配置需要认证的eureka所需要引用的包-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 	</dependencies>
 
     <build>
@@ -228,7 +260,6 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
                     </execution>
                 </executions>
             </plugin>
-
             <!-- 集成Docker maven 插件 -->
             <plugin>
                 <groupId>com.spotify</groupId>
@@ -263,16 +294,6 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
                     </imageTags>
                     <!--install阶段也上传，否则只有deploy阶段上传-->
                     <pushImage>${docker.push.image}</pushImage>
-                    <!--时区配置-->
-                    <env>
-                        <TZ>Asia/Shanghai</TZ>
-                    </env>
-                    <runs>
-                        <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>
-                        <run>echo $TZ > /etc/timezone</run>
-                        <run>wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh</run>
-                        <run>chmod 777 wait-for-it.sh</run>
-                    </runs>
                     <!-- 配置镜像名称，遵循Docker的命名规范： springio/image -->
                     <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
                     <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于编译后位置 -->
@@ -306,7 +327,6 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
         </snapshotRepository>
     </distributionManagement>
 </project>
-
 ```
 
 **说明**：
@@ -449,8 +469,8 @@ server:
 eureka:
   instance:
     hostname: docker-eureka1
-    leaseRenewalIntervalInSeconds: 15
-    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
     serviceUrl:
@@ -465,8 +485,8 @@ server:
 eureka:
   instance:
     hostname: docker-eureka2
-    leaseRenewalIntervalInSeconds: 15
-    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
     serviceUrl:
@@ -481,8 +501,8 @@ server:
 eureka:
   instance:
     hostname: docker-eureka3
-    leaseRenewalIntervalInSeconds: 15
-    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+#    prefer-ip-address: true
     instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
   client:
     serviceUrl:
@@ -503,69 +523,118 @@ eureka:
 `docker-compose.yml`:
 
 ```
-spring:
-  application:
-    name: eureka-center-server
-  cloud:
-    inetutils:
-      preferred-networks: ${PREFERRED_NETWORKS}
-  output:
-    ansi:
-      enabled: always
-security:
-  basic:
-    enabled: true     # 开启基于HTTP basic的认证
-  user:
-    name: ${SECURITY_NAME}
-    password: ${SECURITY_PASSWORD}
----
-spring:
-  profiles: docker1
-server:
-  port: ${PORT}
-eureka:
-  instance:
-    hostname: docker-eureka1
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
-  client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
-  server:
-    enable-self-preservation: false
----
-spring:
-  profiles: docker2
-server:
-  port: ${PORT}
-eureka:
-  instance:
-    hostname: docker-eureka2
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
-  client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
-  server:
-    enable-self-preservation: false
----
-spring:
-  profiles: docker3
-server:
-  port: ${PORT}
-eureka:
-  instance:
-    hostname: docker-eureka3
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
-  client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
-  server:
-    enable-self-preservation: false
+version: "3.4"
+services:
+  docker-eureka1:
+    image: ${IMAGE}
+    env_file:
+      - .env
+    environment:
+      - ACTIVE=docker1
+      - PORT=${EUREKA1_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA1_PORT}:${EUREKA1_PORT}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA1_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
+
+  docker-eureka2:
+    image: ${IMAGE}
+    env_file:
+      - .env
+    environment:
+      - ACTIVE=docker2
+      - PORT=${EUREKA2_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+    ports:
+      - ${EUREKA2_PORT}:${EUREKA2_PORT}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA2_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
+
+  docker-eureka3:
+    image: ${IMAGE}
+    env_file:
+      - .env
+    environment:
+      - ACTIVE=docker3
+      - PORT=${EUREKA3_PORT}
+      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/
+    ports:
+      - ${EUREKA3_PORT}:${EUREKA3_PORT}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 20s
+      update_config:
+        parallelism: 1
+        delay: 20s
+    networks:
+      eureka-net:
+        aliases:
+          - eureka
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA3_PORT}/health/"]
+      interval: 1m30s
+      timeout: 15s
+      retries: 3
+
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 name
+networks:
+  eureka-net:
+    external:
+      name: ${BACKEND_NETWORK:-backend}
 ```
 
 `.env`
@@ -606,7 +675,7 @@ services:
 **启动** ：
 
 ```
-docker network create -d=overlay --attachable --subnet 10.0.3.0/24 eureka-net
+docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
 docker-compse up -d
 ```
 

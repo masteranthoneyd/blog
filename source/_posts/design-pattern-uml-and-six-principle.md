@@ -1,7 +1,7 @@
 ---
 title: 设计模式原则与UML类图
 date: 2017-10-18 09:22:07
-categories: [Programming, Design Pattern]
+categories: [Programming, Java]
 tags: [Java, Design Pattern]
 ---
 

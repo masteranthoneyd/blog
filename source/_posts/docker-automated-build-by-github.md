@@ -1,7 +1,7 @@
 ---
 title: 使用Github自动构建Docker
 date: 2017-09-18 18:07:18
-categories: [Docker,Automated]
+categories: [Docker]
 tags: [Docker,Automated]
 ---
 

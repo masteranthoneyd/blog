@@ -1,7 +1,7 @@
 ---
 title: Docker入坑笔记
 date: 2017-09-07 15:55:07
-categories: [Docker,Base]
+categories: [Docker]
 tags: [Docker]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker.png)
@@ -496,6 +496,18 @@ docker run -t -i ubuntu:14.04 /bin/bash
 - 执行用户指定的应用程序
 - 执行完毕后容器被终止
 
+启动一个es并指明healthcheck相关策略：
+
+```
+docker run --rm -d \
+    --name=elasticsearch \
+    --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" \
+    --health-interval=5s \
+    --health-retries=12 \
+    --health-timeout=2s \
+    elasticsearch:5.5
+```
+
 ## 暂停
 
 docker pause :暂停容器中所有的进程。
@@ -748,9 +760,7 @@ ex 删除所有悬浮的volume：
 docker volume rm $(docker volume ls -q -f dangling=true)
 ```
 
-
-
-### 选择 -v 还是 -–mount 参数
+## 选择 -v 还是 -–mount 参数
 
 Docker 新用户应该选择 `--mount` 参数，经验丰富的 Docker 使用者对 `-v` 或者 `--volume` 已经很熟悉了，但是推荐使用 `--mount` 参数。
 
@@ -758,11 +768,10 @@ Docker 新用户应该选择 `--mount` 参数，经验丰富的 Docker 使用者
 
 ```
 $ docker run -d -P \
-    --name web \
-    # -v /src/webapp:/opt/webapp \
-    --mount type=bind,source=/src/webapp,target=/opt/webapp \
-    training/webapp \
-    python app.py
+--name web \
+--mount type=bind,source=/src/webapp,target=/opt/webapp \
+training/webapp \
+python app.py
 ```
 
 上面的命令加载主机的 `/src/webapp` 目录到容器的 `/opt/webapp`目录。这个功能在进行测试的时候十分方便，比如用户可以放置一些程序到本地目录中，来查看容器是否正常工作。本地目录的路径必须是**绝对路径**，以前使用 `-v` 参数时**如果本地目录不存在** Docker 会**自动为你创建**一个文件夹，现在使用 `--mount` 参数时如果本地目录不存在，Docker 会**报错**。
@@ -770,12 +779,11 @@ $ docker run -d -P \
 Docker 挂载主机目录的默认权限是 `读写`，用户也可以通过增加 `readonly` 指定为 `只读`。
 
 ```
-$ docker run -d -P \
-    --name web \
-    # -v /src/webapp:/opt/webapp:ro \
-    --mount type=bind,source=/src/webapp,target=/opt/webapp,readonly \
-    training/webapp \
-    python app.py
+docker run -d -P \
+--name web \
+--mount type=bind,source=/src/webapp,target=/opt/webapp,readonly \
+training/webapp \
+python app.py
 ```
 
 # Self Usage Docker Or Compose

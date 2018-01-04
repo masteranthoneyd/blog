@@ -247,8 +247,10 @@ sudo systemctl enable supervisor
 ## 番外篇二：一键安装脚本
 这个就不多说了，直接贴上网址：***[Shadowsocks 一键安装脚本（四合一）](https://shadowsocks.be/11.html)***
 
+# 使用ShadowSocks代理实现科学上网
 
-# 使用ShadowSocks代理实现穿墙
+**毕竟Shadowsocks是sock5代理，不能接受http协议，所以我们需要把sock5转化成http流量。**
+
 ## 方式一：配置浏览器代理
 假如你上面任选一种方式已经开始运行`sslocal`了，火狐那个代理插件老是订阅不了`gfwlist`所以配置自动模式的话不好使。这里用的是chrome，你可以在Ubuntu软件中心下载得到。
 
@@ -335,6 +337,50 @@ proxychains firefox
 ```
 使用`shadowsocks`+`proxychains`代理打开新的firefox实现浏览器翻墙。 
 也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个shell运行的所有命令都将使用代理。
+
+## 方式四：Privoxy
+
+Privoxy是一款带过滤功能的代理服务器，针对HTTP、HTTPS协议。通过Privoxy的过滤功能，用户可以保护隐私、对网页内容进行过滤、管理cookies，以及拦阻各种广告等。Privoxy可以用作单机，也可以应用到多用户的网络。
+
+```
+sudo apt install privoxy
+```
+
+安装好后进行配置，Privoxy的配置文件在`/etc/privoxy/config`，这个配置文件中注释很多。
+
+找到`4.1. listen-address`这一节，确认监听的端口号。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config02.png)
+
+找到`5.2. forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t`这一节，加上如下配置，注意最后的点号。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config01.png)
+
+重启一下Privoxy
+
+```
+sudo /etc/init.d/privoxy restart
+```
+
+终端体验：
+
+```
+export http_proxy="127.0.0.1:8118" && export https_proxy="127.0.0.1:8118"
+wget http://www.google.com
+```
+
+为了方便还是在`/etc/rc.local`中添加如下命令，注意在`exit 0`之前。
+
+```
+sudo /etc/init.d/privoxy start
+```
+
+在`/etc/profile`的末尾添加如下两句。
+
+```
+export http_proxy="127.0.0.1:8118"
+export https_proxy="127.0.0.1:8118"
+```
 
 # ShadowSocks优化
 ## 开启TCP Fast Open
