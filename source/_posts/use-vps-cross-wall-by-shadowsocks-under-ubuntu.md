@@ -369,12 +369,6 @@ export http_proxy="127.0.0.1:8118" && export https_proxy="127.0.0.1:8118"
 wget http://www.google.com
 ```
 
-为了方便还是在`/etc/rc.local`中添加如下命令，注意在`exit 0`之前。
-
-```
-sudo /etc/init.d/privoxy start
-```
-
 在`/etc/profile`的末尾添加如下两句。
 
 ```

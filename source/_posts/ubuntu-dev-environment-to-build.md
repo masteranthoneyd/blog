@@ -581,7 +581,114 @@ shell命令模式
 ## GUI客户端
 ***[Robomongo](https://www.mongodb.com/download-center#community)***
 
+# RabbitMQ
+
+选择Docker安装。。。不折腾了。。
+
+```
+docker pull rabbitmq:3-management
+docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 --restart=always rabbitmq:3-management
+```
+
+(注意版本，是`management`)
+
+浏览器打开`localhost:15673`，默认帐号密码都是`guest`
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/rabbitmq.png)
+
+集群：[https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
+
+# Kafka&Zookeeper集群
+
+`docker-compose.yml`:
+
+```
+version: '3'
+services:
+  kafka1:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 1
+      KAFKA_CREATE_TOPICS: test:6:1
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  kafka2:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9093
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  kafka3:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    ports:
+      - "9094:9092"
+    environment:
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
+      KAFKA_ADVERTISED_PORT: 9094
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
+
+  zoo1:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 1
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2181:2181"
+      - "2888"
+      - "3888"
+
+  zoo2:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 2
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2182:2181"
+      - "2888"
+      - "3888"
+
+  zoo3:
+    image: zookeeper:latest
+    environment:
+      ZOO_MY_ID: 3
+      SERVERS: zoo1,zoo2,zoo3
+    ports:
+      - "2183:2181"
+      - "2888"
+      - "3888"
+```
+
+启动：
+```
+docker-compose up -d
+```
+
 # 搭建ngrok配置
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/ngrok_p1.jpg)
 >ngrok 是一个反向代理，通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道。ngrok 可捕获和分析所有通道上的流量，便于后期分析和重放。可以被使用来进行微信借口的本地调试。在ngrok被墙之后，我们需要通过ngrok开源的源码自行搭建ngrok服务。
 

@@ -232,6 +232,16 @@ list = list.stream()
 
 # Plugin
 
+## Docker Integration
+
+可以通过IDEA链接Docker API，前提是开启了Docker API
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration01.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration02.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration03.png)
+
 ## Ali规约插件 P3C
 插件地址：***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
 文档：***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***

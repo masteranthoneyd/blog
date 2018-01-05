@@ -135,8 +135,6 @@ spring.output.ansi.enabled=ALWAYS
 eureka.client.serviceUrl.defaultZone=http://peer1:5001/eureka/
 ```
 
-
-
 # Step2、创建Dockerfile
 
 在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
@@ -439,11 +437,11 @@ docker run --name discover-server2 -e ACTIVE=peer2 -p 5002:5002 -d --network=hos
 
 这样一个简单的基于Docker的高可用Eureka就运行起来了。
 
-# HA Eureka
+# 高可用Eureka Server
 
 **基于Compose运行高可用的Eureka**
 
-`application.yml`:
+## `application.yml`
 
 ```
 spring:
@@ -469,9 +467,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka1
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
@@ -485,9 +484,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka2
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
@@ -501,9 +501,10 @@ server:
 eureka:
   instance:
     hostname: docker-eureka3
-    leaseRenewalIntervalInSeconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-#    prefer-ip-address: true
-    instance-id: ${HOSTNAME:}:${spring.cloud.client.ipAddress}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${eureka.instance.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
+    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
   client:
     serviceUrl:
       defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
@@ -520,7 +521,7 @@ eureka:
 </dependency>
 ```
 
-`docker-compose.yml`:
+## `docker-compose.yml`
 
 ```
 version: "3.4"
@@ -672,7 +673,9 @@ services:
 
 另外要注意的是所有依赖于Eureka的应用服务都要挂到`eureka-net`网络上，否则无法和Eureka Server通信。
 
-**启动** ：
+## 启动
+
+启动前确保创建好了网络：
 
 ```
 docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
@@ -698,6 +701,44 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 我们的app通过合适的`network`交互应该是这样的：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/cnm-demo.png)
+
+
+
+## Eureka Edgware.RELEASE版本注册优化
+
+在`Edgware.RELEASE`版本中相比之前的步骤，省略了在主函数上添加`@EnableDiscoveryClient`注解这一过程。Spring Cloud默认认为客户端是要完成向注册中心进行注册的。
+
+- 添加对应的`pom`依赖.
+- `properties`文件进行配置
+
+**添加pom依赖**
+
+```
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+
+**properties文件进行配置**
+
+```
+spring.application.name=EUREKA-CLIENT
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+```
+
+启动Eureka Client客户端，访问<http://localhost:8761/eureka>
+可以看到EUEREKA-CLIENT已经注册到Eureka Server服务上了。
+
+**关闭自动注册功能**
+
+spring cloud提供了一个参数，该参数的作用是控制是否要向Eureka Server发起注册。具体参数为：
+
+```
+//默认为true,如果控制不需要向Eureka Server发起注册将该值设置为false.
+spring.cloud.service-registry.auto-registration.enabled = xxx
+```
 
 # Finally
 

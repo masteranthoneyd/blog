@@ -15,7 +15,7 @@ tags: [Docker, Swarm]
 
 <!--more-->
 
-# Docker Registry
+# Docker Registry & Mirror
 
 ## Harbor
 
@@ -256,20 +256,117 @@ docker-compose start
 
 注意：配置文件`config.yml`挂载在`/etc/registry/`下.
 
-## Harbor做Mirror加速器
+### Harbor做Mirror加速器
 
 **mirror服务器和私有服务器分开部署，因为mirror服务器只能pull，不能push**
 
-`./prepare`之后修改`config/registry/config.yml`，在config.yml文件的最后追加以下配置：
+`./prepare`之后修改`config/registry/config.yml`，在`config.yml`文件的最后追加以下配置：
 
 ```
 proxy:
-  remoteurl: https://registry-1.docker.io
+  remoteurl: https://vioqnt8w.mirror.aliyuncs.com
 ```
 
 这样保证docker pull并不存在于docker harbor中的image时，会从Docker Hub上去pull，并缓存于mirror服务器。
 
+最后修改`/etc/docker/daemon.json`中的`"registry-mirrors": ["https://xxxxx.mirror.aliyuncs.com"]`
 
+**But，试了一下发现木有效果**
+
+## Registry Mirror
+
+**registry mirror原理**
+
+Docker Hub的镜像数据分为两部分：index数据和registry数据。前者保存了镜像的一些元数据信息，数据量很小；后者保存了镜像的实际数据，数据量比较大。平时我们使用docker pull命令拉取一个镜像时的过程是：先去index获取镜像的一些元数据，然后再去registry获取镜像数据。
+
+所谓registry mirror就是搭建一个registry，然后将docker hub的registry数据缓存到自己本地的registry。整个过程是：当我们使用docker pull去拉镜像的时候，会先从我们本地的registry mirror去获取镜像数据，如果不存在，registry mirror会先从docker hub的registry拉取数据进行缓存，再传给我们。而且整个过程是流式的，registry mirror并不会等全部缓存完再给我们传，而且边缓存边给客户端传。
+
+对于缓存，我们都知道一致性非常重要。registry mirror与docker官方保持一致的方法是：registry mirror只是缓存了docker hub的registry数据，并不缓存index数据。所以我们pull镜像的时候会先连docker hub的index获取镜像的元数据，如果我们registry mirror里面有该镜像的缓存，且数据与从index处获取到的元数据一致，则从registry mirror拉取；如果我们的registry mirror有该镜像的缓存，但数据与index处获取的元数据不一致，或者根本就没有该镜像的缓存，则先从docker hub的registry缓存或者更新数据。
+
+1、拉取镜像
+
+```
+docker pull registry:latest
+```
+
+2、获取registry的默认配置
+
+```
+docker run -it --rm --entrypoint cat registry:latest  /etc/docker/registry/config.yml > config.yml
+```
+
+内容可能如下：
+
+```
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+http:
+  addr: :5000
+  headers:
+    X-Content-Type-Options: [nosniff]
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
+```
+
+我们在最后面加上如下配置：
+
+```
+proxy:
+  remoteurl: https://registry-1.docker.io
+  username: [username]
+  password: [password]
+```
+
+`username`和`password`是可选的，如果配置了的话，那registry mirror除了可以缓存所有的公共镜像外，也可以访问这个用户所有的私有镜像。
+
+启动registry容器：
+
+Bash
+
+```
+docker run  --restart=always -p 5000:5000 --name v2-mirror -v /data:/var/lib/registry -v  $PWD/config.yml:/etc/registry/config.yml registry:latest /etc/registry/config.yml
+```
+
+当然我们也可以使用docker-compose启动：
+
+```
+version: '3'
+services:
+  registry:
+    image: library/registry:latest
+    container_name: registry-mirror
+    restart: always
+    volumes:
+      - /data:/var/lib/registry
+      - ./config.yml:/etc/registry/config.yml
+    ports:
+      - 5000:5000
+    command:
+      ["serve", "/etc/registry/config.yml"]
+```
+
+curl验证一下服务是否启动OK：
+
+```
+# ybd @ ybd-PC in ~ [17:30:14] 
+$ curl -I http://192.168.6.113:5000
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Date: Fri, 05 Jan 2018 09:30:27 GMT
+Content-Type: text/plain; charset=utf-8
+```
+
+最后修改`/etc/docker/daemon.json`或`/etc/default/docker`中的`registry-mirrors`即可
 
 # Cluster and Orchestrate Tools
 
@@ -1509,7 +1606,7 @@ Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负�
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
 
-### 端口监听
+### 开启API端口监听
 
 （下面的Portainer需要用到）
 
@@ -1521,6 +1618,17 @@ Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负�
 
 ```
 -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
+```
+
+或者在`/etc/docker/daemon.json`添加（需要高版本Docker）：
+
+```
+{
+  "hosts": [
+    "tcp://0.0.0.0:2375",
+    "unix:///var/run/docker.sock"
+  ]
+}
 ```
 
 **方式二，添加代理**：
@@ -1695,11 +1803,11 @@ docker swarm leave -f
 
 ```
 docker service create \
---name=visualizer \
---publish 8088:8080 \
+--name=viz \
+--publish=8088:8080/tcp \
 --constraint=node.role==manager \
 --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
-manomarks/visualizer
+dockersamples/visualizer
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/visualizer.png)
@@ -1887,3 +1995,5 @@ Endpoints：
 > ***[在生产环境中使用Docker Swarm的一些建议](http://www.jiagoumi.com/virtualization/1464.html)***
 >
 > ***[使用Docker Harbor搭建私有镜像服务器和Mirror服务器](https://www.jianshu.com/p/8d4fcff97a35)***
+>
+> ***[远程连接docker daemon，Docker Remote API](https://deepzz.com/post/dockerd-and-docker-remote-api.html)***
