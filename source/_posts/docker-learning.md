@@ -411,11 +411,11 @@ OPTIONS说明：
 
 将镜像runoob/ubuntu:v3 生成my_ubuntu_v3.tar文档
 
-```
 runoob@runoob:~$ docker save -o my_ubuntu_v3.tar runoob/ubuntu:v3
-```
 
 ## 导入镜像
+
+### Import
 
 docker import : 从归档文件中创建镜像。
 
@@ -436,6 +436,28 @@ OPTIONS说明：
 ```
 docker import  ubuntu.tar ybd/ubuntu:v1
 ```
+
+### Load
+
+Usage:	docker load [OPTIONS]
+
+Load an image from a tar archive or STDIN
+
+Options:
+
+```
+  -i, --input string   Read from tar archive file, instead of STDIN
+
+  -q, --quiet          Suppress the load output
+```
+
+### 区别
+
+1. 首先，docker import可以重新指定镜像的名字，docker load不可以
+2. 其次，我们发现导出后的版本会比原来的版本稍微小一些。那是因为导出后，会丢失历史和元数据。执行下面的命令就知道了： 
+   显示镜像的所有层(layer) 
+   `docker images --tree` 
+   执行命令，显示下面的内容。正你看到的，导出后再导入(exported-imported)的镜像会丢失所有的历史，而保存后再加载（saveed-loaded）的镜像没有丢失**历史和层(layer)**。这意味着使用导出后再导入的方式，你将无法回滚到之前的层(layer)，同时，使用保存后再加载的方式持久化整个镜像，就可以做到**层回滚**（可以执行docker tag 来回滚之前的层）。
 
 # Operating Container
 

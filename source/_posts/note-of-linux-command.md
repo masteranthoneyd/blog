@@ -16,7 +16,7 @@ tags: [Ubuntu]
 <!--more-->
 # SSH相关
 
-# 安装SSH
+## 安装SSH
 
 ```
 sudo apt install ssh
@@ -84,7 +84,7 @@ scp -P <端口> <源文件> <目标文件>
 scp -P <端口> -r <源文件夹> <目标文件夹>
 ```
 **注意**`-P`要在前面
-ex：
+例如把本地的file复制到远程服务器：
 ```
 scp -P 2333 /home/ybd/file root@123.456.78:/root/file
 ```

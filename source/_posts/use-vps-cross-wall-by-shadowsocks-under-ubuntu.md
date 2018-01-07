@@ -350,11 +350,11 @@ sudo apt install privoxy
 
 找到`4.1. listen-address`这一节，确认监听的端口号。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config02.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config01.png)
 
 找到`5.2. forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t`这一节，加上如下配置，注意最后的点号。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config01.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/vps/privoxy-config02.png)
 
 重启一下Privoxy
 
