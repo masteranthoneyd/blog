@@ -1023,6 +1023,9 @@ public static Map<String, List<Integer>> getElementPositions(List<String> list) 
 # Summary
 
 关于java8的介绍与使用网上有太多太多了，如***[java8最佳技巧](https://zhuanlan.zhihu.com/p/27424997)***等等...
+
+更加深入理解函数式编程请参考***[Java Functional Programming Internals](https://github.com/CarpenterLee/JavaLambdaInternals)***
+
 > 参考
 > ***[Java8简明教程](http://blog.didispace.com/books/java8-tutorial/)***
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***

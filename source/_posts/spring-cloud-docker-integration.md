@@ -551,10 +551,6 @@ services:
       eureka-net:
         aliases:
           - eureka
-    logging:
-      options:
-        max-size: "1m"
-        max-file: "3"
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA1_PORT}/health/"]
       interval: 1m30s
@@ -586,10 +582,6 @@ services:
       eureka-net:
         aliases:
           - eureka
-    logging:
-      options:
-        max-size: "1m"
-        max-file: "3"
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA2_PORT}/health/"]
       interval: 1m30s
@@ -621,10 +613,6 @@ services:
       eureka-net:
         aliases:
           - eureka
-    logging:
-      options:
-        max-size: "1m"
-        max-file: "3"
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA3_PORT}/health/"]
       interval: 1m30s

@@ -642,9 +642,29 @@ docker stack deploy --compose-file docker-compose.yml
 
 ##### placement
 
-这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器。
+这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器，下面是官方的说明：
 
-> 网上能找的资料好少，官方文档只有两句废话，如果我能找到原来的 issue 或者 PR 或许可以理解一些。
+| node attribute  | matches                  | example                                  |
+| --------------- | ------------------------ | ---------------------------------------- |
+| `node.id`       | Node ID                  | `node.id==2ivku8v2gvtg4`                 |
+| `node.hostname` | Node hostname            | `node.hostname!=node-2`                  |
+| `node.role`     | Node role                | `node.role==manager`                     |
+| `node.labels`   | user defined node labels | `node.labels.security==high`             |
+| `engine.labels` | Docker Engine's labels   | `engine.labels.operatingsystem==ubuntu 14.04` |
+
+```
+version: '3'
+services:
+  db:
+    image: postgres
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+          - engine.labels.operatingsystem == ubuntu 14.04
+        preferences:
+          - spread: node.labels.zone
+```
 
 ##### update_config
 
@@ -1385,6 +1405,46 @@ docker-machine create -d virtualbox test
 `--virtualbox-cpu-count 2` 配置主机 CPU
 
 更多参数请使用 `docker-machine create --driver virtualbox --help` 命令查看。
+
+```
+$ docker-machine create --driver virtualbox --help
+Usage: docker-machine create [OPTIONS] [arg...]
+
+Create a machine.
+
+Run 'docker-machine create --driver name' to include the create flags for that driver in the help text.
+
+Options:
+
+   --driver, -d "none"                                                                                  Driver to create machine with.
+   --engine-env [--engine-env option --engine-env option]                                               Specify environment variables to set in the engine
+   --engine-insecure-registry [--engine-insecure-registry option --engine-insecure-registry option]     Specify insecure registries to allow with the created engine
+   --engine-install-url "https://get.docker.com"                                                        Custom URL to use for engine installation [$MACHINE_DOCKER_INSTALL_URL]
+   --engine-label [--engine-label option --engine-label option]                                         Specify labels for the created engine
+   --engine-opt [--engine-opt option --engine-opt option]                                               Specify arbitrary flags to include with the created engine in the form flag=value
+   --engine-registry-mirror [--engine-registry-mirror option --engine-registry-mirror option]           Specify registry mirrors to use [$ENGINE_REGISTRY_MIRROR]
+   --engine-storage-driver                                                                              Specify a storage driver to use with the engine
+   --swarm                                                                                              Configure Machine with Swarm
+   --swarm-addr                                                                                         addr to advertise for Swarm (default: detect and use the machine IP)
+   --swarm-discovery                                                                                    Discovery service to use with Swarm
+   --swarm-experimental                                                                                 Enable Swarm experimental features
+   --swarm-host "tcp://0.0.0.0:3376"                                                                    ip/socket to listen on for Swarm master
+   --swarm-image "swarm:latest"                                                                         Specify Docker image to use for Swarm [$MACHINE_SWARM_IMAGE]
+   --swarm-master                                                                                       Configure Machine to be a Swarm master
+   --swarm-opt [--swarm-opt option --swarm-opt option]                                                  Define arbitrary flags for swarm
+   --swarm-strategy "spread"                                                                            Define a default scheduling strategy for Swarm
+   --virtualbox-boot2docker-url                                                                         The URL of the boot2docker image. Defaults to the latest available version [$VIRTUALBOX_BOOT2DOCKER_URL]
+   --virtualbox-cpu-count "1"                                                                           number of CPUs for the machine (-1 to use the number of CPUs available) [$VIRTUALBOX_CPU_COUNT]
+   --virtualbox-disk-size "20000"                                                                       Size of disk for host in MB [$VIRTUALBOX_DISK_SIZE]
+   --virtualbox-host-dns-resolver                                                                       Use the host DNS resolver [$VIRTUALBOX_HOST_DNS_RESOLVER]
+   --virtualbox-dns-proxy                                                                               Proxy all DNS requests to the host [$VIRTUALBOX_DNS_PROXY]
+   --virtualbox-hostonly-cidr "192.168.99.1/24"                                                         Specify the Host Only CIDR [$VIRTUALBOX_HOSTONLY_CIDR]
+   --virtualbox-hostonly-nicpromisc "deny"                                                              Specify the Host Only Network Adapter Promiscuous Mode [$VIRTUALBOX_HOSTONLY_NIC_PROMISC]
+   --virtualbox-hostonly-nictype "82540EM"                                                              Specify the Host Only Network Adapter Type [$VIRTUALBOX_HOSTONLY_NIC_TYPE]
+   --virtualbox-import-boot2docker-vm                                                                   The name of a Boot2Docker VM to import
+   --virtualbox-memory "1024"                                                                           Size of memory for host in MB [$VIRTUALBOX_MEMORY_SIZE]
+   --virtualbox-no-share                                                                                Disable the mount of your home directory
+```
 
 创建好主机之后，查看主机
 
