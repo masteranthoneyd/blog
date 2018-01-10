@@ -232,24 +232,6 @@ list = list.stream()
 
 # Plugin
 
-## Docker Integration
-
-可以通过IDEA链接Docker API，前提是开启了Docker API
-
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration01.png)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration02.png)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration03.png)
-
-## Ali规约插件 P3C
-插件地址：***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
-文档：***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***
-
-## FindBugs
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/find-bug.png)
-装完之后右键最下面会多出一个`FindBugs`的选项
-
 ## 简洁代码风格Lombok
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件，
 打开IDEA的Settings面板，并选择Plugins选项，然后点击 “Browse repositories..” 
@@ -344,6 +326,36 @@ indenpence
 
 
 `Lombok`的功能不仅如此，更详细请看***[features](https://projectlombok.org/features/all)***
+
+## Docker Integration
+
+可以通过IDEA链接Docker API，前提是开启了Docker API
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration01.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration02.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration03.png)
+
+## GsonFormat
+
+复制一段JSON格式字符串
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format01.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format02.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format03.png)
+
+## Ali规约插件 P3C
+
+插件地址：***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
+文档：***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***
+
+## FindBugs
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/find-bug.png)
+装完之后右键最下面会多出一个`FindBugs`的选项
+
 
 ## 热部署插件JRebel安装与激活
 > 每次修改java文件都需要重启tomcat，很痛苦有木有？ 推荐给大家一个很好用的热部署插件，JRebel，目前是最好的，在使用过程中应该90%的编辑操作都是可以reload的，爽歪歪，节约我们大量的开发时间，提高开发效率。
