@@ -16,8 +16,8 @@ tags: [Docker,Shadowsocks]
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-shadowsocks/change-kernel.png)
 然后执行：
 ```
-wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
-chmod +x bbr.sh
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && \
+chmod +x bbr.sh && \
 ./bbr.sh
 ```
 

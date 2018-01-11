@@ -410,7 +410,7 @@ service ssh restart
 
 ## Google BBR
 BBR 目的是要尽量跑满带宽, 并且尽量不要有排队的情况, 效果并不比速锐差。
-***[Centos/Ubuntu/Debian BBR加速一键安装包](https://www.91yun.org/archives/5174)***
+***[一键安装最新内核并开启 BBR 脚本](https://teddysun.com/489.html)***
 
 ## Kcptun
 ***[Kcptun 服务端一键安装脚本](https://blog.kuoruan.com/110.html)***
