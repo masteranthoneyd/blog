@@ -907,6 +907,38 @@ DOCKER_OPTS="-g /root/data/docker"
 
 最后重新启动，Docker 的路径就改成 `/root/data/docker` 了。
 
+# 定期清理容器日志
+> 参考：[*https://zhuanlan.zhihu.com/p/29051214*](https://zhuanlan.zhihu.com/p/29051214)
+
+## 通过logrotate服务实现日志定期清理和回卷
+
+logrotate是个十分有用的工具，它可以自动对日志进行截断（或轮循）、压缩以及删除旧的日志文件。例如，你可以设置logrotate，让/var/log/foo日志文件每30天轮循，并删除超过6个月的日志。配置完后，logrotate的运作完全自动化，不必进行任何进一步的人为干预。
+
+**[https://github.com/blacklabelops/logrotate](https://github.com/blacklabelops/logrotate)**
+
+## 通过修改dockerd参数进行回卷和清理
+
+在`/etc/docker/daemon.json`中添加`log-driver`以及`log-opts`参数：
+
+```
+{
+  "registry-mirrors": ["https://vioqnt8w.mirror.aliyuncs.com"],
+  "insecure-registries": ["192.168.6.113:8888"],
+  "log-driver":"json-file",
+  "log-opts":{
+    "max-size" :"10m","max-file":"3"
+    }
+}
+```
+
+参数说明： 设置单个容器日志超过10M则进行回卷，回卷的副本数超过3个就进行清理。
+
+重启docker
+
+```
+sudo systemctl daemon-reload && sudo systemctl restart docker
+```
+
 # Self Usage Docker Or Compose
 
 以下是个人使用的一些容器运行命令或者`docker-compose.yml`，不定时更新
@@ -1123,107 +1155,234 @@ docker run -idt --name ngrok-server \
 
 > 详情：[***Docker搭建Ngrok***](http://yangbingdong.com/2017/self-hosted-build-ngrok-server/#Docker搭建Ngrok)
 
-## Kafka Zookeeper集群
+## [*Zookeeper*](https://hub.docker.com/_/zookeeper/)集群
 
 docker-compose.yml:
 
 ```
-version: '3'
+version: '3.4'
 services:
-  kafka1:
-    image: wurstmeister/kafka:1.0.0
-    depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_LOG_DIRS: /kafka
-      KAFKA_BROKER_ID: 1
-      KAFKA_CREATE_TOPICS: test:6:1
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
-
-  kafka2:
-    image: wurstmeister/kafka:1.0.0
-    depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
-    ports:
-      - "9093:9092"
-    environment:
-      KAFKA_LOG_DIRS: /kafka
-      KAFKA_BROKER_ID: 2
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
-      KAFKA_ADVERTISED_PORT: 9093
-      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
-
-  kafka3:
-    image: wurstmeister/kafka:1.0.0
-    depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
-    ports:
-      - "9094:9092"
-    environment:
-      KAFKA_LOG_DIRS: /kafka
-      KAFKA_BROKER_ID: 3
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
-      KAFKA_ADVERTISED_PORT: 9094
-      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
-
   zoo1:
     image: zookeeper:latest
+    hostname: zoo1
     environment:
       ZOO_MY_ID: 1
-      SERVERS: zoo1,zoo2,zoo3
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     ports:
       - "2181:2181"
-      - "2888"
-      - "3888"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == ybd-PC
+    networks:
+      zoo-net:
+        aliases:
+          - zookeeper1
 
   zoo2:
     image: zookeeper:latest
+    hostname: zoo2
     environment:
       ZOO_MY_ID: 2
-      SERVERS: zoo1,zoo2,zoo3
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
     ports:
       - "2182:2181"
-      - "2888"
-      - "3888"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == qww-PC
+    networks:
+      zoo-net:
+        aliases:
+          - zookeeper2
 
   zoo3:
     image: zookeeper:latest
+    hostname: zoo3
     environment:
       ZOO_MY_ID: 3
-      SERVERS: zoo1,zoo2,zoo3
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
     ports:
       - "2183:2181"
-      - "2888"
-      - "3888"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == qww-PC
+    networks:
+      zoo-net:
+        aliases:
+          - zookeeper3
+
+# docker network create -d=overlay --attachable zoo-net
+networks:
+  zoo-net:
+    external:
+      name: zoo-net
 ```
+
+## [*Kafka*](https://hub.docker.com/r/wurstmeister/kafka/tags/)集群
+
+docker-compose.yml
+
+```
+version: '3.4'
+services:
+  kafka1:
+    image: wurstmeister/kafka:1.0.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == ybd-PC
+    networks:
+      zoo-net:
+        aliases:
+          - kafka1
+
+  kafka2:
+    image: wurstmeister/kafka:1.0.0
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_PORT: 9093
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == qww-PC
+    networks:
+      zoo-net:
+        aliases:
+          - kafka2
+
+
+  kafka3:
+    image: wurstmeister/kafka:1.0.0
+    ports:
+      - "9094:9092"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_PORT: 9094
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == qww-PC
+    networks:
+      zoo-net:
+        aliases:
+          - kafka3
+
+# docker network create -d=overlay --attachable zoo-net
+networks:
+  zoo-net:
+    external:
+      name: zoo-net
+```
+
+参考：[http://www.blockchain4u.info/docker/2017/07/28/kafka-cluster-with-docker](http://www.blockchain4u.info/docker/2017/07/28/kafka-cluster-with-docker)
 
 ## *[Kafka Manager](https://hub.docker.com/r/sheepkiller/kafka-manager/)*
 
 docker-compose.yml:
 
 ```
-version: '3'
+version: '3.4'
 services:
   kafka-manager:
     image: sheepkiller/kafka-manager
     environment: 
-      ZK_HOSTS: 192.168.6.113:2181,192.168.6.113:2182,192.168.6.113:2183
-    APPLICATION_SECRET: "letmein"
+      ZK_HOSTS: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      APPLICATION_SECRET: letmein
     ports:
       - "9100:9000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == ybd-PC
+    networks:
+      zoo-net:
+        aliases:
+          - kafka-manager
+
+# docker network create -d=overlay --attachable zoo-net
+networks:
+  zoo-net:
+    external:
+      name: zoo-net
 ```
 
-> [http://dearcharles.cn/2017/11/23/%E5%9F%BA%E4%BA%8EDocker%E6%90%AD%E5%BB%BA%E5%88%86%E5%B8%83%E5%BC%8F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97Kafka/](http://dearcharles.cn/2017/11/23/%E5%9F%BA%E4%BA%8EDocker%E6%90%AD%E5%BB%BA%E5%88%86%E5%B8%83%E5%BC%8F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97Kafka/)
+## [*Logrotate*](https://hub.docker.com/r/blacklabelops/logrotate/)
+
+docker-compose.yml:
+
+```
+version: '3.4'
+services:
+  kafka-manager:
+    image: blacklabelops/logrotate:1.2
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    environment: 
+      LOGS_DIRECTORIES: /var/lib/docker/containers
+      LOGROTATE_INTERVAL: weekly
+      LOGROTATE_SIZE: 20M
+      TZ: Asia/Shanghai
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+```
 
 # Last
 

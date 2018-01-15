@@ -374,6 +374,12 @@ mv  <源路径> <目标路径>
 ## 删除目录：rmdir
 删除目录的时候，必须确保目录是空的，否则无法删除。命令格式：`rm <目录>`。
 
+## 管理员权限打开文件夹
+
+```
+sudo nautilus
+```
+
 # 查找相关
 
 > 以下转载于***[http://blog.csdn.net/wzzfeitian/article/details/40985549](http://blog.csdn.net/wzzfeitian/article/details/40985549)***
