@@ -10,6 +10,9 @@ tags: [VPS,ShadowSocks]
 
 <!--more-->
 # ShadowSocks介绍
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-shadowsocks/shadowsocks.png)
+
 ## 什么是ShadowSocks(影梭)
 ShadowSocks 是由***[clowwindy](https://github.com/shadowsocks/shadowsocks)***所开发的一个开源 Socks5 代理。如其***[官网](http://shadowsocks.org/en/index.html)***所言 ，它是 “`A secure socks5 proxy, designed to protect your Internet traffic`” （一个安全的 `Socks5` 代理）。其作用，亦如该项目主页的 ***[wiki](https://github.com/shadowsocks/shadowsocks/wiki)***（***[中文版](https://github.com/shadowsocks/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)***） 中所说，“`A fast tunnel proxy that helps you bypass firewalls`” （一个**可穿透防火墙**的快速代理）。
 不过，在中国，由于***[GFW](https://zh.wikipedia.org/wiki/%E9%98%B2%E7%81%AB%E9%95%BF%E5%9F%8E)***[^1]的存在，更多的网友用它来进行**科学上网**。
@@ -247,6 +250,90 @@ sudo systemctl enable supervisor
 ## 番外篇二：一键安装脚本
 这个就不多说了，直接贴上网址：***[Shadowsocks 一键安装脚本（四合一）](https://shadowsocks.be/11.html)***
 
+# 基于Docker安装
+
+## 安装Docker
+
+详细教程不在本篇范围内，请看***[Docker入门笔记](/2017/docker-learning)***
+以下是最简单快捷高效的安装方式：
+
+```
+curl -fsSL get.docker.com -o get-docker.sh
+sh get-docker.sh
+```
+
+就是这么粗暴的两条命令=.=
+这里可能会有个小问题，如果VPS使用的`IPv6`可能会导致`apt update`失败，解决办法是把上面下载的`get-docker.sh`里面所有的`apt-get update`改为`apt-get Acquire::ForceIPv4=true update`。
+
+## 拉取镜像
+
+`Showdowsocks`镜像：***[https://hub.docker.com/r/mritd/shadowsocks/](https://hub.docker.com/r/mritd/shadowsocks/)***
+根据需要选择自己喜欢的Tag
+
+```
+docker pull mritd/shadowsocks:latest
+```
+
+## 启动示例
+
+```
+docker run -dt --name ss -p 6443:6443 mritd/shadowsocks -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k test123 --fast-open"
+```
+
+**说明：**
+
+- `-m` : 参数后指定一个 `shadowsocks` 命令，如 `ss-local`，不写默认为 `ss-server`；该参数用于 shadowsocks 在客户端和服务端工作模式间切换，可选项如下: `ss-local`、`ss-manager`、`ss-nat`、`ss-redir`、`ss-server`、`ss-tunnel`
+- `-s` : 参数后指定一个 `shadowsocks-libev` 的参数字符串，所有参数将被拼接到 `ss-server` 后
+- `-x` : 指定该参数后才会开启 `kcptun` 支持，否则将默认禁用 `kcptun`
+- `-e` : 参数后指定一个 `kcptun` 命令，如 `kcpclient`，不写默认为 `kcpserver`；该参数用于 kcptun 在客户端和服务端工作模式间切换，可选项如下: `kcpserver`、`kcpclient`
+- `-k` : 参数后指定一个 `kcptun` 的参数字符串，所有参数将被拼接到 `kcptun` 后
+
+## Shadowsocks Server
+
+**With Kcptun**
+
+```
+docker run -dt --name ssserver --restart=always -p 6443:6443 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpserver" -k "-t 127.0.0.1:6443 -l :6500 -mode fast2"
+```
+
+**Without Kcptun**
+
+```
+docker run -dt --name ssserver --restart=always -p 6443:6443 mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open"
+```
+
+ss命令说明：
+
+- `-s` : 监听服务ip，为服务器本地
+- `-p` : 端口
+- `-m` : 加密算法
+- `-k` : 密码
+- `--fast-open` : 开启TCP `fast-open`
+
+kcptun命令自行度娘=.=
+
+## Shadowsocks Client
+
+**With Kcptun**
+
+```
+docker run -dt --name ssclient --restart=always -p 1080:1080 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-local" -s "-s 127.0.0.1 -p 6500 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpclient" -k "-r server-ip:6500 -l :6500 -mode fast2"
+```
+
+**Without Kcptun**
+
+```
+docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:latest -m "ss-local" -s "-s server-ip -p 6443 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open"
+```
+
+**注意：**
+如果使用了**With Kcptun**，ss的监听ip填本地 `127.0.0.1`，`server-ip`填服务器`ip`。
+
+## Test
+
+测试了一下，在开启了BBR情况下，**without kcptun**更快。
+对于一般情况（没有开启BBR或其他加速），**with kcptun**速度有所提升。
+
 # 使用ShadowSocks代理实现科学上网
 
 **毕竟Shadowsocks是sock5代理，不能接受http协议，所以我们需要把sock5转化成http流量。**
@@ -409,13 +496,117 @@ service ssh restart
 ***[锐速破解版linux一键自动安装包](https://www.91yun.org/archives/683)***
 
 ## Google BBR
-BBR 目的是要尽量跑满带宽, 并且尽量不要有排队的情况, 效果并不比速锐差。
 ***[一键安装最新内核并开启 BBR 脚本](https://teddysun.com/489.html)***
 
+### 更换Linode内核
+
+谷歌开发的TCP加速“外挂”，目前已集成到最新的Linux内核。
+博主用的**[Linode](https://www.linode.com/)**不能直接命令更换内核，需要到管理后台设置：
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-shadowsocks/change-kernel.png)
+
+### 安装
+
+```
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && \
+chmod +x bbr.sh && \
+./bbr.sh
+```
+
 ## Kcptun
+
 ***[Kcptun 服务端一键安装脚本](https://blog.kuoruan.com/110.html)***
 
-# Denyhosts防暴力攻击
+# VPS防DDOS攻击
+
+> 公司刚买了一个Linode VPS 2TB流量的，不到几天就被DDOS攻击，直到余额被扣完停机。。。
+>
+> 吓得我马上谷歌了一些防御措施
+
+## 开启UFW防火墙
+
+```
+ufw enable
+ufw allow ssh
+ufw allow [shadowsocks_port]
+ufw allow from [remote_ip]
+```
+
+## DDOS deflate
+
+`DDOS deflate`是一款免费的用来防御和减轻DDOS攻击的脚本。它通过netstat监测跟踪创建大量网络连接的IP地址，在检测到某个结点超过预设的限制时，该程序会通过APF或IPTABLES禁止或阻挡这些IP。
+
+```
+wget http://www.moerats.com/usr/down/DDOS/deflate.sh && \
+chmod +x deflate.sh && \
+./deflate.sh
+```
+
+配置文件`/usr/local/ddos/ddos.conf`
+
+```
+##### Paths of the script and other files
+PROGDIR=”/usr/local/ddos”
+PROG=”/usr/local/ddos/ddos.sh”
+IGNORE_IP_LIST=”/usr/local/ddos/ignore.ip.list” 
+# 白名单.如有反向代理,注意添加本机地址和本机外网IP地址,防止提供反向代理的主机被判定为攻击.
+CRON=”/etc/cron.d/ddos.cron”
+APF=”/etc/apf/apf”
+IPT=”/sbin/iptables”##### frequency in minutes for running the script
+
+##### Caution: Every time this setting is changed, run the script with cron
+##### option so that the new frequency takes effect
+FREQ=1
+
+##### How many connections define a bad IP? Indicate that below. 
+# 单IP发起连接数阀值,不建议设置太低.
+NO_OF_CONNECTIONS=150
+
+##### APF_BAN=1 (Make sure your APF version is atleast 0.96)
+##### APF_BAN=0 (Uses iptables for banning ips instead of APF) 
+#一般情况下你是使用iptables来做防火墙,所以这里你需要将 APF_BAN的值改为0.
+APF_BAN=1
+
+##### KILL=0 (Bad IPs are’nt banned, good for interactive execution of script)
+##### KILL=1 (Recommended setting)
+KILL=1 
+#是否屏蔽IP，默认即可
+
+##### An email is sent to the following address when an IP is banned. 
+# 当单IP发起的连接数超过阀值后,将发邮件给指定的收件人.
+##### Blank would suppress sending of mails
+EMAIL_TO=”root” 
+# 这里是邮箱，可以把root替换成你的邮箱
+
+##### Number of seconds the banned ip should remain in blacklist. 
+# 设置被挡IP多少秒后移出黑名单.
+BAN_PERIOD=600
+```
+
+将上述配置文件修改完成后，使用命令启动即可
+
+```
+ddos -d
+```
+
+Ubuntu中可能会报错：
+
+```
+root@localhost:~# ddos -d
+/usr/local/sbin/ddos: 13: [: /usr/local/ddos/ddos.conf: unexpected operator
+DDoS-Deflate version 0.6
+Copyright (C) 2005, Zaf <zaf@vsnl.com>
+```
+
+因为启动大多数为 bash 脚本，而 Ubuntu 的默认环境为 dash，所以需要使用 dpkg-reconfigure dash，选择 NO，切换为 bash 运行脚本：
+
+```
+dpkg-reconfigure dash
+```
+
+
+
+## Denyhosts防暴力攻击
+
 这个方法比较省时省力。denyhosts 是 Python 语言写的一个程序，它会分析 sshd 的日志文件，当发现重复的失败登录时就会记录 IP 到 /etc/hosts.deny 文件，从而达到自动屏 IP 的功能：
 ```shell
 apt-get install denyhosts

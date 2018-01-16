@@ -1362,6 +1362,20 @@ networks:
 
 ## [*Logrotate*](https://hub.docker.com/r/blacklabelops/logrotate/)
 
+单机运行：
+
+```
+docker run -d \
+--name logrotate \
+--restart always \
+-v /var/lib/docker/containers:/var/lib/docker/containers \
+-v /var/log/docker:/var/log/docker \
+-e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
+-e "LOGROTATE_SIZE=10M" \
+-e "LOGROTATE_INTERVAL=weekly" \
+blacklabelops/logrotate:1.2
+```
+
 docker-compose.yml:
 
 ```

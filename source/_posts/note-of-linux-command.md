@@ -140,7 +140,7 @@ su - ${USER_NAME} -s /bin/bash shell.sh
 
 # ufw防火墙
 
-### 安装
+## 安装
 
 Ubuntu自带ufw，没有可以直接安装：
 
@@ -148,13 +148,12 @@ Ubuntu自带ufw，没有可以直接安装：
 sudo get install ufw
 ```
 
-### 查看端口是否开启
-
+## 查看端口是否开启
 ```
 telnet 192.168.1.103 80
 ```
 
-### 设置默认规则
+## 设置默认规则
 
 大多数系统只需要打开少量的端口接受传入连接，并且关闭所有剩余的端口。 从一个简单的规则基础开始，`ufw default`命令可以用于设置对传入和传出连接的默认响应动作。 要拒绝所有传入并允许所有传出连接，那么运行：
 
@@ -163,37 +162,37 @@ sudo ufw default allow outgoing
 sudo ufw default deny incoming
 ```
 
-### 查看本地的端口开启情况
+## 查看本地的端口开启情况
 
 ```
 sudo ufw status
 ```
 
-### 打开80端口
+## 打开80端口
 
 ```
 sudo ufw allow 80
 ```
 
-### 允许从一个 IP 地址连接
+## 允许从一个 IP 地址连接
 
 ```
 sudo ufw allow from 123.45.67.89
 ```
 
-### 允许特定子网的连接
+## 允许特定子网的连接
 
 ```
 sudo ufw allow from 123.45.67.89/24
 ```
 
-### 允许特定 IP/ 端口的组合
+## 允许特定 IP/ 端口的组合
 
 ```
 sudo ufw allow from 123.45.67.89 to any port 22 proto tcp
 ```
 
-### 防火墙开启/禁用
+## 防火墙开启/禁用
 
 ```
 # 开启
@@ -202,7 +201,7 @@ sudo ufw enable
 sudo ufw disable
 ```
 
-### 防火墙重启：
+## 防火墙重启：
 
 ```
 sudo ufw reload
@@ -753,7 +752,38 @@ $ which grep
 
 ```
 
+# 查看磁盘空间
 
+```
+df -hl
+```
+
+显示格式为：
+
+```
+文件系统              容量 已用 可用 已用% 挂载点　
+
+Filesystem            Size Used Avail Use% Mounted on
+```
+
+`df -hl` 查看磁盘剩余空间
+
+`df -h` 查看每个根路径的分区大小
+
+`du -sh` [目录名] 返回该目录的大小
+
+`du -sm` [文件夹] 返回该文件夹总M数
+
+# 查看内存使用情况
+
+`free`：
+
+```
+root@localhost:~# free -h
+              total        used        free      shared  buff/cache   available
+Mem:           989M        121M         87M        7.0M        781M        662M
+Swap:          255M         14M        241M
+```
 
 
 

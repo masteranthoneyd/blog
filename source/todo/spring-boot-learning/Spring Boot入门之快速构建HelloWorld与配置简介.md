@@ -2,30 +2,7 @@
 # 前言
 **理念“习惯优于配置”**
 # 构建
-## 方式一：官方SPRING INITIALIZR页面
-1、访问***[http://start.spring.io/](http://start.spring.io/)***
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot/spring-boot-io.png)
-2、 选择对应的`Maven Project`以及填写项目相关信息，然后点击`Generate Project`按钮下载。
-3、解压下载下来的压缩包。
-4、IDEA导入： 
-* `File`–>`New`–>`Project from Existing Sources...`
-* 点击`OK`
-* 点击`Import project from external model`并选择`Maven`，然后`Next`到`Finish`
 
-## 方式二：IDEA的Spring Initializr工具
-1、选择`File`->`New`->`Project`
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot/spring-initializr.png)
-如图所示，选择`Spring Initializr`，图中的URL指向就是方式一里面的`SPRING INITIALIZR`页面，这里创建的工程实际上也是基于它的Web工具来实现的
-
-2、点击`Next`选择相应配置
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot/spring-initializr-new.png)
-
-3、点击`Next`，进入选择Spring Boot版本和依赖管理的窗口，里面不仅包含了`Spring Boot Starter POMs`中的各个依赖，还包含了`Spring Cloud`的各种依赖
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot/spring-initializr-config.png)
-
-4、再次`Next`，选择存放路径，最后`Finish`
-
-在这我们要注意一下，Java版本要在Java **7**以上，Spring要在**4.1.5**以上
 
 # 项目结构
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot/spring-boot-frame.png)
