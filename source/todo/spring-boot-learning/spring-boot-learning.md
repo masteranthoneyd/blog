@@ -4,9 +4,47 @@
 
 # 构建父工程
 
+父工程只是作为管理全局依赖版本管理以及插件管理的存在，子工程只需要引用依赖，并不需要关心版本号。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/parent.png)
+
+整个工程只需要一个`pom.xml`（下面那个是IDEA生成的，非必要）：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/parent-pom.png)
+
+说明：
+
+* `<packaging>`为`pom`表示此会被打包成pom文件被其他子项目依赖。
+* 子项目会继承父项目的`properties`，若子项目重新定义属性，则会覆盖父项目的属性。
+* `<dependencyManagement>`管理依赖版本，不使用`<parent>`来依赖Spring Boot，可以使用上面方式，添加`<type>`为`pom`以及`<scope>`为`import`。
+* `<pluginManagement>`的功能类似于`<dependencyManagement>`，在父项目中设置好插件属性，在子项目中直接依赖就可以，不需要每个子项目都配置一遍，当然了，子项目也可以覆盖插件属性。
+
+# 打包成可执行的Jar
+
+默认情况下Spring Boot打包出来的jar包是不可执行的，需要这样配置：
+
+```
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring-boot.version}</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+```
+
+打包之后会发现有两个jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/repackage.png)
 
 
-# 配置连接池
 
 # 热部署
 
@@ -22,6 +60,17 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 ```
 
 `application.yml`配置文件中添加：
@@ -74,6 +123,11 @@ OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自�
 
 > **热部署可能会牺牲一定的系统性能，因为是动态的编译**
 
-# 打包成可执行的Jar
+# 配置连接池
 
-默认情况下Spring Boot打包出来的jar包是不可执行的，
+
+
+
+
+> 学习汇总：[http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html](http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html)
+
