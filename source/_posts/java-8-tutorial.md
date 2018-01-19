@@ -127,9 +127,66 @@ num = 5;
 ### 不能访问接口的默认方法
 Lambda表达式中是**无法访问到默认方法**的。
 
-### Lambda表达式中的this
-Lambda 表达式中使用 `this` 会引用创建该 Lambda 表达式的方法的 `this` 参数。
+**补充**：Lambda表达式对**值**封闭，对**变量**开放的原文是：lambda expressions close over **values**, not **variables**，在这里增加一个例子以说明这个特性：
+
+```java
+int sum = 0;
+list.forEach(e -> { sum += e.size(); }); // Illegal, close over values
+
+List<Integer> aList = new List<>();
+list.forEach(e -> { aList.add(e); }); // Legal, open over variables
+```
+
+## 匿名内部类的简写？
+
+**Lambda表达式通过`invokedynamic`指令实现，书写Lambda表达式不会产生新的类**。如果有如下代码，编译之后只有一个`class`文件：
+
+```
+public class MainLambda {
+	public static void main(String[] args) {
+		new Thread(
+				() -> System.out.println("Lambda Thread run()")
+			).start();;
+	}
+}
+```
+
+编译之后的结果：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/java/2-Lambda.png)
+
+通过javap反编译命名，我们更能看出Lambda表达式内部表示的不同：
+
+```
+// javap -c -p MainLambda.class
+public class MainLambda {
+  ...
+  public static void main(java.lang.String[]);
+    Code:
+       0: new           #2                  // class java/lang/Thread
+       3: dup
+       4: invokedynamic #3,  0              // InvokeDynamic #0:run:()Ljava/lang/Runnable; /*使用invokedynamic指令调用*/
+       9: invokespecial #4                  // Method java/lang/Thread."<init>":(Ljava/lang/Runnable;)V
+      12: invokevirtual #5                  // Method java/lang/Thread.start:()V
+      15: return
+
+  private static void lambda$main$0();  /*Lambda表达式被封装成主类的私有方法*/
+    Code:
+       0: getstatic     #6                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       3: ldc           #7                  // String Lambda Thread run()
+       5: invokevirtual #8                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       8: return
+}
+```
+
+反编译之后我们发现Lambda表达式被封装成了主类的一个私有方法，并通过*`invokedynamic`*指令进行调用。
+
+## Lambda表达式中的this
+
+既然Lambda表达式不是内部类的简写，那么Lambda内部的`this`引用也就跟内部类对象没什么关系了。在Lambda表达式中`this`的意义跟在表达式外部完全一样。
+
 eg：
+
 ```java
 public class Test2 {  
     public static void main(String[] args) {  
@@ -148,19 +205,8 @@ public class Test2 {
     }  
 }  
 ```
-显示结果：Lambda
 
-**补充**：Lambda表达式对**值**封闭，对**变量**开放的原文是：lambda expressions close over **values**, not **variables**，在这里增加一个例子以说明这个特性：
-
-```java
-int sum = 0;
-list.forEach(e -> { sum += e.size(); }); // Illegal, close over values
-
-List<Integer> aList = new List<>();
-list.forEach(e -> { aList.add(e); }); // Legal, open over variables
-```
-
-
+显示结果：`Lambda`
 
 # Functional Interfaces
 
@@ -273,7 +319,7 @@ public Optional<Long> getPhone() {
    `ifPresentOrElse` 方法的用途是，如果一个 `Optional` 包含值，则对其包含的值调用函数 *action*，即 `action.accept(value)`，这与 `ifPresent` 一致；与 `ifPresent` 方法的区别在于，`ifPresentOrElse` 还有第二个参数 `emptyAction` —— 如果 `Optional` 不包含值，那么 `ifPresentOrElse` 便会调用 `emptyAction`，即 `emptyAction.run()`
 
 3. `public Stream<T> stream()`
-   `stream` 方法的作用就是将 `Optional` 转为一个 `Stream`，如果该 `Optional` 中包含值，那么就返回包含这个值的 `Stream`；否则返回一个空的 `Stream`（`Stream.empty()`）。​
+   `stream` 方法的作用就是将 `Optional` 转为一个 `Stream`，如果该 `Optional` 中包含值，那么就返回包含这个值的 `Stream`；否则返回一个空的 `Stream`（`Stream.empty()`）。
 
    举个例子，在 Java8，我们会写下面的代码：
 
@@ -300,6 +346,8 @@ public Optional<Long> getPhone() {
    ```
 
 # Streams
+
+![](http://ojoba1c98.bkt.clouddn.com/img/java/Java_stream_Interfaces.png)
 
 ## 流是什么
 
@@ -425,11 +473,93 @@ Collectors 实用类提供了许多静态工厂方法，用来创建常见收集
     - 与 groupingBy 联合使用的其他收集器例子：`summingInt`,`mapping`
 - 分区：`Collectors.partitioningBy`是分组的特殊情况，由一个谓词作为分类函数(分区函数)，返回一个Map，只有两个Boolean类型的key。
 
+#### Ex1:使用collect()生成Collection
+
+前面已经提到通过`collect()`方法将*Stream*转换成容器的方法，这里再汇总一下。将*Stream*转换成*List*或*Set*是比较常见的操作，所以*Collectors*工具已经为我们提供了对应的收集器，通过如下代码即可完成：
+
+```
+// 将Stream转换成List或Set
+Stream<String> stream = Stream.of("I", "love", "you", "too");
+List<String> list = stream.collect(Collectors.toList()); // (1)
+Set<String> set = stream.collect(Collectors.toSet()); // (2)
+```
+
+上述代码能够满足大部分需求，但由于返回结果是接口类型，我们并不知道类库实际选择的容器类型是什么，有时候我们可能会想要人为指定容器的实际类型，这个需求可通过`Collectors.toCollection(Supplier<C> collectionFactory)`方法完成。
+
+```
+// 使用toCollection()指定规约容器的类型
+ArrayList<String> arrayList = stream.collect(Collectors.toCollection(ArrayList::new));// (3)
+HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));// (4)
+```
+
+上述代码(3)处指定规约结果是*ArrayList*，而(4)处指定规约结果为*HashSet*。一切如你所愿。
+
+#### Ex2:使用collect()生成Map
+
+前面已经说过*Stream*背后依赖于某种数据源，数据源可以是数组、容器等，但不能是*Map*。反过来从*Stream*生成*Map*是可以的，但我们要想清楚*Map*的*key*和*value*分别代表什么，根本原因是我们要想清楚要干什么。通常在三种情况下`collect()`的结果会是*Map*：
+
+1. 使用`Collectors.toMap()`生成的收集器，用户需要指定如何生成*Map*的*key*和*value*。
+2. 使用`Collectors.partitioningBy()`生成的收集器，对元素进行二分区操作时用到。
+3. 使用`Collectors.groupingBy()`生成的收集器，对元素做*group*操作时用到。
+
+情况1：使用`toMap()`生成的收集器，这种情况是最直接的，前面例子中已提到，这是和`Collectors.toCollection()`并列的方法。如下代码展示将学生列表转换成由<学生，GPA>组成的*Map*。非常直观，无需多言。
+
+```
+// 使用toMap()统计学生GPA
+Map<Student, Double> studentToGPA =
+     students.stream().collect(Collectors.toMap(Functions.identity(),// 如何生成key
+                                     student -> computeGPA(student)));// 如何生成value
+```
+
+情况2：使用`partitioningBy()`生成的收集器，这种情况适用于将`Stream`中的元素依据某个二值逻辑（满足条件，或不满足）分成互补相交的两部分，比如男女性别、成绩及格与否等。下列代码展示将学生分成成绩及格或不及格的两部分。
+
+```
+// Partition students into passing and failing
+Map<Boolean, List<Student>> passingFailing = students.stream()
+         .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
+```
+
+情况3：使用`groupingBy()`生成的收集器，这是比较灵活的一种情况。跟SQL中的*group by*语句类似，这里的*groupingBy()也是按照某个属性对数据进行分组，属性相同的元素会被对应到Map*的同一个*key*上。下列代码展示将员工按照部门进行分组：
+
+```
+// Group employees by department
+Map<Department, List<Employee>> byDept = employees.stream()
+            .collect(Collectors.groupingBy(Employee::getDepartment));
+```
+
+以上只是分组的最基本用法，有些时候仅仅分组是不够的。在SQL中使用*group by*是为了协助其他查询，比如*1. 先将员工按照部门分组，2. 然后统计每个部门员工的人数*。Java类库设计者也考虑到了这种情况，增强版的`groupingBy()`能够满足这种需求。增强版的`groupingBy()`允许我们对元素分组之后再执行某种运算，比如求和、计数、平均值、类型转换等。这种先将元素分组的收集器叫做**上游收集器**，之后执行其他运算的收集器叫做**下游收集器**(*downstream Collector*)。
+
+```
+// 使用下游收集器统计每个部门的人数
+Map<Department, Integer> totalByDept = employees.stream()
+                    .collect(Collectors.groupingBy(Employee::getDepartment,
+                                                   Collectors.counting()));// 下游收集器
+```
+
+上面代码的逻辑是不是越看越像SQL？高度非结构化。还有更狠的，下游收集器还可以包含更下游的收集器，这绝不是为了炫技而增加的把戏，而是实际场景需要。考虑将员工按照部门分组的场景，如果*我们想得到每个员工的名字（字符串），而不是一个个*Employee*对象*，可通过如下方式做到：
+
+```
+// 按照部门对员工分布组，并只保留员工的名字
+Map<Department, List<String>> byDept = employees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment,
+                        Collectors.mapping(Employee::getName,// 下游收集器
+                                Collectors.toList())));// 更下游的收集器
+```
+
 ## Notice And Optimization
 
 * 流不可被复用
 * 一般先`filter`、`limit`、`skip`操作后再进行`sorted`、`peek`、`map`等操作以达到`short-circuiting` 目的
 
+
+| Stream操作分类                    |                                          |                                          |
+| ----------------------------- | ---------------------------------------- | ---------------------------------------- |
+| 中间操作(Intermediate operations) | 无状态(Stateless)                           | unordered() filter() map() mapToInt() mapToLong() mapToDouble() flatMap() flatMapToInt() flatMapToLong() flatMapToDouble() peek() |
+| 有状态(Stateful)                 | distinct() sorted() sorted() limit() skip() |                                          |
+| 结束操作(Terminal operations)     | 非短路操作                                    | forEach() forEachOrdered() toArray() reduce() collect() max() min() count() |
+| 短路操作(short-circuiting)        | anyMatch() allMatch() noneMatch() findFirst() findAny() |                                          |
+
+Stream上的所有操作分为两类：中间操作和结束操作，中间操作只是一种标记，只有结束操作才会触发实际计算。中间操作又可以分为无状态的(*`Stateless`*)和有状态的(*`Stateful`*)，无状态中间操作是指元素的处理不受前面元素的影响，而有状态的中间操作必须等到所有元素处理之后才知道最终结果，比如排序是有状态操作，在读取所有元素之前并不能确定排序结果；结束操作又可以分为短路操作和非短路操作，短路操作是指不用处理全部元素就可以返回结果，比如*找到第一个满足条件的元素*。之所以要进行如此精细的划分，是因为底层对每一种情况的处理方式不同。
 
 # Annotations
 
@@ -1028,6 +1158,7 @@ public static Map<String, List<Integer>> getElementPositions(List<String> list) 
 
 > 参考
 > ***[Java8简明教程](http://blog.didispace.com/books/java8-tutorial/)***
+> ***[CarpenterLee](http://www.cnblogs.com/CarpenterLee/)***
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***
 > ***[http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api](http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api)***
 > ***[http://ifeve.com/java-8-features-tutorial/](http://ifeve.com/java-8-features-tutorial/)***

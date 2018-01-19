@@ -14,10 +14,11 @@
 
 说明：
 
-* `<packaging>`为`pom`表示此会被打包成pom文件被其他子项目依赖。
-* 子项目会继承父项目的`properties`，若子项目重新定义属性，则会覆盖父项目的属性。
-* `<dependencyManagement>`管理依赖版本，不使用`<parent>`来依赖Spring Boot，可以使用上面方式，添加`<type>`为`pom`以及`<scope>`为`import`。
-* `<pluginManagement>`的功能类似于`<dependencyManagement>`，在父项目中设置好插件属性，在子项目中直接依赖就可以，不需要每个子项目都配置一遍，当然了，子项目也可以覆盖插件属性。
+* `<packaging>` 为 `pom` 表示此会被打包成 pom 文件被其他子项目依赖。
+* 由于 Spring Boot 以及集成了 `maven-surefire-plugin` 插件，跳过测试只需要在 properties中添加 `<maven.test.skip>true</maven.test.skip>`即可
+* 子项目会继承父项目的 `properties`，若子项目重新定义属性，则会覆盖父项目的属性。
+* `<dependencyManagement>` 管理依赖版本，不使用 `<parent>` 来依赖 Spring Boot，可以使用上面方式，添加 `<type>` 为 `pom` 以及 `<scope>` 为 `import`。
+* `<pluginManagement>` 的功能类似于 `<dependencyManagement>`，在父项目中设置好插件属性，在子项目中直接依赖就可以，不需要每个子项目都配置一遍，当然了，子项目也可以覆盖插件属性。
 
 # 打包成可执行的Jar
 
