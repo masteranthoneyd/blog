@@ -251,7 +251,18 @@ sudo apt-get update
 sudo apt-get install typora
 ```
 
+## GIF制作软件 Peek
+
+```
+sudo add-apt-repository ppa:peek-developers/stable
+sudo apt update
+sudo apt install peek
+```
+
+终端执行`peek`即可运行
+
 ## StarUml
+
 这个一款绘图工具
 下载：***[http://staruml.io/download](http://staruml.io/download)***
 安装依赖：***[https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5](https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5)***

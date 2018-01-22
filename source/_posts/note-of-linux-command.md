@@ -785,11 +785,13 @@ Mem:           989M        121M         87M        7.0M        781M        662M
 Swap:          255M         14M        241M
 ```
 
+#  Extend
 
+## apt-get update无法下载
 
+![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
 
-
-
+出现类似情况，可以找到`/etc/apt/sources.list.d`目录，删除对应的`.list`文件即可
 
 
 
