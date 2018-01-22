@@ -1,5 +1,5 @@
 ---
-title: Ubuntu安装后的主题美化与个性化设置
+title: Ubuntu主题美化、个性化设置与常用软件
 date: 2017-01-12 23:04:36
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
@@ -240,7 +240,7 @@ sudo apt-get remove smartgithg
 ```
 
 ## Typora(Markdown编辑器)
-*[官方](https://www.typora.io/#linux)*安装方法如下：
+*[官方](https://typora.io/#linux)*安装方法如下：
 ```
 # optional, but recommended
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
