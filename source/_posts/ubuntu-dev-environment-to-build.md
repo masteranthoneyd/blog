@@ -64,8 +64,33 @@ javac -version
 ```
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/javaVersion.png)
 
+# 安装Scala环境
+
+更上面安装JDK类似
+
+1、去 *[官网](http://www.scala-lang.org/download/)* 下载最新地SDK
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/scala-download.jpg)
+
+2、解压到 `/usr/local` 目录，并创建软链接为 `scala` 
+
+3、在 `/etc/profile.d` 目录下创建 `scala.sh` ，输入以下信息：
+
+```
+export SCALA_HOME=/usr/local/scala
+PATH=$PATH:$SCALA_HOME/bin
+```
+
+4、查看是否安装成功
+```
+source /etc/profile.d/scala.sh
+scala -version
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/source-scala.jpg)
 
 #  安装IDE
+
 ## Eclipse
 
 直接在 *[Eclipse官方网站](https://www.eclipse.org/)* 下载相关版本Eclipse
@@ -114,10 +139,11 @@ MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/idea.png)
 
 ### 激活
-问度娘，博主也是度娘要的激活码
 
+博主使用授权服务器，可以自己搭建，详情请看 ***[这里](/2017/note-of-learning-idea-under-ubuntu/#License)***
 
-# 部署Tomcat
+### 部署Tomcat
+
 若是服务器版切换root用户解压到 `/opt/` 或者 `/usr/local/` 下
 直接运行tomcat目录下`bin/start.sh`即可开启，前提是配置好`JDK`
 

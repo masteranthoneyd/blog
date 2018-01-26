@@ -134,7 +134,9 @@ list = list.stream()
 		   .....
 ```
 
+## 多线程自动编译
 
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/auto-compile.png)
 
 # Keyboard shortcuts
 

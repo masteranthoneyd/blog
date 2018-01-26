@@ -41,7 +41,7 @@
     </plugins>
 ```
 
-打包之后会发现有两个jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
+打包之后会发现有**两个**jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/repackage.png)
 

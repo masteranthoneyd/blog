@@ -261,6 +261,8 @@ sudo apt install peek
 
 终端执行`peek`即可运行
 
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/Peek%202018-01-22%2015-49.gif)
+
 ## StarUml
 
 这个一款绘图工具
@@ -388,34 +390,194 @@ sudo apt-get install bleachbit
 ```
 
 
-## 多线程下载器
-`XTREME`下载管理器旨在为您提供一个快速和安全的工具，用于管理所有的下载。采用了先进的动态分割算法，应用程序可以加快下载过程。 下载管理器支持`HTTP`，`HTTPS`，`FTP`协议，代理服务器需要授权的网站。此外，它可以无缝地集成到`Xtreme`下载管理器安装的浏览器发送任何下载。由于它是用`Java`编写的，它是兼容所有主要平台。
+## 多协议下载器 Aria2
+一般在Linux环境中下载东西都是比较不友好的，不支持多种协议，方式单一，但这款Aria2就是为了解决多协议问题而诞生的，配合UI界面可以很方便地~~随心所欲~~地下载。
 
-最终版本 `Xtreme Download Manager` (`XDMAN`) 4.7 已经发布。
-安装方法，因为有`PPA`可用，支持`Ubuntu 14.10`、`14.04`、`12.04`用户，打开终端，输入一下命令：
+### 搭建 Aria2 以及 AriaNg Web UI
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/aria2-ariaNg.jpg)
+
+> 博主选择使用Docker
+
+参考 *[aria2-ariang-docker](https://github.com/wahyd4/aria2-ariang-docker)* 以及 *[aria2-ariang-x-docker-compose](https://github.com/wahyd4/aria2-ariang-x-docker-compose)*
+
+#### 配置`aria2.conf`
+
+这个文件是从作者地 Github下载下来的，主要加了代理，而这个代理是 `sock5` 通过 `privoxy`
+
 ```
-sudo add-apt-repository ppa:noobslab/apps
-sudo apt-get update
-sudo apt-get install xdman
+#所有协议代理
+all-proxy=http://192.168.6.113:8118
+#用户名
+#rpc-user=user
+#密码
+#rpc-passwd=passwd
+#上面的认证方式不建议使用,建议使用下面的token方式
+#设置加密的密钥
+#rpc-secret=token
+#允许rpc
+enable-rpc=true
+#允许所有来源, web界面跨域权限需要
+rpc-allow-origin-all=true
+#允许外部访问，false的话只监听本地端口
+rpc-listen-all=true
+#RPC端口, 仅当默认端口被占用时修改
+#rpc-listen-port=6800
+#最大同时下载数(任务数), 路由建议值: 3
+max-concurrent-downloads=5
+#断点续传
+continue=true
+#同服务器连接数
+max-connection-per-server=5
+#最小文件分片大小, 下载线程数上限取决于能分出多少片, 对于小文件重要
+min-split-size=10M
+#单文件最大线程数, 路由建议值: 5
+split=10
+#下载速度限制
+max-overall-download-limit=0
+#单文件速度限制
+max-download-limit=0
+#上传速度限制
+max-overall-upload-limit=0
+#单文件速度限制
+max-upload-limit=0
+#断开速度过慢的连接
+#lowest-speed-limit=0
+#验证用，需要1.16.1之后的release版本
+#referer=*
+#文件保存路径, 默认为当前启动位置
+# dir=/user-files/superuser/
+dir=/data
+#文件缓存, 使用内置的文件缓存, 如果你不相信Linux内核文件缓存和磁盘内置缓存时使用, 需要1.16及以上版本
+#disk-cache=0
+#另一种Linux文件缓存方式, 使用前确保您使用的内核支持此选项, 需要1.15及以上版本(?)
+#enable-mmap=true
+#文件预分配, 能有效降低文件碎片, 提高磁盘性能. 缺点是预分配时间较长
+#所需时间 none < falloc ? trunc « prealloc, falloc和trunc需要文件系统和内核支持
+file-allocation=prealloc
+
+# General Options
+log=/var/log/aria2.log
+#You can set either debug, info, notice, warn or error.
+log-level=error
+
+## 进度保存相关 ##
+# 从会话文件中读取下载任务
+input-file=/root/conf/aria2.session
+# 在Aria2退出时保存`错误/未完成`的下载任务到会话文件
+save-session=/root/conf/aria2.session
+# 定时保存会话, 0为退出时才保存, 需1.16.1以上版本, 默认:0
+save-session-interval=10
+
+# BT trackers from https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt
+# echo `wget -qO- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt|awk NF|sed ":a;N;s/\n/,/g;ta"`
+bt-tracker=udp://tracker.coppersurfer.tk:6969/announce,udp://tracker.leechers-paradise.org:6969/announce,udp://9.rarbg.to:2710/announce,udp://p4p.arenabg.com:1337/announce,http://p4p.arenabg.com:1337/announce,udp://tracker.internetwarriors.net:1337/announce,http://tracker.internetwarriors.net:1337/announce,udp://tracker.skyts.net:6969/announce,udp://tracker.safe.moe:6969/announce,udp://tracker.piratepublic.com:1337/announce,udp://tracker.opentrackr.org:1337/announce,http://tracker.opentrackr.org:1337/announce,udp://wambo.club:1337/announce,udp://trackerxyz.tk:1337/announce,udp://tracker4.itzmx.com:2710/announce,udp://tracker2.christianbro.pw:6969/announce,udp://tracker1.wasabii.com.tw:6969/announce,udp://tracker.zer0day.to:1337/announce,udp://public.popcorn-tracker.org:6969/announce,udp://peerfect.org:6969/announce,udp://tracker.mg64.net:6969/announce,udp://mgtracker.org:6969/announce,http://tracker.mg64.net:6881/announce,http://mgtracker.org:6969/announce,http://t.nyaatracker.com:80/announce,http://retracker.telecom.by:80/announce,ws://tracker.btsync.cf:2710/announce,udp://zephir.monocul.us:6969/announce,udp://z.crazyhd.com:2710/announce,udp://tracker.xku.tv:6969/announce,udp://tracker.vanitycore.co:6969/announce,udp://tracker.tvunderground.org.ru:3218/announce,udp://tracker.torrent.eu.org:451/announce,udp://tracker.tiny-vps.com:6969/announce,udp://tracker.swateam.org.uk:2710/announce,udp://tracker.halfchub.club:6969/announce,udp://tracker.grepler.com:6969/announce,udp://tracker.files.fm:6969/announce,udp://tracker.dutchtracking.com:6969/announce,udp://tracker.dler.org:6969/announce,udp://tracker.desu.sh:6969/announce,udp://tracker.cypherpunks.ru:6969/announce,udp://tracker.cyberia.is:6969/announce,udp://tracker.christianbro.pw:6969/announce,udp://tracker.bluefrog.pw:2710/announce,udp://tracker.acg.gg:2710/announce,udp://thetracker.org:80/announce,udp://sd-95.allfon.net:2710/announce,udp://santost12.xyz:6969/announce,udp://sandrotracker.biz:1337/announce,udp://retracker.nts.su:2710/announce,udp://retracker.lanta-net.ru:2710/announce,udp://retracker.coltel.ru:2710/announce,udp://oscar.reyesleon.xyz:6969/announce,udp://open.stealth.si:80/announce,udp://ipv4.tracker.harry.lu:80/announce,udp://inferno.demonoid.pw:3418/announce,udp://allesanddro.de:1337/announce,http://tracker2.itzmx.com:6961/announce,http://tracker.vanitycore.co:6969/announce,http://tracker.torrentyorg.pl:80/announce,http://tracker.city9x.com:2710/announce,http://torrentsmd.me:8080/announce,http://sandrotracker.biz:1337/announce,http://retracker.mgts.by:80/announce,http://open.acgtracker.com:1096/announce,http://omg.wtftrackr.pw:1337/announce,wss://tracker.openwebtorrent.com:443/announce,wss://tracker.fastcast.nz:443/announce,wss://tracker.btorrent.xyz:443/announce,udp://tracker.uw0.xyz:6969/announce,udp://tracker.kamigami.org:2710/announce,udp://tracker.justseed.it:1337/announce,udp://tc.animereactor.ru:8082/announce,udp://packages.crunchbangplusplus.org:6969/announce,udp://explodie.org:6969/announce,udp://bt.xxx-tracker.com:2710/announce,udp://bt.aoeex.com:8000/announce,udp://104.238.198.186:8000/announce,https://open.acgnxtracker.com:443/announce,http://tracker.tfile.me:80/announce,http://share.camoe.cn:8080/announce,http://retracker.omsk.ru:2710/announce,http://open.acgnxtracker.com:80/announce,http://explodie.org:6969/announce,http://agusiq-torrents.pl:6969/announce,http://104.238.198.186:8000/announce
 ```
-卸载`xdman`命令：
+
+#### 使用h5ai作为文件管理器
+
 ```
-sudo apt-get remove xdman
+version: '3.4'
+
+services:
+  h5ai:
+    image: bixidock/h5ai
+    volumes:
+      - /home/ybd/data/docker/aria2/data:/var/www
+    restart: always
+  aria2:
+    image: wahyd4/aria2-ui:h5ai
+    ports:
+      - "8000:80"
+      - "6800:6800"
+    volumes:
+    #   - /some_folder:/root/conf/key
+      - /home/ybd/data/docker/aria2/config/aria2.conf:/root/conf/aria2.conf
+      - /home/ybd/data/docker/aria2/config/aria2.session:/root/conf/aria2.session
+      - /home/ybd/data/docker/aria2/cache/dht.dat:/root/.cache/aria2/dht.dat
+      - /home/ybd/data/docker/aria2/data:/data
+    environment:
+      - DOMAIN=:80
+      # - SSL=true
+      # - RPC_SECRET=Hello
+      # - ARIA2_USER=admin
+      # - ARIA2_PWD=password
+      # - ENABLE_AUTH=true
+    links:
+      - h5ai:file-manager
+    restart: always
 ```
-或者到*[官网](http://xdman.sourceforge.net/download.html)* 下载
-下载到的是.tar.xz的格式
-创建`tar.xz`文件：只要先 `tar cvf xxx.tar xxx/` 这样创建`xxx.tar`文件先，然后使用 `xz -z xxx.tar `来将 `xxx.tar`压缩成为 `xxx.tar.xz`
-解压`tar.xz`文件：先 `xz -d xxx.tar.xz` 将 `xxx.tar.xz`解压成 `xxx.tar` 然后，再用 `tar xvf xxx.tar`来解包。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/h5ai.jpg)
+
+#### 使用nextcloud作为文件管理器
+
+`docker-compose.yml` :
+
+```
+version: '3.4'
+
+services:
+  nextcloud:
+    image: wonderfall/nextcloud
+    volumes:
+      - /home/ybd/data/docker/aria2/nextcloud:/data
+      - /home/ybd/data/docker/aria2/data:/user-files
+    restart: always
+  aria2:
+    image: wahyd4/aria2-ui:nextcloud
+    ports:
+      - "8000:80"
+      - "6800:6800"
+    volumes:
+      - /home/ybd/data/docker/aria2/config/aria2.conf:/root/conf/aria2.conf
+      - /home/ybd/data/docker/aria2/config/aria2.session:/root/conf/aria2.session
+      - /home/ybd/data/docker/aria2/data:/data
+    environment:
+      - DOMAIN=:80
+      # - SSL=true
+      # - RPC_SECRET=Hello
+      # - ARIA2_USER=admin
+      # - ARIA2_PWD=password
+      # - ENABLE_AUTH=true
+    links:
+      - nextcloud:file-manager
+    restart: always
+```
+
+使用nettcloud作为文件管理还需要手动配置一下：
+
+*[https://github.com/wahyd4/aria2-ariang-x-docker-compose/tree/master/nextcloud#nextcloud-%E9%85%8D%E7%BD%AE-external-storage](https://github.com/wahyd4/aria2-ariang-x-docker-compose/tree/master/nextcloud#nextcloud-%E9%85%8D%E7%BD%AE-external-storage)*
+
+### 百度网盘直接下载助手
+
+1、安装 *[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN)* Chrome插件，这个主要是管理脚本的，下面安装百度云盘脚本需要用到
+
+2、进入 *[百度网盘直接下载助手(显示直接下载入口)](https://greasyfork.org/zh-CN/scripts/36549-%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%8A%A9%E6%89%8B-%E6%98%BE%E7%A4%BA%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%85%A5%E5%8F%A3)* ，点击`安装`或者`install`,完了直接刷新界面，进入到自己的百度云盘选择所需的下载文件即可。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baidupan.jpg)
+
+### BaiduExporter
+
+> 博主使用的是BaiduExporter，上面那个下载助手导出来链接在我这边并不能下载成功。。囧
+>
+> 官方是这么说明的
+>
+> * Chrome : Click Settings -> Extensions, drag BaiduExporter.crx file to the page, install it, or check Developer mode -> Load unpacked extension, navigate to the chrome/release folder.
+> * Firefox : Open about:debugging in Firefox, click "Load Temporary Add-on" and navigate to the chrome/release folder, select manifest.json, click OK.
 
 
-## SMPlayer播放器安装
-```
-sudo apt-add-repository ppa:rvm/smplayer
-sudo apt-get update
-sudo apt-get install smplayer smplayer-skins smplayer-themes
-```
+1、到 *[Github](https://github.com/acgotaku/BaiduExporter)* 下载与源码
+
+2、打开Chrome -> 扩展程序 -> 勾选开发者模式 -> 加载已解压的扩展程序 ，然后会弹出文件框，找到刚才下载的源码，找到chrome -> release，添加成功！
+
+3、打开百度云盘网页版，勾选需要下载的文件，在上方会出现导出下载地选项，通过设置可以修改RCP地址
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baiduexporter1.jpg)
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baiduexporter2.jpg)
 
 ## Stardict火星译王
+
 ```
 sudo apt-get install stardict
 ```
