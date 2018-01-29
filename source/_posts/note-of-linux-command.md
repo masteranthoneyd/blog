@@ -787,6 +787,83 @@ Swap:          255M         14M        241M
 
 #  Extend
 
+## 使用systemd设置开机启动
+
+> [ubuntu](https://www.centos.bz/category/other-system/ubuntu/)从16.04开始不再使用initd管理系统，改用[systemd](https://www.centos.bz/tag/systemd/)
+
+**为了像以前一样，在`/etc/rc.local`中设置开机启动程序，需要以下几步：**
+
+**1、systemd默认读取`/etc/systemd/system`下的配置文件，该目录下的文件会链接`/lib/systemd/system/`下的文件。一般系统安装完`/lib/systemd/system/`下会有`rc-local.service`文件，即我们需要的配置文件。**
+
+链接过来：
+
+```
+ln -fs /lib/systemd/system/rc-local.service /etc/systemd/system/rc-local.service
+```
+
+```
+cd /etc/systemd/system/
+vim rc-local.service
+```
+
+`rc-local.service`内容：
+
+```
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+# This unit gets pulled automatically into multi-user.target by
+# systemd-rc-local-generator if /etc/rc.local is executable.
+[Unit]
+Description=/etc/rc.local Compatibility
+ConditionFileIsExecutable=/etc/rc.local
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+RemainAfterExit=yes
+GuessMainPID=no
+
+[Install]
+WantedBy=multi-user.target
+Alias=rc-local.service
+```
+
+**2、创建/etc/rc.local文件**
+
+```
+touch /etc/rc.local
+```
+
+**3、赋可执行权限**
+
+```
+chmod 755 /etc/rc.local
+```
+
+**4、编辑rc.local，添加需要开机启动的任务**
+
+```
+#!/bin/bash
+
+echo "test test " > /var/test_boot_up.log
+```
+
+**5、执行reboot重启系统验证OK。**
+
+最后，说一下`/etc/systemd/system/`下的配置文件（`XXXX.service`）,
+其中有三个配置项，`[Unit]` / `[Service]` / `[Install]`
+
+- `[Unit]` 区块：启动顺序与依赖关系。
+- `[Service]` 区块：启动行为,如何启动，启动类型。
+- `[Install]` 区块，定义如何安装这个配置文件，即怎样做到开机启动。
+
 ## apt-get update无法下载
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/apt-get-update-fail.png)

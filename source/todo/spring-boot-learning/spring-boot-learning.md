@@ -124,6 +124,197 @@ OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自�
 
 > **热部署可能会牺牲一定的系统性能，因为是动态的编译**
 
+# 使用为Undertow作为Web容器
+
+> Spring Boot内嵌容器支持Tomcat、Jetty、Undertow。
+> 根据 [Tomcat vs. Jetty vs. Undertow: Comparison of Spring Boot Embedded Servlet Containers](https://link.jianshu.com/?t=https://examples.javacodegeeks.com/enterprise-java/spring/tomcat-vs-jetty-vs-undertow-comparison-of-spring-boot-embedded-servlet-containers/) 这篇文章统计，Undertow的综合性能更好。
+
+## Maven配置
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-undertow</artifactId>
+</dependency>
+```
+
+## 监听多个端口与HTTP2支持
+
+```
+// 在@Configuration的类中添加@bean
+@Bean
+UndertowEmbeddedServletContainerFactory embeddedServletContainerFactory() {
+    
+    UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
+    
+    // 这里也可以做其他配置
+    // 支持HTTP2
+    factory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true));
+    // 监听多个端口
+    builder.addHttpListener(8080, "0.0.0.0");
+    return factory;
+}
+```
+
+## Undertow相关配置
+
+```
+# Undertow 日志存放目录
+server.undertow.accesslog.dir
+# 是否启动日志
+server.undertow.accesslog.enabled=false 
+# 日志格式
+server.undertow.accesslog.pattern=common
+# 日志文件名前缀
+server.undertow.accesslog.prefix=access_log
+# 日志文件名后缀
+server.undertow.accesslog.suffix=log
+# HTTP POST请求最大的大小
+server.undertow.max-http-post-size=0 
+# 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
+server.undertow.io-threads=4
+# 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+server.undertow.worker-threads=20
+# 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
+# 每块buffer的空间大小,越小的空间被利用越充分
+server.undertow.buffer-size=1024
+# 每个区分配的buffer数量 , 所以pool的大小是buffer-size * buffers-per-region
+server.undertow.buffers-per-region=1024
+# 是否分配的直接内存
+server.undertow.direct-buffers=true
+```
+
+# 使用Log4j2
+
+下面是 Log4j2  官方性能测试结果：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/log4j2-performance.png)
+
+## Maven配置
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <!-- 抛弃自带的log，使用外置log框架 -->
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 日志 Log4j2 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-log4j2</artifactId>
+</dependency>
+
+<!-- Log4j2 异步支持 -->
+<dependency>
+    <groupId>com.lmax</groupId>
+    <artifactId>disruptor</artifactId>
+    <version>3.3.7</version>
+</dependency>
+```
+
+## log4j2.xml 配置
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，
+     你会看到log4j2内部各种详细输出。可以设置成OFF(关闭) 或 Error(只输出错误信息)。
+     30s 刷新此配置
+-->
+<configuration status="WARN" monitorInterval="30">
+
+    <!-- 日志文件目录、压缩文件目录、日志格式配置 -->
+    <properties>
+        <Property name="fileName">/home/ybd/logs/log</Property>
+        <Property name="fileGz">/home/ybd/logs/7z</Property>
+        <Property name="PID">????</Property>
+        <Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx</Property>
+        <!--<Property name="LOG_PATTERN">%d{yyyy-MM-dd 'at' HH:mm:ss z} [%t] %-5level %logger{36} %L %M - %msg%xEx%n</Property>-->
+    </properties>
+
+    <Appenders>
+        <!-- 输出控制台日志的配置 -->
+        <Console name="console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- 打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档 -->
+        <RollingRandomAccessFile name="infoFile" fileName="${fileName}/web-info.log" immediateFlush="false"
+                                    filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-info.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+
+            <Policies>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+
+            <Filters>
+                <!-- 只记录info和warn级别信息 -->
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+
+            <!-- 指定每天的最大压缩包个数，默认7个，超过了会覆盖之前的 -->
+            <DefaultRolloverStrategy max="50"/>
+        </RollingRandomAccessFile>
+
+        <!-- 存储所有error信息 -->
+        <RollingRandomAccessFile name="errorFile" fileName="${fileName}/web-error.log" immediateFlush="false"
+                                    filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-error.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+
+            <Filters>
+                <!-- 只记录error级别信息 -->
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+
+            <!-- 指定每天的最大压缩包个数，默认7个，超过了会覆盖之前的 -->
+            <DefaultRolloverStrategy max="50"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <!-- Mixed sync/async -->
+    <Loggers>
+        <Root level="debug" includeLocation="true">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="infoFile"/>
+            <AppenderRef ref="errorFile"/>
+        </Root>
+
+        <AsyncRoot level="debug" includeLocation="true">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="infoFile"/>
+            <AppenderRef ref="errorFile"/>
+        </AsyncRoot>
+    </Loggers>
+
+</configuration>
+```
+
+
+
 # 配置连接池
 
 
