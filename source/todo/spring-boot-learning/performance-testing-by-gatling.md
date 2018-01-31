@@ -1,5 +1,6 @@
-## 使用Gatling进行性能测试
+# Spring Boot 学习之测试篇
 
+## 使用 Gatling 进行性能测试
 > 性能测试的两种类型，负载测试和压力测试：
 > - **负载测试（Load Testing）：**负载测试是一种主要为了测试软件系统是否达到需求文档设计的目标，譬如软件在一定时期内，最大支持多少并发用户数，软件请求出错率等，测试的主要是软件系统的性能。
 > - **压力测试（Stress Testing）：**压力测试主要是为了测试硬件系统是否达到需求文档设计的性能目标，譬如在一定时期内，系统的cpu利用率，内存使用率，磁盘I/O吞吐率，网络吞吐量等，压力测试和负载测试最大的差别在于测试目的不同。
@@ -133,7 +134,13 @@ class ApiGatlingSimulationTest extends Simulation {
 ```
 mvn gatling:execute
 ```
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/idea-gatling-test.jpg)
 
+我们打开结果中的`index.html`：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result1.jpg)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result2.jpg)
 
 > 参考：*[http://www.spring4all.com/article/584](http://www.spring4all.com/article/584)*
 >

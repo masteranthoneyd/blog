@@ -203,16 +203,22 @@ server.undertow.direct-buffers=true
 ## Maven配置
 
 ```
+<!-- Spring Boot 依赖-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
+    <artifactId>spring-boot-starter</artifactId>
+    <!-- 去除 logback 依赖 -->
     <exclusions>
-        <!-- 抛弃自带的log，使用外置log框架 -->
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
     </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 
 <!-- 日志 Log4j2 -->
@@ -229,7 +235,9 @@ server.undertow.direct-buffers=true
 </dependency>
 ```
 
-## log4j2.xml 配置
+**注意**：需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
+
+## log4j2.xml配置
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -237,30 +245,33 @@ server.undertow.direct-buffers=true
      你会看到log4j2内部各种详细输出。可以设置成OFF(关闭) 或 Error(只输出错误信息)。
      30s 刷新此配置
 -->
-<configuration status="WARN" monitorInterval="30">
+<configuration status="OFF" monitorInterval="30">
 
     <!-- 日志文件目录、压缩文件目录、日志格式配置 -->
     <properties>
-        <Property name="fileName">/home/ybd/logs/log</Property>
+        <Property name="fileName">/home/ybd/logs</Property>
         <Property name="fileGz">/home/ybd/logs/7z</Property>
         <Property name="PID">????</Property>
-        <Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx</Property>
-        <!--<Property name="LOG_PATTERN">%d{yyyy-MM-dd 'at' HH:mm:ss z} [%t] %-5level %logger{36} %L %M - %msg%xEx%n</Property>-->
+        <!--<Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS z}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta}
+            %clr{-&#45;&#45;}{faint} %clr{[%t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx
+        </Property>-->
+        <Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{${sys:PID}}{magenta} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx
+        </Property>
     </properties>
 
     <Appenders>
         <!-- 输出控制台日志的配置 -->
         <Console name="console" target="SYSTEM_OUT">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
-            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
         </Console>
 
         <!-- 打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档 -->
         <RollingRandomAccessFile name="infoFile" fileName="${fileName}/web-info.log" immediateFlush="false"
-                                    filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-info.gz">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+                                 filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-info.gz">
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
 
             <Policies>
                 <SizeBasedTriggeringPolicy size="20 MB"/>
@@ -278,8 +289,8 @@ server.undertow.direct-buffers=true
 
         <!-- 存储所有error信息 -->
         <RollingRandomAccessFile name="errorFile" fileName="${fileName}/web-error.log" immediateFlush="false"
-                                    filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-error.gz">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+                                 filePattern="${fileGz}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-%i.web-error.gz">
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
 
             <Policies>
                 <SizeBasedTriggeringPolicy size="50 MB"/>
@@ -313,13 +324,258 @@ server.undertow.direct-buffers=true
 </configuration>
 ```
 
+## 也可以使用log4j2.yml
 
+需要引入依赖以识别：
 
-# 配置连接池
+```
+<!-- 加上这个才能辨认到log4j2.yml文件 -->
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+</dependency>
+```
 
+`log4j2.yml`:
 
+```
+Configuration:
+  status: "OFF"
+  monitorInterval: 10
 
+  Properties:
+    Property:
+      - name: log.level.console
+        value: debug
+      - name: PID
+        value: ????
+      - name: LOG_PATTERN
+        value: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{${sys:PID}}{magenta} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx"
 
+  Appenders:
+    Console:  #输出到控制台
+      name: CONSOLE
+      target: SYSTEM_OUT
+      ThresholdFilter:
+        level: ${sys:log.level.console} # “sys:”表示：如果VM参数中没指定这个变量值，则使用本文件中定义的缺省全局变量值
+        onMatch: ACCEPT
+        onMismatch: DENY
+      PatternLayout:
+        pattern: ${LOG_PATTERN}
+        charset: UTF-8
+  Loggers:
+    Root:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE
+    AsyncRoot:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE
+```
+
+更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
+
+> 如有依赖冲突，可使用 `mvn dependency:tree` 命令查找
+
+# 常用连接池配置
+
+如果项目中已包含`spring-boot-starter-jdbc`或`spring-boot-starter-jpa`模块，那么连接池将**自动激活**！
+
+Spring Boot选择数据库链接池实现的判断逻辑：
+
+1. 检查Tomcat的数据库链接池实现是否可用，如可用，则启用。使用`spring.datasource.tomcat.*`可以控制链接池的行为。
+2. 检查HikariCP是否可用，如可用，则启用。使用`spring.datasource.hikari.*`可以控制链接池的行为。
+3. 检查Commons DBCP是否可用，如可用，则启用；但Spring Boot**不建议**在生产环境使用该链接池的实现。
+4. 检查Commons DBCP2是否可用，如可用，则启用。使用`spring.datasource.dbcp2.*`可以控制链接池的行为。
+
+## Tomcat连接池常用的属性
+
+| 属性                            | 描述                                       | 默认值                |
+| ----------------------------- | ---------------------------------------- | ------------------ |
+| defaultAutoCommit             | 连接池中创建的连接默认是否自动提交事务                      | 驱动的缺省值             |
+| defaultReadOnly               | 连接池中创建的连接默认是否为只读状态                       | -                  |
+| defaultCatalog                | 连接池中创建的连接默认的 catalog                     | -                  |
+| driverClassName               | 驱动类的名称                                   | -                  |
+| username                      | 数据库账户                                    | -                  |
+| password                      | 数据库密码                                    | -                  |
+| maxActive                     | 连接池同一时间可分配的最大活跃连接数                       | 100                |
+| maxIdle                       | 始终保留在池中的最大连接数，如果启用，将定期检查限制连接，超出此属性设定的值且空闲时间超过minEvictableIdleTimeMillis的连接则释放 | 与maxActive设定的值相同   |
+| minIdle                       | 始终保留在池中的最小连接数，池中的连接数量若低于此值则创建新的连接，如果连接验证失败将缩小至此值 | 与initialSize设定的值相同 |
+| initialSize                   | 连接池启动时创建的初始连接数量                          | 10                 |
+| maxWait                       | 最大等待时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出异常    | 30000（30秒）         |
+| testOnBorrow                  | 当从连接池中取出一个连接时是否进行验证，若验证失败则从池中删除该连接并尝试取出另一个连接 | false              |
+| testOnConnect                 | 当一个连接首次被创建时是否进行验证，若验证失败则抛出 SQLException 异常 | false              |
+| testOnReturn                  | 当一个连接使用完归还到连接池时是否进行验证                    | false              |
+| testWhileIdle                 | 对池中空闲的连接是否进行验证，验证失败则回收此连接                | false              |
+| validationQuery               | 在连接池返回连接给调用者前用来对连接进行验证的查询 SQL            | null               |
+| validationQueryTimeout        | SQL 查询验证超时时间（秒），小于或等于 0 的数值表示禁用          | -1                 |
+| timeBetweenEvictionRunsMillis | 在空闲连接回收器线程运行期间休眠时间（毫秒）， 该值不应该小于 1 秒，它决定线程多久验证空闲连接或丢弃连接的频率 | 5000（5秒）           |
+| minEvictableIdleTimeMillis    | 连接在池中保持空闲而不被回收的最小时间（毫秒）                  | 60000（60秒）         |
+| removeAbandoned               | 标记是否删除泄露的连接，如果连接超出removeAbandonedTimeout的限制，且该属性设置为 true，则连接被认为是被泄露并且可以被删除 | false              |
+| removeAbandonedTimeout        | 泄露的连接可以被删除的超时时间（秒），该值应设置为应用程序查询可能执行的最长时间 | 60                 |
+
+`application.yml`:
+
+```
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    tomcat:
+      default-auto-commit: true
+      initial-size: 30
+      max-active: 120
+      max-wait: 10000
+      test-on-borrow: true
+      test-while-idle: true
+      validation-query: 'SELECT 1'
+      validation-query-timeout: 3
+      time-between-eviction-runs-millis: 10000
+      min-evictable-idle-time-millis: 120000
+      remove-abandoned: true
+      remove-abandoned-timeout: 120
+```
+
+## HikariCP 连接池常用属性
+
+| 属性                  | 描述                                       | 默认值                  |
+| ------------------- | ---------------------------------------- | -------------------- |
+| dataSourceClassName | JDBC 驱动程序提供的 DataSource 类的名称，如果使用了jdbcUrl则不需要此属性 | -                    |
+| jdbcUrl             | 数据库连接地址                                  | -                    |
+| username            | 数据库账户，如果使用了jdbcUrl则需要此属性                 | -                    |
+| password            | 数据库密码，如果使用了jdbcUrl则需要此属性                 | -                    |
+| autoCommit          | 是否自动提交事务                                 | true                 |
+| connectionTimeout   | 连接超时时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出 SQLException | 30000（30秒）           |
+| idleTimeout         | 空闲超时时间（毫秒），只有在minimumIdle<maximumPoolSize时生效，超时的连接可能被回收，数值 0 表示空闲连接永不从池中删除 | 600000（10分钟）         |
+| maxLifetime         | 连接池中的连接的最长生命周期（毫秒）。数值 0 表示不限制            | 1800000（30分钟）        |
+| connectionTestQuery | 连接池每分配一条连接前执行的查询语句（如：SELECT 1），以验证该连接是否是有效的。如果你的驱动程序支持 JDBC4，HikariCP 强烈建议我们不要设置此属性 | -                    |
+| minimumIdle         | 最小空闲连接数，HikariCP 建议我们不要设置此值，而是充当固定大小的连接池 | 与maximumPoolSize数值相同 |
+| maximumPoolSize     | 连接池中可同时连接的最大连接数，当池中没有空闲连接可用时，就会阻塞直到超出connectionTimeout设定的数值 | 10                   |
+| poolName            | 连接池名称，主要用于显示在日志记录和 JMX 管理控制台中            | auto-generated       |
+
+`application.yml`
+
+```
+spring:
+  datasource:
+      url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
+      username: root
+      password: root
+      driver-class-name: com.mysql.jdbc.Driver
+      hikari:
+        auto-commit: true
+        connection-test-query: 'SELECT 1'
+        maximum-pool-size: 150
+```
+
+Spring Boot Data Jpa 依赖声明：
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<!-- 移除 tomcat-jdbc, Spring Boot 将会自动使用 HikariCP -->
+<dependency>
+    <groupId>com.zaxxer</groupId>
+    <artifactId>HikariCP</artifactId>
+    <version>2.7.1</version>
+</dependency>
+```
+
+## DBCP 连接池常用配置
+
+| 属性                            | 描述                                       | 默认值           |
+| ----------------------------- | ---------------------------------------- | ------------- |
+| url                           | 数据库连接地址                                  | -             |
+| username                      | 数据库账户                                    | -             |
+| password                      | 数据库密码                                    | -             |
+| driverClassName               | 驱动类的名称                                   | -             |
+| defaultAutoCommit             | 连接池中创建的连接默认是否自动提交事务                      | 驱动的缺省值        |
+| defaultReadOnly               | 连接池中创建的连接默认是否为只读状态                       | 驱动的缺省值        |
+| defaultCatalog                | 连接池中创建的连接默认的 catalog                     | -             |
+| initialSize                   | 连接池启动时创建的初始连接数量                          | 0             |
+| maxTotal                      | 连接池同一时间可分配的最大活跃连接数；负数表示不限制               | 8             |
+| maxIdle                       | 可以在池中保持空闲的最大连接数，超出此值的空闲连接被释放，负数表示不限制     | 8             |
+| minIdle                       | 可以在池中保持空闲的最小连接数，低于此值将创建空闲连接，若设置为 0，则不创建  | 0             |
+| maxWaitMillis                 | 最大等待时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出异常；-1 表示无限期等待，直到获取到连接为止 | -             |
+| validationQuery               | 在连接池返回连接给调用者前用来对连接进行验证的查询 SQL            | -             |
+| validationQueryTimeout        | SQL 查询验证超时时间（秒）                          | -             |
+| testOnCreate                  | 连接在创建之后是否进行验证                            | false         |
+| testOnBorrow                  | 当从连接池中取出一个连接时是否进行验证，若验证失败则从池中删除该连接并尝试取出另一个连接 | true          |
+| testOnReturn                  | 当一个连接使用完归还到连接池时是否进行验证                    | false         |
+| testWhileIdle                 | 对池中空闲的连接是否进行验证，验证失败则释放此连接                | false         |
+| timeBetweenEvictionRunsMillis | 在空闲连接回收器线程运行期间休眠时间（毫秒），如果设置为非正数，则不运行此线程  | -1            |
+| numTestsPerEvictionRun        | 空闲连接回收器线程运行期间检查连接的个数                     | 3             |
+| minEvictableIdleTimeMillis    | 连接在池中保持空闲而不被回收的最小时间（毫秒）                  | 1800000（30分钟） |
+| removeAbandonedOnBorrow       | 标记是否删除泄露的连接，如果连接超出removeAbandonedTimeout的限制，且该属性设置为 true，则连接被认为是被泄露并且可以被删除 | false         |
+| removeAbandonedTimeout        | 泄露的连接可以被删除的超时时间（秒），该值应设置为应用程序查询可能执行的最长时间 | 300（5分钟）      |
+| poolPreparedStatements        | 设置该连接池的预处理语句池是否生效                        | false         |
+
+`application.yml`
+
+```
+spring:
+  jmx:
+    enabled: false
+  datasource:
+    url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    dbcp2:
+      default-auto-commit: true
+      initial-size: 30
+      max-total: 120
+      max-idle: 120
+      min-idle: 30
+      max-wait-millis: 10000
+      validation-query: 'SELECT 1'
+      validation-query-timeout: 3
+      test-on-borrow: true
+      test-while-idle: true
+      time-between-eviction-runs-millis: 10000
+      num-tests-per-eviction-run: 10
+      min-evictable-idle-time-millis: 120000
+      remove-abandoned-on-borrow: true
+      remove-abandoned-timeout: 120
+      pool-prepared-statements: true
+```
+
+Spring Boot Data Jpa 依赖声明：
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-dbcp2</artifactId>
+    <version>2.2.0</version>
+</dependency>
+```
+
+## Druid连接池配置
+
+参考：***[https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter](https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter)***
 
 > 学习汇总：[http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html](http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html)
 
