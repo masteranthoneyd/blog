@@ -442,7 +442,7 @@ LockSupport.parkNanos(1);
 | ----------------------------- | ---------------------------------------- | ---------------------------------------- |
 | `BlockingWaitStrategy`        | 默认等待策略。和`BlockingQueue`的实现很类似，通过使用锁和条件（`Condition`）进行线程阻塞的方式，等待生产者唤醒(线程同步和唤醒)。此策略对于线程切换来说，最节约CPU资源，但在高并发场景下性能有限 | CPU资源紧缺，吞吐量和延迟并不重要的场景                    |
 | `BusySpinWaitStrategy`        | 死循环策略。消费者线程会尽最大可能监控缓冲区的变化，会占用所有CPU资源,线程一直自旋等待，比较耗CPU | 通过不断重试，减少切换线程导致的系统调用，而降低延迟。推荐在线程绑定到固定的CPU的场景下使用 |
-| `LiteBlockingWaitStrategy`    | 通过线程阻塞的方式，等待生产者唤醒，比`BlockingWaitStrategy`要轻，某些情况下可以减少阻塞的次数 | 通过不断重试，减少切换线程导致的系统调用，而降低延迟。推荐在线程绑定到固定的CPU的场景下使用 |
+| `LiteBlockingWaitStrategy`    | 通过线程阻塞的方式，等待生产者唤醒，比`BlockingWaitStrategy`要轻，某些情况下可以减少阻塞的次数 |                                          |
 | `PhasedBackoffWaitStrategy`   | 根据指定的时间段参数和指定的等待策略决定采用哪种等待策略             | CPU资源紧缺，吞吐量和延迟并不重要的场景                    |
 | `SleepingWaitStrategy`        | CPU友好型策略。会在循环中不断等待数据。可通过参数设置,首先进行自旋等待，若不成功，则使用`Thread.yield()`让出CPU，并使用`LockSupport.parkNanos(1)`进行线程睡眠，通过线程调度器重新调度；或一直自旋等待，所以，此策略数据处理数据可能会有较高的延迟，适合用于对延迟不敏感的场景，优点是对生产者线程影响小， 典型应用场景是异步日志 | 性能和CPU资源之间有很好的折中。延迟不均匀                   |
 | `TimeoutBlockingWaitStrategy` | 通过参数设置阻塞时间，如果超时则抛出异常                     | CPU资源紧缺，吞吐量和延迟并不重要的场景                    |
@@ -472,8 +472,10 @@ LockSupport.parkNanos(1);
 3. 实现`EventHandler<T>`（消费者）：例如`LongEventHandler implements EventHandler<LongEvent>`
 4. 实现`EventTranslatorOneArg<T, E>`作为生产者，将业务转换为事件：例如`LongEventTranslatorOneArg implements EventTranslatorOneArg<LongEvent, ByteBuffer>`
 5. 提供线程池或线程工厂
-6. 构建`Disruptor<T>`
-7. 开启`disruptor`并发布事件，驱动自行流转
+6. 定义buffer大小，它**必须是2的幂**，否则会在初始化时抛出异常。因为重点在于使用逻辑二进制运算符有着更好的性能；(例如:mod运算)
+7. 构建`Disruptor<T>`
+8. 启动`disruptor`，`disruptor.start()`
+9. 发布事件，驱动自行流转
 
 ## 基础事件生产与消费
 
@@ -751,3 +753,85 @@ public void singleProducerLongEventJava8Test() {
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/simple-test02.jpg)
 
+### 多生产者，单消费者
+
+```
+@SuppressWarnings("unchecked")
+@Test
+public void multiProducerOneCustomerTest() throws InterruptedException {
+	CountDownLatch countDownLatch = new CountDownLatch(30);
+
+	int bufferSize = 1 << 6;
+
+	Disruptor<LongEvent> disruptor = new Disruptor<>(LongEvent::new, bufferSize, Executors.defaultThreadFactory(), ProducerType.MULTI, new SleepingWaitStrategy());
+
+	disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
+		log.info("handle event: {}, sequence: {}, endOfBatch: {}", event, sequence, endOfBatch);
+		countDownLatch.countDown();
+	});
+
+	LongEventProducerWithTranslator longEventProducerWithTranslator = new LongEventProducerWithTranslator();
+
+	disruptor.start();
+
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 0, 10)).start();
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 10, 20)).start();
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 20, 30)).start();
+
+	countDownLatch.await();
+}
+
+private void produce(Disruptor<LongEvent> disruptor, LongEventProducerWithTranslator longEventProducerWithTranslator, int i, int i2) {
+	try {
+		RingBuffer<LongEvent> ringBuffer = disruptor.getRingBuffer();
+
+		ByteBuffer bb = ByteBuffer.allocate(8);
+		for (long l = i; l < i2; l++) {
+			bb.putLong(0, l);
+			ringBuffer.publishEvent(longEventProducerWithTranslator, bb);
+			TimeUnit.MILLISECONDS.sleep(20);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+```
+
+### 一个及以上生产者，多个消费者
+
+![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/dsl1.png)
+
+先处理完c1和c2才处理c3：
+
+```
+@Test
+public void multiCustomerOneProducerTest() throws InterruptedException {
+	int bufferSize = 1 << 8;
+
+	Disruptor<LongEvent> disruptor = new Disruptor<>(LongEvent::new, bufferSize, Executors.defaultThreadFactory(), ProducerType.MULTI, new YieldingWaitStrategy());
+
+	LongEventHandler c1 = new LongEventHandler();
+	LongEventHandler2 c2 = new LongEventHandler2();
+	LongEventHandler3 c3 = new LongEventHandler3();
+
+	disruptor.handleEventsWith(c1, c2).then(c3);
+
+	LongEventProducerWithTranslator longEventProducerWithTranslator = new LongEventProducerWithTranslator();
+
+	disruptor.start();
+
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 0, 100)).start();
+
+	TimeUnit.SECONDS.sleep(1);
+}
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/multi-test1.jpg)
+
+从上图结果可以看出来c1和c2的顺序是不确定的，c3总是在最后
+
+![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/dsl2.png)
+
+
+
+> [http://bbs.xiaomi.cn/t-13417592](http://bbs.xiaomi.cn/t-13417592)
