@@ -1,12 +1,25 @@
+---
+title: 极致的追求：高性能并发框架 Disruptor
+date: 2018-02-05 15:52:51
+categories: [Programming, Java]
+tags: [Java, Disruptor]
+---
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/Models.png)
 
 # Preface
 
-> [Disruptor](https://lmax-exchange.github.io/disruptor/)是英国外汇交易公司LMAX开发的一个高性能队列，研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。2011年，企业应用软件专家Martin Fowler专门撰写长文介绍。同年它还获得了Oracle官方的Duke大奖。目前，包括**Apache Storm**、**Camel**、**Log4j2**、**Reactor**在内的很多知名项目都应用了Disruptor以获取高性能。
+> [Disruptor](https://lmax-exchange.github.io/disruptor/)是英国外汇交易公司LMAX开发的一个高性能队列，研发的初衷是**解决内存队列的延迟问题**（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑**每秒600万订单**，2010年在QCon演讲后，获得了业界关注。2011年，企业应用软件专家Martin Fowler专门撰写长文介绍。同年它还获得了Oracle官方的Duke大奖。目前，包括**Apache Storm**、**Camel**、**Log4j2**、**Reactor**在内的很多知名项目都应用或参考了Disruptor以获取高性能。
+>
+> 其实Disruptor与其说是一个框架，不如说是一种设计思路，这个设计思路对于存在“并发、缓冲区、生产者—消费者模型、事务处理”这些元素的程序来说，Disruptor提出了一种大幅提升性能（TPS）的方案。
+>
+> 听说小米也是用这个东东把亚马逊搞挂了：[http://bbs.xiaomi.cn/t-13417592](http://bbs.xiaomi.cn/t-13417592)
 
-# Core Concepts
+<!--more-->
 
-在理解Disruptor之前，我们需要看一下它的核心概念
+# 核心概念
+
+在理解[Disruptor](https://github.com/LMAX-Exchange/disruptor)之前，我们需要看一下它的核心概念
 
 - [**Ring Buffer**](https://github.com/LMAX-Exchange/disruptor/blob/master/src/main/java/com/lmax/disruptor/RingBuffer.java): Ring Buffer通常被认为是Disruptor的主要方面，然而从3.0开始，Ring Buffer只负责存储和更新通过Disruptor的数据（Events）。 而且对于一些高级用例可以完全由用户替换。
 - [**Sequence**](https://github.com/LMAX-Exchange/disruptor/blob/master/src/main/java/com/lmax/disruptor/Sequence.java): Disruptor使用序列作为一种手段来确定特定组件的位置。 每个消费者（EventProcessor）都像Disruptor本身一样维护一个Sequence。 大部分并发代码依赖于这些Sequence值的移动，因此Sequence支持AtomicLong的许多当前特性。 事实上，与2版本之间唯一真正的区别是序列包含额外的功能，以防止序列和其他值之间的错误共享。
@@ -828,10 +841,154 @@ public void multiCustomerOneProducerTest() throws InterruptedException {
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/multi-test1.jpg)
 
-从上图结果可以看出来c1和c2的顺序是不确定的，c3总是在最后
+从上图结果可以看出来c1和c2的顺序是不确定的，c3总是在最后。
+
+
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/dsl2.png)
 
+如图，消费者1b消费时，必须保证消费者1a已经完成对该消息的消费；消费者2b消费时，必须保证消费者2a已经完成对该消息的消费；消费者c3消费时，必须保证消费者1b和2b已经完成对该消息的消费。
 
+```
+@SuppressWarnings("unchecked")
+@Test
+public void multiCustomerOneProducerTest2() throws InterruptedException {
+	int bufferSize = 1 << 8;
 
-> [http://bbs.xiaomi.cn/t-13417592](http://bbs.xiaomi.cn/t-13417592)
+	Disruptor<LongEvent> disruptor = new Disruptor<>(LongEvent::new, bufferSize, Executors.defaultThreadFactory(), ProducerType.SINGLE, new LiteBlockingWaitStrategy());
+
+	LongEventHandler c1a = new LongEventHandler();
+	LongEventHandler2 c2a = new LongEventHandler2();
+	LongEventHandler3 c1b = new LongEventHandler3();
+	LongEventHandler4 c2b = new LongEventHandler4();
+
+	disruptor.handleEventsWith(c1a, c2a);
+	disruptor.after(c1a).then(c1b);
+	disruptor.after(c2a).then(c2b);
+	disruptor.after(c1b, c2b).then((EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("last costumer \n"));
+
+	LongEventProducerWithTranslator longEventProducerWithTranslator = new LongEventProducerWithTranslator();
+
+	disruptor.start();
+
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 0, 30)).start();
+
+	TimeUnit.SECONDS.sleep(1);
+}
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/multi-test2.jpg)
+
+再来一个复杂点的：
+
+```
+@SuppressWarnings("unchecked")
+@Test
+public void multiCustomerOneProducerTest3() throws InterruptedException {
+	int bufferSize = 1 << 8;
+
+	Disruptor<LongEvent> disruptor = new Disruptor<>(LongEvent::new, bufferSize, Executors.defaultThreadFactory(), ProducerType.SINGLE, new LiteBlockingWaitStrategy());
+
+	EventHandler a = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process a... event: " + event);
+	EventHandler b = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process b... event: " + event);
+	EventHandler c = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process c... event: " + event);
+	EventHandler d = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process d... event: " + event);
+	EventHandler e = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process e... a,b,c has completed, event: " + event + "\n");
+	EventHandler f = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process f... d has completed, event: " + event + "\n");
+	EventHandler g = (EventHandler<LongEvent>) (event, sequence, endOfBatch) -> System.out.println("process g... e,f has completed, event: " + event + "\n\n");
+
+	disruptor.handleEventsWith(a, b, c, d);
+	disruptor.after(a, b, c).then(e);
+	disruptor.after(d).then(f);
+	disruptor.after(e, f).then(g);
+
+	LongEventProducerWithTranslator longEventProducerWithTranslator = new LongEventProducerWithTranslator();
+
+	disruptor.start();
+
+	new Thread(() -> produce(disruptor, longEventProducerWithTranslator, 0, 2)).start();
+
+	TimeUnit.SECONDS.sleep(1);
+}
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/disruptor-learning/multi-test3.jpg)
+
+## 异常处理
+
+Disruptor默认会把异常包装成`RuntimeException`并抛出去，导致线程挂掉或阻塞，我们需要自定义异常处理器：
+
+```
+disruptor.setDefaultExceptionHandler(new ExceptionHandler<LongEvent>() {
+			@Override
+			public void handleEventException(Throwable ex, long sequence, LongEvent event) {
+				System.out.println("捕捉异常：" + ex.getMessage());
+				System.out.println("处理异常逻辑...");
+			}
+
+			@Override
+			public void handleOnStartException(Throwable ex) {
+				System.out.println("handleOnStartException");
+			}
+
+			@Override
+			public void handleOnShutdownException(Throwable ex) {
+				System.out.println("handleOnShutdownException");
+			}
+		});
+```
+
+> [](http://bbs.xiaomi.cn/t-13417592)
+
+# 从RingBuffer中移除对象
+
+> 来自官方翻译：当通过Disruptor传递数据时，对象可能比预期寿命更长。 为避免发生这种情况，可能需要在处理事件后清除事件。 如果你有一个单一的事件处理程序清除在同一个处理程序中的值是足够的。 如果你有一连串的事件处理程序，那么你可能需要一个特定的处理程序放置在链的末尾来处理对象。
+
+```
+class ObjectEvent<T>
+{
+    T val;
+
+    void clear()
+    {
+        val = null;
+    }
+}
+
+public class ClearingEventHandler<T> implements EventHandler<ObjectEvent<T>>
+{
+    public void onEvent(ObjectEvent<T> event, long sequence, boolean endOfBatch)
+    {
+        // Failing to call clear here will result in the 
+        // object associated with the event to live until
+        // it is overwritten once the ring buffer has wrapped
+        // around to the beginning.
+        event.clear(); 
+    }
+}
+
+public static void main(String[] args)
+{
+    Disruptor<ObjectEvent<String>> disruptor = new Disruptor<>(
+        () -> ObjectEvent<String>(), bufferSize, executor);
+
+    disruptor
+        .handleEventsWith(new ProcessingEventHandler())
+        .then(new ClearingObjectHandler());
+}
+```
+
+# 总结
+
+> 代码：[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-disruptor](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-disruptor)
+>
+> 来自某大神的点评：
+> “当对性能的追求达到这样的程度，以致对现代硬件构成的理解变得越来越重要。”这句话恰当地形容了Disruptor/LMAX在对性能方面的追求和失败。咦，失败？为什么会这么说呢？Disruptor当然是一个优秀的框架，我说的失败指的是在开发它的过程中，LMAX曽试图提高并发程序效率，优化、使用锁或借助其他模型，但是这些尝试最终失败了——然后他们构建了Disruptor。再提问：一个Java程序员在尝试提高他的程序性能的时候，需要了解很多硬件知识吗？我想很多人都会回答“不需要”，构建Disruptor的过程中，最初开发人员对这个问题的回答可能也是“不需要”，但是尝试失败后他们决定另辟蹊径。总的看下Disruptor的设计：锁到CAS、缓冲行填充、避免GC等，我感觉这些设计都在刻意“迁就”或者“依赖”硬件设计，这些设计更像是一种“(ugly)hack”（毫无疑问，Disruptor还是目前最优秀的方案之一）。
+
+Disruptor可以说是工程级别的项目，通过各种高级的优化达到了性能的极致：
+
+- 可选锁无关lock-free, 没有竞争所以非常快
+- 所有访问者都记录自己的序号的实现方式，允许多个生产者与多个消费者共享相同的数据结构
+- 在每个对象中都能跟踪序列号， 没有为伪共享和非预期的竞争
+- 增加缓存行补齐， 提升cache缓存命中率
+- 环形数组中的元素不会被删除

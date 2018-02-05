@@ -939,6 +939,45 @@ logrotate是个十分有用的工具，它可以自动对日志进行截断（�
 sudo systemctl daemon-reload && sudo systemctl restart docker
 ```
 
+# 数据卷备份与恢复
+
+## 数据卷备份
+
+```
+docker run --rm \
+  --volumes-from <ContainerName> \
+  -v $(pwd):/backup \
+  busybox \
+  tar cvf /backup/backup.tar /data
+
+```
+
+- `--rm`: 执行完命令之后移除容器
+- `--volumes-from <Container>`: 连接要备份数据的容器
+- `-v $(pwd):/backup`: 挂载当前路径到容器 busybox 容器，数据将会备份到此路径
+- `busybox`: 非常小的镜像
+- `tar cvf /backup/backup.tar /data`: 将 /data 路径下的文件打包到 backup.tar
+
+## 数据卷恢复
+
+**1、新建容器**
+
+```
+docker run -v /data --name <ContainerName> <Image>
+```
+
+**2、恢复数据**
+
+```
+docker run --rm \
+  --volumes-from <ContainerName> \
+  -v $(pwd):/backup \
+  busybox \
+  tar xvf /backup/backup.tar
+```
+
+> 注意：其中的路径 /data 仅为示例，具体需要备份的文件路径请结合自身需求。
+
 # Self Usage Docker Or Compose
 
 以下是个人使用的一些容器运行命令或者`docker-compose.yml`，不定时更新

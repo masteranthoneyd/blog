@@ -1,7 +1,7 @@
 ---
 title: 使用 Reactor 进行反应式编程
 date: 2017-11-30 08:55:12
-categories: [Java]
+categories: [Programming, Java]
 tags: [Java, Reactor]
 ---
 
