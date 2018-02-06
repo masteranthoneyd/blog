@@ -1465,6 +1465,12 @@ docker-machine env test
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-env.png)
 
+通过以下命令恢复当前环境：
+
+```
+docker-machine env -u
+```
+
 也可以通过 `SSH` 登录到主机。
 
 ```
@@ -1569,8 +1575,6 @@ docker-machine create \
 ```
 docker-machine create -d none --url=tcp://192.168.6.105:2375 vmware_docker01
 ```
-
-
 
 ### 添加镜像加速
 

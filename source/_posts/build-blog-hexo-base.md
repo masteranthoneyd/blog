@@ -1,5 +1,5 @@
 ---
-title: 基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)
+title: 基于Hexo+Github+Coding搭建个人博客——基础篇(从菜鸟到放弃)
 date: 2017-01-15 20:44:05
 categories: Hexo
 tags: [Hexo, Node.js, Github, Coding, Git]
