@@ -478,8 +478,49 @@ Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
+# VM Options
+
+可以通过ToolBox或IDEA选项里面设置
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/vmoption1.jpg)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
+
+优化参数：
+
+```
+-Xms512m
+-Xmx2g
+-XX:ReservedCodeCacheSize=480m
+-XX:+UseG1GC
+-XX:-UseParNewGC
+-XX:-UseConcMarkSweepGC
+-XX:SoftRefLRUPolicyMSPerMB=200
+-XX:MaxMetaspaceSize=512m
+-ea
+-server
+-Dsun.io.useCanonCaches=false
+-Djava.net.preferIPv4Stack=true
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:-OmitStackTraceInFastThrow
+-Dsun.awt.keepWorkingSetOnMinimize=true
+-Dide.no.platform.update=true
+```
+
+**部分参数说明**：
+
+`-Xms512m`: 初始时内存大小，至少为`Xmx`的二分之一
+
+`-Xmx2g`: 最大内存大小，若总内存小于2GB，至少为总内存的四分之一；若总内存大于2GB，设为1-4GB
+
+`-XX:+UseG1GC -XX:-UseParNewGC -XX:-UseConcMarkSweepGC`: 设置使用G1垃圾收集器 
+
+`-server`: JVM以server的方式运行，启动速度慢，运行速度快
+
+`-Dsun.awt.keepWorkingSetOnMinimize=true`: 让IDEA最小化后阻止JVM对其进行修剪
 
 # Conflict of keyboard shortcuts
+
 快捷键有冲突，创建脚本并执行：
 ```bash
 #!/bin/bash  

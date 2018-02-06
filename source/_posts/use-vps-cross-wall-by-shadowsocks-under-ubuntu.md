@@ -422,8 +422,8 @@ proxychains curl www.google.com
 ```shell
 proxychains firefox
 ```
-使用`shadowsocks`+`proxychains`代理打开新的firefox实现浏览器翻墙。 
-也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个shell运行的所有命令都将使用代理。
+使用`shadowsocks`+`proxychains`代理打开新的Firefox实现浏览器翻墙。 
+也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个`shell`运行的所有命令都将使用代理。
 
 ## 方式四：Privoxy
 

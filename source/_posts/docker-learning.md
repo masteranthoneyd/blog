@@ -42,16 +42,6 @@ Ops: "这是开发的锅..."
 
 Dev: "这是运维的盘..."
 
-
-
-Dev: "为什么破玩意在我机子上跑不起来了？"
-
-Ops: "这个只支持CentOS"
-
-Dev: "....."
-
-
-
 Q：
 
 - 线上线下环境不一致，线上JDK1.8.01,线下JDK1.8.02，数据库版本不统一等环境问题
@@ -85,29 +75,29 @@ Q：
 
 # Docker实现DevOps的优势
 
-## 优势一
+**优势一**:
 
 开发、测试和生产环境的**统一化**和**标准化**。镜像作为标准的交付件，可在开发、测试和生产环境上以容器来运行，最终实现三套环境上的应用以及运行所**依赖内容的完全一致**。
 
-## 优势二
+**优势二**:
 
 **解决底层基础环境的异构问题**。基础环境的多元化造成了从Dev到Ops过程中的阻力，而使用Docker Engine可无视基础环境的类型。不同的物理设备，不同的虚拟化类型，不同云计算平台，只要是运行了Docker Engine的环境，最终的应用都会以容器为基础来提供服务。
 
-## 优势三
+**优势三**:
 
 易于**构建**、**迁移**和**部署**。Dockerfile实现镜像构建的标准化和可复用，镜像本身的分层机制也提高了镜像构建的效率。使用Registry可以将构建好的镜像迁移到任意环境，而且环境的部署仅需要将静态只读的镜像转换为动态可运行的容器即可。
 
-## 优势四
+**优势四**:
 
 **轻量**和**高效**。和需要封装操作系统的虚拟机相比，容器仅需要封装应用和应用需要的依赖文件，实现轻量的应用运行环境，且拥有比虚拟机更高的硬件资源利用率。
 
-## 优势五
+**优势五**:
 
 工具链的标准化和快速部署。将实现DevOps所需的多种工具或软件进行Docker化后，可在任意环境实现一条或多条工具链的快速部署。
 
 适合**敏捷开发**、**持续交付**
 
-# Concept
+# 核心概念
 
 以下是Docker的三个基本概念。
 
@@ -129,7 +119,7 @@ Q：
 ## Repository(仓库)
 仓库没啥好说的了，以 `Ubuntu` 镜像 为例，`ubuntu` 是仓库的名字，其内包含有不同的版本标签，如，`14.04`, `16.04`。我们可以通过 `ubuntu:14.04`，或者 `ubuntu:16.04` 来具体指定所需哪个版本的镜像。如果忽略了标签，比如 `ubuntu`，那将视为 `ubuntu:latest`
 
-# Install
+# 安装
 这里以Ubuntu为例（当然是因为博主用的是Ubuntu= =），版本的话Docker目前支持的Ubuntu版本最低为12.04LTS,但从稳定性上考虑,推荐使用14.04LTS或更高的版本。
 
 ## 使用脚本自动安装
@@ -229,7 +219,7 @@ Registry Mirrors:
  https://vioqnt8w.mirror.aliyuncs.com/
 ```
 
-# Use Image
+# 镜像的相关操作
 ## 获取
 [**Docker Hub**](https://hub.docker.com/explore/) 上有大量的高质量的镜像可以用，我们可以通过以下的方式获取镜像：
 ```
@@ -459,7 +449,7 @@ Options:
    `docker images --tree` 
    执行命令，显示下面的内容。正你看到的，导出后再导入(exported-imported)的镜像会丢失所有的历史，而保存后再加载（saveed-loaded）的镜像没有丢失**历史和层(layer)**。这意味着使用导出后再导入的方式，你将无法回滚到之前的层(layer)，同时，使用保存后再加载的方式持久化整个镜像，就可以做到**层回滚**（可以执行docker tag 来回滚之前的层）。
 
-# Operating Container
+# 容器的相关操作
 
 ## 开启
 docker run ：创建一个新的容器并运行一个命令 docker create ：创建一个新的容器但不启动它
@@ -764,7 +754,7 @@ docker cp /www/runoob 96f7f14e99ab:/www
 docker cp  96f7f14e99ab:/www /tmp/
 ```
 
-# Operating Volume
+# Volume的相关操作
 
 Usage:	docker volume COMMAND
 
@@ -808,7 +798,7 @@ training/webapp \
 python app.py
 ```
 
-# Operating Network
+# Network的相关操作
 
 基本命令：
 
@@ -825,7 +815,6 @@ docker network inspect
 
 ```
 docker network create -d bridge my-net
-
 ```
 
 `-d` 参数指定 Docker 网络类型，有 `bridge` `overlay`。其中 `overlay` 网络类型用于 Swarm mode
@@ -846,6 +835,344 @@ docker network create \
 --subnet 10.0.9.0/24 \
 --gateway 10.0.9.99 \
 my-network
+```
+
+# Dockerfile 详解
+
+![](http://ojoba1c98.bkt.clouddn.com/img/note-of-dockerfile/dockerfile.jpg)
+
+> 制作一个镜像可以使用`docker commit`和定制Dockerfile，但推荐的是写Dockerfile。
+>
+> 因为`docker commit`是一个**暗箱操作**，除了制作镜像的人知道执行过什么命令、怎么生成的镜像，别人根本无从得知，而且会加入一些没用的操作导致镜像**臃肿**。
+
+## Build Images
+首先在当前空目录创建一个Dockerfile：
+```
+FROM ubuntu:latest
+
+ENV BLOG_PATH /root/blog
+ENV NODE_VERSION 6
+
+MAINTAINER yangbingdong <yangbingdong1994@gmail.com>
+
+RUN \
+    apt-get update -y && \
+    apt-get install -y git curl libpng-dev && \
+    curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    apt-get autoclean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    npm install -g hexo-cli
+
+WORKDIR $BLOG_PATH
+
+VOLUME ["$BLOG_PATH", "/root/.ssh"]
+
+EXPOSE 4000
+
+CMD ['/bin/bash']
+```
+
+然后在当前目录打开终端：
+```
+docker build -t <repo-name>/<image-name>:<tag> .
+```
+
+其中`<repo-name>`表示仓库名，与远程仓库（如docker hub）名字要一致，`<tag>`表示标签，不给默认`latest`，都是**可选项**，例如可以写成这样：
+```
+docker build -t <image-name> .
+```
+![](http://ojoba1c98.bkt.clouddn.com/img/note-of-dockerfile/docker-build.png)
+
+看到`Successfully built`就表示构建成功了
+
+注意`docker build` 命令最后有一个 `.`表示构建的**上下文**，镜像构建需要把上下文的东西上传到Docker引擎去构建。
+
+## Dockerfile 指令
+
+### From 指定基础镜像
+
+所谓定制镜像，那一定是以一个镜像为基础，在其上进行定制。而 `FROM` 就是指定**基础镜像**，因此一个 `Dockerfile` 中 `FROM` 是必备的指令，并且必须是第一条指令。
+
+在 [Docker Hub](https://hub.docker.com/explore/)上有非常多的高质量的官方镜像， 有可以直接拿来使用的服务类的镜像，如 [`nginx`](https://hub.docker.com/_/nginx/)、[`redis`](https://hub.docker.com/_/redis/)、[`mongo`](https://hub.docker.com/_/mongo/)、[`mysql`](https://hub.docker.com/_/mysql/)、[`httpd`](https://hub.docker.com/_/httpd/)、[`php`](https://hub.docker.com/_/php/)、[`tomcat`](https://hub.docker.com/_/tomcat/) 等； 也有一些方便开发、构建、运行各种语言应用的镜像，如 [`node`](https://hub.docker.com/_/node/)、[`openjdk`](https://hub.docker.com/_/openjdk/)、[`python`](https://hub.docker.com/_/python/)、[`ruby`](https://hub.docker.com/_/ruby/)、[`golang`](https://hub.docker.com/_/golang/) 等。 可以在其中寻找一个最符合我们最终目标的镜像为基础镜像进行定制。 如果没有找到对应服务的镜像，官方镜像中还提供了一些更为基础的操作系统镜像，如 [`ubuntu`](https://hub.docker.com/_/ubuntu/)、[`debian`](https://hub.docker.com/_/debian/)、[`centos`](https://hub.docker.com/_/centos/)、[`fedora`](https://hub.docker.com/_/fedora/)、[`alpine`](https://hub.docker.com/_/alpine/) 等，这些操作系统的软件库为我们提供了更广阔的扩展空间。
+
+除了选择现有镜像为基础镜像外，Docker 还存在一个特殊的镜像，名为 `scratch`。这个镜像是虚拟的概念，并不实际存在，它表示一个空白的镜像。
+
+### RUN 执行命令
+
+`RUN` 指令是用来执行命令行命令的。由于命令行的强大能力，`RUN` 指令在定制镜像时是最常用的指令之一。其格式有两种：
+
+- *shell* 格式：`RUN <命令>`，就像直接在命令行中输入的命令一样。刚才写的 Dockrfile 中的 `RUN` 指令就是这种格式。
+```
+RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
+
+```
+
+- *exec* 格式：`RUN ["可执行文件", "参数1", "参数2"]`，这更像是函数调用中的格式。
+
+**注意**：
+* RUN命令尽量精简，也就是像上面一样一个RUN（使用`$$ \`），如果分开写很多个RUN会导致镜像铺了很多层从而臃肿。
+* RUN最后记住清理掉没用的垃圾，很多人初学 Docker 制作出了很臃肿的镜像的原因之一，就是忘记了每一层构建的最后一定要清理掉无关文件。
+
+### COPY 复制文件
+
+格式：
+
+- `COPY <源路径>... <目标路径>`
+- `COPY ["<源路径1>",... "<目标路径>"]`
+
+和 `RUN` 指令一样，也有两种格式，一种类似于命令行，一种类似于函数调用。
+
+`COPY` 指令将从构建上下文目录中 `<源路径>` 的文件/目录复制到新的一层的镜像内的 `<目标路径>` 位置。比如：
+```
+COPY package.json /usr/src/app/
+```
+
+### ADD 更高级的复制文件
+
+`ADD` 指令和 `COPY` 的格式和性质基本一致。但是在 `COPY` 基础上增加了一些功能。
+
+比如 `<源路径>` 可以是一个 `URL`，这种情况下，Docker 引擎会试图去下载这个链接的文件放到 `<目标路径>` 去。下载后的文件权限自动设置为 `600`，如果这并不是想要的权限，那么还需要增加额外的一层 `RUN`进行权限调整，另外，如果下载的是个压缩包，需要解压缩，也一样还需要额外的一层 `RUN` 指令进行解压缩。所以不如直接使用 `RUN` 指令，然后使用 `wget` 或者 `curl` 工具下载，处理权限、解压缩、然后清理无用文件更合理。因此，这个功能其实并不实用，而且不推荐使用。
+
+如果 `<源路径>` 为一个 `tar` 压缩文件的话，压缩格式为 `gzip`, `bzip2` 以及 `xz` 的情况下，`ADD` 指令将会自动解压缩这个压缩文件到 `<目标路径>` 去。
+
+在某些情况下，这个自动解压缩的功能非常有用，比如官方镜像 `ubuntu` 中：
+
+```
+FROM scratch
+ADD ubuntu-xenial-core-cloudimg-amd64-root.tar.gz /
+...
+```
+
+但在某些情况下，如果我们真的是希望复制个压缩文件进去，而不解压缩，这时就不可以使用 `ADD` 命令了。
+
+在 Docker 官方的最佳实践文档中要求，尽可能的使用 `COPY`，因为 `COPY` 的语义很明确，就是复制文件而已，而 `ADD` 则包含了更复杂的功能，其行为也不一定很清晰。最适合使用 `ADD` 的场合，就是所提及的需要自动解压缩的场合。
+
+另外需要注意的是，`ADD` 指令会令镜像构建缓存失效，从而可能会令镜像构建变得比较缓慢。
+
+因此在 `COPY` 和 `ADD` 指令中选择的时候，可以遵循这样的原则，所有的文件复制均使用 `COPY` 指令，仅在需要自动解压缩的场合使用 `ADD`。
+
+### CMD 容器启动命令
+
+`CMD` 指令就是用于指定默认的容器主进程的启动命令的。
+
+`CMD` 指令的格式和 `RUN` 相似，也是两种格式：
+
+- `shell` 格式：`CMD <命令>`
+- `exec` 格式：`CMD ["可执行文件", "参数1", "参数2"...]`
+- 参数列表格式：`CMD ["参数1", "参数2"...]`。在指定了 `ENTRYPOINT` 指令后，用 `CMD` 指定具体的参数。
+
+在运行时可以指定新的命令来替代镜像设置中的这个默认命令，比如，`ubuntu` 镜像默认的 `CMD` 是 `/bin/bash`，如果我们直接 `docker run -it ubuntu` 的话，会直接进入 `bash`。我们也可以在运行时指定运行别的命令，如 `docker run -it ubuntu cat /etc/os-release`。这就是用 `cat /etc/os-release` 命令替换了默认的 `/bin/bash` 命令了，输出了系统版本信息。
+
+在指令格式上，一般推荐使用 `exec` 格式，这类格式在解析时会被解析为 JSON 数组，因此一定要使用双引号 `"`，而不要使用单引号。
+
+如果使用 `shell` 格式的话，实际的命令会被包装为 `sh -c` 的参数的形式进行执行。比如：
+```
+CMD echo $HOME
+
+```
+
+在实际执行中，会将其变更为：
+```
+CMD [ "sh", "-c", "echo $HOME" ]
+```
+
+所以如果使用`shell`格式会导致容器**莫名退出**，因为实际上执行的事`sh`命令，而`sh`命令执行完时候容器也就没有存在的意义。
+
+### ENTRYPOINT 入口点
+
+`ENTRYPOINT` 的格式和 `RUN` 指令格式一样，分为 `exec` 格式和 `shell` 格式。
+
+`ENTRYPOINT` 的目的和 `CMD` 一样，都是在指定容器启动程序及参数。`ENTRYPOINT` 在运行时也可以替代，不过比 `CMD` 要略显繁琐，需要通过 `docker run` 的参数 `--entrypoint` 来指定。
+
+当指定了 `ENTRYPOINT` 后，`CMD` 的含义就发生了改变，不再是直接的运行其命令，而是将 `CMD` 的内容作为参数传给 `ENTRYPOINT` 指令，换句话说实际执行时，将变为：
+
+```
+<ENTRYPOINT> "<CMD>"
+```
+
+这个指令非常有用，例如可以把命令后面的参数传进来或启动容器前准备一些环境然后执行启动命令（通过脚本`exec "$@"`）。
+
+### ENV 设置环境变量
+
+格式有两种：
+
+- `ENV <key> <value>`
+- `ENV <key1>=<value1> <key2>=<value2>...`
+
+这个指令很简单，就是设置环境变量而已，无论是后面的其它指令，如 `RUN`，还是运行时的应用，都可以直接使用这里定义的环境变量。
+
+ex：
+
+```
+ENV NODE_VERSION 6
+...
+RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - && \
+...
+```
+
+### ARG 构建参数
+
+格式：`ARG <参数名>[=<默认值>]`
+
+构建参数和 `ENV` 的效果一样，都是设置环境变量。所不同的是，`ARG` 所设置的构建环境的环境变量，在将来容器运行时是不会存在这些环境变量的。但是不要因此就使用 `ARG` 保存密码之类的信息，因为 `docker history` 还是可以看到所有值的。
+
+`Dockerfile` 中的 `ARG` 指令是定义参数名称，以及定义其默认值。该默认值可以在构建命令 `docker build` 中用 `--build-arg <参数名>=<值>` 来覆盖。
+
+在 1.13 之前的版本，要求 `--build-arg` 中的参数名，必须在 `Dockerfile` 中用 `ARG` 定义过了，换句话说，就是 `--build-arg` 指定的参数，必须在 `Dockerfile` 中使用了。如果对应参数没有被使用，则会报错退出构建。从 1.13 开始，这种严格的限制被放开，不再报错退出，而是显示警告信息，并继续构建。这对于使用 CI 系统，用同样的构建流程构建不同的 `Dockerfile` 的时候比较有帮助，避免构建命令必须根据每个 Dockerfile 的内容修改。
+
+### VOLUME 定义匿名卷
+格式为：
+- `VOLUME ["<路径1>", "<路径2>"...]`
+- `VOLUME <路径>`
+
+之前我们说过，容器运行时应该尽量保持容器存储层不发生写操作，对于数据库类需要保存动态数据的应用，其数据库文件应该保存于卷(volume)中，后面的章节我们会进一步介绍 Docker 卷的概念。为了防止运行时用户忘记将动态文件所保存目录挂载为卷，在 `Dockerfile` 中，我们可以事先指定某些目录挂载为匿名卷，这样在运行时如果用户不指定挂载，其应用也可以正常运行，不会向容器存储层写入大量数据。
+```
+VOLUME /data
+
+```
+
+这里的 `/data` 目录就会在运行时自动挂载为匿名卷，任何向 `/data` 中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化。当然，运行时可以覆盖这个挂载设置。比如：
+```
+docker run -d -v mydata:/data xxxx
+
+```
+
+在这行命令中，就使用了 `mydata` 这个命名卷挂载到了 `/data` 这个位置，替代了 `Dockerfile` 中定义的匿名卷的挂载配置。
+
+### EXPOSE 声明端口
+
+格式为 `EXPOSE <端口1> [<端口2>...]`。
+`EXPOSE` 指令是声明运行时容器提供服务端口，这只是一个声明，在运行时并不会因为这个声明应用就会开启这个端口的服务。在 Dockerfile 中写入这样的声明有两个好处，一个是帮助镜像使用者理解这个镜像服务的守护端口，以方便配置映射；另一个用处则是在运行时使用随机端口映射时，也就是 `docker run -P`时，会自动随机映射 `EXPOSE` 的端口。
+
+此外，在早期 Docker 版本中还有一个特殊的用处。以前所有容器都运行于默认桥接网络中，因此所有容器互相之间都可以直接访问，这样存在一定的安全性问题。于是有了一个 Docker 引擎参数 `--icc=false`，当指定该参数后，容器间将默认无法互访，除非互相间使用了 `--links` 参数的容器才可以互通，并且只有镜像中 `EXPOSE` 所声明的端口才可以被访问。这个 `--icc=false` 的用法，在引入了 `docker network`后已经基本不用了，通过自定义网络可以很轻松的实现容器间的互联与隔离。
+
+要将 `EXPOSE` 和在运行时使用 `-p <宿主端口>:<容器端口>` 区分开来。`-p`，是映射宿主端口和容器端口，换句话说，就是将容器的对应端口服务公开给外界访问，而 `EXPOSE` 仅仅是声明容器打算使用什么端口而已，并不会自动在宿主进行端口映射。
+
+### WORKDIR 指定工作目录
+格式为 `WORKDIR <工作目录路径>`。
+使用 `WORKDIR` 指令可以来指定工作目录（或者称为当前目录），以后各层的当前目录就被改为指定的目录，如该目录不存在，`WORKDIR` 会帮你建立目录。
+
+之前提到一些初学者常犯的错误是把 `Dockerfile` 等同于 Shell 脚本来书写，这种错误的理解还可能会导致出现下面这样的错误：
+```
+RUN cd /app
+RUN echo "hello" > world.txt
+
+```
+
+如果将这个 Dockerfile 进行构建镜像运行后，会发现找不到 `/app/world.txt` 文件，或者其内容不是 `hello`。原因其实很简单，在 Shell 中，连续两行是同一个进程执行环境，因此前一个命令修改的内存状态，会直接影响后一个命令；而在 Dockerfile 中，这两行 `RUN` 命令的执行环境根本不同，是两个完全不同的容器。这就是对 Dokerfile 构建分层存储的概念不了解所导致的错误。
+
+之前说过每一个 `RUN` 都是启动一个容器、执行命令、然后提交存储层文件变更。第一层 `RUN cd /app` 的执行仅仅是当前进程的工作目录变更，一个内存上的变化而已，其结果不会造成任何文件变更。而到第二层的时候，启动的是一个全新的容器，跟第一层的容器更完全没关系，自然不可能继承前一层构建过程中的内存变化。
+
+因此如果需要改变以后各层的工作目录的位置，那么应该使用 `WORKDIR` 指令。
+
+### USER 指定当前用户
+
+格式：`USER <用户名>`
+
+`USER` 指令和 `WORKDIR` 相似，都是改变环境状态并影响以后的层。`WORKDIR` 是改变工作目录，`USER`则是改变之后层的执行 `RUN`, `CMD` 以及 `ENTRYPOINT` 这类命令的身份。
+
+当然，和 `WORKDIR` 一样，`USER` 只是帮助你切换到指定用户而已，这个用户必须是事先建立好的，否则无法切换。
+
+```
+RUN groupadd -r redis && useradd -r -g redis redis
+USER redis
+RUN [ "redis-server" ]
+```
+### HEALTHCHECK 健康检查
+
+格式：
+
+- `HEALTHCHECK [选项] CMD <命令>`：设置检查容器健康状况的命令
+- `HEALTHCHECK NONE`：如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令
+
+`HEALTHCHECK` 支持下列选项：
+
+- `--interval=<间隔>`：两次健康检查的间隔，默认为 30 秒；
+- `--timeout=<间隔>`：健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒；
+- `--retries=<次数>`：当连续失败指定次数后，则将容器状态视为 `unhealthy`，默认 3 次。
+- `--start-period=<间隔>`: 应用的启动的初始化时间，在启动过程中的健康检查失效不会计入，默认 0 秒； (从17.05)引入
+
+在 `HEALTHCHECK [选项] CMD` 后面的命令，格式和 `ENTRYPOINT` 一样，分为 `shell` 格式，和 `exec` 格式。命令的返回值决定了该次健康检查的成功与否：
+
+- `0`：成功；
+- `1`：失败；
+- `2`：保留值，不要使用
+
+容器启动之后，初始状态会为 `starting` (启动中)。Docker Engine会等待 `interval` 时间，开始执行健康检查命令，并周期性执行。如果单次检查返回值非0或者运行需要比指定 `timeout` 时间还长，则本次检查被认为失败。如果健康检查连续失败超过了 `retries` 重试次数，状态就会变为 `unhealthy` (不健康)。
+
+注：
+
+- 一旦有一次健康检查成功，Docker会将容器置回 `healthy` (健康)状态
+- 当容器的健康状态发生变化时，Docker Engine会发出一个 `health_status` 事件。
+
+假设我们有个镜像是个最简单的 Web 服务，我们希望增加健康检查来判断其 Web 服务是否在正常工作，我们可以用 `curl`来帮助判断，其 `Dockerfile` 的 `HEALTHCHECK` 可以这么写：
+
+```
+FROM elasticsearch:5.5
+
+HEALTHCHECK --interval=5s --timeout=2s --retries=12 \
+  CMD curl --silent --fail localhost:9200/_cluster/health || exit 1
+```
+
+## 踩坑
+
+- Dockerfile里也需要注意**权限问题**（nodejs7版本以上不能正常安装hexo，需要创建用户并制定权限去安装）
+- 在docker容器里如果是root用户对挂载的文件进行了操作，那么实际上挂载文件的**权限也变成了root的**
+- 使用attach进入容器，退出的时候容器也跟着退出了。。。囧
+- 每一个RUN是一个**新的shell**
+- `su -`之前在启动脚本加了`-`，导致**环境变量以及工作目录都变了**
+
+## Hexo Dockerfile
+
+```
+FROM ubuntu:16.04
+
+MAINTAINER yangbingdong <yangbingdong1994@gmail.com>
+
+USER root
+
+ENV NODE_VERSION 8.9.4
+ENV NODE_DIR /opt/nodejs
+ENV HOXO_DIR /root/hexo
+
+RUN apt-get update && \
+	apt-get install -y git curl && \
+	mkdir ${NODE_DIR} && \
+	curl -L https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xvzf - -C ${NODE_DIR} --strip-components=1 
+     
+ENV PATH $PATH:${NODE_DIR}/bin
+
+RUN npm install -g hexo-cli
+
+ENV PATH $PATH:${NODE_DIR}/bin
+
+RUN cd /root && \
+	hexo init hexo && \
+	cd hexo && \
+	git clone https://github.com/iissnan/hexo-theme-next themes/next && \
+	npm install && \
+	apt-get clean && \
+	apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+VOLUME ["/root/hexo/source/_posts"] 
+
+WORKDIR /root/hexo
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+```
+
+`docker-entrypoint.sh`:
+
+```
+#!/bin/sh
+set -e
+hexo clean && hexo server
+exec "$@"
 ```
 
 # 修改Docker默认镜像，容器存放位置
@@ -977,6 +1304,69 @@ docker run --rm \
 ```
 
 > 注意：其中的路径 /data 仅为示例，具体需要备份的文件路径请结合自身需求。
+
+# 使用Github自动构建Docker
+
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/github-docker.jpg)
+
+> 一开始玩Docker总是用别人的镜像确实很爽~~歪歪~~...
+> But，如果要定制个性化的Image那就必须要自己写Dockerfile了，但是每一次修改完Dockerfile，都要经过几个步骤：
+> Built -> Push -> Delete invalid images
+> 对于程序猿而言做重复的事情是很恐怖的，所以博主选择Github自动构建Docker Image~
+
+## 创建用于自动构建的仓库
+在Github上面创建一个项目并把Dockerfile以及上下文需要用到的文件放到里面。
+
+## 链接仓库服务
+首先需要绑定一个仓库服务（Github）：
+
+1、登录`Docker Hub`；
+2、选择 `Profile` > `Settings` > `Linked Accounts & Services`；
+3、选择需要连接的仓库服务（目前只支持`Github`和`BitBucket`）；
+4、这时候需要授权，点击授权就可以了。
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-repo-service.png)
+
+## 创建一个自动构建
+自动构建需要创建对应的仓库类型
+自动构建仓库也可以使用`docker push`把已有的镜像上传上去
+1、选择`Create` > `Create Automated Build`；
+2、选择`Github`；
+3、接下来会列出`User/Organizations`的所有项目，从中选择你需要的构建的项目（包含Dockerfile）；
+4、可以选择`Click here to customize`自定义路径；
+5、最后点击创建就可以了。
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/create-automated.png)
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/creating.png)
+
+## 集成到Github
+用过`Github`自动构建当然需要`Github`的支持啦，这里只需要在Github里面点两下就配置完成，很方便：
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-integrations.png)
+在`Add Service`里面找到`Docker`并添加
+
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/github-docker-server.png)
+
+## 构建设置
+### 勾选自动构建
+系统会默认帮我们勾上自动构建选项：
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/aotumated-setting.png)
+这时候，当我们的Dockerfile有变动会自动触发构建：
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/building.png)
+还在构建过程中我们可以点击Cancel取消构建过程。
+
+### 添加新的构建
+Docker hub默认选择master分支作为latest版本，我们可以根据自己的标签或分支构建不同的版本：
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-build.png)
+
+（点击箭头位置会出现例子）
+这样，当我们创建一个标签如1.0.2并push上去的时候会自动触发构建～
+
+`Git`标签相关请看：***[Git标签管理](/2017/note-of-learning-git/#标签管理)***
+
+### 远程触发构建
+当然我们也可以远程触发构建，同样在Build Setting页面:
+![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/remote-trigger.png)
+然后例子已经说的很清楚了
+
+参考：***[https://docs.docker.com/docker-hub/builds/](https://docs.docker.com/docker-hub/builds/)***
 
 # Self Usage Docker Or Compose
 

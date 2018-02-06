@@ -4,9 +4,11 @@ date: 2017-01-12 23:04:36
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/desktop.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/activities-overview.jpg)
 # 前言
-既然是博主是喜欢折腾的人，那么重装这种事情也是必不可少的，每次重装之后，重新设置个性化总是觉得少了点什么。博主笨拙，那么把需要安装的、美化的记下来免得下次又少了点什么。
+> 鉴于 [Ubuntu 18.04 LTS](https://linux.cn/article-9183-1.html) 版本即将到来，本篇的16.04也将升级到18.04 GNOME 版本
+>
+> 可能会存在兼容问题，本篇将持续更新
 
 <!--more-->
 
@@ -16,44 +18,24 @@ tags: [Ubuntu]
 
 安装完系统之后，需要更新一些补丁。`Ctrl+Alt+T`调出终端，执行一下代码：
 ```
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt update && sudo apt upgrade -y
 ```
 ## 卸载libreOffice
 ```
-sudo apt-get remove libreoffice-common
+sudo apt remove --purge libreoffice-common
 ```
 ## 删除Amazon的链接
 ```
-sudo apt-get remove unity-webapps-common
-
+sudo apt remove --purge ubuntu-web-launchers
 ```
 ## 删除不常用的软件
 ```
-sudo apt-get remove thunderbird totem rhythmbox empathy brasero simple-scan gnome-mahjongg aisleriot 
-sudo apt-get remove gnome-mines cheese transmission-common gnome-orca webbrowser-app gnome-sudoku  landscape-client-ui-install   
-sudo apt-get remove onboard deja-dup
+sudo apt remove --purge thunderbird totem rhythmbox transmission gnome-mines gnome-mahjongg gnome-sudoku
+sudo apt autoremove
 ```
-**做完上面这些，系统应该干净了，下面我们来安装一些必要的软件**
-
-***
-
-# 翻墙篇
-## 方式一：修改hosts
-
-**为了便于后续软件能够快速下载，教程如下**
-
-*[老D的博客](https://laod.cn/hosts/2016-google-hosts.html)* 讲的很清楚怎么修改hosts，下载地址：*[戳我](https://laod.cn/hosts/2016-google-hosts.html)*
-
-下载完之后，解压会得到一个`hosts`文件。
-
-```
-cd ./Downloads 
-sudo mv -f hosts /etc/hosts
-```
-
-## 方式二：下载Lantern
-**如果为了更方便地科学上网，建议下载`Lantern`**
+# 科学上网篇
+## 方式一：下载Lantern
+**如果为了更方便地科学上网，建议下载`Lantern`** （免费版限流）
 可在github（免翻墙）找到*[开源项目](https://github.com/getlantern/lantern/)*，拉到下面`README`下载对应版本
 
 ```
@@ -61,14 +43,14 @@ sudo dpkg -i lantern.deb
 sudo chmod -R 777 /usr/bin/lantern
 ```
 
-## 方式三：自搭建Shadowsocks
+## 方式二：自搭建Shadowsocks
 ***[Access Blocked Sites(翻墙):VPS自搭建ShadowSocks与加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
 
-***
-
-
 # 主题美化篇
-## 安装unity-tweak-tool
+
+## 16.04 Unity 桌面环境
+
+### 安装unity-tweak-tool
 
 调整 `Unity` 桌面环境，还是推荐使用`Unity Tweak Tool`，这是一个非常好用的 `Unity` 图形化管理工具，可以修改工作区数量、热区等。
 
@@ -77,7 +59,7 @@ sudo apt-get install unity-tweak-tool
 
 ```
 
-## 安装Flatabulous主题
+### 安装Flatabulous主题
 
 `Flatabulous`主题是一款`Ubuntu`下扁平化主题，也是我试过众多主题中最喜欢的一个！最终效果如上述图所示。
 
@@ -106,8 +88,199 @@ sudo apt-get install ultra-flat-icons
 在此界面下进入`Icons`栏，修改为`Ultra-flat`:
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/icons.png)
 
+## 17.10以后的 GNOME 桌面环境
 
-## 安装zsh
+### 安装原生 GNOME 环境
+
+```
+sudo apt install -y gnome-session gnome-weather gnome-photos gnome-music gnome-backgrounds
+```
+
+恢复原生 gdm 登录界面：
+
+```
+sudo update-alternatives --config gdm3.css
+```
+
+然后选择第二个 `gnome-shell.css` ， 输入 `1`
+
+### 主题
+
+选择一款叫 Arc-Theme 的主题，包括了 GNOME Shell 主题和 GTK 主题。
+安装前需要以下依赖包（直接使用 `sudo apt install` 安装即可）：
+
+- `autoconf`
+- `automake`
+- `pkg-config`
+- `libgtk-3-dev`
+- `git`
+
+#### 从 Github 上获取项目
+
+```
+git clone https://github.com/horst3180/arc-theme --depth 1 && cd arc-theme
+```
+
+#### 构建项目并安装
+
+```
+./autogen.sh --prefix=/usr
+sudo make install
+```
+
+#### 其它选项
+
+```
+--disable-transparency     在 GTK3 主题中禁用透明度
+--disable-light            禁用 Arc Light
+--disable-darker           禁用 Arc Darker
+--disable-dark             禁用 Arc Dark
+--disable-cinnamon         禁用 Cinnamon
+--disable-gnome-shell      禁用 GNOME Shell
+--disable-gtk2             禁用 GTK2
+--disable-gtk3             禁用 GTK3
+--disable-metacity         禁用 Metacity
+--disable-unity            禁用 Unity
+--disable-xfwm             禁用 XFWM
+--with-gnome=<version>     为特定的 GNOME 版本 (3.14, 3.16, 3.18, 3.20, 3.22) 构建主题
+```
+
+#### 选择主题
+
+安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可。
+
+如果没有这个工具那就：
+
+```
+sudo apt install gnome-tweak-tool
+sudo apt install gnome-shell-extensions
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
+
+**注意** :对于高分屏，可能使用 `Arc-Theme` 显示 GNOME Shell 的字体过小，可通过修改 `/usr/share/themes/[对应 Arc 主题]/gnome-shell/gnome-shell.css` 修改 **stage** 的 `font-size` 。
+
+[**项目地址**](https://github.com/snwh/paper-icon-theme) ，其他热门主题 [**Numix**](https://github.com/snwh/paper-gtk-theme) 、 [**Paper**](https://github.com/numixproject/numix-gtk-theme)
+
+### Icon
+
+#### Numix
+
+```
+sudo add-apt-repository ppa:numix/ppa
+sudo apt-get update
+sudo apt-get install numix-icon-theme
+```
+
+**[项目地址](https://github.com/numixproject/numix-icon-theme)**
+
+#### Paper
+
+```
+sudo add-apt-repository ppa:snwh/pulp
+sudo apt-get update
+sudo apt-get install paper-icon-theme
+# 同时也可以安装 GTK 和 Cursor 主题
+sudo apt-get install paper-gtk-theme
+sudo apt-get install paper-cursor-theme
+```
+
+**[项目地址](https://github.com/snwh/paper-icon-theme)**
+
+#### Papirus
+
+```
+sudo add-apt-repository ppa:papirus/papirus
+sudo apt-get update
+sudo apt-get install papirus-icon-theme
+```
+
+或者下载最新的 [**deb 安装包**](https://launchpad.net/~papirus/+archive/ubuntu/papirus/+packages?field.name_filter=papirus-icon-theme)
+**[项目地址](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme)**
+
+### GNOME Shell Extensions
+
+先上图...
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop1.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop2.png)
+
+[**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
+
+[**System Monitor**](https://extensions.gnome.org/extension/1064/system-monitor/) 系统监视器
+
+这个先要安装依赖：
+
+```
+sudo apt install gir1.2-gtop-2.0 libgtop2-dev
+```
+
+[**Topicons Plus**](https://extensions.gnome.org/extension/1031/topicons/) 任务图标栏
+
+任务图标栏使用默认的图标，如何让他使用自定义的图标主题呢？
+比如使用 **Papirus** ，它支持 `hardcode-tray` 脚本来实现
+
+1. 安装 `hardcode-tray`
+
+```
+sudo add-apt-repository ppa:andreas-angerer89/sni-qt-patched
+sudo apt update
+sudo apt install sni-qt sni-qt:i386 hardcode-tray
+```
+
+1. 转换图标
+
+```
+hardcode-tray --conversion-tool Inkscape
+```
+
+[**Nvidia GPU Temperature Indicator**](https://extensions.gnome.org/extension/541/nvidia-gpu-temperature-indicator/) 显卡温度指示器
+
+[**Dash To Dock**](https://extensions.gnome.org/extension/307/dash-to-dock/) 可定制的 Dock
+
+### 中文输入法
+
+可更换成`ibus-pinyin`:
+
+```
+sudo apt remove --purge ibus-sunpinyin
+sudo apt install ibus-pinyin
+sudo ibus-daemon -d -x -r
+现在可以在 Settings > Region & Language > Input sources 中添加 pinyin 输入法
+```
+
+### Fix Curl
+
+装了GNOME后，发现没有`curl`...
+对，下载源码安装：***[https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)***
+装好之后又尴尬了，不支持`https`！！！
+一番查阅后，已解决：
+step1，安装`openssl`：
+
+```
+sudo apt-get install openssl
+sudo apt-get install libssl-dev
+```
+
+安装默认路径：
+`/usr/lib/ssl`
+
+step2，进入解压的`curl`源码包：
+
+```
+./configure --with-ssl=/usr/lib/ssl
+make
+sudo make install
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/configure.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/have-https.png)
+
+搞定～
+
+## 安装Oh-My-Zsh
 
 
 终端采用`zsh`和`oh-my-zsh`，既美观又简单易用，主要是能提高你的逼格！！！
@@ -153,6 +326,12 @@ sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install
 - 粗体字颜色：与文本颜色相同
 - 背景颜色：`#002B36`
 
+**主题**：
+
+在`~/.oh-my-zsh/themes`中查看主题。
+
+然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可。
+
 ## 安装字体
 
 `Ubuntu`自带的字体不太好看，所以采用**文泉译微米黑字体**替代，效果会比较好，毕竟是国产字体！
@@ -174,7 +353,7 @@ sudo apt-get install fonts-wqy-microhei
 ## Wechat for Ubuntu
 下载地址：
 ***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
-***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>wechat4Ubuntu`)
+***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools -> wechat4Ubuntu`)
 
 
 下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
@@ -225,14 +404,14 @@ fcitx
 ## Git
 上面也提到过安装`git`
 ```
-sudo apt-get install git
+sudo apt install git
 ```
 
 ## 版本控制系统GUI-SmartGit
 ```
 sudo add-apt-repository ppa:eugenesan/ppa
-sudo apt-get update
-sudo apt-get install smartgithg
+sudo apt update
+sudo apt install smartgithg
 ```
 卸载：
 ```
@@ -246,9 +425,9 @@ sudo apt-get remove smartgithg
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
 # add Typora's repository
 sudo add-apt-repository 'deb http://typora.io linux/'
-sudo apt-get update
+sudo apt update
 # install typora
-sudo apt-get install typora
+sudo apt install typora
 ```
 
 ## GIF制作软件 Peek
@@ -337,7 +516,7 @@ sudo apt-get install wiznote
 ## Vim
 系统并没有集成`vim`，可以执行以下代码安装：
 ```
-sudo apt-get install vim
+sudo apt install vim
 ```
 ## Wps
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
@@ -591,37 +770,15 @@ mv a /usr/share/stardict/dic
 
 ## Filezilla
 ```
-sudo apt-get install filezilla
-sudo apt-get install filezilla-locales
+sudo apt install filezilla
+sudo apt install filezilla-locales
 ```
-## proxychains的安装与使用
-安装：
-```
-sudo apt install proxychains
-```
-配置：
-```
-编辑/etc/proxychains.conf，最下面有一行socks4 127.0.0.1 9050，把这一行注释掉，添加一行socks5 127.0.0.1 1080
-```
-测试：
-```
-proxychains curl www.google.com
-```
-如果能看到一堆输出，说明设置成功，如果一直等待或者无法访问则代表设置失败。
-使用：
-用命令行启动软件，在前面加上proxychains，如：
-```
-proxychains firefox
-```
-使用shadowsocks+proxychains代理打开新的firefox实现浏览器翻墙。
-也可以通过输入proxychains bash建立一个新的shell，基于这个shell运行的所有命令都将使用代理。
-
 
 ## rar安装与使用
 
 ### 安装
 ```
-sudo apt-get install rar
+sudo apt install rar
 ```
 ### 使用
 解压到当前目录：
@@ -642,15 +799,15 @@ rar a pg_healthcheck.rar1 pg_healthcheck/
 ## 备份工具
 ```
 sudo add-apt-repository ppa:nemh/systemback
-sudo apt-get update
-sudo apt-get install systemback
+sudo apt update
+sudo apt install systemback
 ```
 
 ## 键盘输入声音特效（Tickys）
 ***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
 下载`tickys`之后执行:
 ```
-sudo apt-get install tickys
+sudo apt install tickys
 ```
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/tickeys_v0.2.5.png)
@@ -664,7 +821,7 @@ sudo apt-get install tickys
 
 ## exfat驱动
 ```
-sudo apt-get install exfat-fuse
+sudo apt install exfat-fuse
 ```
 
 ## 设置grub2引导等待时间
@@ -684,26 +841,14 @@ gnome-session-properties
 
 ## 好玩的Docky
 ```
-sudo apt-get install docky
+sudo apt install docky
 ```
 
 ## 提高逼格
 ```
-sudo apt-get install cmatrix
+sudo apt install cmatrix
 cmatrix -b
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/cmatrix.png)
-
-# 参考
-> 参考来源 请查看***[ubuntu16.04主题美化和软件推荐](http://blog.csdn.net/terence1212/article/details/52270210)***
-
-
-
-
-
-
-
-
-
 
