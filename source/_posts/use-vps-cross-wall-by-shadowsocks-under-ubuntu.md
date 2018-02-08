@@ -250,6 +250,8 @@ sudo systemctl enable supervisor
 ## 番外篇二：一键安装脚本
 这个就不多说了，直接贴上网址：***[Shadowsocks 一键安装脚本（四合一）](https://shadowsocks.be/11.html)***
 
+更多脚本请看：***[https://github.com/iMeiji/shadowsocks_install](https://github.com/iMeiji/shadowsocks_install)***
+
 # 基于Docker安装
 
 ## 安装Docker

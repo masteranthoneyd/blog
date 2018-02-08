@@ -1,0 +1,35 @@
+Configuration:
+  status: "OFF"
+  monitorInterval: 10
+
+  Properties:
+    Property:
+      - name: log.level.console
+        value: debug
+      - name: PID
+        value: ????
+      - name: LOG_PATTERN
+        value: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{${sys:PID}}{magenta} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx"
+
+  Appenders:
+    Console:  #输出到控制台
+      name: CONSOLE
+      target: SYSTEM_OUT
+      ThresholdFilter:
+        level: ${sys:log.level.console} # “sys:”表示：如果VM参数中没指定这个变量值，则使用本文件中定义的缺省全局变量值
+        onMatch: ACCEPT
+        onMismatch: DENY
+      PatternLayout:
+        pattern: ${LOG_PATTERN}
+        charset: UTF-8
+  Loggers:
+    Root:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE
+    AsyncRoot:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE

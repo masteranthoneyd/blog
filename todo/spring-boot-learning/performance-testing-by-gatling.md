@@ -142,6 +142,33 @@ mvn gatling:execute
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result2.jpg)
 
+### 遇到问题
+
+途中出现了以下错误
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-error1.jpg)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-error2.jpg)
+
+这是由于使用了Log4J2，把Gatling自带的Logback排除了（同一个项目）：
+
+```
+<dependency>
+    <groupId>io.gatling.highcharts</groupId>
+    <artifactId>gatling-charts-highcharts</artifactId>
+    <version>${gatling-charts-highcharts.version}</version>
+    <!-- 由于配置了log4j2，运行Gatling时需要**注释**以下的 exclusions，否则会抛异常，但貌似不影响测试结果 -->
+    <exclusions>
+        <exclusion>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+囧。。。。。。
+
 > 参考：*[http://www.spring4all.com/article/584](http://www.spring4all.com/article/584)*
 >
 > 官方教程：*[https://gatling.io/docs/current/advanced_tutorial/](https://gatling.io/docs/current/advanced_tutorial/)*

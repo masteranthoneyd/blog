@@ -129,6 +129,20 @@ OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自�
 > Spring Boot内嵌容器支持Tomcat、Jetty、Undertow。
 > 根据 [Tomcat vs. Jetty vs. Undertow: Comparison of Spring Boot Embedded Servlet Containers](https://link.jianshu.com/?t=https://examples.javacodegeeks.com/enterprise-java/spring/tomcat-vs-jetty-vs-undertow-comparison-of-spring-boot-embedded-servlet-containers/) 这篇文章统计，Undertow的综合性能更好。
 
+## 与Tomcat性能对比
+
+以下是Undertow与Tomcat简单的性能测试（同样是默认配置）
+
+Tomcat:
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/tomcat-gatling-test.jpg)
+
+Undertow:
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/undertow-gatling-test.jpg)
+
+显然Undertow的吞吐量要比Tomcat高
+
 ## Maven配置
 
 ```
@@ -158,10 +172,12 @@ UndertowEmbeddedServletContainerFactory embeddedServletContainerFactory() {
     UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
     
     // 这里也可以做其他配置
-    // 支持HTTP2
-    factory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true));
-    // 监听多个端口
-    builder.addHttpListener(8080, "0.0.0.0");
+	// 支持HTTP2
+	factory.addBuilderCustomizers(builder -> {
+		builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true);
+		// 监听多个端口
+		builder.addHttpListener(8080, "0.0.0.0");
+	});
     return factory;
 }
 ```
@@ -183,7 +199,7 @@ server.undertow.accesslog.suffix=log
 server.undertow.max-http-post-size=0 
 # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
 server.undertow.io-threads=4
-# 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+# 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载，默认数量为 CPU核心*8
 server.undertow.worker-threads=20
 # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
 # 每块buffer的空间大小,越小的空间被利用越充分
@@ -236,6 +252,14 @@ server.undertow.direct-buffers=true
 ```
 
 **注意**：需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
+
+## application.yml简单配置
+
+```
+logging:
+  pattern:
+    console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx"
+```
 
 ## log4j2.xml配置
 
@@ -308,6 +332,31 @@ server.undertow.direct-buffers=true
 
     <!-- Mixed sync/async -->
     <Loggers>
+    
+        <!--<logger name="org.apache.http" level="warn"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="com.ibatis" level="DEBUG"/>
+        <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG"/>
+        <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG"/>
+        <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG"/>
+        <logger name="java.sql.Connection" level="DEBUG" additivity="true"/>
+        <logger name="java.sql.Statement" level="DEBUG" additivity="true"/>
+        <logger name="java.sql.PreparedStatement" level="=debug,stdout" additivity="true"/>
+        <logger name="java.sql.ResultSet" level="DEBUG" additivity="true"/>
+        <logger name="org.apache" level="WARN"/>
+
+        &lt;!&ndash; 对包进行更详细的配置 &ndash;&gt;
+        &lt;!&ndash; additivity表示是否追加,防止重复,因为root已经接收过一次了 &ndash;&gt;
+        <logger name="com.my.blog.website.dao" level="DEBUG" additivity="true">
+            <appender-ref ref="db_log"/>
+        </logger>
+        <logger name="com.my.blog.website.controller" level="DEBUG" additivity="false">
+            <appender-ref ref="service_log"/>
+        </logger>
+        <logger name="com.my.blog.website.service" level="DEBUG" additivity="false">
+            <appender-ref ref="service_log"/>
+        </logger>-->
+        
         <Root level="debug" includeLocation="true">
             <AppenderRef ref="console"/>
             <AppenderRef ref="infoFile"/>
@@ -378,7 +427,13 @@ Configuration:
 
 更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
 
-> 如有依赖冲突，可使用 `mvn dependency:tree` 命令查找
+## 依赖冲突
+
+如果引入了某些jar包带有`logback`依赖，log4j2会失效，需要通过IDEA或Maven查找排除依赖：
+
+```
+mvn dependency:tree
+```
 
 # 常用连接池配置
 
