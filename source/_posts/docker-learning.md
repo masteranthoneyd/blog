@@ -1439,6 +1439,8 @@ redis-cli
 
 ## *[Portainer](https://hub.docker.com/r/portainer/portainer/)*
 
+功能：管理容器与swarm集群
+
 单机版：
 
 ```
@@ -1791,6 +1793,8 @@ networks:
 
 ## [*Logrotate*](https://hub.docker.com/r/blacklabelops/logrotate/)
 
+功能：日志清理
+
 单机运行：
 
 ```
@@ -1825,7 +1829,31 @@ services:
         condition: on-failure
         delay: 5s
         max_attempts: 3
+
 ```
+
+## *[ShowDoc](https://github.com/star7th/showdoc)*
+
+功能：API与数据字典管理
+
+docker-compose.yml:
+
+```
+version: '3.4'
+
+services:
+  showdoc:
+    image: yangbingdong/showdoc:1.0
+    volumes:
+      - /home/ybd/data/docker/showdoc/data:/var/www/html
+    ports:
+      - "4999:80"
+    restart: always
+```
+
+其中要把 *[ShowDoc](https://github.com/star7th/showdoc)* 整个项目根目录所有文件拷贝到 data 里面，确保里面文件可执行 `chmod -R 777 data`
+
+访问 `localhost:4999/install` 进行设置后把data里面的 `install` 目录删除防止再次安装。
 
 # Last
 
