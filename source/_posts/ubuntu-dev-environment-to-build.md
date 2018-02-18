@@ -713,6 +713,24 @@ services:
 docker-compose up -d
 ```
 
+测试：
+
+```
+#创建主题
+docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-topics.sh --create --zookeeper zoo1:2181 --replication-factor 1 --partitions 1 --topic test
+
+#查看topic列表
+docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-topics.sh --list --zookeeper zoo1:2181
+
+#生产者
+docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+
+#消费者
+docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+
+
 # 搭建ngrok配置
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/ngrok_p1.jpg)

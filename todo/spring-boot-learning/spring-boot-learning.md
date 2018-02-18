@@ -1,200 +1,24 @@
 > Spring Boot作为当下最流行的微服务项目构建基础，有的时候我们根本不需要额外的配置就能够干很多的事情，这得益于它的一个核心理念：“习惯优于配置”。。。
 >
 > 说白的就是大部分的配置都已经按照比较便准的编程规范配置好了
+>
+> 本文基于 Spring Boot 2，与1.X版本还是有一定区别的
 
-# 构建父工程
+# 构建依赖版本管理工程以及父工程
 
-父工程只是作为管理全局依赖版本管理以及插件管理的存在，子工程只需要引用依赖，并不需要关心版本号。
+> 为什么要分开为两个工程？因为考虑到common工程也需要版本控制，但parent工程中依赖了common工程，所以common工程不能依赖parent工程（循环依赖），故例外抽离出一个dependencies的工程，专门用作依赖版本管理，而parent工程用作其他子工程的公共依赖。
+
+## 依赖版本管理工程
+
+跟下面父工程一样只有一个`pom.xml`
+
+*[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-parent-dependencies](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-parent-dependencies)*
+
+## 父工程
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/parent.png)
 
-整个工程只需要一个`pom.xml`（下面那个是IDEA生成的，非必要）:
-
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.yangbingdong</groupId>
-    <artifactId>spring-boot-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-
-        <spring-boot.version>1.5.10.RELEASE</spring-boot.version>
-        <spring-boot-common.version>0.0.1-SNAPSHOT</spring-boot-common.version>
-        <hikariCP.version>2.7.1</hikariCP.version>
-        <disruptor.version>3.3.7</disruptor.version>
-        <assertj-core.version>3.9.0</assertj-core.version>
-
-        <!-- maven 方式跳过 maven test, 等同 mvn package -Dmaven.test.skip=true -->
-        <!-- Spring Boot 内部已经集成 maven-surefire-plugin 插件，可使用 <skipTests>true</skipTests> 跳过测试 -->
-        <!-- 两者的区别在于 <maven.test.skip> 标签连 .class 文件都不会生成，而 <skipTests> 会编译生成 .class 文件-->
-        <maven.test.skip>true</maven.test.skip>
-    </properties>
-
-
-    <dependencyManagement>
-
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- HikariCP 高性能连接池 -->
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikariCP.version}</version>
-            </dependency>
-        </dependencies>
-
-    </dependencyManagement>
-
-    <dependencies>
-        <!-- 通用工具包 -->
-        <dependency>
-            <groupId>com.yangbingdong</groupId>
-            <artifactId>spring-boot-common</artifactId>
-            <version>${spring-boot-common.version}</version>
-        </dependency>
-
-        <!-- Spring Boot 依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <!-- 去除 logback 依赖 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- 高性能日志框架 Log4j2 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
-
-        <!-- Log4j2 异步支持，Disruptor 超高性能并发框架 -->
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${disruptor.version}</version>
-        </dependency>
-
-        <!-- 提供 Spring Boot 测试支持 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <exclusions>
-                <!-- 鉴于spring-boot-starter-test模块的assertj版本比较旧，故移除并使用最新版本 -->
-                <exclusion>
-                    <groupId>org.assertj</groupId>
-                    <artifactId>assertj-core</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- 使用最新版的assertj，功能更强大 -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj-core.version}</version>
-        </dependency>
-
-        <!-- Spring Mvc 依赖 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <!-- 抛弃默认web容器tomcat，使用undertow -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- 使用高性能 Web 容器 undertow -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
-
-        <!-- 提供自定义元数据支持 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Lombok简洁代码插件 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-    </dependencies>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>ali-repos</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>ali-plugin</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
-</project>
-```
-
-
+*[https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml](https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml)*
 
 说明：
 
@@ -314,6 +138,8 @@ OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自�
 
 > Spring Boot内嵌容器支持Tomcat、Jetty、Undertow。
 > 根据 [Tomcat vs. Jetty vs. Undertow: Comparison of Spring Boot Embedded Servlet Containers](https://link.jianshu.com/?t=https://examples.javacodegeeks.com/enterprise-java/spring/tomcat-vs-jetty-vs-undertow-comparison-of-spring-boot-embedded-servlet-containers/) 这篇文章统计，Undertow的综合性能更好。
+>
+> 在Spring Boot 2中，已经把netty作为webflux的默认容器
 
 ## 与Tomcat性能对比
 
@@ -336,12 +162,28 @@ Undertow:
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
+        <!-- 移除默认web容器，使用undertow -->
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
         </exclusion>
     </exclusions>
 </dependency>
+
+如果是webflux，默认的容器的netty
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+    <exclusions>
+        <!-- 移除默认web容器，使用undertow -->
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-reactor-netty</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 使用高性能 Web 容器 undertow -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-undertow</artifactId>
@@ -433,7 +275,7 @@ server.undertow.direct-buffers=true
 <dependency>
     <groupId>com.lmax</groupId>
     <artifactId>disruptor</artifactId>
-    <version>3.3.7</version>
+    <version>3.3.8</version>
 </dependency>
 ```
 
@@ -443,8 +285,9 @@ server.undertow.direct-buffers=true
 
 ```
 logging:
+  config: classpath:log4j2.xml # 指定log4j2配置文件的路径，默认就是这个
   pattern:
-    console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx"
+    console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
 ```
 
 ## log4j2.xml配置
@@ -542,12 +385,6 @@ logging:
         <logger name="com.my.blog.website.service" level="DEBUG" additivity="false">
             <appender-ref ref="service_log"/>
         </logger>-->
-        
-        <Root level="debug" includeLocation="true">
-            <AppenderRef ref="console"/>
-            <AppenderRef ref="infoFile"/>
-            <AppenderRef ref="errorFile"/>
-        </Root>
 
         <AsyncRoot level="debug" includeLocation="true">
             <AppenderRef ref="console"/>
@@ -613,7 +450,7 @@ Configuration:
 
 更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
 
-## 依赖冲突
+# 查看依赖树
 
 如果引入了某些jar包带有`logback`依赖，log4j2会失效，需要通过IDEA或Maven查找排除依赖：
 
@@ -623,14 +460,47 @@ mvn dependency:tree
 
 # 常用连接池配置
 
+> Spring Boot 2 默认使用 [*HikariCP*](https://github.com/brettwooldridge/HikariCP) 作为连接池
+
 如果项目中已包含`spring-boot-starter-jdbc`或`spring-boot-starter-jpa`模块，那么连接池将**自动激活**！
 
-Spring Boot选择数据库链接池实现的判断逻辑：
+在Spring Boot2中选择数据库链接池实现的判断逻辑：
 
-1. 检查Tomcat的数据库链接池实现是否可用，如可用，则启用。使用`spring.datasource.tomcat.*`可以控制链接池的行为。
-2. 检查HikariCP是否可用，如可用，则启用。使用`spring.datasource.hikari.*`可以控制链接池的行为。
-3. 检查Commons DBCP是否可用，如可用，则启用；但Spring Boot**不建议**在生产环境使用该链接池的实现。
-4. 检查Commons DBCP2是否可用，如可用，则启用。使用`spring.datasource.dbcp2.*`可以控制链接池的行为。
+1. 检查HikariCP是否可用，如可用，则启用。使用`spring.datasource.hikari.*`可以控制链接池的行为。
+2. 检查Tomcat的数据库链接池实现是否可用，如可用，则启用。使用`spring.datasource.tomcat.*`可以控制链接池的行为。
+3. 检查Commons DBCP2是否可用，如可用，则启用。使用`spring.datasource.dbcp2.*`可以控制链接池的行为。
+
+## HikariCP 连接池常用属性
+
+| 属性                  | 描述                                       | 默认值                  |
+| ------------------- | ---------------------------------------- | -------------------- |
+| dataSourceClassName | JDBC 驱动程序提供的 DataSource 类的名称，如果使用了jdbcUrl则不需要此属性 | -                    |
+| jdbcUrl             | 数据库连接地址                                  | -                    |
+| username            | 数据库账户，如果使用了jdbcUrl则需要此属性                 | -                    |
+| password            | 数据库密码，如果使用了jdbcUrl则需要此属性                 | -                    |
+| autoCommit          | 是否自动提交事务                                 | true                 |
+| connectionTimeout   | 连接超时时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出 SQLException | 30000（30秒）           |
+| idleTimeout         | 空闲超时时间（毫秒），只有在minimumIdle<maximumPoolSize时生效，超时的连接可能被回收，数值 0 表示空闲连接永不从池中删除 | 600000（10分钟）         |
+| maxLifetime         | 连接池中的连接的最长生命周期（毫秒）。数值 0 表示不限制            | 1800000（30分钟）        |
+| connectionTestQuery | 连接池每分配一条连接前执行的查询语句（如：SELECT 1），以验证该连接是否是有效的。如果你的驱动程序支持 JDBC4，HikariCP 强烈建议我们不要设置此属性 | -                    |
+| minimumIdle         | 最小空闲连接数，HikariCP 建议我们不要设置此值，而是充当固定大小的连接池 | 与maximumPoolSize数值相同 |
+| maximumPoolSize     | 连接池中可同时连接的最大连接数，当池中没有空闲连接可用时，就会阻塞直到超出connectionTimeout设定的数值，推荐的公式：((core_count * 2) + effective_spindle_count) | 10                   |
+| poolName            | 连接池名称，主要用于显示在日志记录和 JMX 管理控制台中            | auto-generated       |
+
+`application.yml`
+
+```
+spring:
+  datasource:
+      url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
+      username: root
+      password: root
+      driver-class-name: com.mysql.jdbc.Driver
+#     type: com.zaxxer.hikari.HikariDataSource #Spring Boot2.0默认使用HikariDataSource
+      hikari:
+        auto-commit: false
+        maximum-pool-size: 9 #连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
+```
 
 ## Tomcat连接池常用的属性
 
@@ -680,59 +550,6 @@ spring:
       min-evictable-idle-time-millis: 120000
       remove-abandoned: true
       remove-abandoned-timeout: 120
-```
-
-## HikariCP 连接池常用属性
-
-| 属性                  | 描述                                       | 默认值                  |
-| ------------------- | ---------------------------------------- | -------------------- |
-| dataSourceClassName | JDBC 驱动程序提供的 DataSource 类的名称，如果使用了jdbcUrl则不需要此属性 | -                    |
-| jdbcUrl             | 数据库连接地址                                  | -                    |
-| username            | 数据库账户，如果使用了jdbcUrl则需要此属性                 | -                    |
-| password            | 数据库密码，如果使用了jdbcUrl则需要此属性                 | -                    |
-| autoCommit          | 是否自动提交事务                                 | true                 |
-| connectionTimeout   | 连接超时时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出 SQLException | 30000（30秒）           |
-| idleTimeout         | 空闲超时时间（毫秒），只有在minimumIdle<maximumPoolSize时生效，超时的连接可能被回收，数值 0 表示空闲连接永不从池中删除 | 600000（10分钟）         |
-| maxLifetime         | 连接池中的连接的最长生命周期（毫秒）。数值 0 表示不限制            | 1800000（30分钟）        |
-| connectionTestQuery | 连接池每分配一条连接前执行的查询语句（如：SELECT 1），以验证该连接是否是有效的。如果你的驱动程序支持 JDBC4，HikariCP 强烈建议我们不要设置此属性 | -                    |
-| minimumIdle         | 最小空闲连接数，HikariCP 建议我们不要设置此值，而是充当固定大小的连接池 | 与maximumPoolSize数值相同 |
-| maximumPoolSize     | 连接池中可同时连接的最大连接数，当池中没有空闲连接可用时，就会阻塞直到超出connectionTimeout设定的数值 | 10                   |
-| poolName            | 连接池名称，主要用于显示在日志记录和 JMX 管理控制台中            | auto-generated       |
-
-`application.yml`
-
-```
-spring:
-  datasource:
-      url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
-      username: root
-      password: root
-      driver-class-name: com.mysql.jdbc.Driver
-      hikari:
-        auto-commit: true
-        connection-test-query: 'SELECT 1'
-        maximum-pool-size: 150
-```
-
-Spring Boot Data Jpa 依赖声明：
-
-```
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-    <exclusions>
-        <exclusion>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
-<!-- 移除 tomcat-jdbc, Spring Boot 将会自动使用 HikariCP -->
-<dependency>
-    <groupId>com.zaxxer</groupId>
-    <artifactId>HikariCP</artifactId>
-    <version>2.7.1</version>
-</dependency>
 ```
 
 ## DBCP 连接池常用配置
@@ -797,16 +614,8 @@ spring:
 Spring Boot Data Jpa 依赖声明：
 
 ```
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-    <exclusions>
-        <exclusion>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
+通过application.yml: spring.datasource.type=...配置
+
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-dbcp2</artifactId>
@@ -819,4 +628,215 @@ Spring Boot Data Jpa 依赖声明：
 参考：***[https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter](https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter)***
 
 > 学习汇总：[http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html](http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html)
+
+# 创建异步方法
+
+## 启动异步
+
+```
+@Configuration
+@EnableAsync
+public class SpringAsyncConfig {
+  
+}
+```
+
+配置完这个就已经具备异步方法功能了，只需要在方法上面添加`@Async`即可
+
+如果被`@Async`注解的方法所在类是基于接口实现的，想要直接注入实现类，需要添加：`@EnableAsync(proxyTargetClass = true)` 以使用CGLIB代理
+
+## 编写异步方法
+
+```
+@Async
+public void asyncMethodWithVoidReturnType() throws InterruptedException {
+	System.out.println("Execute method asynchronously. " + Thread.currentThread().getName());
+}
+```
+
+## 配置线程池
+
+在不配置线程池的情况下，Spring默认使用`SimpleAsyncTaskExecutor`，每一次的执行任务都会使用新的线程，性能不太好，所以我们可以自定义线程池
+
+### 直接定义线程池
+
+```
+@Configuration
+@EnableAsync
+public class SpringAsyncConfig {
+	@Bean
+	public Executor threadPoolTaskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(8);
+		executor.setMaxPoolSize(42);
+		executor.setQueueCapacity(500);
+		executor.setThreadNamePrefix("asyncExecutor-");
+		executor.initialize();
+		return executor;
+	}
+}
+```
+
+### 实现AsyncConfigurer
+
+`AsyncConfigurer`接口有两个方法：
+
+* `getAsyncExecutor()`: 提供线程池
+* `getAsyncUncaughtExceptionHandler()`: 异步任务异常处理
+
+```
+@Configuration
+@EnableAsync
+public class SpringAsyncConfig implements AsyncConfigurer {
+	@Override
+	public Executor getAsyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(8);
+		executor.setMaxPoolSize(42);
+		executor.setQueueCapacity(500);
+		executor.setThreadNamePrefix("MyExecutor-");
+		executor.initialize();
+		return executor;
+	}
+	
+	@Override
+	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler(){
+		return (ex, method, params) -> {
+			ExceptionUtils.printRootCauseStackTrace(ex);
+			System.out.println("Exception message - " + ex.getMessage());
+			System.out.println("Method name - " + method.getName());
+			for (Object param : params) {
+				System.out.println("Parameter value - " + param);
+			}
+		};
+	}
+}
+```
+
+## Async使用指定线程池
+
+如果同时实现了`AsyncConfigurer`以及配置线程池，那么`@Async`默认使用`AsyncConfigurer.getAsyncExecutor`的线程池。
+
+如果需要指定线程池可以这样
+
+```
+@Bean("threadPoolTaskExecutor")
+public Executor threadPoolTaskExecutor() {
+	ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+	executor.setCorePoolSize(8);
+	executor.setMaxPoolSize(42);
+	executor.setQueueCapacity(500);
+	executor.setThreadNamePrefix("asyncExecutor-");
+	executor.initialize();
+	return executor;
+}
+
+
+@Async("threadPoolTaskExecutor")
+public void someMethod(){...}
+```
+
+## 获取异步执行结果
+
+Service：
+
+```
+@Async("threadPoolTaskExecutor")
+@Override
+public Future<String> asyncMethodWithVoidReturnType() throws InterruptedException {
+	Thread.sleep(2000L);
+	return AsyncResult.forValue("Execute method asynchronously. " + Thread.currentThread().getName());
+}
+```
+
+Controller：
+
+```
+@GetMapping("/hello")
+public Mono<String> syaHello() throws InterruptedException, ExecutionException {
+	Future<String> stringFuture = someService.asyncMethodWithVoidReturnType();
+	while (!stringFuture.isDone()){
+		System.out.println("wait...");
+		Thread.sleep(500L);
+	}
+	System.out.println(stringFuture.get());
+	return Mono.just("Hello World");
+}
+```
+
+执行结果：
+
+```
+wait...
+wait...
+wait...
+wait...
+wait...
+Execute method asynchronously. asyncExecutor-1
+```
+
+# Spring定时任务
+
+启用：
+
+```
+@Configuration
+@EnableScheduling
+public class SpringScheduleConfig implements SchedulingConfigurer {
+
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		taskRegistrar.setScheduler(taskExecutor());
+	}
+
+	@Bean
+	public Executor taskExecutor() {
+		return Executors.newScheduledThreadPool(20, new ScheduleThreadFactory());
+	}
+
+	static class ScheduleThreadFactory implements ThreadFactory {
+		private final ThreadGroup group;
+		private final AtomicInteger threadNumber = new AtomicInteger(1);
+		private final String namePrefix;
+
+		ScheduleThreadFactory() {
+			SecurityManager s = System.getSecurityManager();
+			group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+			namePrefix = "schedule-pool-thread-";
+		}
+
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+			if (t.isDaemon()) {
+				t.setDaemon(false);
+			}
+			if (t.getPriority() != Thread.NORM_PRIORITY) {
+				t.setPriority(Thread.NORM_PRIORITY);
+			}
+			return t;
+		}
+	}
+}
+```
+
+定时任务：
+
+```
+	private int i = 0;
+
+	@Scheduled(fixedDelay=1000)
+	public void doScheduled() {
+		System.out.println(Thread.currentThread().getName() + "  " + ++i);
+	}
+```
+
+结果：
+
+```
+schedule-pool-thread-1  2
+schedule-pool-thread-2  3
+schedule-pool-thread-1  4
+schedule-pool-thread-3  5
+schedule-pool-thread-2  6
+```
 

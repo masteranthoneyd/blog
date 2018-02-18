@@ -1,7 +1,7 @@
 # AssertJ学习
 > [AssertJ Core features highlight](http://joel-costigliola.github.io/assertj/assertj-core-features-highlight.html)
 
-在`spring-boot-starter-test`模块中，AssertJ的版本依然停留在`2.x`，为了可以使用新功能，我们可以引入新版本的AssertJ:
+如果是Spring Boot 1.x版本，在`spring-boot-starter-test`模块中，AssertJ的版本依然停留在`2.x`，为了可以使用新功能，我们可以引入新版本的AssertJ（Spring Boot 2已经是最新版的AssertJ）:
 
 ```
 <dependency>

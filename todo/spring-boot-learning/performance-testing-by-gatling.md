@@ -171,5 +171,7 @@ mvn gatling:execute
 
 > 参考：*[http://www.spring4all.com/article/584](http://www.spring4all.com/article/584)*
 >
+> 代码：*[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-gatling](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-gatling)*
+>
 > 官方教程：*[https://gatling.io/docs/current/advanced_tutorial/](https://gatling.io/docs/current/advanced_tutorial/)*
 
