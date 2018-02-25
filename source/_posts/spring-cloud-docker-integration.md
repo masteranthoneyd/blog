@@ -1,8 +1,8 @@
 ---
 title: 基于Docker构建高可用Eureka并提交到私有仓库
 date: 2018-01-02 13:00:19
-categories: [Spring Cloud]
-tags: [Docker, Spring Cloud]
+categories: [Programming, Java, Spring Cloud]
+tags: [Docker, Spring Cloud, Java, Spring]
 ---
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
