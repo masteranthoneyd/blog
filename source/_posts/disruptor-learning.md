@@ -978,6 +978,30 @@ public static void main(String[] args)
 }
 ```
 
+# 消费者分片
+
+```
+public final class MyHandler implements EventHandler<ValueEvent>
+{
+    private final long ordinal;
+    private final long numberOfConsumers;
+
+    public MyHandler(final long ordinal, final long numberOfConsumers)
+    {
+        this.ordinal = ordinal;
+        this.numberOfConsumers = numberOfConsumers;
+    }
+
+    public void onEvent(final ValueEvent entry, final long sequence, final boolean onEndOfBatch)
+    {
+        if ((sequence % numberOfConsumers) == ordinal)
+        {
+            // Process the event
+        }
+    }
+}
+```
+
 # 总结
 
 > 代码：[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-disruptor](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-disruptor)
@@ -987,8 +1011,8 @@ public static void main(String[] args)
 
 Disruptor可以说是工程级别的项目，通过各种高级的优化达到了性能的极致：
 
-- 可选锁无关lock-free, 没有竞争所以非常快
+- 可选锁无关`lock-free`, 没有竞争所以非常快
 - 所有访问者都记录自己的序号的实现方式，允许多个生产者与多个消费者共享相同的数据结构
 - 在每个对象中都能跟踪序列号， 没有为伪共享和非预期的竞争
-- 增加缓存行补齐， 提升cache缓存命中率
+- 增加缓存行补齐， 提升`cache`缓存命中率
 - 环形数组中的元素不会被删除
