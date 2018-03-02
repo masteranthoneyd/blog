@@ -95,7 +95,7 @@ spring:
   cloud:
     stream:
       default: # 配置bindings.<channelName>默认属性
-        contentType: application/json
+        contentType: application/json # 参考 https://docs.spring.io/spring-cloud-stream/docs/Chelsea.SR2/reference/htmlsingle/index.html#mime-types
         consumer:
           max-attempts: 1 # 消费失败重试次数，默认为3，设置为1则不重试
       bindings:
@@ -216,7 +216,9 @@ spring:
         bindings:
           prodInput:
             consumer:
-              autoCommitOffset: false
+              auto-commit-offset: false # 开启手动提交offset，据说可以防止生产过快
+              configuration: # Map with a key/value pair containing generic Kafka producer properties.
+                max.poll.records: 200 # 每次最大拉取消息数量，貌似默认为500
 ```
 
 之后Kafka binder会自动把`ack mode`设置为`org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL`
