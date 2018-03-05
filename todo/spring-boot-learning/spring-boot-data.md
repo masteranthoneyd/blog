@@ -99,4 +99,4 @@ class MyComponent {
   }
   ```
 
-  ​
+  用`@EventListener`也可以，但是`@TransactionalEventListener`可以在事务之后执行。使用前者的话，程序异常事务会滚监听器照样会执行，而后者必须等事务正确提交之后才会执行。
