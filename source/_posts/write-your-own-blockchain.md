@@ -1164,3 +1164,24 @@ public class ImportChain {
 > ***[原文链接](https://mp.weixin.qq.com/s?__biz=MzA5MzQ2NTY0OA==&mid=2650797427&idx=1&sn=ba11e0bbe90b4776b73412264856e98c&chksm=8856282cbf21a13ab4e3031d4ce1eb2ea6ce66fa6ea182f509a104f5d9258c3144f4be149886&mpshare=1&scene=1&srcid=0305A7seElVJKytsJ4qseFzp#rd)***
 >
 
+# 最热门的3个基于Java的Blockchain库
+
+大家应该都听说过比特币、以太币或其他加密货币，这些名字在新闻中经常出现，但是作为Java开发人员，你们知道如何轻松地与Blockchain技术进行交互吗?下面是可以利用Blockchain的三大Java项目。这个列表是基于GitHub存储库的星序排列的。非常感谢你的评论和意见。
+
+## BitcoinJ
+
+你有没有觉得这个名字很有描述性呢?如果你想知道如何创建一个比特币钱包，并且管理节点之间的事务，那么你应该[尝试一下BitcoinJ](https://github.com/bitcoinj/bitcoinj)。这个项目有一个不断扩大的社区，里面包含非常好的文档资料，这对每个开发人员都是非常有利的。当然，作为一个试图获得声望的开源项目，它也存在一定的局限性。现在已经有几个已知的开放漏洞的安全问题，以及可扩展性问题。不过，如果你想了解比特币协议是如何运作的，这个项目将是非常有帮助的。个人意见:这并不适用于生产应用。
+
+## Web3j
+
+一个词——Ethereum（以太币），这是基于尖端技术的第二大加密货币。[Web3j项目](https://github.com/web3j/web3j)允许你使用Ethereum区块链，同时不必为平台编写集成代码。同样，核心功能是创建钱包，管理事务，以及智能合约包装器。Ethereum项目的一部分是一种称为[Solidity](https://solidity.readthedocs.io/)的特殊语言，它是创建智能合约的实际标准。如果你想避免使用智能合约的底层实现细节，那就使用Web3j的智能合约包装器。如果这对一名开发人员来说还不够，那我需要告诉你，它包含很多好的文档和大量的例子，这也是使web3j成为我个人最爱的原因。
+
+## HyperLedger Fabric
+
+[HyperLedger Fabric](https://github.com/hyperledger/fabric-sdk-java)是企业会用到的。Linux基金会的框架是区块链解决方案的主干。所以无论你想创建一个简单的PoC，还是一个生产应用程序，它都是一个强大的工具。该项目正在由Linux基金会成员积极组织开发。它的重点是创建和管理智能合约。主要特点是:
+
+> 管理共享机密信息的渠道 
+> 支持政策事务 
+> 一致地向网络中的对等节点交付事务
+
+如果你在软件区块链堆栈中包括了HyperLedger Fabric，那么我的建议是熟悉其他的HyperLedger项目。根据你的需要，可以选择各种不同的HyperLedger项目，这些项目将保证一个连贯的、可扩展的、易于维护的区块链基础设施。对于许多人来说，区块链将改变整个互联网，难道你不想成为其中的一部分吗?
