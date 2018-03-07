@@ -638,7 +638,90 @@ Spring Boot Data Jpa 依赖声明：
 
 参考：***[https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter](https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter)***
 
-> 学习汇总：[http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html](http://www.ityouknow.com/springboot/2015/12/30/springboot-collect.html)
+# Spring MVC集成fastjson
+
+```
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.46</version>
+</dependency>
+```
+
+两种方式：
+
+## 方式一、实现`WebMvcConfigurer`
+
+```
+@Configuration
+public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
+	@Override
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
+
+		SerializeConfig serializeConfig = SerializeConfig.globalInstance;
+		serializeConfig.put(BigInteger.class, ToStringSerializer.instance);
+		serializeConfig.put(Long.class, ToStringSerializer.instance);
+		serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
+
+		FastJsonConfig fastJsonConfig = new FastJsonConfig();
+		fastJsonConfig.setCharset(Charset.forName("UTF-8"));
+		fastJsonConfig.setSerializeConfig(serializeConfig);
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+		fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		fastConverter.setFastJsonConfig(fastJsonConfig);
+
+		converters.add(fastConverter);
+	}
+}
+```
+
+## 方式二、通过`@Bean`方式
+
+```
+@Configuration
+public class WebMvcMessageConvertConfig {
+	@Bean
+	public HttpMessageConverters fastJsonHttpMessageConverter() {
+		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
+
+		SerializeConfig serializeConfig = SerializeConfig.globalInstance;
+		serializeConfig.put(BigInteger.class, ToStringSerializer.instance);
+		serializeConfig.put(Long.class, ToStringSerializer.instance);
+		serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
+
+		FastJsonConfig fastJsonConfig = new FastJsonConfig();
+		fastJsonConfig.setCharset(Charset.forName(Constant.CHARSET));
+		fastJsonConfig.setSerializeConfig(serializeConfig);
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+		fastJsonConfig.setDateFormat(Constant.DATE_FORMAT);
+
+		fastConverter.setFastJsonConfig(fastJsonConfig);
+		return new HttpMessageConverters((HttpMessageConverter<?>) fastConverter);
+	}
+}
+```
+
+## WebFlux
+
+上面针对的是Web MVC，**对于Webflux目前不支持这种方式**，只能先这么设置
+
+```
+spring:
+  jackson:
+    default-property-inclusion: non_null # 过滤值为null的字段
+    date-format: "yyyy-MM-dd HH:mm:ss"
+```
+
+# 开启GZIP算法压缩响应流
+
+```
+server:
+  compression:
+    enabled: true # 启用压缩
+    min-response-size: 2048 # 对应Content-Length，超过这个值才会压缩
+```
 
 # 创建异步方法
 
