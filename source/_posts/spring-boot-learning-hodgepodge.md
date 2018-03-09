@@ -1019,6 +1019,17 @@ schedule-pool-thread-2  6
    ​
 
 
+# Spring Boot 事件
+
+在Spring Boot 2.0中对事件模型做了一些增强，主要就是增加了`ApplicationStartedEvent`事件，所以在2.0版本中所有的事件按执行的先后顺序如下：
+
+- `ApplicationStartingEvent`
+- `ApplicationEnvironmentPreparedEvent`
+- `ApplicationPreparedEvent`
+- `ApplicationStartedEvent` <= 新增的事件
+- `ApplicationReadyEvent`
+- `ApplicationFailedEvent`
+
 # 测试篇
 
 ## 使用AssertJ
