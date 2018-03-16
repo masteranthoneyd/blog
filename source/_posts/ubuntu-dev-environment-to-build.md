@@ -346,39 +346,53 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 
 
-# 安装Navicat For Mysql
+# Navicat Premium
 
-到*[官网](https://www.navicat.com/download)*下载对应系统版本
-解压到适应文件夹
-解压后，进入解压后的目录运行命令：
+## 破解
 
-```
-./start_navicat
-```
-OK，这样就完啦
-连接上数据库后里面的中文数据是乱码,把`Ubuntu`的字符集修改为`zh_CN.utf8`就行了,修改方法:
-1.查看系统支持的字符集: `locale -a` 
-2.到start_navicat修改字符集: `export LANG=zh_CN.utf8`
+1. 到*[官网](https://www.navicat.com/download)*下载对应系统版本，这里选择linux版本，并解压
 
+2. 到*[Github](https://github.com/DoubleLabyrinth/navicat-keygen/releases)*下载注册机，并解压
 
-## 破解方案
-### 懒人式破解 
-第一次执行`start_navicat`时，会在用户主目录下生成一个名为`.navicat`的隐藏文件夹。
-```
-cd /home/ybd/.navicat/ 
-```
-此文件夹下有一个system.reg文件
-```
-rm system.reg
-```
-把此文件删除后，下次启动`navicat` 会重新生成此文件，15天试用期会按新的时间开始计算。
-**这个是最简单暴力的方法！不过也是最麻烦的，因为每次到期删除了文件，再重新试用所有的配置。**
+   CHS - > Navicat简体中文版。
+   CHT - > Navicat繁体中文版。
+   ENG - > Navicat英文版
 
-### 完全破解
-这个方法对Navicat For Mysql和Premium都有效，但貌似只能对111版本起效，其他更高版本需要另找锤子。
-<a id="download" href="https://pan.baidu.com/s/1i5EB3yX"><i class="fa fa-download"></i><span> Download Now</span>
-</a>
-点击上面跳到云盘，里面有111版的Navicat解压文件(Ubuntu版的)，还有一个`PatchNavicat.exe`，把压缩包解压出来，然后照上面的安装，完成后把里面的`Navicat.exe`拷贝到windows虚拟机(博主用的VirtualBox)，然后在虚拟机里面打开`PatchNavicat.exe`，选择`Navicat.exe`破解，再把破解的`Navicat.exe`放回到安装目录，完美破解！
+3.  安装wine
+
+   ```
+   sudo add-apt-repository ppa:ubuntu-wine/ppa
+   sudo apt-get update
+   sudo apt-get install wine1.8
+   ```
+
+4. 进入注册机解压目录，在此目录下打开命令窗口输入
+
+   ```
+   wine navicat-patcher.exe <navicat.exe path>
+   ```
+
+   `<navicat.exe path>`就是`navicat.exe`的路径，最好是完整的。
+
+   可能会出现N个error日志信息不用鸟他 能正常success就行
+   之后在当前目录下会生成对应的私钥文件`RegPrivateKey.pem`
+
+5. 接着再用`navicat-keygen.exe`生成注册码，使用命令
+
+   ```
+   wine navicat-keygen.exe  RegPrivateKey.pem
+   ```
+
+   先填名字和组织名称，之后会生成一个序列号，并要求填入请求码。
+
+   **打开navicat，然后断网**
+
+6. 在注册界面填入序列号，然后激活。这时会提示要手动激活，ok就选这个
+   接下来会有请求码，复制然后贴入控制台，就可以得到注册码了。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/navicat-patch.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/navicat12.png)
 
 
 ## 创建快捷方式
@@ -403,7 +417,16 @@ Type=Application
 Terminal=0
 ```
 
+> 参考：***[https://www.52pojie.cn/thread-705020-1-1.html]( https://www.52pojie.cn/thread-705020-1-1.html)***
+
+## 后台运行
+
+```
+nohup /home/ybd/data/application/navicat/navicat120_premium_en_x64/start_navicat > /dev/null 2>&1 &
+```
+
 # 安装Redis
+
 ## 安装
 终端执行：
 ```

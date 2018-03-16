@@ -55,8 +55,7 @@ sudo chmod -R 777 /usr/bin/lantern
 调整 `Unity` 桌面环境，还是推荐使用`Unity Tweak Tool`，这是一个非常好用的 `Unity` 图形化管理工具，可以修改工作区数量、热区等。
 
 ```
-sudo apt-get install unity-tweak-tool
-
+sudo apt install unity-tweak-tool
 ```
 
 ### 安装Flatabulous主题
@@ -67,15 +66,15 @@ sudo apt-get install unity-tweak-tool
 
 ```
 sudo add-apt-repository ppa:noobslab/themes 
-sudo apt-get update 
-sudo apt-get install flatabulous-theme
+sudo apt update 
+sudo apt install flatabulous-theme
 ```
 
 该主题有配套的图标，安装方式如下：
 ```
 sudo add-apt-repository ppa:noobslab/icons 
-sudo apt-get update 
-sudo apt-get install ultra-flat-icons
+sudo apt update 
+sudo apt install ultra-flat-icons
 ```
 
 **安装完成后，打开`unity-tweak-tool`软件，修改主题和图标**
@@ -152,8 +151,7 @@ sudo make install
 如果没有这个工具那就：
 
 ```
-sudo apt install gnome-tweak-tool
-sudo apt install gnome-shell-extensions
+sudo apt install gnome-tweak-tool gnome-shell-extensions
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
@@ -168,8 +166,8 @@ sudo apt install gnome-shell-extensions
 
 ```
 sudo add-apt-repository ppa:numix/ppa
-sudo apt-get update
-sudo apt-get install numix-icon-theme
+sudo apt update
+sudo apt install numix-icon-theme
 ```
 
 **[项目地址](https://github.com/numixproject/numix-icon-theme)**
@@ -178,11 +176,11 @@ sudo apt-get install numix-icon-theme
 
 ```
 sudo add-apt-repository ppa:snwh/pulp
-sudo apt-get update
-sudo apt-get install paper-icon-theme
+sudo apt update
+sudo apt install paper-icon-theme
 # 同时也可以安装 GTK 和 Cursor 主题
-sudo apt-get install paper-gtk-theme
-sudo apt-get install paper-cursor-theme
+sudo apt install paper-gtk-theme
+sudo apt install paper-cursor-theme
 ```
 
 **[项目地址](https://github.com/snwh/paper-icon-theme)**
@@ -191,8 +189,8 @@ sudo apt-get install paper-cursor-theme
 
 ```
 sudo add-apt-repository ppa:papirus/papirus
-sudo apt-get update
-sudo apt-get install papirus-icon-theme
+sudo apt update
+sudo apt install papirus-icon-theme
 ```
 
 或者下载最新的 [**deb 安装包**](https://launchpad.net/~papirus/+archive/ubuntu/papirus/+packages?field.name_filter=papirus-icon-theme)
@@ -205,6 +203,12 @@ sudo apt-get install papirus-icon-theme
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop1.png)
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop2.png)
+
+**下安装一下Chrome支持**：
+
+```
+sudo apt install chrome-gnome-shell
+```
 
 [**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
 
@@ -226,7 +230,7 @@ sudo apt install gir1.2-gtop-2.0 libgtop2-dev
 ```
 sudo add-apt-repository ppa:andreas-angerer89/sni-qt-patched
 sudo apt update
-sudo apt install sni-qt sni-qt:i386 hardcode-tray
+sudo apt install sni-qt sni-qt:i386 hardcode-tray inkscape
 ```
 
 1. 转换图标
@@ -259,7 +263,7 @@ sudo ibus-daemon -d -x -r
 step1，安装`openssl`：
 
 ```
-sudo apt-get install openssl
+sudo apt install openssl
 sudo apt-get install libssl-dev
 ```
 
@@ -366,7 +370,7 @@ sudo apt-get install fonts-wqy-microhei
 
 ### crossover安装与破解
 这个轻聊版是Deepin的作品，要在Ubuntu上使用，就要安装**crossover**，很不幸这玩意是收费的，很幸运的是这玩意是可以破解的。
-1、安装的工具包下载下来解压后会有三个文件，首先先安装`crossover_16.0.0-1.deb`，缺少依赖就执行一下`sudo apt-get -f install`，安装完后**先不要打开**crossover。
+1、安装的工具包下载下来解压后会有三个文件，首先先安装`crossover_16.0.0-1.deb`，缺少依赖就执行一下`sudo apt -f install`，安装完后**先不要打开**crossover。
 2、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
 3、把破解文件 (`crossover16crack`->`winewrapper.exe.so`) 替换路径: `/opt/cxoffice/lib/wine`下的`winewrapper.exe.so`文件。提示已有文件，点“替换”破解完成。
 
@@ -385,7 +389,7 @@ sudo apt-get install fonts-wqy-microhei
 ### 安装
 点击下载 Sogou For Linux -> <a id="download" href="http://pinyin.sogou.com/linux/"><i class="fa fa-download"></i><span> Download Now</span>
 </a>
-然后`dpkg -i` 就可以安装了，中间如有冲突就`sudo apt-get -f install`进行修复。
+然后`dpkg -i` 就可以安装了，中间如有冲突就`sudo apt -f install`进行修复。
 
 ### 搜狗输入法不能输入中文解决（linux下常见软件崩溃问题解决方案） 
 先关闭`fcitx`：
@@ -401,12 +405,6 @@ fcitx
 ```
 解决！
 
-## Git
-上面也提到过安装`git`
-```
-sudo apt install git
-```
-
 ## 版本控制系统GUI-SmartGit
 ```
 sudo add-apt-repository ppa:eugenesan/ppa
@@ -415,7 +413,8 @@ sudo apt install smartgithg
 ```
 卸载：
 ```
-sudo apt-get remove smartgithg
+sudo apt remove smartgithg
+
 ```
 
 ## Typora(Markdown编辑器)
@@ -509,8 +508,9 @@ sudo apt-get install virtualbox
 
 ```
 sudo add-apt-repository ppa:wiznote-team 
-sudo apt-get update 
-sudo apt-get install wiznote
+sudo apt update 
+sudo apt install wiznote
+
 ```
 
 ## Vim
@@ -552,7 +552,8 @@ sudo dpkg -i xmind-7.5-linux_amd64.deb
 ## Shutter
 `Ubuntu`下很强大的一款截图软件
 ```
-sudo apt-get install shutter
+sudo apt install shutter
+
 ```
 
 ***设置快捷键：*** 
@@ -564,8 +565,9 @@ sudo apt-get install shutter
 ## 系统清理软件 BleachBit
 ```
 sudo add-apt-repository ppa:n-muench/programs-ppa
-sudo apt-get update 
-sudo apt-get install bleachbit 
+sudo apt update 
+sudo apt install bleachbit 
+
 ```
 
 
@@ -758,7 +760,8 @@ services:
 ## Stardict火星译王
 
 ```
-sudo apt-get install stardict
+sudo apt install stardict
+
 ```
 ***安装词库：***
 进入*[http://download.huzheng.org/](http://download.huzheng.org/)*
@@ -812,9 +815,26 @@ sudo apt install tickys
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/tickeys_v0.2.5.png)
 
+## 硬件信息
 
+### I-Nex
+
+这是一个类似CPU-Z的工具
+
+下载链接：***[https://launchpad.net/i-nex/+download](https://launchpad.net/i-nex/+download)***
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/I-Nex%20-%20CPU_001.png)
+
+### Hardinfo
+
+```
+sudo apt-get install hardinfo -y
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/System%20Information_002.png)
 
 # 其他设置篇
+
 ## 点击图标最小化
 `Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。
 方法有两种，你可以安装 `Unity Tweak Tool` 图形界面工具之后在 `「Unity」-「Launcher」-「Minimise」`中进行配置，或直接在终端中使用如下命令启用。
