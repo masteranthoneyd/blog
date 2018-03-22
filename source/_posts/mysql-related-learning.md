@@ -17,7 +17,7 @@ tags: [MySQL]
 
 ## 传统安装
 
-
+请见[*博主之前的一篇博文*](/2017/ubuntu-dev-environment-to-build/#%E5%AE%89%E8%A3%85MySQL%E4%BB%A5%E5%8F%8AGUI%E5%B7%A5%E5%85%B7)
 
 ## Docker版安装
 
@@ -189,7 +189,7 @@ MySQL官方开源GUI
 
 - `ref`：显示索引的哪一列被使用了，如果可能的话，是一个常数；
 
-- `rows：MySQL`认为必须检查的用来返回请求数据的行数；
+- `rows`：MySQL认为必须检查的用来返回请求数据的行数；
 
 - `Extra`：关于MySQL如何解析查询的额外信息。
 
@@ -197,7 +197,7 @@ MySQL官方开源GUI
 
     `Distinct`:一旦MYSQL找到了与行相联合匹配的行，就不再搜索了
 
-    `Not exists`: MYSQL优化了LEFT JOIN，一旦它找到了匹配LEFT JOIN标准的行，就不再搜索了
+    `Not exists`: MYSQL优化了`LEFT JOIN`，一旦它找到了匹配`LEFT JOIN`标准的行，就不再搜索了
 
     `Range checked for each Record（index map:#）`:没有找到理想的索引，因此对于从前面表中来的每一个行组合，MYSQL检查使用哪个索引，并用它来从表中返回行。这是使用索引的最慢的连接之一
 
@@ -205,11 +205,11 @@ MySQL官方开源GUI
 
     `Using index`: 列数据是从仅仅使用了索引中的信息而没有读取实际的行动的表返回的，这发生在对表的全部的请求列都是同一个索引的部分的时候
 
-    `Using temporary` 看到这个的时候，查询需要优化了。这里，MYSQL需要创建一个临时表来存储结果，这通常发生在对不同的列集进行ORDER BY上，而不是GROUP BY上
+    `Using temporary` 看到这个的时候，查询需要优化了。这里，MYSQL需要创建一个临时表来存储结果，这通常发生在对不同的列集进行`ORDER BY`上，而不是`GROUP BY`上
 
-    `Where used` 使用了WHERE从句来限制哪些行将与下一张表匹配或者是返回给用户。如果不想返回表中的全部行，并且连接类型ALL或index，这就会发生，或者是查询有问题不同连接类型的解释（按照效率高低的顺序排序）
+    `Where used` 使用了`WHERE`从句来限制哪些行将与下一张表匹配或者是返回给用户。如果不想返回表中的全部行，并且连接类型`ALL`或`index`，这就会发生，或者是查询有问题不同连接类型的解释（按照效率高低的顺序排序）
 
-    `system` 表只有一行：system表。这是const连接类型的特殊情况
+    `system` 表只有一行：`system`表。这是`const`连接类型的特殊情况
 
     `const`:表中的一个记录的最大值能够匹配这个查询（索引可以是主键或惟一索引）。因为只有一行，这个值实际就是常数，因为MYSQL先读这个值然后把它当做常数来对待
 
@@ -285,17 +285,21 @@ MySQL官方开源GUI
 
 10. 不适合键值较少的列（重复数据较多的列）
 
-    > 假如索引列TYPE有5个键值，如果有1万条数据，那么 WHERE TYPE = 1将访问表中的2000个数据块。再加上访问索引块，一共要访问大于200个的数据块。如果全表扫描，假设10条数据一个数据块，那么只需访问1000个数据块，既然全表扫描访问的数据块少一些，肯定就不会利用索引了。
+    > 假如索引列TYPE有5个键值，如果有1万条数据，那么 WHERE TYPE = 1将访问表中的2000个数据块。再加上访问索引块，一共要访问大于2000个的数据块。如果全表扫描，假设10条数据一个数据块，那么只需访问1000个数据块，既然全表扫描访问的数据块少一些，肯定就不会利用索引了。
 
 
-> 参考：[*http://blog.csdn.net/xlgen157387/article/details/79572598*](http://blog.csdn.net/xlgen157387/article/details/79572598)
+> 参考：*[http://blog.csdn.net/xlgen157387/article/details/79572598](http://blog.csdn.net/xlgen157387/article/details/79572598)*
 
-# JSON支持以及建立JSON索引
+# JSON相关
+
+## JSON支持
 
 * 在MySQL 5.7.8中，MySQL支持由RFC 7159定义的本地JSON数据类型，它支持对JSON(JavaScript对象标记)文档中的数据进行有效访问.
 * MySQL会对DML JSON数据自动验证。无效的DML JSON数据操作会产生错误.
 * 优化的存储格式。存储在JSON列中的JSON文档转换为一种内部格式，允许对Json元素进行快速读取访问.
 * MySQL Json类型支持通过虚拟列方式建立索引，从而增加查询性能提升.
+
+### 函数语法
 
 mysql在json类型中增加了一些json相关的函数 可以参考如下
 
@@ -331,3 +335,166 @@ mysql在json类型中增加了一些json相关的函数 可以参考如下
 
 常见的就是`JSON_EXTRACT()等`
 
+### 表结构
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain05.png)
+
+### 插入数据
+
+```
+INSERT INTO `user_json` VALUES (1, '{\"name\": \"yang\", \"address\": \"shenyang\"}');
+...
+```
+
+
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain07.png)
+
+**JSON校验**：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain06.png)
+
+### 查询
+
+```
+select * from user_json where json_extract(data,'$.name')='yang';
+select json_extract(data,'$.name') from user_json where json_extract(data,'$.name')='yang';
+select data->'$.name' from user_json where data->'$.name'='yang';
+```
+
+发现结果集是带有双引号的：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain08.png)
+
+如果想要去除双引号一般来说我们这样:
+
+```
+select JSON_UNQUOTE(json_extract(data,'$.name'))from user_json where json_extract(data,'$.name')='yang';
+select  data->>'$.name' from user_json where data->'$.name'='yang';
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain09.png)
+
+## JSON如何建立索引
+
+json类型并不能建立索引，但我们可以通过**虚拟列**来建立索引
+
+```
+ALTER TABLE user_json ADD COLUMN `virtual_name` varchar(20) GENERATED ALWAYS AS (data->>'$.name') VIRTUAL NULL AFTER `data`;
+
+ALTER TABLE user_json ADD KEY (virtual_name);
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain10.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/idx-explain11.png)
+
+可以看到索引起作用了~
+
+像时间这些要把周一到周日建索引也是可以的：
+
+```
+`dayofweek` tinyint(4) GENERATED ALWAYS AS (dayofweek(SomeDate)) VIRTUAL,
+```
+
+或者某些很麻烦的条件：
+
+```
+alter table ApiLog add verb_url_hash varbinary(16) GENERATED ALWAYS AS (unhex(md5(CONCAT(verb, ' - ', replace(url,'.xml',''))))) VIRTUAL;
+alter table ApiLog add key (verb_url_hash);
+```
+
+# MySQL存储引擎MyISAM与InnoDB区别
+
+## MySQL默认存储引擎的变迁
+
+在MySQL 5.1之前的版本中，默认的搜索引擎是MyISAM，从MySQL 5.5之后的版本中，默认的搜索引擎变更为InnoDB。
+
+## MyISAM与InnoDB存储引擎的主要特点
+
+MyISAM存储引擎的特点是：**表级锁**、**不支持事务和全文索引**，适合一些CMS内容管理系统作为后台数据库使用，但是使用大并发、重负荷生产系统上，**表锁结构的特性就显得力不从心**；
+
+以下是MySQL 5.7 MyISAM存储引擎的版本特性：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/mysql-engine01.png)
+
+InnoDB存储引擎的特点是：**行级锁**、**事务安全（ACID兼容）**、**支持外键**、不支持FULLTEXT类型的索引(5.6.4以后版本开始支持FULLTEXT类型的索引)。InnoDB存储引擎提供了具有提交、回滚和崩溃恢复能力的事务安全存储引擎。InnoDB是**为处理巨大量时拥有最大性能而设计的**。它的CPU效率可能是任何其他基于磁盘的关系数据库引擎所不能匹敌的。
+
+以下是MySQL 5.7 InnoDB存储引擎的版本特性：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/mysql-engine02.png)
+
+*注意：* 
+InnoDB表的行锁也不是绝对的，假如在执行一个SQL语句时MySQL不能确定要扫描的范围，InnoDB表同样会锁全表，例如`update table set num=1 where name like “a%”`。
+
+两种类型最主要的差别就是InnoDB支持事务处理与外键和行级锁。而MyISAM不支持。所以MyISAM往往就容易被人认为只适合在小项目中使用。
+
+## MyISAM与InnoDB性能测试
+
+下边两张图是官方提供的MyISAM与InnoDB的压力测试结果
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/mysql-engine03.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/mysql-engine04.png)
+
+可以看出，**随着CPU核数的增加**，**InnoDB的吞吐量反而越好**，而MyISAM，其吞吐量几乎没有什么变化，显然，MyISAM的表锁定机制降低了读和写的吞吐量。
+
+## 事务支持与否
+
+MyISAM是一种非事务性的引擎，使得MyISAM引擎的MySQL可以提供高速存储和检索，以及全文搜索能力，适合数据仓库等查询频繁的应用；
+
+InnoDB是事务安全的；
+
+事务是一种高级的处理方式，如在一些列增删改中只要哪个出错还可以回滚还原，而MyISAM就不可以了。
+
+## MyISAM与InnoDB构成上的区别
+
+（1）每个MyISAM在磁盘上存储成三个文件：
+
+> 第一个文件的名字以表的名字开始，扩展名指出文件类型，.frm文件存储表定义。 
+> 第二个文件是数据文件，其扩展名为.MYD (MYData)。 
+> 第三个文件是索引文件，其扩展名是.MYI (MYIndex)。
+
+（2）基于磁盘的资源是InnoDB表空间数据文件和它的日志文件，InnoDB 表的 大小只受限于操作系统文件的大小，一般为 2GB。
+
+## MyISAM与InnoDB表锁和行锁的解释
+
+MySQL表级锁有两种模式：表共享读锁（Table Read Lock）和表独占写锁（Table Write Lock）。什么意思呢，就是说对MyISAM表进行读操作时，它不会阻塞其他用户对同一表的读请求，但会阻塞对同一表的写操作；而对MyISAM表的写操作，则会阻塞其他用户对同一表的读和写操作。
+
+InnoDB行锁是通过给索引项加锁来实现的，即**只有通过索引条件检索数据**，**InnoDB才使用行级锁**，**否则将使用表锁**！行级锁在每次获取锁和释放锁的操作需要消耗比表锁更多的资源。在InnoDB两个事务发生死锁的时候，会计算出每个事务影响的行数，然后回滚行数少的那个事务。当锁定的场景中不涉及Innodb的时候，InnoDB是检测不到的。只能依靠锁定超时来解决。
+
+## 是否保存数据库表中表的具体行数
+
+InnoDB 中不保存表的具体行数，也就是说，执行`select count(*) from table` 时，InnoDB要扫描一遍整个表来计算有多少行，但是MyISAM只要简单的读出保存好的行数即可。
+
+注意的是，当`count(*)`语句包含`where`条件时，两种表的操作是一样的。也就是 上述“6”中介绍到的InnoDB使用表锁的一种情况。
+
+## 如何选择
+
+MyISAM适合： 
+（1）做很多count 的计算； 
+（2）插入不频繁，查询非常频繁，如果执行大量的SELECT，MyISAM是更好的选择； 
+（3）没有事务。
+
+InnoDB适合： 
+（1）可靠性要求比较高，或者要求事务； 
+（2）表更新和查询都相当的频繁，并且表锁定的机会比较大的情况指定数据引擎的创建； 
+（3）如果你的数据执行大量的INSERT或UPDATE，出于性能方面的考虑，应该使用InnoDB表； 
+（4）DELETE FROM table时，InnoDB不会重新建立表，而是一行一行的 删除； 
+（5）LOAD TABLE FROM MASTER操作对InnoDB是不起作用的，解决方法是首先把InnoDB表改成MyISAM表，导入数据后再改成InnoDB表，但是对于使用的额外的InnoDB特性（例如外键）的表不适用。
+
+要注意，创建每个表格的代码是相同的，除了最后的 TYPE参数，这一参数用来指定数据引擎。
+
+## 其他区别
+
+1、对于AUTO_INCREMENT类型的字段，InnoDB中必须包含只有该字段的索引，但是在MyISAM表中，可以和其他字段一起建立联合索引。
+
+2、DELETE FROM table时，InnoDB不会重新建立表，而是一行一行的删除。
+
+3、LOAD TABLE FROMMASTER操作对InnoDB是不起作用的，解决方法是首先把InnoDB表改成MyISAM表，导入数据后再改成InnoDB表，但是对于使用的额外的InnoDB特性(例如外键)的表不适用。
+
+4、 InnoDB存储引擎被完全与MySQL服务器整合，InnoDB存储引擎为在主内存中缓存数据和索引而维持它自己的缓冲池。
+
+5、对于自增长的字段，InnoDB中必须包含只有该字段的索引，但是在MyISAM表中可以和其他字段一起建立联合索引。
+
+6、清空整个表时，InnoDB是一行一行的删除，效率非常慢。MyISAM则会重建表。
