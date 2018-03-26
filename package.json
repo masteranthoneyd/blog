@@ -9,6 +9,7 @@
     "hexo": "^3.4.1",
     "hexo-autonofollow": "^1.0.1",
     "hexo-baidu-url-submit": "0.0.5",
+    "hexo-all-minifier": "^0.4.0",
     "hexo-deployer-git": "^0.3.1",
     "hexo-fs": "^0.2.2",
     "hexo-generator-archive": "^0.1.4",

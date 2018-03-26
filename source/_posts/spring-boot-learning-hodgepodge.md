@@ -918,70 +918,93 @@ schedule-pool-thread-2  6
 
 # Spring启动后执行程序的几种方式
 
-1. 通过`@PostConstruct`或实现`InitializingBean`实现初始化`bean`的时候干一些事情，两者区别在于`InitializingBean`是在属性设置完之后执行的，所以执行顺序是在`@PostConstruct`之前
+## @PostConstruct 或 InitializingBean
 
-   > 由于此接口的方法afterPropertiesSet是在对象的所有属性被初始化后才会调用。当Spring的配置文件中设置类初始默认为”延迟初始”（`default-lazy-init="true"`，此值默认为false）时，
-   >
-   > 类对象如果不被使用，则不会实例化该类对象。所以 InitializingBean子类不能用于在容器启动时进行初始化的工作，则应使用Spring提供的`ApplicationListener`接口来进行程序的初始化工作。
-   >
-   > 另外，如果需要InitializingBean子类对象在Spring容器启动时就初始化并则容器调用afterPropertiesSet方法则需要在类上增加`org.springframework.context.annotation.Lazy`注解并设置为false即可（也可通过spring配置bean时添加`lazy-init="false"`)。
+通过`@PostConstruct`或实现`InitializingBean`实现初始化`bean`的时候干一些事情，两者区别在于`InitializingBean`是在属性设置完之后执行的，所以执行顺序是在`@PostConstruct`之前
 
-2. 通过监听`ContextRefreshedEvent`事件：
+> 由于此接口的方法`afterPropertiesSet`是在对象的所有属性被初始化后才会调用。当Spring的配置文件中设置类初始默认为”延迟初始”（`default-lazy-init="true"`，此值默认为`false`）时，
+>
+> 类对象如果不被使用，则不会实例化该类对象。所以 `InitializingBean`子类不能用于在容器启动时进行初始化的工作，则应使用Spring提供的`ApplicationListener`接口来进行程序的初始化工作。
+>
+> 另外，如果需要`InitializingBean`子类对象在Spring容器启动时就初始化并则容器调用`afterPropertiesSet`方法则需要在类上增加`org.springframework.context.annotation.Lazy`注解并设置为false即可（也可通过spring配置bean时添加`lazy-init="false"`)。
 
-   ```
-   public class ApplicationContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
-   	@Override
-   	public void onApplicationEvent(ContextRefreshedEvent event) {
-   		System.out.println("ContextRefreshedEvent process...");
-   	}
-   }
+## 监听ContextRefreshedEvent
 
-   或者
-   @EventListener
-   public void processContextRefreshedEvent(ContextRefreshedEvent event) throws InterruptedException {
-   	log.info("ContextRefreshedEvent process...");
-   }
-   ```
+通过监听`ContextRefreshedEvent`事件：
 
-   以下是Spring的内置事件
+```
+public class ApplicationContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		System.out.println("ContextRefreshedEvent process...");
+	}
+}
 
-   | Spring 内置事件               | 描述                                       |
-   | ------------------------- | ---------------------------------------- |
-   | **ContextRefreshedEvent** | `ApplicationContext`被初始化或刷新时，该事件被发布。这也可以在`ConfigurableApplicationContext`接口中使用`refresh()`方法来发生。 |
-   | **ContextStartedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`start()`方法启动`ApplicationContext`时，该事件被触发。你可以查询你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。 |
-   | **ContextStoppedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`stop()`方法停止`ApplicationContext`时，该事件被触发。你可以在接受到这个事件后做必要的清理的工作。 |
-   | **ContextClosedEvent**    | 当使用`ConfigurableApplicationContext`接口中的`close()`方法关闭`ApplicationContext`时，该事件被触发。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。 |
-   | **RequestHandledEvent**   | 这是一个`web-specific`事件，告诉所有`bean` HTTP请求已经被服务。 |
+或者
+@EventListener
+public void processContextRefreshedEvent(ContextRefreshedEvent event) throws InterruptedException {
+	log.info("ContextRefreshedEvent process...");
+}
+```
 
-   Spring的事件处理是单线程的，所以如果一个事件被触发，除非所有的接收者得到消息，否则这些进程被阻止，流程将不会继续。因此，如果要使用事件处理，在设计应用程序时应小心。
+Spring的事件处理是单线程的，所以如果一个事件被触发，除非所有的接收者得到消息，否则这些进程被阻止，流程将不会继续。因此，如果要使用事件处理，在设计应用程序时应小心。
 
-   **注意！**发现在Spring Boot 2中通过监听内置事件，都会发布两次，不知道这是BUG还是啥，所以需要确保方法**幂等性**或者做**只消费一次处理**
+以下是Spring的内置事件
 
-3. 实现`ApplicationRunner`或`CommandLineRunner`
+| Spring 内置事件           | 描述                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| **ContextRefreshedEvent** | `ApplicationContext`被初始化或刷新时，该事件被发布。这也可以在`ConfigurableApplicationContext`接口中使用`refresh()`方法来发生。 |
+| **ContextStartedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`start()`方法启动`ApplicationContext`时，该事件被触发。你可以查询你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。 |
+| **ContextStoppedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`stop()`方法停止`ApplicationContext`时，该事件被触发。你可以在接受到这个事件后做必要的清理的工作。 |
+| **ContextClosedEvent**    | 当使用`ConfigurableApplicationContext`接口中的`close()`方法关闭`ApplicationContext`时，该事件被触发。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。 |
+| **RequestHandledEvent**   | 这是一个`web-specific`事件，告诉所有`bean` HTTP请求已经被服务。 |
 
-   ```
-   @SpringBootApplication
-   public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRunner{
+## ApplicationRunner 或 CommandLineRunner
 
-   	public static void main(String[] args) {
-   		SpringApplication.run(ProdSyncLayerApplication.class, args);
-   	}
+实现`ApplicationRunner`或`CommandLineRunner`
 
-   	@Override
-   	public void run(ApplicationArguments args) throws Exception {
-   		System.out.println("ApplicationRunner...");
-   	}
+```
+@SpringBootApplication
+public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRunner{
 
-   	@Override
-   	public void run(String... args) throws Exception {
-   		System.out.println("CommandLineRunner...");
-   	}
-   }
-   ```
+	public static void main(String[] args) {
+		SpringApplication.run(ProdSyncLayerApplication.class, args);
+	}
 
-   `ApplicationRunner`比`CommandLineRunner`先执行
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		System.out.println("ApplicationRunner...");
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		System.out.println("CommandLineRunner...");
+	}
+}
+```
+
+`ApplicationRunner`比`CommandLineRunner`先执行
 
 **总结**：以上三种方式的顺序跟其序号一样
+
+## onApplicationEvent执行两次问题
+
+`applicationontext`和使用MVC之后的`webApplicationontext`会两次调用上面的方法，如何区分这个两种容器呢？
+
+但是这个时候，会存在一个问题，在web 项目中（spring mvc），系统会存在两个容器，一个是`root application context` ,另一个就是我们自己的 `projectName-servlet context`（作为root application context的子容器）。
+
+这种情况下，就会造成`onApplicationEvent`方法被执行两次。为了避免上面提到的问题，我们可以只在`root application context`初始化完成后调用逻辑代码，其他的容器的初始化完成，则不做任何处理，修改后代码 
+
+```
+      @Override  
+      public void onApplicationEvent(ContextRefreshedEvent event) {  
+        if(event.getApplicationContext().getParent() == null){//root application context 没有parent，他就是老大.  
+             //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。  
+        }  
+      }  
+```
+
+> 后续发现加上以上判断还是能执行两次，不加的话三次，最终研究结果使用以下判断更加准确：`event.getApplicationContext().getDisplayName().equals("Root WebApplicationContext")`
 
 # Spring应用停止前执行程序的几种方式
 
