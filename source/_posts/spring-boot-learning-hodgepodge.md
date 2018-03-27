@@ -66,7 +66,90 @@ tags: [Java, Spring, Spring Boot]
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/repackage.png)
 
+# 配置文件：Properties 和 YAML
 
+## 配置文件的生效顺序，会对值进行覆盖
+
+1. `@TestPropertySource` 注解
+
+2. 命令行参数
+3. Java系统属性（`System.getProperties()`）
+4. 操作系统环境变量
+5. 只有在`random.*`里包含的属性会产生一个`RandomValuePropertySource`
+6. 在打包的jar外的应用程序配置文件（`application.properties`，包含YAML和profile变量）
+7. 在打包的jar内的应用程序配置文件（`application.properties`，包含YAML和profile变量）
+8. 在`@Configuration`类上的`@PropertySource`注解
+9. 默认属性（使用`SpringApplication.setDefaultProperties`指定）
+
+## 配置随机值
+
+```
+roncoo.secret=${random.value}
+roncoo.number=${random.int}
+roncoo.bignumber=${random.long}
+roncoo.number.less.than.ten=${random.int(10)}
+roncoo.number.in.range=${random.int[1024,65536]}
+
+读取使用注解：@Value(value = "${roncoo.secret}")
+```
+
+## 应用简单配置
+
+```
+#端口配置：
+server.port=8090
+#应用名
+spring.application.name=test-demo
+#时间格式化
+spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
+#时区设置
+spring.jackson.time-zone=Asia/Chongqing
+```
+
+## 配置文件-多环境配置
+
+### 多环境配置的好处
+
+> - 不同环境配置可以配置不同的参数
+> - 便于部署，提高效率，减少出错
+
+### Properties多环境配置
+
+```
+1. 配置激活选项
+spring.profiles.active=dev
+
+2.添加其他配置文件
+application.properties
+application-dev.properties
+application-prod.properties
+application-test.properties
+```
+
+### YAML多环境配置
+
+```
+1.配置激活选项
+spring:
+  profiles:
+    active: dev
+2.在配置文件添加三个英文状态下的短横线即可区分
+---
+spring:
+  profiles: dev
+```
+
+### 两种配置方式的比较
+
+> - Properties配置多环境，需要添加多个配置文件，YAML只需要一个配件文件
+> - 书写格式的差异，yaml相对比较简洁，优雅
+> - YAML的缺点：不能通过`@PropertySource`注解加载。如果需要使用`@PropertySource`注解的方式加载值，那就要使用properties文件。
+
+### 如何使用
+
+```
+java -jar myapp.jar --spring.profiles.active=dev
+```
 
 # 热部署
 
@@ -250,6 +333,8 @@ server.undertow.direct-buffers=true
 ```
 
 # 使用Log4j2
+
+> 更多Log4j2配置请看：***[https://my.oschina.net/kkrgwbj/blog/734530](https://my.oschina.net/kkrgwbj/blog/734530)***
 
 下面是 Log4j2  官方性能测试结果：
 
@@ -469,176 +554,9 @@ Configuration:
 mvn dependency:tree
 ```
 
-# 常用连接池配置
+# Spring MVC 相关
 
-> Spring Boot 2 默认使用 [*HikariCP*](https://github.com/brettwooldridge/HikariCP) 作为连接池
-
-如果项目中已包含`spring-boot-starter-jdbc`或`spring-boot-starter-jpa`模块，那么连接池将**自动激活**！
-
-在Spring Boot2中选择数据库链接池实现的判断逻辑：
-
-1. 检查HikariCP是否可用，如可用，则启用。使用`spring.datasource.hikari.*`可以控制链接池的行为。
-2. 检查Tomcat的数据库链接池实现是否可用，如可用，则启用。使用`spring.datasource.tomcat.*`可以控制链接池的行为。
-3. 检查Commons DBCP2是否可用，如可用，则启用。使用`spring.datasource.dbcp2.*`可以控制链接池的行为。
-
-## HikariCP 连接池常用属性
-
-| 属性                  | 描述                                       | 默认值                  |
-| ------------------- | ---------------------------------------- | -------------------- |
-| dataSourceClassName | JDBC 驱动程序提供的 DataSource 类的名称，如果使用了jdbcUrl则不需要此属性 | -                    |
-| jdbcUrl             | 数据库连接地址                                  | -                    |
-| username            | 数据库账户，如果使用了jdbcUrl则需要此属性                 | -                    |
-| password            | 数据库密码，如果使用了jdbcUrl则需要此属性                 | -                    |
-| autoCommit          | 是否自动提交事务                                 | true                 |
-| connectionTimeout   | 连接超时时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出 SQLException | 30000（30秒）           |
-| idleTimeout         | 空闲超时时间（毫秒），只有在minimumIdle<maximumPoolSize时生效，超时的连接可能被回收，数值 0 表示空闲连接永不从池中删除 | 600000（10分钟）         |
-| maxLifetime         | 连接池中的连接的最长生命周期（毫秒）。数值 0 表示不限制            | 1800000（30分钟）        |
-| connectionTestQuery | 连接池每分配一条连接前执行的查询语句（如：SELECT 1），以验证该连接是否是有效的。如果你的驱动程序支持 JDBC4，HikariCP 强烈建议我们不要设置此属性 | -                    |
-| minimumIdle         | 最小空闲连接数，HikariCP 建议我们不要设置此值，而是充当固定大小的连接池 | 与maximumPoolSize数值相同 |
-| maximumPoolSize     | 连接池中可同时连接的最大连接数，当池中没有空闲连接可用时，就会阻塞直到超出connectionTimeout设定的数值，推荐的公式：((core_count * 2) + effective_spindle_count) | 10                   |
-| poolName            | 连接池名称，主要用于显示在日志记录和 JMX 管理控制台中            | auto-generated       |
-
-`application.yml`
-
-```
-spring:
-  datasource:
-      url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
-      username: root
-      password: root
-      driver-class-name: com.mysql.jdbc.Driver
-#     type: com.zaxxer.hikari.HikariDataSource #Spring Boot2.0默认使用HikariDataSource
-      hikari:
-        auto-commit: false
-        maximum-pool-size: 9 #连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
-```
-
-## Tomcat连接池常用的属性
-
-| 属性                            | 描述                                       | 默认值                |
-| ----------------------------- | ---------------------------------------- | ------------------ |
-| defaultAutoCommit             | 连接池中创建的连接默认是否自动提交事务                      | 驱动的缺省值             |
-| defaultReadOnly               | 连接池中创建的连接默认是否为只读状态                       | -                  |
-| defaultCatalog                | 连接池中创建的连接默认的 catalog                     | -                  |
-| driverClassName               | 驱动类的名称                                   | -                  |
-| username                      | 数据库账户                                    | -                  |
-| password                      | 数据库密码                                    | -                  |
-| maxActive                     | 连接池同一时间可分配的最大活跃连接数                       | 100                |
-| maxIdle                       | 始终保留在池中的最大连接数，如果启用，将定期检查限制连接，超出此属性设定的值且空闲时间超过minEvictableIdleTimeMillis的连接则释放 | 与maxActive设定的值相同   |
-| minIdle                       | 始终保留在池中的最小连接数，池中的连接数量若低于此值则创建新的连接，如果连接验证失败将缩小至此值 | 与initialSize设定的值相同 |
-| initialSize                   | 连接池启动时创建的初始连接数量                          | 10                 |
-| maxWait                       | 最大等待时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出异常    | 30000（30秒）         |
-| testOnBorrow                  | 当从连接池中取出一个连接时是否进行验证，若验证失败则从池中删除该连接并尝试取出另一个连接 | false              |
-| testOnConnect                 | 当一个连接首次被创建时是否进行验证，若验证失败则抛出 SQLException 异常 | false              |
-| testOnReturn                  | 当一个连接使用完归还到连接池时是否进行验证                    | false              |
-| testWhileIdle                 | 对池中空闲的连接是否进行验证，验证失败则回收此连接                | false              |
-| validationQuery               | 在连接池返回连接给调用者前用来对连接进行验证的查询 SQL            | null               |
-| validationQueryTimeout        | SQL 查询验证超时时间（秒），小于或等于 0 的数值表示禁用          | -1                 |
-| timeBetweenEvictionRunsMillis | 在空闲连接回收器线程运行期间休眠时间（毫秒）， 该值不应该小于 1 秒，它决定线程多久验证空闲连接或丢弃连接的频率 | 5000（5秒）           |
-| minEvictableIdleTimeMillis    | 连接在池中保持空闲而不被回收的最小时间（毫秒）                  | 60000（60秒）         |
-| removeAbandoned               | 标记是否删除泄露的连接，如果连接超出removeAbandonedTimeout的限制，且该属性设置为 true，则连接被认为是被泄露并且可以被删除 | false              |
-| removeAbandonedTimeout        | 泄露的连接可以被删除的超时时间（秒），该值应设置为应用程序查询可能执行的最长时间 | 60                 |
-
-`application.yml`:
-
-```
-spring:
-  datasource:
-    url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
-    username: root
-    password: root
-    driver-class-name: com.mysql.jdbc.Driver
-    tomcat:
-      default-auto-commit: true
-      initial-size: 30
-      max-active: 120
-      max-wait: 10000
-      test-on-borrow: true
-      test-while-idle: true
-      validation-query: 'SELECT 1'
-      validation-query-timeout: 3
-      time-between-eviction-runs-millis: 10000
-      min-evictable-idle-time-millis: 120000
-      remove-abandoned: true
-      remove-abandoned-timeout: 120
-```
-
-## DBCP 连接池常用配置
-
-| 属性                            | 描述                                       | 默认值           |
-| ----------------------------- | ---------------------------------------- | ------------- |
-| url                           | 数据库连接地址                                  | -             |
-| username                      | 数据库账户                                    | -             |
-| password                      | 数据库密码                                    | -             |
-| driverClassName               | 驱动类的名称                                   | -             |
-| defaultAutoCommit             | 连接池中创建的连接默认是否自动提交事务                      | 驱动的缺省值        |
-| defaultReadOnly               | 连接池中创建的连接默认是否为只读状态                       | 驱动的缺省值        |
-| defaultCatalog                | 连接池中创建的连接默认的 catalog                     | -             |
-| initialSize                   | 连接池启动时创建的初始连接数量                          | 0             |
-| maxTotal                      | 连接池同一时间可分配的最大活跃连接数；负数表示不限制               | 8             |
-| maxIdle                       | 可以在池中保持空闲的最大连接数，超出此值的空闲连接被释放，负数表示不限制     | 8             |
-| minIdle                       | 可以在池中保持空闲的最小连接数，低于此值将创建空闲连接，若设置为 0，则不创建  | 0             |
-| maxWaitMillis                 | 最大等待时间（毫秒），如果在没有连接可用的情况下等待超过此时间，则抛出异常；-1 表示无限期等待，直到获取到连接为止 | -             |
-| validationQuery               | 在连接池返回连接给调用者前用来对连接进行验证的查询 SQL            | -             |
-| validationQueryTimeout        | SQL 查询验证超时时间（秒）                          | -             |
-| testOnCreate                  | 连接在创建之后是否进行验证                            | false         |
-| testOnBorrow                  | 当从连接池中取出一个连接时是否进行验证，若验证失败则从池中删除该连接并尝试取出另一个连接 | true          |
-| testOnReturn                  | 当一个连接使用完归还到连接池时是否进行验证                    | false         |
-| testWhileIdle                 | 对池中空闲的连接是否进行验证，验证失败则释放此连接                | false         |
-| timeBetweenEvictionRunsMillis | 在空闲连接回收器线程运行期间休眠时间（毫秒），如果设置为非正数，则不运行此线程  | -1            |
-| numTestsPerEvictionRun        | 空闲连接回收器线程运行期间检查连接的个数                     | 3             |
-| minEvictableIdleTimeMillis    | 连接在池中保持空闲而不被回收的最小时间（毫秒）                  | 1800000（30分钟） |
-| removeAbandonedOnBorrow       | 标记是否删除泄露的连接，如果连接超出removeAbandonedTimeout的限制，且该属性设置为 true，则连接被认为是被泄露并且可以被删除 | false         |
-| removeAbandonedTimeout        | 泄露的连接可以被删除的超时时间（秒），该值应设置为应用程序查询可能执行的最长时间 | 300（5分钟）      |
-| poolPreparedStatements        | 设置该连接池的预处理语句池是否生效                        | false         |
-
-`application.yml`
-
-```
-spring:
-  jmx:
-    enabled: false
-  datasource:
-    url: jdbc:mysql://127.0.0.1/spring_boot_testing_storage
-    username: root
-    password: root
-    driver-class-name: com.mysql.jdbc.Driver
-    dbcp2:
-      default-auto-commit: true
-      initial-size: 30
-      max-total: 120
-      max-idle: 120
-      min-idle: 30
-      max-wait-millis: 10000
-      validation-query: 'SELECT 1'
-      validation-query-timeout: 3
-      test-on-borrow: true
-      test-while-idle: true
-      time-between-eviction-runs-millis: 10000
-      num-tests-per-eviction-run: 10
-      min-evictable-idle-time-millis: 120000
-      remove-abandoned-on-borrow: true
-      remove-abandoned-timeout: 120
-      pool-prepared-statements: true
-```
-
-Spring Boot Data Jpa 依赖声明：
-
-```
-通过application.yml: spring.datasource.type=...配置
-
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-dbcp2</artifactId>
-    <version>2.2.0</version>
-</dependency>
-```
-
-## Druid连接池配置
-
-参考：***[https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter](https://github.com/alibaba/druid/tree/master/druid-spring-boot-starter)***
-
-# Spring MVC集成fastjson
+## Spring MVC集成fastjson
 
 ```
 <dependency>
@@ -650,7 +568,7 @@ Spring Boot Data Jpa 依赖声明：
 
 两种方式：
 
-## 方式一、实现`WebMvcConfigurer`
+### 方式一、实现`WebMvcConfigurer`
 
 ```
 @Configuration
@@ -677,7 +595,7 @@ public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
 }
 ```
 
-## 方式二、通过`@Bean`方式
+### 方式二、通过`@Bean`方式
 
 ```
 @Configuration
@@ -703,7 +621,7 @@ public class WebMvcMessageConvertConfig {
 }
 ```
 
-## WebFlux
+### WebFlux
 
 上面针对的是Web MVC，**对于Webflux目前不支持这种方式**，只能先这么设置
 
@@ -714,6 +632,34 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
 ```
 
+## Spring Boot MVC特性
+
+Spring boot 在spring默认基础上，自动配置添加了以下特性
+
+- 包含了`ContentNegotiatingViewResolver`和`BeanNameViewResolver` beans。
+- 对静态资源的支持，包括对WebJars的支持。
+- 自动注册`Converter`，`GenericConverter`，`Formatter` beans。
+- 对`HttpMessageConverters`的支持。
+- 自动注册`MessageCodeResolver`。
+- 对静态`index.html`的支持。
+- 对自定义`Favicon`的支持。
+- 主动使用`ConfigurableWebBindingInitializer` bean
+
+## 模板引擎的选择
+
+- FreeMarker
+- Thymeleaf
+- Velocity (1.4版本之后弃用，Spring Framework 4.3版本之后弃用)
+- Groovy
+- Mustache
+
+注：jsp应该尽量避免使用，原因如下：
+
+- jsp只能打包为：war格式，不支持jar格式，只能在标准的容器里面跑（tomcat，jetty都可以）
+- 内嵌的Jetty目前不支持JSPs
+- Undertow不支持jsps
+- jsp自定义错误页面不能覆盖spring boot 默认的错误页面
+
 # 开启GZIP算法压缩响应流
 
 ```
@@ -721,6 +667,45 @@ server:
   compression:
     enabled: true # 启用压缩
     min-response-size: 2048 # 对应Content-Length，超过这个值才会压缩
+```
+
+# 全局异常处理
+
+## 方式一：添加自定义的错误页面
+
+- html静态页面：在resources/public/error/ 下定义. 如添加404页面： resources/public/error/404.html页面，中文注意页面编码
+- 模板引擎页面：在templates/error/下定义. 如添加5xx页面： templates/error/5xx.ftl
+
+> 注：templates/error/ 这个的优先级比较resources/public/error/高
+
+## 方式二：通过@ControllerAdvice
+
+```
+@Slf4j
+@ControllerAdvice
+//@RestControllerAdvice
+public class ErrorExceptionHandler {
+
+	@ExceptionHandler({ RuntimeException.class })
+	@ResponseStatus(HttpStatus.OK)
+	public ModelAndView processException(RuntimeException exception) {
+		log.info("自定义异常处理-RuntimeException");
+		ModelAndView m = new ModelAndView();
+		m.addObject("roncooException", exception.getMessage());
+		m.setViewName("error/500");
+		return m;
+	}
+
+	@ExceptionHandler({ Exception.class })
+	@ResponseStatus(HttpStatus.OK)
+	public ModelAndView processException(Exception exception) {
+		log.info("自定义异常处理-Exception");
+		ModelAndView m = new ModelAndView();
+		m.addObject("roncooException", exception.getMessage());
+		m.setViewName("error/500");
+		return m;
+	}
+}
 ```
 
 # 创建异步方法
@@ -949,6 +934,8 @@ public void processContextRefreshedEvent(ContextRefreshedEvent event) throws Int
 
 Spring的事件处理是单线程的，所以如果一个事件被触发，除非所有的接收者得到消息，否则这些进程被阻止，流程将不会继续。因此，如果要使用事件处理，在设计应用程序时应小心。
 
+### Spring内置事件
+
 以下是Spring的内置事件
 
 | Spring 内置事件           | 描述                                                         |
@@ -958,6 +945,17 @@ Spring的事件处理是单线程的，所以如果一个事件被触发，除�
 | **ContextStoppedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`stop()`方法停止`ApplicationContext`时，该事件被触发。你可以在接受到这个事件后做必要的清理的工作。 |
 | **ContextClosedEvent**    | 当使用`ConfigurableApplicationContext`接口中的`close()`方法关闭`ApplicationContext`时，该事件被触发。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。 |
 | **RequestHandledEvent**   | 这是一个`web-specific`事件，告诉所有`bean` HTTP请求已经被服务。 |
+
+### Spring Boot 2.0新增事件
+
+在Spring Boot 2.0中对事件模型做了一些增强，主要就是增加了`ApplicationStartedEvent`事件，所以在2.0版本中所有的事件按执行的先后顺序如下：
+
+- `ApplicationStartingEvent`
+- `ApplicationEnvironmentPreparedEvent`
+- `ApplicationPreparedEvent`
+- `ApplicationStartedEvent` <= 新增的事件
+- `ApplicationReadyEvent`
+- `ApplicationFailedEvent`
 
 ## ApplicationRunner 或 CommandLineRunner
 
@@ -1039,601 +1037,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
    }
    ```
 
-   ​
 
 
-# Spring Boot 事件
 
-在Spring Boot 2.0中对事件模型做了一些增强，主要就是增加了`ApplicationStartedEvent`事件，所以在2.0版本中所有的事件按执行的先后顺序如下：
-
-- `ApplicationStartingEvent`
-- `ApplicationEnvironmentPreparedEvent`
-- `ApplicationPreparedEvent`
-- `ApplicationStartedEvent` <= 新增的事件
-- `ApplicationReadyEvent`
-- `ApplicationFailedEvent`
-
-# 测试篇
-
-## 使用AssertJ
-
-> [AssertJ Core features highlight](http://joel-costigliola.github.io/assertj/assertj-core-features-highlight.html)
-
-如果是Spring Boot 1.x版本，在`spring-boot-starter-test`模块中，AssertJ的版本依然停留在`2.x`，为了可以使用新功能，我们可以引入新版本的AssertJ（**Spring Boot 2已经是最新版的AssertJ**）:
-
-```
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-test</artifactId>
-    <scope>test</scope>
-    <exclusions>
-        <exclusion>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
-
-<dependency>
-    <groupId>org.assertj</groupId>
-    <artifactId>assertj-core</artifactId>
-    <version>3.9.0</version>
-</dependency>
-```
-
-AsserJ的API很多，功能非常强大，直接贴上代码：
-
-```
-package com.yangbingdong.springboottestassertj.assertj;
-
-import com.yangbingdong.springboottestassertj.domain.Person;
-import org.assertj.core.util.Maps;
-import org.junit.Test;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatIOException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.atIndex;
-import static org.assertj.core.api.Assertions.contentOf;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.util.DateUtil.parse;
-import static org.assertj.core.util.DateUtil.parseDatetimeWithMs;
-import static org.assertj.core.util.Lists.newArrayList;
-
-/**
- * @author ybd
- * @date 18-2-8
- * @contact yangbingdong@1994.gmail
- */
-public class AssertJTestDemo {
-
-	/**
-	 * 字符串断言
-	 */
-	@Test
-	public void testString() {
-		String str = null;
-		// 断言null或为空字符串
-		assertThat(str).isNullOrEmpty();
-		// 断言空字符串
-		assertThat("").isEmpty();
-		// 断言字符串相等 断言忽略大小写判断字符串相等
-		assertThat("Frodo").isEqualTo("Frodo").isEqualToIgnoringCase("frodo");
-		// 断言开始字符串 结束字符穿 字符串长度
-		assertThat("Frodo").startsWith("Fro").endsWith("do").hasSize(5);
-		// 断言包含字符串 不包含字符串
-		assertThat("Frodo").contains("rod").doesNotContain("fro");
-		// 断言字符串只出现过一次
-		assertThat("Frodo").containsOnlyOnce("do");
-		// 判断正则匹配
-		assertThat("Frodo").matches("..o.o").doesNotMatch(".*d");
-	}
-
-	/**
-	 * 数字断言
-	 */
-	@Test
-	public void testNumber() {
-		Integer num = null;
-		// 断言空
-		assertThat(num).isNull();
-		// 断言相等
-		assertThat(42).isEqualTo(42);
-		// 断言大于 大于等于
-		assertThat(42).isGreaterThan(38).isGreaterThanOrEqualTo(38);
-		// 断言小于 小于等于
-		assertThat(42).isLessThan(58).isLessThanOrEqualTo(58);
-		// 断言0
-		assertThat(0).isZero();
-		// 断言正数 非负数
-		assertThat(1).isPositive().isNotNegative();
-		// 断言负数 非正数
-		assertThat(-1).isNegative().isNotPositive();
-	}
-
-	/**
-	 * 时间断言
-	 */
-	@Test
-	public void testDate() {
-		// 断言与指定日期相同 不相同 在指定日期之后 在指定日期之钱
-		assertThat(parse("2014-02-01")).isEqualTo("2014-02-01").isNotEqualTo("2014-01-01")
-									   .isAfter("2014-01-01").isBefore(parse("2014-03-01"));
-		// 断言 2014 在指定年份之前 在指定年份之后
-		assertThat(new Date()).isBeforeYear(2020).isAfterYear(2013);
-		// 断言时间再指定范围内 不在指定范围内
-		assertThat(parse("2014-02-01")).isBetween("2014-01-01", "2014-03-01").isNotBetween(
-				parse("2014-02-02"), parse("2014-02-28"));
-
-		// 断言两时间相差100毫秒
-		Date d1 = new Date();
-		Date d2 = new Date(d1.getTime() + 100);
-		assertThat(d1).isCloseTo(d2, 100);
-
-		// sets dates differing more and more from date1
-		Date date1 = parseDatetimeWithMs("2003-01-01T01:00:00.000");
-		Date date2 = parseDatetimeWithMs("2003-01-01T01:00:00.555");
-		Date date3 = parseDatetimeWithMs("2003-01-01T01:00:55.555");
-		Date date4 = parseDatetimeWithMs("2003-01-01T01:55:55.555");
-		Date date5 = parseDatetimeWithMs("2003-01-01T05:55:55.555");
-
-		// 断言 日期忽略毫秒，与给定的日期相等
-		assertThat(date1).isEqualToIgnoringMillis(date2);
-		// 断言 日期与给定的日期具有相同的年月日时分秒
-		assertThat(date1).isInSameSecondAs(date2);
-		// 断言 日期忽略秒，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringSeconds(date3);
-		// 断言 日期与给定的日期具有相同的年月日时分
-		assertThat(date1).isInSameMinuteAs(date3);
-		// 断言 日期忽略分，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringMinutes(date4);
-		// 断言 日期与给定的日期具有相同的年月日时
-		assertThat(date1).isInSameHourAs(date4);
-		// 断言 日期忽略小时，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringHours(date5);
-		// 断言 日期与给定的日期具有相同的年月日
-		assertThat(date1).isInSameDayAs(date5);
-	}
-
-	/**
-	 * 集合断要
-	 */
-	@Test
-	public void testList() {
-		// 断言 列表是空的
-		assertThat(newArrayList()).isEmpty();
-		// 断言 列表的开始 结束元素
-		assertThat(newArrayList(1, 2, 3)).startsWith(1).endsWith(3);
-		// 断言 列表包含元素 并且是排序的
-		assertThat(newArrayList(1, 2, 3)).contains(1, atIndex(0)).contains(2, atIndex(1)).contains(3)
-										 .isSorted();
-		// 断言 被包含与给定列表
-		assertThat(newArrayList(3, 1, 2)).isSubsetOf(newArrayList(1, 2, 3, 4));
-		// 断言 存在唯一元素
-		assertThat(newArrayList("a", "b", "c")).containsOnlyOnce("a");
-	}
-
-	/**
-	 * Map断言
-	 */
-	@Test
-	public void testMap() {
-		Map<String, Object> foo = Maps.newHashMap("A", 1);
-		foo.put("B", 2);
-		foo.put("C", 3);
-
-		// 断言 map 不为空 size
-		assertThat(foo).isNotEmpty().hasSize(3);
-		// 断言 map 包含元素
-		assertThat(foo).contains(entry("A", 1), entry("B", 2));
-		// 断言 map 包含key
-		assertThat(foo).containsKeys("A", "B", "C");
-		// 断言 map 包含value
-		assertThat(foo).containsValue(3);
-	}
-
-	/**
-	 * 类断言
-	 */
-	@Test
-	public void testClass() {
-		// 断言 是注解
-		assertThat(Magical.class).isAnnotation();
-		// 断言 不是注解
-		assertThat(Ring.class).isNotAnnotation();
-		// 断言 存在注解
-		assertThat(Ring.class).hasAnnotation(Magical.class);
-		// 断言 不是借口
-		assertThat(Ring.class).isNotInterface();
-		// 断言 是否为指定Class实例
-		assertThat("string").isInstanceOf(String.class);
-		// 断言 类是给定类的父类
-		assertThat(Person1.class).isAssignableFrom(Employee.class);
-	}
-
-	/**
-	 * 异常断言
-	 */
-	@Test
-	public void testException() {
-		assertThatThrownBy(() -> { throw new Exception("boom!"); }).isInstanceOf(Exception.class)
-		  .hasMessageContaining("boom");
-
-		assertThatExceptionOfType(IOException.class).isThrownBy(() -> { throw new IOException("boom!"); })
-													.withMessage("%s!", "boom")
-													.withMessageContaining("boom")
-													.withNoCause();
-
-		/*
-		 * assertThatNullPointerException
-		 * assertThatIllegalArgumentException
-		 * assertThatIllegalStateException
-		 * assertThatIOException
-		 */
-		assertThatIOException().isThrownBy(() -> { throw new IOException("boom!"); })
-							   .withMessage("%s!", "boom")
-							   .withMessageContaining("boom")
-							   .withNoCause();
-	}
-
-	/**
-	 * 断言添加描述
-	 */
-	@Test
-	public void addDesc() {
-		Person person = new Person("ybd", 18);
-		assertThat(person.getAge()).as("check %s's age", person.getName()).isEqualTo(18);
-	}
-
-	/**
-	 * 断言对象列表
-	 */
-	@Test
-	public void personListTest() {
-		List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
-		assertThat(personList).extracting(Person::getName).contains("A", "B").doesNotContain("D");
-	}
-
-	@Test
-	public void personListTest1() {
-		List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
-		assertThat(personList).flatExtracting(Person::getName).contains("A", "B").doesNotContain("D");
-	}
-
-	/**
-	 * 断言文件
-	 * @throws Exception
-	 */
-	@Test
-	public void testFile() throws Exception {
-		File xFile = writeFile("xFile", "The Truth Is Out There");
-
-		assertThat(xFile).exists().isFile().isRelative();
-
-		assertThat(xFile).canRead().canWrite();
-
-		assertThat(contentOf(xFile)).startsWith("The Truth").contains("Is Out").endsWith("There");
-	}
-
-	private File writeFile(String fileName, String fileContent) throws Exception {
-		return writeFile(fileName, fileContent, Charset.defaultCharset());
-	}
-
-	private File writeFile(String fileName, String fileContent, Charset charset) throws Exception {
-		File file = new File("target/" + fileName);
-		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
-		out.write(fileContent);
-		out.close();
-		return file;
-	}
-
-	@Magical
-	public enum Ring {
-		oneRing, vilya, nenya, narya, dwarfRing, manRing;
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Magical {
-	}
-
-	public class Person1 {
-	}
-
-	public class Employee extends Person1 {
-	}
-}
-```
-
-更多请看官方例子：***[https://github.com/joel-costigliola/assertj-examples](https://github.com/joel-costigliola/assertj-examples)***
-
-## Gatling性能测试
-
-> 性能测试的两种类型，负载测试和压力测试：
-> - **负载测试（Load Testing）：**负载测试是一种主要为了测试软件系统是否达到需求文档设计的目标，譬如软件在一定时期内，最大支持多少并发用户数，软件请求出错率等，测试的主要是软件系统的性能。
-> - **压力测试（Stress Testing）：**压力测试主要是为了测试硬件系统是否达到需求文档设计的性能目标，譬如在一定时期内，系统的cpu利用率，内存使用率，磁盘I/O吞吐率，网络吞吐量等，压力测试和负载测试最大的差别在于测试目的不同。
-
-### Gatling 简介
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-logo.png)
-
-Gatling 是一个功能强大的负载测试工具。它是为易用性、可维护性和高性能而设计的。
-
-开箱即用，Gatling 带有对 HTTP 协议的出色支持，使其成为负载测试任何 HTTP 服务器的首选工具。由于核心引擎实际上是协议不可知的，所以完全可以实现对其他协议的支持，例如，Gatling 目前也提供JMS 支持。
-
-只要底层协议（如 HTTP）能够以非阻塞的方式实现，Gatling 的架构就是异步的。这种架构可以将虚拟用户作为消息而不是专用线程来实现。因此，运行数千个并发的虚拟用户不是问题。
-
-### 使用Recorder快速开始
-
-官方提供了GUI界面的录制器，可以监听对应端口记录请求操作并转化为Scala脚本
-
-1、进入 *[下载页面](https://gatling.io/download/)* 下载最新版本
-2、解压并进入 `$GATLING_HOME/bin` (`$GATLING_HOME`为解压目录)，运行`recorder.sh`
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/recorder1.png)
-
-* 上图监听8000端口（若被占用请更换端口），需要在浏览器设置代理，以FireFox为例：
-  ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/firefox-proxy.jpg)
-
-* `Output folder`为Scala脚本输出路径，例如设置为 `/home/ybd/data/application/gatling-charts-highcharts-bundle-2.3.0/user-files/simulations`，会在该路经下面生成一个`RecordedSimulation.scala`的文件（上面指定的Class Name）：
-  ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/scala-script-location.jpg)
-
-
-3、点击`record`并在Firefox进行相应操作，然后点击`Stop`，会生成类似下面的脚本：
-
-```
-package computerdatabase 
-
-import io.gatling.core.Predef._ 
-import io.gatling.http.Predef._
-import scala.concurrent.duration._
-
-class BasicSimulation extends Simulation { 
-
-  val httpConf = http 
-    .baseURL("http://computer-database.gatling.io") 
-    .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8") 
-    .doNotTrackHeader("1")
-    .acceptLanguageHeader("en-US,en;q=0.5")
-    .acceptEncodingHeader("gzip, deflate")
-    .userAgentHeader("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0")
-
-  val scn = scenario("BasicSimulation")
-    .exec(http("request_1")
-    .get("/"))
-    .pause(5) 
-
-  setUp( 
-    scn.inject(atOnceUsers(1))
-  ).protocols(httpConf)
-}
-```
-
-4、然后运行 `$GATLING_HOME/bin/gatling.sh`，选择 `[0] RecordedSimulation`，随后的几个选项直接回车即可生成测试结果：
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/terminal-gatling-test1.jpg)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/terminal-gatling-test2.jpg)
-
-注意看上图最下面那一行，就是生成测试结果的入口。
-
-具体请看官方文档：*[https://gatling.io/docs/current/quickstart](https://gatling.io/docs/current/quickstart)*
-
-### 使用IDEA编写
-
-1、首先安装Scala插件：
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/scala-plugin.jpg)
-
-2、安装 scala SDK：
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/add-scala-sdk02.jpg)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/add-scala-sdk01.jpg)
-
-3、编写测试脚本
-
-```
-class ApiGatlingSimulationTest extends Simulation {
-
-  val scn: ScenarioBuilder = scenario("AddAndFindPersons").repeat(100, "n") {
-    exec(
-      http("AddPerson-API")
-        .post("http://localhost:8080/persons")
-        .header("Content-Type", "application/json")
-        .body(StringBody("""{"firstName":"John${n}","lastName":"Smith${n}","birthDate":"1980-01-01", "address": {"country":"pl","city":"Warsaw","street":"Test${n}","postalCode":"02-200","houseNo":${n}}}"""))
-        .check(status.is(200))
-    ).pause(Duration.apply(5, TimeUnit.MILLISECONDS))
-  }.repeat(1000, "n") {
-    exec(
-      http("GetPerson-API")
-        .get("http://localhost:8080/persons/${n}")
-        .check(status.is(200))
-    )
-  }
-
-  setUp(scn.inject(atOnceUsers(30))).maxDuration(FiniteDuration.apply(10, "minutes"))
-```
-
-4、配置pom
-
-```
- <build>
-        <plugins>
-            <!-- Gatling Maven 插件， 使用： mvn gatling:execute 命令运行 -->
-            <plugin>
-                <groupId>io.gatling</groupId>
-                <artifactId>gatling-maven-plugin</artifactId>
-                <version>${gatling-plugin.version}</version>
-                <configuration>
-                    <!-- 测试脚本 -->
-                    <simulationClass>com.yangbingdong.springbootgatling.gatling.ApiGatlingSimulationTest</simulationClass>
-                    <!-- 结果输出地址 -->
-                    <resultsFolder>/home/ybd/test/gatling</resultsFolder>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-```
-
-5、运行 Spring Boot 应用
-
-6、运行测试
-
-```
-mvn gatling:execute
-```
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/idea-gatling-test.jpg)
-
-我们打开结果中的`index.html`：
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result1.jpg)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result2.jpg)
-
-### 遇到问题
-
-途中出现了以下错误
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-error1.jpg)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-error2.jpg)
-
-这是由于**使用了Log4J2**，把Gatling自带的Logback排除了（同一个项目），把`<exclusions>`这一段注释掉就没问题了：
-
-```
-<dependency>
-    <groupId>io.gatling.highcharts</groupId>
-    <artifactId>gatling-charts-highcharts</artifactId>
-    <version>${gatling-charts-highcharts.version}</version>
-    <!-- 由于配置了log4j2，运行Gatling时需要**注释**以下的 exclusions，否则会抛异常，但貌似不影响测试结果 -->
-    <exclusions>
-        <exclusion>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
-```
-
-囧。。。。。。
-
-> 参考：*[http://www.spring4all.com/article/584](http://www.spring4all.com/article/584)*
->
-> 代码：*[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-gatling](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-gatling)*
->
-> 官方教程：*[https://gatling.io/docs/current/advanced_tutorial/](https://gatling.io/docs/current/advanced_tutorial/)*
-
-## ContPerf
-
-ContiPerf
-
-是一个轻量级的**测试**工具，基于**JUnit**4 开发，可用于**接口**级的**性能测试**，快速压测。
-
-引入依赖:
-
-```
-        <!-- 性能测试 -->
-        <dependency>
-            <groupId>org.databene</groupId>
-            <artifactId>contiperf</artifactId>
-            <scope>test</scope>
-            <version>2.1.0</version>
-        </dependency>
-```
-
-### ContiPerf介绍
-
-可以指定在线程数量和执行次数，通过限制最大时间和平均执行时间来进行效率测试，一个简单的例子如下：
-
-```
-public class ContiPerfTest { 
-    @Rule 
-    publicContiPerfRule i = newContiPerfRule(); 
-   
-    @Test 
-    @PerfTest(invocations = 1000, threads = 40) 
-    @Required(max = 1200, average = 250, totalTime = 60000) 
-    publicvoidtest1() throwsException { 
-        Thread.sleep(200); 
-    } 
-}
-```
-
-使用`@Rule`注释激活ContiPerf，通过`@Test`指定测试方法，`@PerfTest`指定调用次数和线程数量，`@Required`指定性能要求（每次执行的最长时间，平均时间，总时间等）。
-
-也可以通过对类指定`@PerfTest`和`@Required`，表示类中方法的默认设置，如下：
-
-```
-@PerfTest(invocations = 1000, threads = 40) 
-@Required(max = 1200, average = 250, totalTime = 60000) 
-public class ContiPerfTest { 
-    @Rule 
-    public ContiPerfRule i = new ContiPerfRule(); 
-   
-    @Test 
-    public void test1() throws Exception { 
-        Thread.sleep(200); 
-    } 
-}
-```
-
-### 主要参数介绍
-
-1）PerfTest参数
-
-`@PerfTest(invocations = 300)`：执行300次，和线程数量无关，默认值为1，表示执行1次；
-
-`@PerfTest(threads=30)`：并发执行30个线程，默认值为1个线程；
-
-`@PerfTest(duration = 20000)`：重复地执行测试至少执行20s。
-
-三个属性可以组合使用，其中`Threads`必须和其他两个属性组合才能生效。当`Invocations`和`Duration`都有指定时，以执行次数多的为准。
-
-　　例，`@PerfTest(invocations = 300, threads = 2, duration = 100)`，如果执行方法300次的时候执行时间还没到100ms，则继续执行到满足执行时间等于100ms，如果执行到50次的时候已经100ms了，则会继续执行之100次。
-
-　　如果你不想让测试连续不间断的跑完，可以通过注释设置等待时间，例，`@PerfTest(invocations = 1000, threads = 10, timer = RandomTimer.class, timerParams = { 30, 80 })` ，每执行完一次会等待30~80ms然后才会执行下一次调用。
-
-　　在开多线程进行并发压测的时候，如果一下子达到最大进程数有些系统可能会受不了，ContiPerf还提供了“预热”功能，例，`@PerfTest(threads = 10, duration = 60000, rampUp = 1000)` ，启动时会先起一个线程，然后每个1000ms起一线程，到9000ms时10个线程同时执行，那么这个测试实际执行了69s，如果只想衡量全力压测的结果，那么可以在注释中加入warmUp，即`@PerfTest(threads = 10, duration = 60000, rampUp = 1000, warmUp = 9000)` ，那么统计结果的时候会去掉预热的9s。
-
-2）Required参数
-
-`@Required(throughput = 20)`：要求每秒至少执行20个测试；
-
-`@Required(average = 50)`：要求平均执行时间不超过50ms；
-
-`@Required(median = 45)`：要求所有执行的50%不超过45ms； 
-
-`@Required(max = 2000)`：要求没有测试超过2s；
-
-`@Required(totalTime = 5000)`：要求总的执行时间不超过5s；
-
-`@Required(percentile90 = 3000)`：要求90%的测试不超过3s；
-
-`@Required(percentile95 = 5000)`：要求95%的测试不超过5s； 
-
-`@Required(percentile99 = 10000)`：要求99%的测试不超过10s; 
-
-`@Required(percentiles = "66:200,96:500")`：要求66%的测试不超过200ms，96%的测试不超过500ms。
-
-### 测试结果
-
-测试结果除了会在控制台显示之外，还会生成一个结果文件`target/contiperf-report/index.html`
-
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/contiperf-report.jpg)
 

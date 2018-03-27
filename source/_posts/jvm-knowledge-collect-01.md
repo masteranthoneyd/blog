@@ -836,15 +836,18 @@ openFile
 
 # 最后
 
-个人觉得以上原文写的很好，起码自己看得懂。
-下面附上参考
-
 > **参考并转载于：**
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/51892567](http://blog.csdn.net/seu_calvin/article/details/51892567)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/52301541](http://blog.csdn.net/seu_calvin/article/details/52301541)***
 > ***[http://www.importnew.com/23774.html](http://www.importnew.com/23774.html)***
 > ***[http://www.importnew.com/23774.html](http://www.importnew.com/23780.html)***
+
+更多JVM汇总请看：
+
+***[Jvm系列文章](http://www.ityouknow.com/jvm.html)***
+
+***[关于Jvm知识看这一篇就够了](https://mp.weixin.qq.com/s/4c9K5eYMFGVV2WyKaYXVBA)***
 
 
 
