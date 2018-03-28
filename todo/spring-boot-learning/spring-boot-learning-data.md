@@ -6,6 +6,17 @@
 
 ### MySQL
 
+pom.xml:
+
+```
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+</dependency>
+```
+
+application.yml:
+
 ```
 spring:
   datasource:
@@ -17,6 +28,21 @@ spring:
 
 ### H2
 
+**注意：使用H2控制台不能使用WebFlux，否则控制台出不来**
+
+pom.xml:
+
+```
+<!-- h2 数据源连接驱动 -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+application.yml:
+
 ```
 spring:
   datasource:
@@ -25,13 +51,18 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  # 开启控制台
+```
+
+#### 开启H2控制台
+
+```
+spring:
   h2:
     console:
-      # 开启控制台，默认为 /h2-console
+      # 开启控制台，默认为 false
       enabled: true
-      # 配置控制台路径
-#      path: /console
+      # 配置控制台路径，默认为 /h2-console
+      path: /console
 ```
 
 ## 常用连接池配置
