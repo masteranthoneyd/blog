@@ -1141,9 +1141,9 @@ public void asyncMethodWithVoidReturnType() throws InterruptedException {
 
 ## 配置线程池
 
-在不配置线程池的情况下，Spring默认使用`SimpleAsyncTaskExecutor`，每一次的执行任务都会使用新的线程，性能不太好，所以我们可以自定义线程池
+在不配置线程池的情况下，Spring**默认使用**`SimpleAsyncTaskExecutor`，每一次的执行任务都会使用新的线程，性能不太好，所以我们可以自定义线程池
 
-### 直接定义线程池
+### 直接声明线程池
 
 ```
 @Configuration
@@ -1152,17 +1152,30 @@ public class SpringAsyncConfig {
 	@Bean
 	public Executor threadPoolTaskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(8);
-		executor.setMaxPoolSize(42);
+		executor.setCorePoolSize(10);
+		executor.setMaxPoolSize(20);
 		executor.setQueueCapacity(500);
+		executor.setKeepAliveSeconds(60);
 		executor.setThreadNamePrefix("asyncExecutor-");
+		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		executor.initialize();
 		return executor;
 	}
 }
 ```
 
+通过使用`ThreadPoolTaskExecutor`创建了一个线程池，同时设置了以下这些参数：
+
+- 核心线程数10：线程池创建时候初始化的线程数
+- 最大线程数20：线程池最大的线程数，只有在缓冲队列满了之后才会申请超过核心线程数的线程
+- 缓冲队列500：用来缓冲执行任务的队列
+- 允许线程的空闲时间60秒：当超过了核心线程出之外的线程在空闲时间到达之后会被销毁
+- 线程池名的前缀：设置好了之后可以方便我们定位处理任务所在的线程池
+- 线程池对拒绝任务的处理策略：这里采用了`CallerRunsPolicy`策略，当线程池没有处理能力的时候，该策略会直接在 execute 方法的调用线程中运行被拒绝的任务；如果执行程序已关闭，则会丢弃该任务
+
 ### 实现AsyncConfigurer
+
+> 通过这种方式，可以**对异常进行处理**
 
 `AsyncConfigurer`接口有两个方法：
 
@@ -1198,6 +1211,15 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 }
 ```
 
+### 优雅关闭线程池
+
+有时候，存在关闭程序但还有异步任务在执行的情况，这时候，我们需要优雅地关闭线程池，只需要两个参数：
+
+```
+executor.setWaitForTasksToCompleteOnShutdown(true);
+executor.setAwaitTerminationSeconds(60);
+```
+
 ## Async使用指定线程池
 
 如果同时实现了`AsyncConfigurer`以及配置线程池，那么`@Async`默认使用`AsyncConfigurer.getAsyncExecutor`的线程池。
@@ -1205,18 +1227,6 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 如果需要指定线程池可以这样
 
 ```
-@Bean("threadPoolTaskExecutor")
-public Executor threadPoolTaskExecutor() {
-	ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-	executor.setCorePoolSize(8);
-	executor.setMaxPoolSize(42);
-	executor.setQueueCapacity(500);
-	executor.setThreadNamePrefix("asyncExecutor-");
-	executor.initialize();
-	return executor;
-}
-
-
 @Async("threadPoolTaskExecutor")
 public void someMethod(){...}
 ```
