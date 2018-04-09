@@ -9,7 +9,7 @@ tags: [Java, Spring, Spring Boot]
 
 > Spring Boot作为当下最流行的微服务项目构建基础，有的时候我们根本不需要额外的配置就能够干很多的事情，这得益于它的一个核心理念：“习惯优于配置”。。。
 >
-> 说白的就是大部分的配置都已经按照最佳实践的编程规范配置好了
+> 说白的就是大部分的配置都已经按照~~最佳实践~~的编程规范配置好了
 >
 > 本文基于 Spring Boot 2的学习杂记，还是与1.X版本还是有一定区别的
 
@@ -332,7 +332,9 @@ server.undertow.buffers-per-region=1024
 server.undertow.direct-buffers=true
 ```
 
-# 使用Log4j2
+# 日志相关
+
+## 使用Log4j2
 
 > 更多Log4j2配置请看：***[https://my.oschina.net/kkrgwbj/blog/734530](https://my.oschina.net/kkrgwbj/blog/734530)***
 
@@ -340,7 +342,7 @@ server.undertow.direct-buffers=true
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/log4j2-performance.png)
 
-## Maven配置
+### Maven配置
 
 ```
 <!-- Spring Boot 依赖-->
@@ -377,7 +379,7 @@ server.undertow.direct-buffers=true
 
 **注意**：需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
 
-## application.yml简单配置
+### application.yml简单配置
 
 ```
 logging:
@@ -386,7 +388,7 @@ logging:
     console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
 ```
 
-## log4j2.xml配置
+### log4j2.xml配置
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -492,7 +494,7 @@ logging:
 </configuration>
 ```
 
-## 也可以使用log4j2.yml
+### 也可以使用log4j2.yml
 
 需要引入依赖以识别：
 
@@ -545,6 +547,79 @@ Configuration:
 ```
 
 更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
+
+## 日志配置文件中获取Application配置项
+
+### Logback
+
+方法1: 使用`logback-spring.xml`，因为`logback.xml`加载早于`application.properties`，所以如果你在`logback.xml`使用了变量时，而恰好这个变量是写在`application.properties`时，那么就会获取不到，只要改成`logback-spring.xml`就可以解决。
+
+方法2: 使用`<springProperty>`标签，例如：
+
+```
+<springProperty scope="context" name="LOG_HOME" source="logback.file"/>
+```
+
+### Log4j2
+
+只能写一个Lookup：
+
+```
+@Plugin(name = "spring", category = StrLookup.CATEGORY)
+public class SpringEnvironmentLookup extends AbstractLookup {
+	private LinkedHashMap ymlData;
+	private Map<String, String> map;
+	private static final String APPLICATION_YML_NAME = "application.yml";
+
+	public SpringEnvironmentLookup() {
+		super();
+		map = new HashMap<>(16);
+		try {
+			ymlData = new Yaml().loadAs(new ClassPathResource(APPLICATION_YML_NAME).getInputStream(), LinkedHashMap.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("SpringEnvironmentLookup initialize fail");
+		}
+	}
+
+	@Override
+	public String lookup(LogEvent event, String key) {
+		return map.computeIfAbsent(key, this::resolveYmlMapByKey);
+	}
+
+	private String resolveYmlMapByKey(String key) {
+		Assert.isTrue(isNotBlank(key), "key can not be blank!");
+		String[] keyChain = key.split("\\.");
+		int length = keyChain.length;
+		if (length == 1) {
+			return map.computeIfAbsent(key, s -> getFinalValue(s, ymlData));
+		}
+		String k;
+		LinkedHashMap[] mapChain = new LinkedHashMap[length];
+		mapChain[0] = ymlData;
+		for (int i = 0; i < length; i++) {
+			if (i == length - 1) {
+				int finalI = i;
+				return map.computeIfAbsent(key, s -> getFinalValue(keyChain[finalI], mapChain[finalI]));
+			}
+			k = keyChain[i];
+			Object o = mapChain[i].get(k);
+			if (o instanceof LinkedHashMap) {
+				mapChain[i + 1] = (LinkedHashMap) o;
+			}else {
+				throw new IllegalArgumentException();
+			}
+		}
+		return "";
+	}
+
+	private static String getFinalValue(String k, LinkedHashMap ymlData) {
+		return defaultIfNull((String) ymlData.get(k), "");
+	}
+}
+```
+
+然后在`log4j2.xml`中这样使用 `${spring:spring.application.name}`
 
 # 查看依赖树
 
@@ -775,6 +850,8 @@ public class InterceptorConfigurerAdapter extends WebMvcConfigurer {
 
 ## 创建 Servlet、 Filter、Listener
 
+### 注解方式
+
 > 直接通过`@WebServlet`、`@WebFilter`、`@WebListener` 注解自动注册
 
 ```
@@ -791,6 +868,53 @@ public class CustomListener implements ServletContextListener {
 @WebServlet(name = "customServlet", urlPatterns = "/roncoo")
 public class CustomServlet extends HttpServlet {
     ...
+}
+```
+
+然后需要在`**Application.java` 加上`@ServletComponentScan`注解，否则不会生效。
+
+**注意：如果同时添加了`@WebFilter`以及`@Component`，那么会初始化两次Filter，并且会过滤所有路径+自己指定的路径 ，便会出现对没有指定的URL也会进行过滤**
+
+### 通过编码注册
+
+```
+@Configuration
+public class WebConfig {
+
+    @Bean
+    public FilterRegistrationBean myFilter(){
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        MyFilter filter = new MyFilter();
+        registrationBean.setFilter(filter);
+
+        List<String> urlPatterns = new ArrayList<>();
+        urlPatterns.add("/*");
+        registrationBean.setUrlPatterns(urlPatterns);
+        registrationBean.setOrder(1);
+
+        return registrationBean;
+    }
+
+    @Bean
+    public ServletRegistrationBean myServlet() {
+        MyServlet demoServlet = new MyServlet();
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+        registrationBean.setServlet(demoServlet);
+        List<String> urlMappings = new ArrayList<String>();
+        urlMappings.add("/myServlet");////访问，可以添加多个
+        registrationBean.setUrlMappings(urlMappings);
+        registrationBean.setLoadOnStartup(1);
+        return registrationBean;
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean myListener() {
+        ServletListenerRegistrationBean registrationBean
+                = new ServletListenerRegistrationBean<>();
+        registrationBean.setListener(new MyListener());
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
 }
 ```
 
@@ -1462,7 +1586,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 - 原理：两个VM之间通过socket协议进行通信，然后以达到远程调试的目的。
 - 注意，如果 Java 源代码与目标应用程序不匹配，调试特性将不能正常工作。
 
-# java启动命令
+## java启动命令
 
 - -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n
 

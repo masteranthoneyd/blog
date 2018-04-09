@@ -690,9 +690,7 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/cnm-demo.png)
 
-
-
-## Eureka Edgware.RELEASE版本注册优化
+# Eureka Edgware.RELEASE版本注册优化
 
 在`Edgware.RELEASE`版本中相比之前的步骤，省略了在主函数上添加`@EnableDiscoveryClient`注解这一过程。Spring Cloud默认认为客户端是要完成向注册中心进行注册的。
 
