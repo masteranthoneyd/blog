@@ -148,7 +148,7 @@ spring:
 ### 如何使用
 
 ```
-java -jar myapp.jar --spring.profiles.active=dev
+java -Dspring.profiles.active=dev -jar myapp.jar
 ```
 
 # 热部署

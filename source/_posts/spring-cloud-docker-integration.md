@@ -30,7 +30,6 @@ tags: [Docker, Spring Cloud, Java, Spring]
 
 ```
 mvn --encrypt-master-password <password>
-
 ```
 
 其次在`settings.xml`文件的同级目录创建`settings-security.xml`文件，将主密码写入：

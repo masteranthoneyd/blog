@@ -1368,6 +1368,34 @@ Docker hub默认选择master分支作为latest版本，我们可以根据自己�
 
 参考：***[https://docs.docker.com/docker-hub/builds/](https://docs.docker.com/docker-hub/builds/)***
 
+# 使用代理构建镜像
+
+有时候，我们构建镜像需要在镜像内安装一些软件，因为构建时采用的是`bridge`模式，对于一些资源比较稀缺或需要**科学上网**才能安装的软件慢得简直无法忍受。对此，我们可以在构建时设置**构建参数**（`--build-arg`）从而达到代理安装的目的。或者也可以用官方的Docker Hub自动构建，或者将Dockerfile上传到VPS进行构建=.=...但感觉没必要。
+
+例如像下面`Dockerfile`：
+
+```
+FROM XXXXXX
+MAINTAINER ybd <yangbingdong1994@gmail.com> 
+ARG HTTP_PROXY
+ENV http_proxy=${HTTP_PROXY} https_proxy=${HTTP_PROXY}
+RUN apk update && \
+    apk add --no-cache && \
+    apk add curl bash tree tzdata .....
+ENV http_proxy=
+ENV https_proxy=
+```
+
+然后构建：
+
+```
+docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/oraclejdk8 .
+```
+
+`192.168.6.113:8118`是从Sock5转换过来的http代理
+
+**注意：镜像内软件安装完成时候需要将代理置空，所以上面示例最后两行后面的值是空的，否则接下来容器内发生的网络访问都会走代理...**
+
 # Self Usage Docker Or Compose
 
 以下是个人使用的一些容器运行命令或者`docker-compose.yml`，不定时更新
