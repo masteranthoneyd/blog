@@ -15,7 +15,7 @@ tags: [Java, Spring, Spring Boot]
 
 <!--more-->
 
-# 构建依赖版本管理工程以及父工程
+# 构建依赖版本管理工程
 
 > 为什么要分开为两个工程？因为考虑到common工程也需要版本控制，但parent工程中依赖了common工程，所以common工程不能依赖parent工程（循环依赖），故例外抽离出一个dependencies的工程，专门用作依赖版本管理，而parent工程用作其他子工程的公共依赖。
 
@@ -41,7 +41,9 @@ tags: [Java, Spring, Spring Boot]
 * `<dependencyManagement>` 管理依赖版本，不使用 `<parent>` 来依赖 Spring Boot，可以使用上面方式，添加 `<type>` 为 `pom` 以及 `<scope>` 为 `import`。
 * `<pluginManagement>` 的功能类似于 `<dependencyManagement>`，在父项目中设置好插件属性，在子项目中直接依赖就可以，不需要每个子项目都配置一遍，当然了，子项目也可以覆盖插件属性。
 
-# 打包成可执行的Jar
+# 打包
+
+## 打包成可执行的Jar
 
 默认情况下Spring Boot打包出来的jar包是不可执行的，需要这样配置：
 
@@ -65,6 +67,59 @@ tags: [Java, Spring, Spring Boot]
 打包之后会发现有**两个**jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/repackage.png)
+
+## 打包依赖了Spring Boot的工具库
+
+只需要在打包插件`spring-boot-maven-plugin`中这样配置：
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>none</phase>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
+## 打包契约类
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+                <includes>
+                    <include>com/yangbingdong/server/**/contract/**/*.class</include>
+                </includes>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>none</phase>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
+然后指定该pom文件构建：
+
+```
+mvn -f pom_own.xml package
+```
 
 # 配置文件：Properties 和 YAML
 
@@ -565,17 +620,33 @@ Configuration:
 只能写一个Lookup：
 
 ```
+@SuppressWarnings("unused")
 @Plugin(name = "spring", category = StrLookup.CATEGORY)
 public class SpringEnvironmentLookup extends AbstractLookup {
-	private LinkedHashMap ymlData;
-	private Map<String, String> map;
-	private static final String APPLICATION_YML_NAME = "application.yml";
+	private static LinkedHashMap profileYmlData;
+	private static LinkedHashMap metaYmlData;
+	private static boolean profileExist;
+	private static Map<String, String> map = new HashMap<>(16);
+	private static final String META_PROFILE = "application.yml";
+	private static final String PROFILE_PREFIX = "application";
+	private static final String PROFILE_SUFFIX = ".yml";
+	private static final String DEFAULT_PROFILE = "application-dev.yml";
+	private static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
 
-	public SpringEnvironmentLookup() {
-		super();
-		map = new HashMap<>(16);
+	static {
 		try {
-			ymlData = new Yaml().loadAs(new ClassPathResource(APPLICATION_YML_NAME).getInputStream(), LinkedHashMap.class);
+			metaYmlData = new Yaml().loadAs(new ClassPathResource(META_PROFILE).getInputStream(), LinkedHashMap.class);
+			Properties properties = System.getProperties();
+			String active = properties.getProperty(SPRING_PROFILES_ACTIVE);
+			if (isBlank(active)) {
+				active = getValueFromData(SPRING_PROFILES_ACTIVE, SPRING_PROFILES_ACTIVE.split("\\."), metaYmlData);
+			}
+			String configName = isNotBlank(active) ? PROFILE_PREFIX + "-" + active + PROFILE_SUFFIX : DEFAULT_PROFILE;
+			ClassPathResource classPathResource = new ClassPathResource(configName);
+			profileExist = classPathResource.exists();
+			if (profileExist) {
+				profileYmlData = new Yaml().loadAs(classPathResource.getInputStream(), LinkedHashMap.class);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("SpringEnvironmentLookup initialize fail");
@@ -584,29 +655,42 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 
 	@Override
 	public String lookup(LogEvent event, String key) {
-		return map.computeIfAbsent(key, this::resolveYmlMapByKey);
+		return map.computeIfAbsent(key, SpringEnvironmentLookup::resolveYmlMapByKey);
 	}
 
-	private String resolveYmlMapByKey(String key) {
+	private static String resolveYmlMapByKey(String key) {
 		Assert.isTrue(isNotBlank(key), "key can not be blank!");
 		String[] keyChain = key.split("\\.");
+		String value = null;
+		if (profileExist) {
+			value = getValueFromData(key, keyChain, profileYmlData);
+		}
+		if (isBlank(value)) {
+			value = getValueFromData(key, keyChain, metaYmlData);
+		}
+		return value;
+	}
+
+	private static String getValueFromData(String key, String[] keyChain, LinkedHashMap dataMap) {
 		int length = keyChain.length;
 		if (length == 1) {
-			return map.computeIfAbsent(key, s -> getFinalValue(s, ymlData));
+			return getFinalValue(key, dataMap);
 		}
 		String k;
 		LinkedHashMap[] mapChain = new LinkedHashMap[length];
-		mapChain[0] = ymlData;
+		mapChain[0] = dataMap;
 		for (int i = 0; i < length; i++) {
 			if (i == length - 1) {
-				int finalI = i;
-				return map.computeIfAbsent(key, s -> getFinalValue(keyChain[finalI], mapChain[finalI]));
+				return getFinalValue(keyChain[i], mapChain[i]);
 			}
 			k = keyChain[i];
 			Object o = mapChain[i].get(k);
+			if (Objects.isNull(o)) {
+				return "";
+			}
 			if (o instanceof LinkedHashMap) {
 				mapChain[i + 1] = (LinkedHashMap) o;
-			}else {
+			} else {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -869,6 +953,7 @@ public class CustomListener implements ServletContextListener {
 public class CustomServlet extends HttpServlet {
     ...
 }
+
 ```
 
 然后需要在`**Application.java` 加上`@ServletComponentScan`注解，否则不会生效。
@@ -916,7 +1001,18 @@ public class WebConfig {
         return registrationBean;
     }
 }
+
 ```
+
+## Spring Interceptor与Servlet Filter的区别
+
+- Filter是基于函数回调的，而Interceptor则是基于Java反射的。
+- Filter依赖于Servlet容器，而Interceptor不依赖于Servlet容器。
+- Filter对几乎所有的请求起作用，而Interceptor只能对action请求起作用。
+- Interceptor可以访问Action的上下文，值栈里的对象，而Filter不能。
+- 在action的生命周期里，Interceptor可以被多次调用，而Filter只能在容器初始化时调用一次。
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/mvc-process.png)
 
 # Validation
 
@@ -963,6 +1059,7 @@ public class Foo {
 	@Email(message = "邮箱格式错误")
 	private String email;
 }
+
 ```
 
 `Controller`:
@@ -984,6 +1081,7 @@ public class FooController {
       return "success";
    }
 }
+
 ```
 
 ## 快速失效
@@ -1003,6 +1101,7 @@ public class ValidatorConfiguration {
 		return validatorFactory.getValidator();
 	}
 }
+
 ```
 
 这样在遇到第一个校验失败的时候就会停止对之后的参数校验。
@@ -1022,6 +1121,7 @@ Class Foo{
 	
 	public interface Minor{}
 }
+
 ```
 
 `Controller`：
@@ -1037,6 +1137,7 @@ public String drink(@Validated({Foo.Adult.class}) Foo foo, BindingResult binding
     }
     return "success";
 }
+
 ```
 
 ## 自定义校验
@@ -1071,11 +1172,12 @@ public @interface CannotHaveBlank {
     }
 
 }
+
 ```
 
 我们不需要关注太多东西，使用spring validation的原则便是便捷我们的开发，例如payload，List ，groups，都可以忽略。
 
-<1> 自定义注解中指定了这个注解真正的验证者类。
+`<1>` 自定义注解中指定了这个注解真正的验证者类。
 
 2 编写真正的校验者类
 
@@ -1103,20 +1205,22 @@ public class CannotHaveBlankValidator implements <1> ConstraintValidator<CannotH
         return true;
     }
 }
+
 ```
 
-<1> 所有的验证者都需要实现`ConstraintValidator`接口，它的接口也很形象，包含一个初始化事件方法，和一个判断是否合法的方法
+`<1>` 所有的验证者都需要实现`ConstraintValidator`接口，它的接口也很形象，包含一个初始化事件方法，和一个判断是否合法的方法
 
 ```
 public interface ConstraintValidator<A extends Annotation, T> {
 	void initialize(A constraintAnnotation);
 		boolean isValid(T value, ConstraintValidatorContext context);
 }
+
 ```
 
-<2> `ConstraintValidatorContext` 这个上下文包含了认证中所有的信息，我们可以利用这个上下文实现获取默认错误提示信息，禁用错误提示信息，改写错误提示信息等操作。
+`<2> ` `ConstraintValidatorContext` 这个上下文包含了认证中所有的信息，我们可以利用这个上下文实现获取默认错误提示信息，禁用错误提示信息，改写错误提示信息等操作。
 
-<3> 一些典型校验操作，或许可以对你产生启示作用。
+`<3>` 一些典型校验操作，或许可以对你产生启示作用。
 
 值得注意的一点是，自定义注解可以用在`METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER`之上，`ConstraintValidator`的第二个泛型参数T，是需要被校验的类型。
 
@@ -1136,6 +1240,7 @@ Set<ConstraintViolation<Foo>> set = validator.validate(foo);
 for (ConstraintViolation<Foo> constraintViolation : set) {
     System.out.println(constraintViolation.getMessage());
 }
+
 ```
 
 由于依赖了Hibernate Validation框架，我们需要调用Hibernate相关的工厂方法来获取validator实例，从而校验。
@@ -1167,11 +1272,12 @@ public String validate() {
 
     return "success";
 }
+
 ```
 
-<1> 真正使用过`Validator`接口的读者会发现有两个接口，一个是位于`javax.validation`包下，另一个位于`org.springframework.validation`包下，**注意我们这里使用的是前者**`javax.validation`，后者是spring自己内置的校验接口，`LocalValidatorFactoryBean`同时实现了这两个接口。
+`<1>` 真正使用过`Validator`接口的读者会发现有两个接口，一个是位于`javax.validation`包下，另一个位于`org.springframework.validation`包下，**注意我们这里使用的是前者**`javax.validation`，后者是spring自己内置的校验接口，`LocalValidatorFactoryBean`同时实现了这两个接口。
 
-<2> 此处校验接口最终的实现类便是`LocalValidatorFactoryBean`。
+`<2>` 此处校验接口最终的实现类便是`LocalValidatorFactoryBean`。
 
 ## 基于方法校验
 
@@ -1198,13 +1304,14 @@ public class BarController {
     }
 
 }
+
 ```
 
-<1> 为类添加@Validated注解
+`<1>` 为类添加@Validated注解
 
-<2> <3> 校验方法的返回值和入参
+`<2> <3>` 校验方法的返回值和入参
 
-<4> 添加一个异常处理器，可以获得没有通过校验的属性相关信息
+`<4>` 添加一个异常处理器，可以获得没有通过校验的属性相关信息
 
 基于方法的校验，个人不推荐使用，感觉和项目结合的不是很好。
 
@@ -1233,8 +1340,6 @@ public class GlobalExceptionHandler {
 }
 ```
 
-
-
 > 参考：
 > *[https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/](https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/)*
 
@@ -1248,6 +1353,7 @@ public class GlobalExceptionHandler {
 public class SpringAsyncConfig {
   
 }
+
 ```
 
 配置完这个就已经具备异步方法功能了，只需要在方法上面添加`@Async`即可
@@ -1261,6 +1367,7 @@ public class SpringAsyncConfig {
 public void asyncMethodWithVoidReturnType() throws InterruptedException {
 	System.out.println("Execute method asynchronously. " + Thread.currentThread().getName());
 }
+
 ```
 
 ## 配置线程池
@@ -1286,6 +1393,7 @@ public class SpringAsyncConfig {
 		return executor;
 	}
 }
+
 ```
 
 通过使用`ThreadPoolTaskExecutor`创建了一个线程池，同时设置了以下这些参数：
@@ -1303,8 +1411,8 @@ public class SpringAsyncConfig {
 
 `AsyncConfigurer`接口有两个方法：
 
-* `getAsyncExecutor()`: 提供线程池
-* `getAsyncUncaughtExceptionHandler()`: 异步任务异常处理
+- `getAsyncExecutor()`: 提供线程池
+- `getAsyncUncaughtExceptionHandler()`: 异步任务异常处理
 
 ```
 @Configuration
@@ -1333,6 +1441,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 		};
 	}
 }
+
 ```
 
 ### 优雅关闭线程池
@@ -1342,6 +1451,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 ```
 executor.setWaitForTasksToCompleteOnShutdown(true);
 executor.setAwaitTerminationSeconds(60);
+
 ```
 
 ## Async使用指定线程池
@@ -1353,6 +1463,7 @@ executor.setAwaitTerminationSeconds(60);
 ```
 @Async("threadPoolTaskExecutor")
 public void someMethod(){...}
+
 ```
 
 ## 获取异步执行结果
@@ -1366,6 +1477,7 @@ public Future<String> asyncMethodWithVoidReturnType() throws InterruptedExceptio
 	Thread.sleep(2000L);
 	return AsyncResult.forValue("Execute method asynchronously. " + Thread.currentThread().getName());
 }
+
 ```
 
 Controller：
@@ -1381,6 +1493,7 @@ public Mono<String> syaHello() throws InterruptedException, ExecutionException {
 	System.out.println(stringFuture.get());
 	return Mono.just("Hello World");
 }
+
 ```
 
 执行结果：
@@ -1392,6 +1505,7 @@ wait...
 wait...
 wait...
 Execute method asynchronously. asyncExecutor-1
+
 ```
 
 # Spring定时任务
@@ -1418,6 +1532,7 @@ public class SpringScheduleConfig implements SchedulingConfigurer {
 						.build());
 	}
 }
+
 ```
 
 定时任务：
@@ -1429,6 +1544,7 @@ public class SpringScheduleConfig implements SchedulingConfigurer {
 	public void doScheduled() {
 		System.out.println(Thread.currentThread().getName() + "  " + ++i);
 	}
+
 ```
 
 结果：
@@ -1439,6 +1555,7 @@ schedule-pool-thread-2  3
 schedule-pool-thread-1  4
 schedule-pool-thread-3  5
 schedule-pool-thread-2  6
+
 ```
 
 # Spring启动后执行程序的几种方式
@@ -1470,6 +1587,7 @@ public class ApplicationContextRefreshedEventListener implements ApplicationList
 public void processContextRefreshedEvent(ContextRefreshedEvent event) throws InterruptedException {
 	log.info("ContextRefreshedEvent process...");
 }
+
 ```
 
 Spring的事件处理是单线程的，所以如果一个事件被触发，除非所有的接收者得到消息，否则这些进程被阻止，流程将不会继续。因此，如果要使用事件处理，在设计应用程序时应小心。
@@ -1519,6 +1637,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 		System.out.println("CommandLineRunner...");
 	}
 }
+
 ```
 
 `ApplicationRunner`比`CommandLineRunner`先执行
@@ -1540,6 +1659,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
              //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。  
         }  
       }  
+
 ```
 
 > 后续发现加上以上判断还是能执行两次，不加的话三次，最终研究结果使用以下判断更加准确：`event.getApplicationContext().getDisplayName().equals("Root WebApplicationContext")`
@@ -1575,8 +1695,8 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
            });
        }
    }
-   ```
 
+   ```
 
 # 进行远程调试
 
@@ -1587,8 +1707,6 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 - 注意，如果 Java 源代码与目标应用程序不匹配，调试特性将不能正常工作。
 
 ## java启动命令
-
-- -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n
 
 ```
 java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n –jar spring-boot-demo-SNAPSHOT.jar

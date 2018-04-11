@@ -22,7 +22,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
-## Maven setting.xml加密配置
+## Maven setting.xml密码加密配置
 
 `settings.xml`配置私有库的访问：
 
@@ -81,7 +81,7 @@ ENV https_proxy=
 构建：
 
 ```
-docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/oraclejdk8 .
+docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/docker-oraclejdk8 .
 ```
 
 其中`HTTP_PROXY`是sock5代理转过来的http代理，通过`--build-arg`参数传入，注意**不能**是`127.0.0.1`或`localhost`。
@@ -101,6 +101,9 @@ RUN sh -c 'touch /app.jar'
 CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker} -jar /app.jar"]
 # ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
 ```
+
+* 通过`@@`动态获取打包后的项目名（需要插件，下面会介绍）
+* `Dspring.profiles.active=${ACTIVE:-docker}`可以通过docker启动命令`-e ACTIVE=docker`参数修改配置
 
 ### pom文件添加Docker插件
 
@@ -389,7 +392,7 @@ docker pull docker.elastic.co/logstash/logstash:6.2.3
 </configuration>
 ```
 
-* `bootstrap.servers`是kafka的地址
+* `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
 * `topic`要与下面Logstash的一致
 * 更多配置请看官网
 
@@ -465,6 +468,8 @@ networks:
     external:
       name: backend
 ```
+
+* `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Spring Boot应用使用Docker network可忽略这个
 
 ## ELK Compose
 
