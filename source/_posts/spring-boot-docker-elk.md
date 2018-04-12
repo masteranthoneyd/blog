@@ -333,6 +333,10 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
 
+## Demo地址
+
+***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker)***
+
 #  Kafka、ELK collect logs
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/elk-arch1.png)
