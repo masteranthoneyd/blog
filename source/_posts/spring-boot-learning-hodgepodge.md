@@ -196,9 +196,9 @@ spring:
 
 ### 两种配置方式的比较
 
-> - Properties配置多环境，需要添加多个配置文件，YAML只需要一个配件文件
-> - 书写格式的差异，yaml相对比较简洁，优雅
-> - YAML的缺点：不能通过`@PropertySource`注解加载。如果需要使用`@PropertySource`注解的方式加载值，那就要使用properties文件。
+- Properties配置多环境，需要添加多个配置文件，YAML只需要一个配件文件
+- 书写格式的差异，yaml相对比较简洁，优雅
+- YAML的缺点：不能通过`@PropertySource`注解加载。如果需要使用`@PropertySource`注解的方式加载值，那就要使用properties文件。
 
 ### 如何使用
 
@@ -716,6 +716,8 @@ mvn dependency:tree
 # Spring MVC 相关
 
 ## Spring MVC集成fastjson
+
+> ***[https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson](https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson)***
 
 ```
 <dependency>
