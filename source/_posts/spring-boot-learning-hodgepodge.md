@@ -1,5 +1,5 @@
 ---
-title: Spring Boot 学习杂记
+title: Spring Boot学习之杂记篇
 date: 2018-02-25 15:25:35
 categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring, Spring Boot]
@@ -1700,17 +1700,494 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
    ```
 
-# 进行远程调试
+# 元注解与组合注解
 
-## 远程调试的概念
+## 元注解
 
-- 什么是远程调试：本地调用非本地的环境进行调试。
-- 原理：两个VM之间通过socket协议进行通信，然后以达到远程调试的目的。
-- 注意，如果 Java 源代码与目标应用程序不匹配，调试特性将不能正常工作。
+Spring4.0的许多注解都可以用作meta annotation（元注解）。元注解是一种使用在别的注解上的注解。这意味着我们可以使用Spring的注解组合成一个我们自己的注解。
 
-## java启动命令
+类似于：`@Documented`, `@Component`, `@RequestMapping`, `@Controller`, `@ResponseBody`等等
+
+对于元注解，是Spring框架中定义的部分，都有特定的含义。我们并不能修改，但是对于组合注解，我们完全可以基于自己的定义进行实现。
+
+## 组合注解
+
+自定义注解或组合注解是从其他的Spring元注解创建的，我们先看一下`@SpringBootApplication`这个神奇的注解（去除注释）：
 
 ```
-java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n –jar spring-boot-demo-SNAPSHOT.jar
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = {
+		@Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+
+	@AliasFor(annotation = EnableAutoConfiguration.class)
+	Class<?>[] exclude() default {};
+
+	@AliasFor(annotation = EnableAutoConfiguration.class)
+	String[] excludeName() default {};
+
+	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
+	String[] scanBasePackages() default {};
+
+	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
+	Class<?>[] scanBasePackageClasses() default {};
+
+}
 ```
 
+发现这个注解中有含有大量其他注解，并使用了`@AliasFor`这个注解传递注解属性值。
+
+我们自定义一个：
+
+```
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public @interface Rest {
+	@AliasFor(annotation = RequestMapping.class, attribute = "value")
+	String[] value() default {};
+}
+```
+
+使用：
+
+```
+@Rest("/ex")
+public class ExampleController {
+
+}
+```
+
+# 自动配置的原理与自定义starter
+
+在自定义starter之前，先看一下Spring Boot的一些原理
+
+## Spring Boot实现自动配置的原理
+
+### 入口注解类@EnableAutoConfiguration
+
+`@SpringBootApplication`注解中包含了自动配置的入口注解：
+
+```
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = {
+        @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+        @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+  // ...
+}
+```
+
+```
+@SuppressWarnings("deprecation")
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage
+@Import(EnableAutoConfigurationImportSelector.class)
+public @interface EnableAutoConfiguration {
+  // ...
+}
+```
+
+这个注解的Javadoc内容还是不少，所有就不贴在文章里面了，概括一下：
+
+1. 自动配置基于应用的类路径以及你定义了什么Beans
+2. 如果使用了`@SpringBootApplication`注解，那么自动就启用了自动配置
+3. 可以通过设置注解的`excludeName`属性或者通过`spring.autoconfigure.exclude`配置项来指定不需要自动配置的项目
+4. 自动配置的发生时机在用户定义的Beans被注册之后
+5. 如果没有和`@SpringBootApplication`一同使用，最好将`@EnableAutoConfiguration`注解放在root package的类上，这样就能够搜索到所有子packages中的类了
+6. 自动配置类就是普通的Spring `@Configuration`类，通过`SpringFactoriesLoader`机制完成加载，实现上通常使用`@Conditional`(比如`@ConditionalOnClass`或者`@ConditionalOnMissingBean`)
+
+### @AutoConfigurationPackage
+
+```
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Import(AutoConfigurationPackages.Registrar.class)
+public @interface AutoConfigurationPackage {
+
+}
+```
+
+这个注解的职责就是**引入**了另外一个配置类：`AutoConfigurationPackages.Registrar`。
+
+```
+/**
+ * ImportBeanDefinitionRegistrar用来从导入的Config中保存base package
+ */
+@Order(Ordered.HIGHEST_PRECEDENCE)
+static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {
+
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata metadata,
+            BeanDefinitionRegistry registry) {
+        register(registry, new PackageImport(metadata).getPackageName());
+    }
+
+    @Override
+    public Set<Object> determineImports(AnnotationMetadata metadata) {
+        return Collections.<Object>singleton(new PackageImport(metadata));
+    }
+
+}
+```
+
+这个注解实现的功能已经比较底层了，调试看看上面的register方法什么会被调用：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-boot-code.png)
+
+调用参数中的`packageNames`数组中仅包含一个值：`com.example.demo`，也就是项目的root package名。
+
+从调用栈来看的话，调用`register`方法的时间在容器刷新期间：
+
+`refresh` -> `invokeBeanFactoryPostProcessors` -> `invokeBeanDefinitionRegistryPostProcessors` -> `postProcessBeanDefinitionRegistry` -> `processConfigBeanDefinitions`(开始处理配置Bean的定义) -> `loadBeanDefinitions` -> `loadBeanDefinitionsForConfigurationClass`(读取配置Class中的Bean定义) -> `loadBeanDefinitionsFromRegistrars`(这里开始准备进入上面的register方法) -> `registerBeanDefinitions`(即上述方法)
+
+这个过程已经比较复杂了，目前暂且不深入研究了。它的功能简单说就是将应用的root package给注册到Spring容器中，供后续使用。
+
+相比而言，下面要讨论的几个类型才是实现自动配置的关键。
+
+### @Import(EnableAutoConfigurationImportSelector.class)
+
+`@EnableAutoConfiguration`注解的另外一个作用就是引入了`EnableAutoConfigurationImportSelector`：
+
+它的类图如下所示：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-boot-code02.png)
+
+可以发现它除了实现几个Aware类接口外，最关键的就是实现了`DeferredImportSelector`(继承自`ImportSelector`)接口。
+
+所以我们先来看看`ImportSelector`以及`DeferredImportSelector`接口的定义：
+
+```
+public interface ImportSelector {
+
+    /**
+     * 基于被引入的Configuration类的AnnotationMetadata信息选择并返回需要引入的类名列表
+     */
+    String[] selectImports(AnnotationMetadata importingClassMetadata);
+
+}
+```
+
+这个接口的Javadoc比较长，还是捡重点说明一下：
+
+1. 主要功能通过`selectImports`方法实现，用于筛选需要引入的类名
+2. 实现了`ImportSelector`的类也可以实现一系列Aware接口，这些Aware接口中的相应方法会在`selectImports`方法之前被调用(这一点通过上面的类图也可以佐证，`EnableAutoConfigurationImportSelector`确实实现了四个Aware类型的接口)
+3. `ImportSelector`的实现和通常的`@Import`在处理方式上是一致的，然而还是可以在所有`@Configuration`类都被处理后再进行引入筛选(具体看下面即将介绍的`DeferredImportSelector`)
+
+```
+public interface DeferredImportSelector extends ImportSelector {
+
+}
+```
+
+这个接口是一个**标记接口**，它本身没有定义任何方法。那么这个接口的含义是什么呢：
+
+1. 它是`ImportSelector`接口的一个变体，在所有的`@Configuration`被处理之后才会执行。在需要筛选的引入类型具备`@Conditional`注解的时候非常有用
+2. 实现类同样也可以实现`Ordered`接口，来定义多个`DeferredImportSelector`的优先级别(同样地，`EnableAutoConfigurationImportSelector`也实现了`Ordered`接口)
+
+明确了这两个接口的意义，下面来看看是如何实现的：
+
+```
+@Override
+public String[] selectImports(AnnotationMetadata annotationMetadata) {
+    if (!isEnabled(annotationMetadata)) {
+        return NO_IMPORTS;
+    }
+    try {
+      // Step1: 得到注解信息
+        AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
+                .loadMetadata(this.beanClassLoader);
+        // Step2: 得到注解中的所有属性信息
+        AnnotationAttributes attributes = getAttributes(annotationMetadata);
+        // Step3: 得到候选配置列表
+        List<String> configurations = getCandidateConfigurations(annotationMetadata,
+                attributes);
+        // Step4: 去重
+        configurations = removeDuplicates(configurations);
+        // Step5: 排序
+        configurations = sort(configurations, autoConfigurationMetadata);
+        // Step6: 根据注解中的exclude信息去除不需要的
+        Set<String> exclusions = getExclusions(annotationMetadata, attributes);
+        checkExcludedClasses(configurations, exclusions);
+        configurations.removeAll(exclusions);
+        configurations = filter(configurations, autoConfigurationMetadata);
+        // Step7: 派发事件
+        fireAutoConfigurationImportEvents(configurations, exclusions);
+        return configurations.toArray(new String[configurations.size()]);
+    }
+    catch (IOException ex) {
+        throw new IllegalStateException(ex);
+    }
+}
+```
+
+很明显，核心就在于上面的**步骤3**：
+
+```
+protected List<String> getCandidateConfigurations(AnnotationMetadata metadata,
+        AnnotationAttributes attributes) {
+    List<String> configurations = SpringFactoriesLoader.loadFactoryNames(
+            getSpringFactoriesLoaderFactoryClass(), getBeanClassLoader());
+    Assert.notEmpty(configurations,
+            "No auto configuration classes found in META-INF/spring.factories. If you "
+                    + "are using a custom packaging, make sure that file is correct.");
+    return configurations;
+}
+```
+
+它将实现委托给了`SpringFactoriesLoader`的`loadFactoryNames`方法：
+
+```
+// 传入的factoryClass：org.springframework.boot.autoconfigure.EnableAutoConfiguration
+public static List<String> loadFactoryNames(Class<?> factoryClass, ClassLoader classLoader) {
+    String factoryClassName = factoryClass.getName();
+    try {
+        Enumeration<URL> urls = (classLoader != null ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :
+                ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
+        List<String> result = new ArrayList<String>();
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            Properties properties = PropertiesLoaderUtils.loadProperties(new UrlResource(url));
+            String factoryClassNames = properties.getProperty(factoryClassName);
+            result.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray(factoryClassNames)));
+        }
+        return result;
+    }
+    catch (IOException ex) {
+        throw new IllegalArgumentException("Unable to load [" + factoryClass.getName() +
+                "] factories from location [" + FACTORIES_RESOURCE_LOCATION + "]", ex);
+    }
+}
+
+// 相关常量
+public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
+```
+
+这段代码的意图很明确，在第一篇文章讨论Spring Boot启动过程的时候就已经接触到了。它会从类路径中拿到所有名为**`META-INF/spring.factories`**的配置文件，然后按照`factoryClass`的名称取到对应的值。那么我们就来找一个**`META-INF/spring.factories`**配置文件看看。
+
+#### META-INF/spring.factories
+
+比如`spring-boot-autoconfigure`包：
+
+```
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
+org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,\
+org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration,\
+org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration,\
+org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,\
+org.springframework.boot.autoconfigure.cloud.CloudAutoConfiguration,\
+# ...
+```
+
+列举了非常多的自动配置候选项，挑一个AOP相关的`AopAutoConfiguration`看看究竟：
+
+```
+// 如果设置了spring.aop.auto=false，那么AOP不会被配置
+// 需要检测到@EnableAspectJAutoProxy注解存在才会生效
+// 默认使用JdkDynamicAutoProxyConfiguration，如果设置了spring.aop.proxy-target-class=true，那么使用CglibAutoProxyConfiguration
+@Configuration
+@ConditionalOnClass({ EnableAspectJAutoProxy.class, Aspect.class, Advice.class })
+@ConditionalOnProperty(prefix = "spring.aop", name = "auto", havingValue = "true", matchIfMissing = true)
+public class AopAutoConfiguration {
+
+    @Configuration
+    @EnableAspectJAutoProxy(proxyTargetClass = false)
+    @ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "false", matchIfMissing = true)
+    public static class JdkDynamicAutoProxyConfiguration {
+
+    }
+
+    @Configuration
+    @EnableAspectJAutoProxy(proxyTargetClass = true)
+    @ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "true", matchIfMissing = false)
+    public static class CglibAutoProxyConfiguration {
+
+    }
+
+}
+```
+
+这个自动配置类的作用是判断是否存在配置项：
+
+```
+spring.aop.proxy-target-class=true
+```
+
+如果存在并且值为`true`的话使用基于**CGLIB**字节码操作的动态代理方案，否则使用JDK自带的动态代理机制。
+
+下面列举所有由Spring Boot提供的条件注解：
+
+- `@ConditionalOnBean`
+- `@ConditionalOnClass`
+- `@ConditionalOnCloudPlatform`
+- `@ConditionalOnExpression`
+- `@ConditionalOnJava`
+- `@ConditionalOnJndi`
+- `@ConditionalOnMissingBean`
+- `@ConditionalOnMissingClass`
+- `@ConditionalOnNotWebApplication`
+- `@ConditionalOnProperty`
+- `@ConditionalOnResource`
+- `@ConditionalOnSingleCandidate`
+- `@ConditionalOnWebApplication`
+
+一般的模式，就是一个条件注解对应一个继承自`SpringBootCondition`的具体实现类。
+
+> 以上来自：***[https://blog.csdn.net/dm_vincent/article/details/77619752](https://blog.csdn.net/dm_vincent/article/details/77619752)***
+
+## 自定义starter
+
+看完上面描述之后，应该不难发现，自定义starter的关键就是**`META-INF/spring.factories`**了，Spring Boot会在启动时加载这个文件中声明的第三方类。
+
+### 自定义配置
+
+为了给可配置的bean属性生成元数据，我们需要引入如下jar包：
+
+```
+<!-- 将被@ConfigurationProperties注解的类的属性注入到元数据 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+`application.properties`:
+
+```
+ybd.datasource.driver-class-name=com.mysql.jdbc.Driver
+ybd.datasource.url=jdbc:mysql://192.168.0.200:3306/transaction_message_test?useUnicode=true&characterEncoding=utf8&useSSL=false
+ybd.datasource.username=ibalife
+ybd.datasource.password=ibalife
+ybd.datasource.dbcp2.validation-query=select 'x'
+```
+
+> 生成的元数据位于jar文件中的`META-INF/spring-configurationmetadata. json`。元数据本身并不会修改被`@ConfigurationProperties`修饰的类属性，在我的理解里元数据仅仅只是表示配置类的默认值以及java doc，供调用者便利的了解默认配置有哪些以及默认配置的含义，在idea里面如果有元数据则可以提供良好的代码提示功能以方便了解默认的配置。
+
+### 自定义配置接收类
+
+```
+@Data
+@ConfigurationProperties(DataSourceProperties.DATASOURCE_PREFIX)
+public class DataSourceProperties {
+	public static final String DATASOURCE_PREFIX = "ybd.datasource";
+	private Boolean tcc;
+	private String driverClassName = "com.mysql.jdbc.Driver";
+	private String url;
+	private String username = "root";
+	private String password = "root";
+	private Dbcp2 dbcp2;
+
+	@Data
+	public static class Dbcp2 {
+		private Integer maxTotal = 50;
+		private Integer initialSize = 20;
+		private Long maxWaitMillis = 60000L;
+		private Integer minIdle = 6;
+		private Boolean logAbandoned = true;
+		private Boolean removeAbandonedOnBorrow = true;
+		private Boolean removeAbandonedOnMaintenance = true;
+		private Integer removeAbandonedTimeout = 1800;
+		private Boolean testWhileIdle = true;
+		private Boolean testOnBorrow = false;
+		private Boolean testOnReturn = false;
+		private String validationQuery;
+		private Integer validationQueryTimeout = 1;
+		private Long timeBetweenEvictionRunsMillis = 30000L;
+		private Integer numTestsPerEvictionRun = 20;
+	}
+}
+```
+
+`@ConfigurationProperties`会将`application.properties`中指定的前缀的属性注入到bean中
+
+### 自定义配置类
+
+```
+@Configuration
+@Import(SpringCloudConfiguration.class)
+@ConditionalOnClass({LocalXADataSource.class})
+@EnableConfigurationProperties({DataSourceProperties.class})
+public class DataSourceConfiguration {
+	private final DataSourceProperties dataSourceProperties;
+
+	@Autowired
+	public DataSourceConfiguration(DataSourceProperties dataSourceProperties) {
+		this.dataSourceProperties = dataSourceProperties;
+	}
+
+
+	@Bean("dataSource")
+	@ConditionalOnProperty(prefix = DATASOURCE_PREFIX, value = "tcc", havingValue = "true", matchIfMissing = true)
+	public DataSource getTccDataSource() {
+		LocalXADataSource dataSource = new LocalXADataSource();
+		dataSource.setDataSource(this.resolveDbcp2DataSource());
+		return dataSource;
+	}
+
+	private DataSource resolveDbcp2DataSource() {
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
+		dataSource.setUrl(dataSourceProperties.getUrl());
+		dataSource.setUsername(dataSourceProperties.getUsername());
+		dataSource.setPassword(dataSourceProperties.getPassword());
+		dataSource.setMaxTotal(dataSourceProperties.getDbcp2().getMaxTotal());
+		dataSource.setInitialSize(dataSourceProperties.getDbcp2().getInitialSize());
+		dataSource.setMaxWaitMillis(dataSourceProperties.getDbcp2().getMaxWaitMillis());
+		dataSource.setMinIdle(dataSourceProperties.getDbcp2().getMinIdle());
+		dataSource.setLogAbandoned(dataSourceProperties.getDbcp2().getLogAbandoned());
+		dataSource.setRemoveAbandonedOnBorrow(dataSourceProperties.getDbcp2().getRemoveAbandonedOnBorrow());
+		dataSource.setRemoveAbandonedOnMaintenance(dataSourceProperties.getDbcp2().getRemoveAbandonedOnMaintenance());
+		dataSource.setRemoveAbandonedTimeout(dataSourceProperties.getDbcp2().getRemoveAbandonedTimeout());
+		dataSource.setTestWhileIdle(dataSourceProperties.getDbcp2().getTestWhileIdle());
+		dataSource.setTestOnBorrow(dataSourceProperties.getDbcp2().getTestOnBorrow());
+		dataSource.setTestOnReturn(dataSourceProperties.getDbcp2().getTestOnReturn());
+		dataSource.setValidationQuery(dataSourceProperties.getDbcp2().getValidationQuery());
+		dataSource.setValidationQueryTimeout(dataSourceProperties.getDbcp2().getValidationQueryTimeout());
+		dataSource.setTimeBetweenEvictionRunsMillis(dataSourceProperties.getDbcp2().getTimeBetweenEvictionRunsMillis());
+		dataSource.setNumTestsPerEvictionRun(dataSourceProperties.getDbcp2().getNumTestsPerEvictionRun());
+		return dataSource;
+	}
+}
+```
+
+* `@Import`引入其他配置类
+* `@ConditionalOnClass`在指定类存在时该配置类生效
+* `@EnableConfigurationProperties`启用配置接受类，通过Spring字段注入或构造器注入properties配置Bean
+
+### 使Spring Boot可以自动加载配置类
+
+在`/resource`目录创建**`META-INF/spring.factories`**：
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.yangbingdong.configuration.WebMvcMessageConvertConfiguration
+```
+
+然后打包成Jar，第三方Spring Boot系统通过引入这个Jar包，会自动加载该类。
+
+如果有需要，可以配合`@AutoConfigureAfter`，`@ConditionalOnBean`，`@ConditionalOnProperty`等注解控制配置是否需要加载以及加载顺序。
+
+需要更灵活的配置可以实现`Condition`或`SpringBootCondition`通过`@Conditional(XXXCondition.class)`实现类加载判断。
