@@ -17,6 +17,8 @@ tags: [Java, Spring, Spring Boot]
 
 # 构建依赖版本管理工程
 
+学习Demo：***[https://github.com/masteranthoneyd/spring-boot-learning](https://github.com/masteranthoneyd/spring-boot-learning)***
+
 > 为什么要分开为两个工程？因为考虑到common工程也需要版本控制，但parent工程中依赖了common工程，所以common工程不能依赖parent工程（循环依赖），故例外抽离出一个dependencies的工程，专门用作依赖版本管理，而parent工程用作其他子工程的公共依赖。
 
 ## 依赖版本管理工程
@@ -639,7 +641,7 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 			Properties properties = System.getProperties();
 			String active = properties.getProperty(SPRING_PROFILES_ACTIVE);
 			if (isBlank(active)) {
-				active = getValueFromData(SPRING_PROFILES_ACTIVE, SPRING_PROFILES_ACTIVE.split("\\."), metaYmlData);
+				active = getValueFromData(SPRING_PROFILES_ACTIVE, metaYmlData);
 			}
 			String configName = isNotBlank(active) ? PROFILE_PREFIX + "-" + active + PROFILE_SUFFIX : DEFAULT_PROFILE;
 			ClassPathResource classPathResource = new ClassPathResource(configName);
@@ -663,15 +665,16 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 		String[] keyChain = key.split("\\.");
 		String value = null;
 		if (profileExist) {
-			value = getValueFromData(key, keyChain, profileYmlData);
+			value = getValueFromData(key, profileYmlData);
 		}
 		if (isBlank(value)) {
-			value = getValueFromData(key, keyChain, metaYmlData);
+			value = getValueFromData(key, metaYmlData);
 		}
 		return value;
 	}
 
-	private static String getValueFromData(String key, String[] keyChain, LinkedHashMap dataMap) {
+	private static String getValueFromData(String key, LinkedHashMap dataMap) {
+		String[] keyChain = key.split("\\.");
 		int length = keyChain.length;
 		if (length == 1) {
 			return getFinalValue(key, dataMap);
@@ -705,6 +708,16 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 
 然后在`log4j2.xml`中这样使用 `${spring:spring.application.name}`
 
+## 自定义字段
+
+可以利用`MDC`实现当前线程自定义字段
+
+```
+MDC.put("IP", IpUtil.getIpAddr(request));
+```
+
+`log4j2.xml`中这样获取`%X{IP}`
+
 # 查看依赖树
 
 如果引入了某些jar包带有`logback`依赖，log4j2会失效，需要通过IDEA或Maven查找排除依赖：
@@ -714,6 +727,32 @@ mvn dependency:tree
 ```
 
 # Spring MVC 相关
+
+## Spring MVC 流程
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-mvc-process.jpg)
+
+1、  用户发送请求至前端控制器`DispatcherServlet`。
+
+2、  `DispatcherServlet`收到请求调用`HandlerMapping`处理器映射器。
+
+3、  处理器映射器找到具体的处理器(可以根据xml配置、注解进行查找)，生成处理器对象及处理器拦截器(如果有则生成)一并返回给`DispatcherServlet`。
+
+4、  `DispatcherServlet`调用`HandlerAdapter`处理器适配器。
+
+5、  `HandlerAdapter`经过适配调用具体的处理器(`Controller`，也叫后端控制器)。
+
+6、  `Controller`执行完成返回`ModelAndView`。
+
+7、  `HandlerAdapter`将`controller`执行结果`ModelAndView`返回给`DispatcherServlet`。
+
+8、  `DispatcherServlet`将`ModelAndView`传给`ViewReslover`视图解析器。
+
+9、  `ViewReslover`解析后返回具体`View`。
+
+10、`DispatcherServlet`根据`View`进行渲染视图（即将模型数据填充至视图中）。
+
+11、 `DispatcherServlet`响应用户。
 
 ## Spring MVC集成fastjson
 
@@ -1020,26 +1059,27 @@ public class WebConfig {
 
 ## 常用注解（大部分**JSR**中已有）
 
-```
-@Null   被注释的元素必须为 null    
-@NotNull    被注释的元素必须不为 null    
-@AssertTrue     被注释的元素必须为 true    
-@AssertFalse    被注释的元素必须为 false    
-@Min(value)     被注释的元素必须是一个数字，其值必须大于等于指定的最小值    
-@Max(value)     被注释的元素必须是一个数字，其值必须小于等于指定的最大值    
-@DecimalMin(value)  被注释的元素必须是一个数字，其值必须大于等于指定的最小值    
-@DecimalMax(value)  被注释的元素必须是一个数字，其值必须小于等于指定的最大值    
-@Size(max=, min=)   被注释的元素的大小必须在指定的范围内    
-@Digits (integer, fraction)     被注释的元素必须是一个数字，其值必须在可接受的范围内    
-@Past   被注释的元素必须是一个过去的日期    
-@Future     被注释的元素必须是一个将来的日期    
-@Pattern(regex=,flag=)  被注释的元素必须符合指定的正则表达式
-@NotBlank(message =)   验证字符串非null，且长度必须大于0    
-@Email  被注释的元素必须是电子邮箱地址    
-@Length(min=,max=)  被注释的字符串的大小必须在指定的范围内    
-@NotEmpty   被注释的字符串的必须非空    
-@Range(min=,max=,message=)  被注释的元素必须在合适的范围内
-```
+| 注解                                           | 类型                                                         | 说明                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `@AssertFalse`                                 | Boolean,boolean                                              | 验证注解的元素值是false                                      |
+| `@AssertTrue`                                  | Boolean,boolean                                              | 验证注解的元素值是true                                       |
+| `@NotNull`                                     | 任意类型                                                     | 验证注解的元素值不是null                                     |
+| `@Null`                                        | 任意类型                                                     | 验证注解的元素值是null                                       |
+| `@Min(value=值)`                               | BigDecimal，BigInteger, byte,short, int, long，等任何Number或CharSequence（存储的是数字）子类型 | 验证注解的元素值大于等于@Min指定的value值                    |
+| `@Max（value=值）`                             | 和@Min要求一样                                               | 验证注解的元素值小于等于@Max指定的value值                    |
+| `@DecimalMin(value=值)`                        | 和@Min要求一样                                               | 验证注解的元素值大于等于@ DecimalMin指定的value值            |
+| `@DecimalMax(value=值)`                        | 和@Min要求一样                                               | 验证注解的元素值小于等于@ DecimalMax指定的value值            |
+| `@Digits(integer=整数位数, fraction=小数位数)` | 和@Min要求一样                                               | 验证注解的元素值的整数位数和小数位数上限                     |
+| `@Size(min=下限, max=上限)`                    | 字符串、Collection、Map、数组等                              | 验证注解的元素值的在min和max（包含）指定区间之内，如字符长度、集合大小 |
+| `@Past`                                        | java.util.Date,java.util.Calendar;Joda Time类库的日期类型    | 验证注解的元素值（日期类型）比当前时间早                     |
+| `@Future`                                      | 与@Past要求一样                                              | 验证注解的元素值（日期类型）比当前时间晚                     |
+| `@NotBlank`                                    | CharSequence子类型                                           | 验证注解的元素值不为空（不为null、去除首位空格后长度为0），不同于@NotEmpty，@NotBlank只应用于字符串且在比较时会去除字符串的首位空格 |
+| `@Length(min=下限, max=上限)`                  | CharSequence子类型                                           | 验证注解的元素值长度在min和max区间内                         |
+| `@NotEmpty`                                    | CharSequence子类型、Collection、Map、数组                    | 验证注解的元素值不为null且不为空（字符串长度不为0、集合大小不为0） |
+| `@Range(min=最小值, max=最大值)`               | BigDecimal,BigInteger,CharSequence, byte, short, int, long等原子类型和包装类型 | 验证注解的元素值在最小值和最大值之间                         |
+| `@Email(regexp=正则表达式,flag=标志的模式)`    | CharSequence子类型（如String）                               | 验证注解的元素值是Email，也可以通过regexp和flag指定自定义的email格式 |
+| `@Pattern(regexp=正则表达式,flag=标志的模式)`  | String，任何CharSequence的子类型                             | 验证注解的元素值与指定的正则表达式匹配                       |
+| `@Valid`                                       | 任何非原子类型                                               | 指定递归验证关联的对象；如用户对象中有个地址对象属性，如果想在验证用户对象时一起验证地址对象的话，在地址对象上加@Valid注解即可级联验证 |
 
 ## 简单使用
 
@@ -1453,7 +1493,6 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 ```
 executor.setWaitForTasksToCompleteOnShutdown(true);
 executor.setAwaitTerminationSeconds(60);
-
 ```
 
 ## Async使用指定线程池
@@ -1743,7 +1782,7 @@ public @interface SpringBootApplication {
 
 发现这个注解中有含有大量其他注解，并使用了`@AliasFor`这个注解传递注解属性值。
 
-我们自定义一个：
+## 自定义组合注解
 
 ```
 @Target(ElementType.TYPE)
@@ -1766,6 +1805,107 @@ public class ExampleController {
 
 }
 ```
+
+# Spring AOP
+
+> AOP为**Aspect Oriented Programming**的缩写，意为：面向切面编程，通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术。AOP是Spring框架中的一个重要内容，它通过对既有程序定义一个切入点，然后在其前后切入不同的执行内容，比如常见的有：打开数据库连接/关闭数据库连接、打开事务/关闭事务、记录日志等。基于AOP不会破坏原来程序逻辑，因此它可以很好的对业务逻辑的各个部分进行**隔离**，从而使得业务逻辑各部分之间的**耦合度降低**，提高程序的可重用性，同时提高了开发的效率。
+
+## 注解说明
+
+实现AOP的切面主要有以下几个要素：
+
+- 使用`@Aspect`注解将一个java类定义为切面类
+- 使用`@Pointcut`定义一个切入点，可以是一个规则表达式，比如下例中某个package下的所有函数，也可以是一个注解等。
+- 根据需要在切入点不同位置的切入内容
+  - 使用`@Before`在切入点开始处切入内容
+  - 使用`@After`在切入点结尾处切入内容
+  - 使用`@AfterReturning`在切入点return内容之后切入内容（可以用来对处理返回值做一些加工处理）
+  - 使用`@Around`在切入点前后切入内容，并自己控制何时执行切入点自身的内容
+  - 使用`@AfterThrowing`用来处理当切入内容部分抛出异常之后的处理逻辑
+
+## 引入依赖
+
+与其他模块一样，使用需要引入pom依赖：
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+```
+
+**引入依赖程序将自动启用AOP**，只要引入了AOP依赖后，默认已经增加了`@EnableAspectJAutoProxy`，并且默认启用**Cglib**代理：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-boot-cglib-default.png)
+
+## AOP顺序
+
+由于通过AOP实现，程序得到了很好的解耦，但是也会带来一些问题，比如：我们可能会对Web层做多个切面，校验用户，校验头信息等等，这个时候经常会碰到切面的处理**顺序问题**。
+
+所以，我们需要定义每个切面的优先级，我们需要`@Order(i)`注解来标识切面的优先级。**i的值越小，优先级越高**。
+
+## AOP记录Web访问日志用例
+
+### 日志注解
+
+```
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+public @interface ReqLog {
+	String value() default "";
+}
+```
+
+别忘了加上`@Retention(RetentionPolicy.RUNTIME)`
+
+### 声明Pointcut
+
+```
+@Pointcut("execution(public * com.yangbingdong.docker.controller..*.*(..))")
+public void path() {}
+
+@Pointcut("@annotation(ReqLog)")
+public void annotation() {}
+
+@Pointcut("path() && annotation()")
+public void logHttp() {}
+```
+
+然后这样使用：
+
+```
+@Before("path() && @annotation(reqLog)")
+public void before(JoinPoint joinPoint) {
+    ...
+}
+```
+
+如果要很方便地获取`@ReqLog`的`value`，我们可以将其**绑定**为参数：
+
+```
+@Pointcut("execution(public * com.yangbingdong.docker.controller..*.*(..))")
+public void path(){}
+
+@Before("path() && @annotation(reqLog)")
+public void doBefore(JoinPoint joinPoint, ReqLog reqLog) {
+    ...
+}
+```
+
+Pointcut匹配表达式详解可以参考：***[https://blog.csdn.net/elim168/article/details/78150438](https://blog.csdn.net/elim168/article/details/78150438)***
+
+如果是使用`@Around`，则方法参数应该使用`ProceedingJoinPoint，`因为`ProceedingJoinPoint.proceed()`可获取方法返回值，且必须返回`Object`：
+
+```
+@Around("logHttp()")
+public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
+    ...
+}
+```
+
+
 
 # 自动配置的原理与自定义starter
 
@@ -2061,7 +2201,7 @@ spring.aop.proxy-target-class=true
 
 看完上面描述之后，应该不难发现，自定义starter的关键就是**`META-INF/spring.factories`**了，Spring Boot会在启动时加载这个文件中声明的第三方类。
 
-### 自定义配置
+### 自定义properties
 
 为了给可配置的bean属性生成元数据，我们需要引入如下jar包：
 
@@ -2086,7 +2226,7 @@ ybd.datasource.dbcp2.validation-query=select 'x'
 
 > 生成的元数据位于jar文件中的`META-INF/spring-configurationmetadata. json`。元数据本身并不会修改被`@ConfigurationProperties`修饰的类属性，在我的理解里元数据仅仅只是表示配置类的默认值以及java doc，供调用者便利的了解默认配置有哪些以及默认配置的含义，在idea里面如果有元数据则可以提供良好的代码提示功能以方便了解默认的配置。
 
-### 自定义配置接收类
+### properties接收类
 
 ```
 @Data
@@ -2123,7 +2263,7 @@ public class DataSourceProperties {
 
 `@ConfigurationProperties`会将`application.properties`中指定的前缀的属性注入到bean中
 
-### 自定义配置类
+### Config类
 
 ```
 @Configuration
@@ -2191,3 +2331,116 @@ com.yangbingdong.configuration.WebMvcMessageConvertConfiguration
 如果有需要，可以配合`@AutoConfigureAfter`，`@ConditionalOnBean`，`@ConditionalOnProperty`等注解控制配置是否需要加载以及加载顺序。
 
 需要更灵活的配置可以实现`Condition`或`SpringBootCondition`通过`@Conditional(XXXCondition.class)`实现类加载判断。
+
+# 优雅停机
+
+可参考：***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
+
+```
+package com.yangbingdong.docker.config.shutdown;
+
+import io.undertow.server.HandlerWrapper;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.GracefulShutdownHandler;
+
+/**
+ * @author ybd
+ * @date 18-4-19
+ * @contact yangbingdong1994@gmail.com
+ */
+public class GracefulShutdownWrapper implements HandlerWrapper {
+	private GracefulShutdownHandler gracefulShutdownHandler;
+
+	@Override
+	public HttpHandler wrap(HttpHandler handler) {
+		if(gracefulShutdownHandler == null) {
+			this.gracefulShutdownHandler = new GracefulShutdownHandler(handler);
+		}
+		return gracefulShutdownHandler;
+	}
+
+	public GracefulShutdownHandler getGracefulShutdownHandler() {
+		return gracefulShutdownHandler;
+	}
+}
+```
+
+```
+package com.yangbingdong.docker.config.shutdown;
+
+import io.undertow.server.handlers.GracefulShutdownHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+
+/**
+ * @author ybd
+ * @date 18-4-19
+ * @contact yangbingdong1994@gmail.com
+ */
+@RequiredArgsConstructor
+@Slf4j
+public class GracefulShutdownListener implements ApplicationListener<ContextClosedEvent> {
+
+	private final GracefulShutdownWrapper gracefulShutdownWrapper;
+
+	@Override
+	public void onApplicationEvent(ContextClosedEvent event) {
+		GracefulShutdownHandler gracefulShutdownHandler = gracefulShutdownWrapper.getGracefulShutdownHandler();
+		try {
+			gracefulShutdownHandler.shutdown();
+			gracefulShutdownHandler.awaitShutdown(5000L);
+		} catch (InterruptedException e) {
+			log.error("Graceful shutdown container error:", e);
+		}
+	}
+}
+
+```
+
+```
+package com.yangbingdong.springboot.common.config.shutdown;
+
+import io.undertow.server.HandlerWrapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @author ybd
+ * @date 18-4-19
+ * @contact yangbingdong1994@gmail.com
+ */
+@Configuration
+@ConditionalOnClass(HandlerWrapper.class)
+public class GracefulShutdownConfiguration {
+
+	@Bean
+	public GracefulShutdownWrapper gracefulShutdownWrapper() {
+		return new GracefulShutdownWrapper();
+	}
+
+	@Bean
+	public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> gracefulWebServerFactoryCustomizer() {
+		return factory -> {
+			if (factory instanceof UndertowServletWebServerFactory) {
+				UndertowServletWebServerFactory undertowServletWebServerFactory = (UndertowServletWebServerFactory) factory;
+				undertowServletWebServerFactory
+						.addDeploymentInfoCustomizers(deploymentInfo ->
+								deploymentInfo.addOuterHandlerChainWrapper(gracefulShutdownWrapper()));
+//				undertowServletWebServerFactory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.ENABLE_STATISTICS, true));
+			}
+		};
+	}
+
+	@Bean
+	public GracefulShutdownListener gracefulShutdown() {
+		return new GracefulShutdownListener(gracefulShutdownWrapper());
+	}
+}
+```
+

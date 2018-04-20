@@ -63,6 +63,9 @@ spring:
       enabled: true
       # 配置控制台路径，默认为 /h2-console
       path: /console
+      settings:
+        trace: true
+        web-allow-others: true # 允许内网访问
 ```
 
 ## 常用连接池配置
