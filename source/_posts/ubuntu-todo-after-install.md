@@ -495,12 +495,48 @@ sudo gedit /opt/staruml/www/license/node/LicenseManagerDomain.js
 ```
 改完打开StarUml -> `Help` -> `Enter License`，不是输入任何东西直接确定
 
-
-
 ## 虚拟机
 ```
 sudo apt-get install virtualbox
 ```
+
+## SecureCRT Crack
+
+### 安装
+
+官方下载地址（选择Linux版deb包）：***[https://www.vandyke.com/download/securecrt/download.html](https://www.vandyke.com/download/securecrt/download.html)***
+
+```
+sudo dpkg -i scrt-8.3.2-1584.ubuntu16-64.x86_64.deb
+```
+
+### 破解
+
+破解准备：
+
+```
+wget http://download.boll.me/securecrt_linux_crack.pl
+
+sudo apt install perl
+```
+
+查看一下SecureCRT的安装路径：
+
+```
+whereis SecureCRT
+
+# 不出意外应该是在 /usr/bin/SecureCRT
+```
+
+运行perl脚本：
+
+```
+sudo perl securecrt_linux_crack.pl /usr/bin/SecureCRT
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/securecrt-crack.png)
+
+然后按照提示手动输入License即可
 
 ## wiznote(为知笔记)
 
@@ -510,7 +546,6 @@ sudo apt-get install virtualbox
 sudo add-apt-repository ppa:wiznote-team 
 sudo apt update 
 sudo apt install wiznote
-
 ```
 
 ## Vim
@@ -553,7 +588,6 @@ sudo dpkg -i xmind-7.5-linux_amd64.deb
 `Ubuntu`下很强大的一款截图软件
 ```
 sudo apt install shutter
-
 ```
 
 ***设置快捷键：*** 
@@ -567,7 +601,6 @@ sudo apt install shutter
 sudo add-apt-repository ppa:n-muench/programs-ppa
 sudo apt update 
 sudo apt install bleachbit 
-
 ```
 
 
@@ -761,7 +794,6 @@ services:
 
 ```
 sudo apt install stardict
-
 ```
 ***安装词库：***
 进入*[http://download.huzheng.org/](http://download.huzheng.org/)*

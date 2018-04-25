@@ -7,6 +7,8 @@ tags: [Blockchain, Java]
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/blockchain/blockchain.jpg)
 
+# Preface
+
 > **区块链**（英语：blockchain 或 block chain）是用[分布式数据库](https://zh.wikipedia.org/wiki/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93)识别、传播和记载信息的智能化[对等网络](https://zh.wikipedia.org/wiki/%E5%AF%B9%E7%AD%89%E7%BD%91%E7%BB%9C), 也称为价值互联网。[中本聪](https://zh.wikipedia.org/wiki/%E4%B8%AD%E6%9C%AC%E8%81%AA)在2008年，于《[比特币](https://zh.wikipedia.org/wiki/%E6%AF%94%E7%89%B9%E5%B8%81)白皮书》中提出“区块链”概念，并在2009年创立了[比特币社会网络](https://zh.wikipedia.org/w/index.php?title=%E6%AF%94%E7%89%B9%E5%B8%81%E7%A4%BE%E4%BC%9A%E7%BD%91%E7%BB%9C&action=edit&redlink=1)，开发出第一个区块，即“创世区块”。
 >
 > 区块链共享价值体系首先被众多的[加密货币](https://zh.wikipedia.org/wiki/%E5%8A%A0%E5%AF%86%E8%B2%A8%E5%B9%A3)效仿，并在[工作量证明](https://zh.wikipedia.org/wiki/%E5%B7%A5%E4%BD%9C%E9%87%8F%E8%AD%89%E6%98%8E)上和算法上进行了改进，如采用[权益证明](https://zh.wikipedia.org/wiki/%E6%9D%83%E7%9B%8A%E8%AF%81%E6%98%8E)和[SCrypt算法](https://zh.wikipedia.org/w/index.php?title=SCrypt%E7%AE%97%E6%B3%95&action=edit&redlink=1)。随后，区块链生态系统在全球不断进化，出现了[首次代币发售](https://zh.wikipedia.org/wiki/%E9%A6%96%E6%AC%A1%E4%BB%A3%E5%B8%81%E5%8F%91%E5%94%AE)ICO；智能合约区块链[以太坊](https://zh.wikipedia.org/wiki/%E4%BB%A5%E5%A4%AA%E5%9D%8A)；“轻所有权、重使用权”的资产代币化[共享经济](https://zh.wikipedia.org/wiki/%E5%85%B1%E4%BA%AB%E7%B6%93%E6%BF%9F)； 和[区块链国家](https://zh.wikipedia.org/w/index.php?title=%E5%8C%BA%E5%9D%97%E9%93%BE%E5%9B%BD%E5%AE%B6&action=edit&redlink=1)。目前，人们正在利用这一共享价值体系，在各行各业开发去中心化电脑程序(Decentralized applications, Dapp)，在全球各地构建[去中心化自主组织](https://zh.wikipedia.org/w/index.php?title=%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E8%87%AA%E4%B8%BB%E7%BB%84%E7%BB%87&action=edit&redlink=1)和去中心化自主社区(Decentralized autonomous society, DAS)。

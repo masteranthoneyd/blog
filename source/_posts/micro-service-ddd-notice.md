@@ -1,8 +1,20 @@
-# Micro Service
+---
+title: 关于微服务的一些调研零散笔记
+date: 2018-01-02 16:59:14
+categories: [Programming, Java]
+tags: [Java]
+---
+
+![](http://ojoba1c98.bkt.clouddn.com/img/micro-service/microservice.png)
+
+# Preface
+
 > *[微服务架构](https://zh.wikipedia.org/zh-cn/%E5%BE%AE%E6%9C%8D%E5%8B%99)*： 
 > **微服务** (Microservices) 是一种软件架构风格 (Software Architecture Style)，它是以专注于单一责任与功能的小型功能区块 (Small Building Blocks) 为基础，利用模组化的方式组合出复杂的大型应用程序，各功能区块使用与**语言无关** (Language-Independent/Language agnostic) 的 **API 集相互通讯**。
 
 > **不拆分存储的微服务是伪服务**：在实践中，我们常常见到一种架构，后端存储是全部和在一个数据库中，仅仅把前端的业务逻辑拆分到不同的服务进程中，本质上和一个Monolithic一样，只是把模块之间的进程内调用改为进程间调用，这种切分不可取，违反了分布式第一原则，**模块耦合没有解决**，**性能却受到了影响**。
+
+<!--more-->
 
 # Concept
 
@@ -27,18 +39,22 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 **拆分领域模型**、**事务**、**查询**
 
 ## 拆分领域模型
+
 遵循Single Responsibility(单一职责)
 **Aggregate**(聚合)：
-* 聚合通过id（例如主键）来引用而不是通过对象引用
-* 聚合必须遵循一个事务只能对一个聚合进行创建或更新
-* 聚合应该尽量细
+
+- 聚合通过id（例如主键）来引用而不是通过对象引用
+- 聚合必须遵循一个事务只能对一个聚合进行创建或更新
+- 聚合应该尽量细
 
 ## 事务
 
 由于采用了微服务拥有各自的私人数据库，只能通过API访问，不可避免出现了分布式跨数据库事务问题。
 
 ### ACID vs BASE
+
 传统事务 **ACID**：
+
 - Atomicity（原子性）：一个事务中的操作是原子的，其中任何一步失败，系统都能够完全回到事务前的状态
 - Consistency（一致性）：数据库的状态始终保持一致
 - Isolation（隔离性）：多个并发执行的事务不会互相影响
@@ -46,8 +62,8 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 
 微服务下依靠分布式事务（如2PC）保证实时一致性（强一致性），性能底下，牺牲了可用性，已不适用于现代的微服务架构。
 
-
 **BASE**模型：
+
 - Basically Available（基本可用）：系统在出现不可预知的故障的时候，允许损失部分可用性，但不等于系统不可用
 - Soft State（软状态）：允许系统中的数据存在中间状态，并认为该中间状态的存在不会影响系统的整体可用性
 - Eventually Consistent（最终一致性）：系统保证最终数据能够达到一致
@@ -55,6 +71,7 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 微服务倡导每个微服务拥有私有的数据库，且其他服务不能直接与访问该数据库，只能通过该服务暴露的API进行交互。
 
 ### TCC
+
 业务层面的2PC，需要实现`Try`、`Comfirm`、`Cancel`
 *[GitHub中TCC实现框架](https://github.com/search?l=Java&o=desc&q=tcc&s=stars&type=Repositories&utf8=%E2%9C%93)*
 
@@ -63,19 +80,23 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 缺点是应用程序不能够立即读取到自己刚刚的写入（滞后性）。
 
 #### 使用本地事务
+
 对资源的操作与发布时间捆绑在同一事务中。
 优点：使用了本地数据库的事务，如果Event没有插入或发布成功，那么订单也不会被创建。
 缺点：需要单独处理Event发布在业务逻辑中，繁琐容易忘记；Event发送有些滞后。
 
 #### 使用数据库特有的MySQL Binlog跟踪
+
 订阅binlog发送event
 优点：提高了性能
 缺点：不同的数据库，日志格式不一样，而且同一数据库，不同版本格式也可能不一样，决策的时候请慎重。
 
 ### Event Sourcing
+
 颠覆传统存储概念，不持久化对象数据，而是持久化对象变更的Event，通过溯源，遍历事件拿到对象的最新状态。在我看来，类似文件系统的概念，一个操作是一层，删除并不是减掉一层，而是添加一层删除操作（类似Git中的版本，可回滚，有记录追踪）。
 
 ### 阿里云GTS全局事务
+
 ***[GTS（Global Transaction Service）官方文档](https://help.aliyun.com/document_detail/48726.html)***（需要捆绑Ali全家桶。。。）
 
 ## 查询
@@ -84,9 +105,8 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 
 解决之道：**CQRS**
 
-
-
 # Extend
+
 ## Event-driven
 
 `Sync`（请求/响应）: 串行架构
@@ -94,7 +114,6 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 ![](http://ojoba1c98.bkt.clouddn.com/img/micro-service/register-sync.jpg)
 优点：个人认为，只有一个优点，可以偷懒
 缺点：中心控制点承担了太多的职责，入侵式强耦合代码，如果此时多加一个业务例如创建用户团队，那就必须在原来代码基础上继续入侵代码，而且修改一行代码有可能影响到下文。
-
 
 `Async`（基于事件）: 并行/异步架构
 

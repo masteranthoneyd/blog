@@ -264,7 +264,18 @@ spring:
 #        dialect: org.hibernate.dialect.MySQL5Dialect  # 方言设置，默认就为MySQL5Dialect，或者MySQL5InnoDBDialect使用InnoDB引擎
 ```
 
+## 默认驼峰模式
 
+Spring Data Jpa 使用的默认策略是 `ImprovedNamingStrategy`
+
+可以这样修改命名策略：
+
+```
+#PhysicalNamingStrategyStandardImpl
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+```
+
+如果需要指定某个字段不使用驼峰模式可以直接使用`@Column(name = "aaa")`
 
 ## MySQL抓取SQL运行时参数
 
@@ -288,6 +299,73 @@ spring:
     password: root
     driver-class-name: net.sf.log4jdbc.DriverSpy
 ```
+
+## 常用注解
+
+`@Entity(name = "t_user")`
+
+`@Table(indexes = {...}`
+
+`@Id`
+
+`@GeneratedValue`
+
+`@Column(length = 100, nullable = false)`
+
+`@Enumerated(EnumType.STRING)`
+
+`@Temporal(TemporalType.TIMESTAMP)`
+
+## 使用Tips
+
+### 使用 @Convert 关联一对多的值对象
+
+有时候在实体当中有某些字段是一个**值对象的集合**，我们又不想（也没必要）为其另起一张表，打个比方：订单里面的商品列表（只是打个比方，实际上应该是一张独立的表）。
+
+例如设计一个访问日志对象，我们需要记录访问方法的行参与接收值：
+
+```
+@Data
+@Accessors(chain = true)
+@Slf4j
+@Entity
+@Table(name = "access_log")
+public class AccessLog implements Serializable {
+
+	private static final long serialVersionUID = -6911021075718017305L;
+
+	@Id
+	@GeneratedValue(generator = "snowflakeIdentifierGenerator")
+	@GenericGenerator(name = "snowflakeIdentifierGenerator", strategy = "com.yangbingdong.docker.domain.core.vo.SnowflakeIdentifierGenerator")
+	private long id;
+
+	@Column(columnDefinition = "text")
+	@Convert(converter = ReqReceiveDataConverter.class)
+	private List<ReqReceiveData> reqReceiveDatas;
+	
+	...
+}
+```
+
+属性转换器：
+```
+//@Converter(autoApply = true)
+public class ReqReceiveDataConverter implements AttributeConverter<List<ReqReceiveData>, String> {
+	@Override
+	public String convertToDatabaseColumn(List<ReqReceiveData> attribute) {
+		return JSONObject.toJSONString(attribute);
+	}
+
+	@Override
+	public List<ReqReceiveData> convertToEntityAttribute(String dbData) {
+		return JSONObject.parseArray(dbData, ReqReceiveData.class);
+	}
+}
+```
+
+* `@Convert`声明使用某个属性转换器（`ReqReceiveDataConverter`）
+* `ReqReceiveDataConverter`需要实现`AttributeConverter<X,Y>`，`X`为实体的字段类型，`Y`对应需要持久化到DB的类型
+* `@Converter(autoApply = true)`注解作用，如果有多个实体需要用到此属性转换器，不需要每个实体都的字段加上`@Convert`注解，自动对全部实体生效
 
 ## 发布领域事件
 
@@ -389,6 +467,60 @@ class MyComponent {
   ```
 
   用`@EventListener`也可以，但是`@TransactionalEventListener`可以在事务之后执行。使用前者的话，程序异常事务会滚监听器照样会执行，而后者必须等事务正确提交之后才会执行。
+
+## 踩坑
+
+### 索引超长
+
+```
+com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Specified key was too long; max key length is 1000 bytes
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:1.8.0_162]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) ~[?:1.8.0_162]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[?:1.8.0_162]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) ~[?:1.8.0_162]
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.Util.getInstance(Util.java:408) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:944) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3973) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3909) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2527) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2680) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2480) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2438) ~[mysql-connector-java-5.1.45.jar:5.1.45]
+```
+
+如果设置了索引：
+
+```
+@Table(indexes = {@Index(name = "idx_server_name", columnList = "serverName")})
+```
+
+上面注解指定了`serverName`这一列为普通索引，如果此列不做限制，默认的长度是为255，默认的字符编码为`utf8mb4`，最大字符长度为4字节，255 * 4 = 1020，所以超过了索引长度。
+
+在`MyISAM`表中，创建索引时，创建的索引长度不能超过**1000**bytes，在`InnoDB`表中，创建索引时，索引的长度不成超过**767**byts 。
+
+建立索引时，数据库计算key的长度是累加所有Index用到的字段的char长度后再按下面比例乘起来不能超过限定的key长度：
+
+```
+latin1 = 1 byte = 1 character 
+uft8 = 3 byte = 1 character 
+gbk = 2 byte = 1 character 
+utf8mb4 = 4 byte = 1 character 
+```
+
+### 使用AttributeConverter转换JSON字符串时，Hibernate执行insert之后再执行update
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-data/jpa-dirty01.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-data/jpa-dirty02.png)
+
+如上图，这是利用AOP实现的操作日志记录，使用`AttributeConverter`与Fastjson实现`ReqReceiveData`转换成JSON字符串，可以看到在执行insert之后接着执行了一次update，那是因为JSON字符串字段顺序居然发生了变化！
+
+不过后来折腾一下把顺序统一了，但还是会出现这种问题，百思不得其解，一样的字符串Hibernate也会认为这是Dirty的数据？
+
+百般折腾得以解决（但还是搞不懂原因）：
+
+value是Object类型，在set的时候调用`JSONObject.toJSON(value)`转成Object再set进去...
 
 # Elasticsearch
 
