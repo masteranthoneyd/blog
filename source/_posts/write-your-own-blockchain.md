@@ -66,6 +66,8 @@ tags: [Blockchain, Java]
 
 # 基础篇
 
+> 也可以看一下这一篇：***[https://yemengying.com/2018/02/11/hash-blockchain/](https://yemengying.com/2018/02/11/hash-blockchain/)***
+
 2018年开始区块链真是火啊。一夜暴富的例子一直在传说。今天我们就自己动手写一个基本的区块链。
 
 先简单的说一下区块链是个什么（相信你早就知道了）。

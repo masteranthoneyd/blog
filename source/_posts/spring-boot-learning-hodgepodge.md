@@ -1248,6 +1248,29 @@ public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
 }
 ```
 
+# 函数式方式动态注册 Bean
+
+> Spring 5 支持在应用程序上下文中以函数式方式注册 bean。简单地说，您可以通过在 **`GenericApplicationContext`** 类中定义的一个新 **`registerBean()`** 方法重载来完成。
+
+看一下有哪些方法重载：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-reg-bean.png)
+
+注入`GenericWebApplicationContext`：
+
+```
+@Autowired
+private GenericWebApplicationContext context;
+```
+
+注册并设置bean：
+
+```
+String beanName = lowercaseInitial(handler.getClass().getSimpleName()) + "-" + j;
+context.registerBean(beanName, handler.getClass());
+AbstractShardingHandler<AopLogEvent> shardingBean = (AbstractShardingHandler<AopLogEvent>) context.getBean(beanName);
+```
+
 
 
 # 自动配置的原理与自定义starter
@@ -1537,8 +1560,6 @@ spring.aop.proxy-target-class=true
 - `@ConditionalOnWebApplication`
 
 一般的模式，就是一个条件注解对应一个继承自`SpringBootCondition`的具体实现类。
-
-> 以上来自：***[https://blog.csdn.net/dm_vincent/article/details/77619752](https://blog.csdn.net/dm_vincent/article/details/77619752)***
 
 ## 自定义starter
 
