@@ -502,7 +502,7 @@ sudo apt-get install virtualbox
 
 ## SecureCRT Crack
 
-### 安装
+### Install
 
 官方下载地址（选择Linux版deb包）：***[https://www.vandyke.com/download/securecrt/download.html](https://www.vandyke.com/download/securecrt/download.html)***
 
@@ -510,9 +510,9 @@ sudo apt-get install virtualbox
 sudo dpkg -i scrt-8.3.2-1584.ubuntu16-64.x86_64.deb
 ```
 
-### 破解
+### Crack
 
-破解准备：
+准备：
 
 ```
 wget http://download.boll.me/securecrt_linux_crack.pl
@@ -578,11 +578,29 @@ sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 ```
 
-## Xmind
-一款思维导图软件，再*[xmind官网](http://www.xmindchina.net/xiazai.html)下载deb安装包*
+## XMind 8 Crack
+
+### Setup
+
+一款思维导图软件，再*[XMind官网](http://www.xmindchina.net/xiazai.html)*下载压缩包.
+
+解压后先执行一下解压包根目录下的`setup.sh`：
+
 ```
-sudo dpkg -i xmind-7.5-linux_amd64.deb
+sudo sh setup.sh
 ```
+
+### Crack
+
+* 将`XMindCrack.jar`复制到根目录的`plugins`文件中
+
+
+* 以文本格式打开根目录中 `XMind.ini`
+* 在最后一行添加`-javaagent:../plugins/XMindCrack.jar`
+* 禁止XMind访问网络：在host文件中添加`127.0.0.1 www.xmind.net`，然后重启网络`sudo /etc/init.d/networking restart`
+* 打开XMind输入序列号
+
+**`XMindCrack.jar`**与**序列号**如果有需要可以私聊博主。
 
 ## Shutter
 `Ubuntu`下很强大的一款截图软件
