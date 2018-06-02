@@ -498,3 +498,7 @@ InnoDB适合：
 5、对于自增长的字段，InnoDB中必须包含只有该字段的索引，但是在MyISAM表中可以和其他字段一起建立联合索引。
 
 6、清空整个表时，InnoDB是一行一行的删除，效率非常慢。MyISAM则会重建表。
+
+# Finally
+
+看到一片美团技术团队的博文非常好：***[https://tech.meituan.com/mysql-index.html](https://tech.meituan.com/mysql-index.html)***

@@ -335,6 +335,33 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
 
+## 打包时复制Jar包到指定文件
+
+在`maven-resources-plugin`的`<executions>`标签中添加：
+
+```
+<execution>
+    <id>copy-jar</id>
+    <phase>package</phase>
+    <goals>
+        <goal>copy-resources</goal>
+    </goals>
+    <configuration>
+        <outputDirectory>${dockerfile.compiled.position}</outputDirectory>
+        <resources>
+            <resource>
+                <directory>${project.build.directory}</directory>
+                <includes>
+                    <include>*.jar</include>
+                </includes>
+            </resource>
+        </resources>
+    </configuration>
+</execution>
+```
+
+以上是将Jar复制到`target`的`docker`目录中，因为真正的Dockerfile也是在里面，方便使用`docker build`命令构建Docker镜像
+
 ## Demo地址
 
 ***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker)***
@@ -560,3 +587,31 @@ networks:
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana.png)
 
 通过这种方式管理容器应用的日志很舒服。
+
+# log-pilot
+
+Github: ***[https://github.com/AliyunContainerService/log-pilot](https://github.com/AliyunContainerService/log-pilot)***
+
+更多说明: ***[https://yq.aliyun.com/articles/69382](https://yq.aliyun.com/articles/69382)***
+
+这个是Ali开源的日志收集组件，通过中间件的方式部署，自动监听其他容器的日志，非常方便：
+
+```
+docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v /etc/localtime:/etc/localtime -v /:/host -e PILOT_TYPE=fluentd -e FLUENTD_OUTPUT=elasticsearch -e ELASTICSEARCH_HOST=192.168.6.113 -e ELASTICSEARCH_PORT=9200 -e TZ=Asia/Chongqing --privileged registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest
+```
+
+需要手机日志的容器：
+
+```
+docker run --rm --label aliyun.logs.demo=stdout -p 8080:8080 192.168.0.202:8080/dev-images/demo:latest
+```
+
+* 通过`--label aliyun.logs.demo=stdout`告诉`log-pilot`需要收集日志，索引为`demo`
+
+然后打开Kibana就可以看到日志了。
+
+问题：
+
+* 日志稍微延迟
+* 日志顺序混乱
+* 异常堆栈不集中

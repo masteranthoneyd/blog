@@ -6,7 +6,7 @@ tags: [Ubuntu]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/activities-overview.jpg)
 # 前言
-> 鉴于 [Ubuntu 18.04 LTS](https://linux.cn/article-9183-1.html) 版本即将到来，本篇的16.04也将升级到18.04 GNOME 版本
+> 鉴于 [Ubuntu 18.04 LTS](https://linux.cn/article-9183-1.html) 版本已经来临，本篇的16.04也将升级到18.04 版本
 >
 > 可能会存在兼容问题，本篇将持续更新
 
@@ -151,7 +151,7 @@ sudo make install
 如果没有这个工具那就：
 
 ```
-sudo apt install gnome-tweak-tool gnome-shell-extensions
+sudo apt install gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2-engines-pixbuf libxml2-utils
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
@@ -495,10 +495,32 @@ sudo gedit /opt/staruml/www/license/node/LicenseManagerDomain.js
 ```
 改完打开StarUml -> `Help` -> `Enter License`，不是输入任何东西直接确定
 
-## 虚拟机
+## VirtualBox
 ```
 sudo apt-get install virtualbox
 ```
+
+## KVM
+
+KVM要求我们的CPU支持硬件虚拟化(hardware virtualization)．在终端里输入下面的命令来查看CPU是否支持硬件虚拟化：
+
+```
+egrep -c '(svm|vmx)' /proc/cpuinfo
+```
+
+如果上面的命令返回数字０，就表示CPU不支持硬件虚拟化，那么我们就只能使用[Virtualbox](http://www.linuxdashen.com/category/virtualbox)或VMware来创建虚拟机了．如果返回的数字大于０，那么表示CPU支持硬件虚拟化，我们就能使用KVM来创建虚拟机．
+
+安装：
+
+```
+sudo apt install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils virt-manager virtinst virt-viewer
+```
+
+Dash里打开virt-manager:
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/kvm-manager.png)
+
+
 
 ## SecureCRT Crack
 
@@ -886,12 +908,13 @@ sudo apt-get install hardinfo -y
 # 其他设置篇
 
 ## 点击图标最小化
-`Ubuntu 16.04 LTS` 也支持了点击应用程序 `Launcher` 图标即可「最小化」的功能，不过还是需要用户进行手动启用。
-方法有两种，你可以安装 `Unity Tweak Tool` 图形界面工具之后在 `「Unity」-「Launcher」-「Minimise」`中进行配置，或直接在终端中使用如下命令启用。
+```
+gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
+```
 
 ## exfat驱动
 ```
-sudo apt install exfat-fuse
+sudo apt install exfat-fuse exfat-utils
 ```
 
 ## 设置grub2引导等待时间

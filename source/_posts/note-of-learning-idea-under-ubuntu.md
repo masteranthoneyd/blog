@@ -349,6 +349,12 @@ indenpence
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format03.png)
 
+## Mybatis 插件
+
+可以直接从Mapper文件跳转到xml：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/free-mybatis.png)
+
 ## Ali规约插件 P3C
 
 插件地址：***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
@@ -527,6 +533,7 @@ Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-
 gsettings set org.gnome.desktop.wm.keybindings toggle-shaded "[]" 
 gsettings set org.gnome.settings-daemon.plugins.media-keys screensaver "[]"
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "[]" 
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "[]"
 gsettings set org.gnome.desktop.wm.keybindings begin-move "[]" 
 ```
 

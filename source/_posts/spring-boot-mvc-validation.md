@@ -110,14 +110,20 @@ public class WebMvcMessageConvertConfig {
 
 ### WebFlux
 
-上面针对的是Web MVC，**对于Webflux目前不支持这种方式**，只能先这么设置
+上面针对的是Web MVC，**对于Webflux目前不支持这种方式**，可参考以下方式
+
+## Spring Boot JSON （Date类型入参、格式化，以及如何处理null）
 
 ```
 spring:
   jackson:
-    default-property-inclusion: non_null # 过滤值为null的字段
-    date-format: "yyyy-MM-dd HH:mm:ss"
+    default-property-inclusion: non_null # 忽略 json 中值为null的属性
+    date-format: "yyyy-MM-dd HH:mm:ss" # 设置 pattern
+    time-zone: GMT+8 # 修正时区
 ```
+
+* 时间格式可以在实体上使用该注解：`@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")`
+* 忽略null属性可以在实体上使用：`@JsonInclude(JsonInclude.Include.NON_NULL)`
 
 ## Spring Boot MVC特性
 
@@ -283,6 +289,8 @@ public class InterceptorConfigurerAdapter extends WebMvcConfigurer {
 }
 
 ```
+
+或者可以使用继承`HandlerInterceptorAdapter`的方式，这种方式可以**按需覆盖父类方法**。
 
 ## 创建 Servlet、 Filter、Listener
 

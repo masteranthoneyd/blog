@@ -256,22 +256,19 @@ docker-compose start
 
 注意：配置文件`config.yml`挂载在`/etc/registry/`下.
 
-### Harbor做Mirror加速器
+### 踩坑
 
-**mirror服务器和私有服务器分开部署，因为mirror服务器只能pull，不能push**
+#### python版本
 
-`./prepare`之后修改`config/registry/config.yml`，在`config.yml`文件的最后追加以下配置：
+在Ubuntu18.04中的python是3+版本的，需要装回2.7版本，不然会有不明异常。。。：
 
 ```
-proxy:
-  remoteurl: https://vioqnt8w.mirror.aliyuncs.com
+sudo apt install python2.7 && sudo apt install python-minimal
 ```
 
-这样保证docker pull并不存在于docker harbor中的image时，会从Docker Hub上去pull，并缓存于mirror服务器。
+#### Fail to generate key file
 
-最后修改`/etc/docker/daemon.json`中的`"registry-mirrors": ["https://xxxxx.mirror.aliyuncs.com"]`
-
-**But，试了一下发现木有效果**
+这个貌似是openssl的问题，解决方案是将`prepare`中的`empty_subj = "/C=/ST=/L=/O=/CN=/"`改为`empty_subj = "/"`
 
 ## Registry Mirror
 
