@@ -1184,7 +1184,6 @@ exec "$@"
 
 ```
 sudo docker info | grep "Docker Root Dir"
-
 ```
 
 解决这个问题，最直接的方法当然是挂载分区到这个目录，但是我的数据盘还有其他东西，这肯定不好管理，所以采用修改镜像和容器的存放路径的方式达到目的。
@@ -1197,7 +1196,6 @@ sudo docker info | grep "Docker Root Dir"
 systemctl restart docker
 或者
 service docker stop
-
 ```
 
 然后移动整个`/var/lib/docker`目录到目的路径：
@@ -1205,7 +1203,6 @@ service docker stop
 ```
 mv /var/lib/docker /root/data/docker
 ln -s /root/data/docker /var/lib/docker
-
 ```
 
 这时候启动Docker时发现存储目录依旧是`/var/lib/docker`，但是实际上是存储在数据盘的，你可以在数据盘上看到容量变化。
@@ -1220,7 +1217,6 @@ Docker 的配置文件可以设置大部分的后台进程参数，在各个操�
 
 ```
 OPTIONS=--graph="/root/data/docker" --selinux-enabled -H fd://
-
 ```
 
 如果是 Ubuntu 则添加下面这行（因为 Ubuntu 默认没开启 selinux）：
@@ -1229,7 +1225,6 @@ OPTIONS=--graph="/root/data/docker" --selinux-enabled -H fd://
 OPTIONS=--graph="/root/data/docker" -H fd://
 # 或者
 DOCKER_OPTS="-g /root/data/docker"
-
 ```
 
 最后重新启动，Docker 的路径就改成 `/root/data/docker` 了。
@@ -1242,6 +1237,17 @@ DOCKER_OPTS="-g /root/data/docker"
 logrotate是个十分有用的工具，它可以自动对日志进行截断（或轮循）、压缩以及删除旧的日志文件。例如，你可以设置logrotate，让/var/log/foo日志文件每30天轮循，并删除超过6个月的日志。配置完后，logrotate的运作完全自动化，不必进行任何进一步的人为干预。
 
 **[https://github.com/blacklabelops/logrotate](https://github.com/blacklabelops/logrotate)**
+
+```
+docker run -d \
+  --restart=always \
+  --name=logrotate \
+  -v /var/lib/docker/containers:/var/lib/docker/containers \
+  -v /var/log/docker:/var/log/docker \
+  -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
+  -e "LOGROTATE_INTERVAL=daily" \
+  blacklabelops/logrotate
+```
 
 ## 通过修改dockerd参数进行回卷和清理
 
@@ -1276,7 +1282,6 @@ docker run --rm \
   -v $(pwd):/backup \
   busybox \
   tar cvf /backup/backup.tar /data
-
 ```
 
 - `--rm`: 执行完命令之后移除容器
@@ -1395,6 +1400,38 @@ docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/oraclejdk
 `192.168.6.113:8118`是从Sock5转换过来的http代理
 
 **注意：镜像内软件安装完成时候需要将代理置空，所以上面示例最后两行后面的值是空的，否则接下来容器内发生的网络访问都会走代理...**
+
+# 开启远程API
+
+**注意：这是一个危险动作，仅测试使用，生产慎用！**
+
+某些应用可能需要使用Docker的远程API调用，例如Portainer。
+
+## 方式一，修改配置文件
+
+打开`/lib/systemd/system/docker.service`，将`ExecStart=/usr/bin/docker daemon -H fd://`修改为`ExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:2375`。
+
+其中`2375`是就是远程调用端口。
+
+然后重启Dcoker：
+
+```
+sudo systemctl daemon-reload && sudo service docker restart
+```
+
+## 方式二，添加代理
+
+这种方式比较优雅点，不需要重启Docker或更改配置文件：
+
+```
+docker run -ti -d -p 2375:2375 \
+--restart=always \
+--hostname=$HOSTNAME \
+--name shipyard-proxy \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-e PORT=2375 \
+shipyard/docker-proxy
+```
 
 # Self Usage Docker Or Compose
 

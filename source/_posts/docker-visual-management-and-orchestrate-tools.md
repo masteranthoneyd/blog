@@ -263,7 +263,7 @@ docker-compose start
 在Ubuntu18.04中的python是3+版本的，需要装回2.7版本，不然会有不明异常。。。：
 
 ```
-sudo apt install python2.7 && sudo apt install python-minimal
+sudo apt install python2.7 python-minimal -y
 ```
 
 #### Fail to generate key file
@@ -1666,43 +1666,6 @@ Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负�
 **服务部署的复制模式和全局模式说明：**
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
-
-### 开启API端口监听
-
-（下面的Portainer需要用到）
-
-`Swarm`是通过监听`2375`端口进行通信的，所以在使用`Swarm`进行集群管理之前，需要设置一下`2375`端口的监听。这里有两种方法，一种是通过修改docker配置文件方式，另一种是通过一个轻量级的代理容器进行监听。
-
-**方式一，修改配置文件**（推荐）：
-
-`/etc/default/docker`中的`DOCKER_OPTS`追加配置：
-
-```
--H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
-```
-
-或者在`/etc/docker/daemon.json`添加（需要高版本Docker）：
-
-```
-{
-  "hosts": [
-    "tcp://0.0.0.0:2375",
-    "unix:///var/run/docker.sock"
-  ]
-}
-```
-
-**方式二，添加代理**：
-
-```
-docker run -ti -d -p 2375:2375 \
---restart=always \
---hostname=$HOSTNAME \
---name shipyard-proxy \
--v /var/run/docker.sock:/var/run/docker.sock \
--e PORT=2375 \
-shipyard/docker-proxy
-```
 
 ### 创建集群
 
