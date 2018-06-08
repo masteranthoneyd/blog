@@ -381,10 +381,10 @@ Dockerfile 可以让用户管理一个单独的应用容器。使用Docker Compo
 
 ### Install
 
-在[release](https://github.com/docker/compose/releases)页面找到最新版安装，ex：
+最新安装请看官方文档：***[https://docs.docker.com/compose/install/#install-compose](https://docs.docker.com/compose/install/#install-compose)***
 
 ```
-sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 ```
 
 变为可执行命令：
@@ -1335,10 +1335,12 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ### Install
 
+最新安装请看官方文档：***[https://docs.docker.com/machine/install-machine/](https://docs.docker.com/machine/install-machine/)***
+
 ```
-curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine &&
-chmod +x /tmp/docker-machine &&
-sudo cp /tmp/docker-machine /usr/local/bin/docker-machine
+base=https://github.com/docker/machine/releases/download/v0.14.0 && \
+curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/tmp/docker-machine && \
+sudo install /tmp/docker-machine /usr/local/bin/docker-machine
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-version.png)
@@ -1367,7 +1369,8 @@ fpath=(~/.zsh/completion $fpath)
 执行：
 
 ```
-autoload -Uz compinit && compinit -i
+autoload -Uz compinit && \
+compinit -i && \
 exec $SHELL -l
 ```
 
@@ -1507,7 +1510,6 @@ docker-machine ssh test
 
 ```
 $ docker-machine COMMAND --help
-
 ```
 
 来查看具体的用法。
@@ -1580,6 +1582,24 @@ $ docker-machine ssh default
 $> sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=$REGISTRY_MIRROR |g" /var/lib/boot2docker/profile
 $> exit
 $ docker-machine restart default
+```
+
+## 使用KVM引擎启动
+
+***[https://github.com/dhiltgen/docker-machine-kvm](https://github.com/dhiltgen/docker-machine-kvm)***
+
+首先确保安装了KVM：
+
+```
+sudo apt install libvirt-bin qemu-kvm
+```
+
+到 ***[Release](https://github.com/dhiltgen/docker-machine-kvm/releases)*** 页面下载相关驱动。
+
+最后启动：
+
+```
+docker-machine create -d kvm myengine0
 ```
 
 ## Swarm Mode

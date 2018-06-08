@@ -339,6 +339,14 @@ indenpence
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration03.png)
 
+## Zookeeper
+
+Zookeeper UI，支持删除操作
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/zookeeper-plugin1.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
+
 ## GsonFormat
 
 复制一段JSON格式字符串
@@ -424,59 +432,6 @@ indenpence
 这个抖动的窗口老年人实在受不了...
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
-
-## Markdown Navigator支持md编写
-
-### 下载
-Markdown Navigator下载地址： ***[https://plugins.jetbrains.com/plugin/7896-markdown-navigator](https://plugins.jetbrains.com/plugin/7896-markdown-navigator)***
-下载下来的应该是一个`zip`文件
-
-### 解压
-解压后进入`lib`文件，找到`idea-multimarkdown.jar`：
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/decompression.png)
-
-打开jar包找到 `com.vladsch.idea.multimarkdown.license.LicenseAgent.java`
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/crack-file.png)
-
-
-### IDEA创建项目
-在IDEA里创建一个Java项目，且目录**必须**为`com.vladsch.idea.multimarkdown.license`,要不然编译出来的`package`属性就变了哦
-把上面找到的`LicenseAgent.java`扔进去
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/crack-java-file.png)
-
-恩，接着一大波红色的波浪错误出现啦，先别紧张，咱们把依赖包加上去就OK了：
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/project-setting-step.png)
-
-上图的两个依赖分别是**解压Markdown Navigator插件里边的`lib`包**和**IDEA文件夹里边的`lib`包**
-
-### 修改
-**铺垫**做完了，开始改源码了。
-修改 `com.vladsch.idea.multimarkdown.license.LicenseAgent.java` 文件的内容如下：
-* `getLicenseExpires()` 整个方法体干掉不要了(删除方法体)，只留返回值改为 `return "Never Expires"`;
-* `getLicenseCode()` 最后一行返回值 `return false` 改为 `return true`，**对你没有看错**，**只改最后一行代码**;
-* `isValidLicense()` 删除方法体，只留返回值，返回值改为 `return true`;
-* `isValidActivation()` 删除方法体，只留返回值，返回值改为 `return true`;
-* `getLicenseType()` 删除方法体，只留返回值，返回值改为 `return "License"` 或 `return "license"`;
-* `getLicenseExpiringIn()` 删除方法体，只留返回值，返回值改为 `return 36000`;(单位是天)
-* `isActivationExpired()` 删除方法体，只留返回值，返回值改为 `return false`.
-
-改完后右键`java`文件`compile`编译一下得到`class`文件
-
-### 替换
-用上面得到的`LicenseAgent.class`文件替换掉`idea-multimarkdown.jar/com/vladsch/idea/multimarkdown/license`里面的文件`LicenseAgent.class`文件：
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/class1.png)
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/class2.png)
-
-### 安装
-替换完成后把解压的插件包重新打包成`zip`文件
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/zip.png)
-
-打开`Setting`找到`Pligins`：
-![](http://ojoba1c98.bkt.clouddn.com/img/idea-markdown/install.png)
-
-之后重启IDEA，搞定~
-虽然有很多功能齐全的md编辑器，但是用IDEA配置和编写Hexo，还要打开别的编辑器那就太不方便了，还是用浑然天成的插件吧。
-改了源码后插件上面的工具栏貌似没有效果了...
 
 ## Enso
 

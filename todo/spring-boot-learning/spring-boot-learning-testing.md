@@ -418,22 +418,43 @@ class ApiGatlingSimulationTest extends Simulation {
 4、配置pom
 
 ```
- <build>
-        <plugins>
-            <!-- Gatling Maven 插件， 使用： mvn gatling:execute 命令运行 -->
-            <plugin>
-                <groupId>io.gatling</groupId>
-                <artifactId>gatling-maven-plugin</artifactId>
-                <version>${gatling-plugin.version}</version>
-                <configuration>
-                    <!-- 测试脚本 -->
-                    <simulationClass>com.yangbingdong.springbootgatling.gatling.ApiGatlingSimulationTest</simulationClass>
-                    <!-- 结果输出地址 -->
-                    <resultsFolder>/home/ybd/test/gatling</resultsFolder>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+<properties>
+    <gatling-plugin.version>2.2.4</gatling-plugin.version>
+    <gatling-charts-highcharts.version>2.3.0</gatling-charts-highcharts.version>
+</properties>
+
+<dependencies>
+    <!-- 性能测试 Gatling -->
+    <dependency>
+        <groupId>io.gatling.highcharts</groupId>
+        <artifactId>gatling-charts-highcharts</artifactId>
+        <version>${gatling-charts-highcharts.version}</version>
+        <!-- 由于配置了log4j2，运行Gatling时需要**注释**以下的 exclusions，否则会抛异常，但貌似不影响测试结果 -->
+        <!--<exclusions>
+            <exclusion>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+            </exclusion>
+        </exclusions>-->
+    </dependency>
+</dependencies>
+
+<build>
+    <plugins>
+        <!-- Gatling Maven 插件， 使用： mvn gatling:execute 命令运行 -->
+        <plugin>
+            <groupId>io.gatling</groupId>
+            <artifactId>gatling-maven-plugin</artifactId>
+            <version>${gatling-plugin.version}</version>
+            <configuration>
+                <!-- 测试脚本 -->
+                <simulationClass>com.yangbingdong.springbootgatling.gatling.DockerTest</simulationClass>
+                <!-- 结果输出地址 -->
+                <resultsFolder>/home/ybd/test/gatling</resultsFolder>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 ```
 
 5、运行 Spring Boot 应用
