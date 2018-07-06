@@ -308,13 +308,15 @@ public class AssertJTestDemo {
 
 更多请看官方例子：***[https://github.com/joel-costigliola/assertj-examples](https://github.com/joel-costigliola/assertj-examples)***
 
-## Gatling性能测试
+# JMH基准测试
+
+# Gatling性能测试
 
 > 性能测试的两种类型，负载测试和压力测试：
 > - **负载测试（Load Testing）：**负载测试是一种主要为了测试软件系统是否达到需求文档设计的目标，譬如软件在一定时期内，最大支持多少并发用户数，软件请求出错率等，测试的主要是软件系统的性能。
 > - **压力测试（Stress Testing）：**压力测试主要是为了测试硬件系统是否达到需求文档设计的性能目标，譬如在一定时期内，系统的cpu利用率，内存使用率，磁盘I/O吞吐率，网络吞吐量等，压力测试和负载测试最大的差别在于测试目的不同。
 
-### Gatling 简介
+## Gatling 简介
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-logo.png)
 
@@ -324,7 +326,7 @@ Gatling 是一个功能强大的负载测试工具。它是为易用性、可维
 
 只要底层协议（如 HTTP）能够以非阻塞的方式实现，Gatling 的架构就是异步的。这种架构可以将虚拟用户作为消息而不是专用线程来实现。因此，运行数千个并发的虚拟用户不是问题。
 
-### 使用Recorder快速开始
+## 使用Recorder快速开始
 
 官方提供了GUI界面的录制器，可以监听对应端口记录请求操作并转化为Scala脚本
 
@@ -379,7 +381,7 @@ class BasicSimulation extends Simulation {
 
 具体请看官方文档：*[https://gatling.io/docs/current/quickstart](https://gatling.io/docs/current/quickstart)*
 
-### 使用IDEA编写
+## 使用IDEA编写
 
 1、首先安装Scala插件：
 
@@ -472,7 +474,7 @@ mvn gatling:execute
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/gatling-test-result2.jpg)
 
-### 遇到问题
+## 遇到问题
 
 途中出现了以下错误
 
@@ -505,11 +507,9 @@ mvn gatling:execute
 >
 > 官方教程：*[https://gatling.io/docs/current/advanced_tutorial/](https://gatling.io/docs/current/advanced_tutorial/)*
 
-## ContPerf
+# ContPerf
 
-ContiPerf
-
-是一个轻量级的**测试**工具，基于**JUnit**4 开发，可用于**接口**级的**性能测试**，快速压测。
+ContiPerf是一个轻量级的**测试**工具，基于**JUnit**4 开发，可用于**接口**级的**性能测试**，快速压测。
 
 引入依赖:
 
@@ -523,7 +523,7 @@ ContiPerf
         </dependency>
 ```
 
-### ContiPerf介绍
+## ContiPerf介绍
 
 可以指定在线程数量和执行次数，通过限制最大时间和平均执行时间来进行效率测试，一个简单的例子如下：
 
@@ -559,7 +559,7 @@ public class ContiPerfTest {
 }
 ```
 
-### 主要参数介绍
+## 主要参数介绍
 
 1）PerfTest参数
 
@@ -597,7 +597,7 @@ public class ContiPerfTest {
 
 `@Required(percentiles = "66:200,96:500")`：要求66%的测试不超过200ms，96%的测试不超过500ms。
 
-### 测试结果
+## 测试结果
 
 测试结果除了会在控制台显示之外，还会生成一个结果文件`target/contiperf-report/index.html`
 

@@ -413,13 +413,20 @@ docker pull docker.elastic.co/logstash/logstash:6.2.3
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
             <Property name="bootstrap.servers">192.168.6.113:9092</Property>
+            <Property name="request.timeout.ms">5000</Property>
+            <Property name="transaction.timeout.ms">5000</Property>
+            <Property name="max.block.ms">3000</Property>
         </Kafka>
+        
+        <Async name="async" includeLocation="true">
+            <AppenderRef ref="kafka"/>
+        </Async>
     </Appenders>
 
     <Loggers>
         <AsyncRoot level="info" includeLocation="true">
             <AppenderRef ref="console"/>
-            <AppenderRef ref="kafka"/>
+            <AppenderRef ref="async"/>
         </AsyncRoot>
     </Loggers>
 </configuration>
@@ -427,7 +434,9 @@ docker pull docker.elastic.co/logstash/logstash:6.2.3
 
 * `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
 * `topic`要与下面Logstash的一致
-* 更多配置请看官网
+* KafkaAppender默认是同步阻塞模式，使用`Async`包装成异步
+* `max.block.ms`默认为60s，在kafka异常时可能导致日志很久才出来
+* 更多配置请看 ***[官方说明](https://logging.apache.org/log4j/2.x/manual/appenders.html#KafkaAppender)***
 
 打印日志：
 

@@ -438,6 +438,20 @@ server.undertow.direct-buffers=true
 
 **注意**：需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
 
+### 开启全局异步
+
+> 官方说明： ***[https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync](https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync)***
+
+添加Disruptor依赖后只需要添加启动参数：
+
+```
+-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+```
+
+也可以在程序启动时添加系统参数。
+
+> 若想知道Disruptor是否生效，可以在`AsyncLogger#logMessage`中断点
+
 ### application.yml简单配置
 
 ```
@@ -543,15 +557,17 @@ logging:
             <appender-ref ref="service_log"/>
         </logger>-->
 
-        <AsyncRoot level="debug" includeLocation="true">
+        <Root level="debug" includeLocation="true">
             <AppenderRef ref="console"/>
             <AppenderRef ref="infoFile"/>
             <AppenderRef ref="errorFile"/>
-        </AsyncRoot>
+        </Root>
     </Loggers>
 
 </configuration>
 ```
+
+* 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
 
 ### 也可以使用log4j2.yml
 

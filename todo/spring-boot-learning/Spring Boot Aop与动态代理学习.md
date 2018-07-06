@@ -10,7 +10,7 @@
 **其他**：
 
 * `@EnableAspectJAutoProxy`默认自动开启的，无需添加额外操作，如果类实现了接口会默认使用JDK动态代理
-* 强制使用cglib：`spring.aop.proxy-target-class=true`
+* 使用cglib：`spring.aop.proxy-target-class=true`(在2.0以上版本这个默认就是`true`)
 * 拦截对象内部调用的方法需要添加在`Aspect`类添加`@EnableAspectJAutoProxy(exposeProxy = true)`
 
 ### 示例1,简单应用
