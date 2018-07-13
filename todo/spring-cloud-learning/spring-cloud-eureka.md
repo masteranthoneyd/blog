@@ -637,6 +637,49 @@ spring cloud提供了一个参数，该参数的作用是控制是否要向Eurek
 spring.cloud.service-registry.auto-registration.enabled = xxx
 ```
 
+可以在Junit测试中通过该变量关闭服务发现：
+
+```
+@BeforeClass
+public static void beforeClass() {
+	System.setProperty("spring.cloud.service-registry.auto-registration.enabled", "false");
+}
+```
+
+# Eureka的自我保护模式
+
+当Eureka提示下面一段话的时候，就表示它已经进入保护模式：
+
+```
+EMERGENCY! EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE UP WHEN THEY'RE NOT.
+RENEWALS ARE LESSER THAN THRESHOLD AND HENCE THE INSTANCES ARE NOT BEING EXPIRED JUST TO BE SAFE.
+```
+
+保护模式主要用于一组客户端和Eureka Server之间存在网络分区场景下的保护。一旦进入保护模式，Eureka Server将会尝试保护其服务注册表中的信息，不再删除服务注册表中的数据（也就是不会注销任何微服务）。
+
+解决方法如下：
+
+服务器端配置：
+
+```
+eureka:
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 15000
+```
+
+客户端配置：
+
+```
+eureka:
+  instance:
+    lease-expiration-duration-in-seconds: 30 
+    lease-renewal-interval-in-seconds: 10
+```
+
+**注意：**
+**更改Eureka更新频率将打破服务器的自我保护功能，生产环境下不建议自定义这些配置。**
+
 # Finally
 
 > 参考
