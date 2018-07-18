@@ -6,34 +6,59 @@ tags: [Ubuntu]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/activities-overview.jpg)
 # 前言
-> 鉴于 [Ubuntu 18.04 LTS](https://linux.cn/article-9183-1.html) 版本已经来临，本篇的16.04也将升级到18.04 版本
+>  ***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本回归GNOME环境，果断升级...
 >
-> 可能会存在兼容问题，本篇将持续更新
 
 <!--more-->
 
-# 系统清理篇
+# 系统篇
 
-## 系统更新
+## 换源
+
+更换最佳源服务器，打开 **软件和更新**（这里我选择阿里的，或者点击右边的 选择最佳服务器）：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/source-server.png)
+
+## 更新
+
+之前的16.04是会安装很多用不上的软件，好在18.04版本优化掉了，最小安装保持干净系统
 
 安装完系统之后，需要更新一些补丁。`Ctrl+Alt+T`调出终端，执行一下代码：
 ```
-sudo apt update && sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove
 ```
-## 卸载libreOffice
+## 关掉sudo的密码
+
+先修改默认编辑器为vim（默认为nano）：
+
 ```
-sudo apt remove --purge libreoffice-common
+sudo update-alternatives --config editor
 ```
-## 删除Amazon的链接
+
+输入vim对应的序号回车即可
+
+打开 `visudo`:
+
 ```
-sudo apt remove --purge ubuntu-web-launchers
+sudo visudo
 ```
-## 删除不常用的软件
+
+找到
+
 ```
-sudo apt remove --purge thunderbird totem rhythmbox transmission gnome-mines gnome-mahjongg gnome-sudoku
-sudo apt autoremove
+%sudo   ALL=(ALL:ALL) ALL
 ```
+
+修改为
+
+```
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+```
+
+这样所有sudo组内的用户使用sudo时就不需要密码了。
+
 # 科学上网篇
+
 ## 方式一：下载Lantern
 **如果为了更方便地科学上网，建议下载`Lantern`** （免费版限流）
 可在github（免翻墙）找到*[开源项目](https://github.com/getlantern/lantern/)*，拉到下面`README`下载对应版本
@@ -48,15 +73,13 @@ sudo chmod -R 777 /usr/bin/lantern
 
 # 主题美化篇
 
-## 16.04 Unity 桌面环境
-
-### 安装unity-tweak-tool
-
-调整 `Unity` 桌面环境，还是推荐使用`Unity Tweak Tool`，这是一个非常好用的 `Unity` 图形化管理工具，可以修改工作区数量、热区等。
+## 使用Tweaks对gnome进行美化
 
 ```
-sudo apt install unity-tweak-tool
+sudo apt install -y gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2-engines-pixbuf libxml2-utils
 ```
+
+
 
 ### 安装Flatabulous主题
 
@@ -76,32 +99,6 @@ sudo add-apt-repository ppa:noobslab/icons
 sudo apt update 
 sudo apt install ultra-flat-icons
 ```
-
-**安装完成后，打开`unity-tweak-tool`软件，修改主题和图标**
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/unity-tweak-tool.png)
-
-
-进入`Theme`，修改为`Flatabulous`：
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/theme.png)
-
-在此界面下进入`Icons`栏，修改为`Ultra-flat`:
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/icons.png)
-
-## 17.10以后的 GNOME 桌面环境
-
-### 安装原生 GNOME 环境
-
-```
-sudo apt install -y gnome-session gnome-weather gnome-photos gnome-music gnome-backgrounds
-```
-
-恢复原生 gdm 登录界面：
-
-```
-sudo update-alternatives --config gdm3.css
-```
-
-然后选择第二个 `gnome-shell.css` ， 输入 `1`
 
 ### 主题
 
@@ -241,48 +238,11 @@ hardcode-tray --conversion-tool Inkscape
 
 [**Nvidia GPU Temperature Indicator**](https://extensions.gnome.org/extension/541/nvidia-gpu-temperature-indicator/) 显卡温度指示器
 
-[**Dash To Dock**](https://extensions.gnome.org/extension/307/dash-to-dock/) 可定制的 Dock
+[**Dash To Dock**](https://extensions.gnome.org/extension/307/dash-to-dock/) 可定制的 
 
-### 中文输入法
+**[User Themes](https://extensions.gnome.org/extension/19/user-themes/)** 可以使用shell-theme：
 
-可更换成`ibus-pinyin`:
-
-```
-sudo apt remove --purge ibus-sunpinyin
-sudo apt install ibus-pinyin
-sudo ibus-daemon -d -x -r
-现在可以在 Settings > Region & Language > Input sources 中添加 pinyin 输入法
-```
-
-### Fix Curl
-
-装了GNOME后，发现没有`curl`...
-对，下载源码安装：***[https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)***
-装好之后又尴尬了，不支持`https`！！！
-一番查阅后，已解决：
-step1，安装`openssl`：
-
-```
-sudo apt install openssl
-sudo apt-get install libssl-dev
-```
-
-安装默认路径：
-`/usr/lib/ssl`
-
-step2，进入解压的`curl`源码包：
-
-```
-./configure --with-ssl=/usr/lib/ssl
-make
-sudo make install
-```
-
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/configure.png)
-
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/have-https.png)
-
-搞定～
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/user-themes.png)
 
 ## 安装Oh-My-Zsh
 
@@ -297,34 +257,32 @@ sudo apt-get install zsh
 
 接下来我们需要下载 `oh-my-zsh` 项目来帮我们配置 `zsh`，采用`wget`安装(需要先安装`git`)
 ```
-sudo apt-get install git
-wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
-```
-
-查看`shells`
-```
-cat /etc/shells
-```
-
-所以这时的`zsh` 基本已经配置完成,你需要一行命令就可以切换到 `zsh` 模式，终端下输入以下命令
-```
-chsh -s /bin/zsh
-```
-
-或者**一键安装**...
-```
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 ```
 
+安装插件`highlight`，**高亮语法**：
+
+```
+cd ~/.oh-my-zsh/custom/plugins &&\
+git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+```
+
+在`Oh-my-zsh`的配置文件中`~/.zshrc`中添加插件
+
+```
+plugins=( [plugins...] zsh-syntax-highlighting)
+```
+
+重新打开终端即可生效！
 
 最后，修改以下配色，会让你的终端样式看起来更舒服，在终端任意地方右键，进入配置文件(`profile`)->外观配置(`profile Preferences`)，弹出如下界面，进入`colors`一栏:
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh02.png)
 
 
 其中，文字和背景采用系统主题，透明度设为10%，下面的`palette`样式采用`Tango`，这样一通设置后，效果如下：
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh-show.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/screenfetch.png)
 
-**配色**：
+**推荐配色**：
 
 - 文本颜色：`#00FF00`
 - 粗体字颜色：与文本颜色相同
@@ -334,18 +292,16 @@ sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install
 
 在`~/.oh-my-zsh/themes`中查看主题。
 
-然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可。
+然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可（感觉ys这个主题不错）。
 
 ## 安装字体
 
 `Ubuntu`自带的字体不太好看，所以采用**文泉译微米黑字体**替代，效果会比较好，毕竟是国产字体！
 ```
-sudo apt-get install fonts-wqy-microhei
+sudo apt install fonts-wqy-microhei
 ```
 
-然后通过`unity-tweak-tool`来替换字体
-
-
+然后通过`gnome-tweak-tool`来替换字体
 
 
 > 到此，主题已经比较桑心悦目了，接下来推荐一些常用的软件，提高你的工作效率！
@@ -635,8 +591,24 @@ sudo apt install shutter
 名字随便起，命令：`shutter -s`
 点击确定，再点禁用，键盘按下`ctrl+alt+a`，完成设置
 
+### 编辑按钮变成程灰色解决方法
+
+需要3个deb包：
+
+*[libgoocanvas-common](https://launchpad.net/ubuntu/+archive/primary/+files/libgoocanvas-common_1.0.0-1_all.deb)*
+
+*[libgoocanvas3](https://launchpad.net/ubuntu/+archive/primary/+files/libgoocanvas3_1.0.0-1_amd64.deb)*
+
+*[libgoo-canvas-perl](https://launchpad.net/ubuntu/+archive/primary/+files/libgoo-canvas-perl_0.06-2ubuntu3_amd64.deb)*
+
+或者：***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools -> shutter-1804-editor.zip`)
+
+依次使用`dpkg`命令安装，报错使用`sudo apt-get -f install`修复
+
+最后重启Shutter进程就好了
 
 ## 系统清理软件 BleachBit
+
 ```
 sudo add-apt-repository ppa:n-muench/programs-ppa
 sudo apt update 
@@ -907,7 +879,18 @@ sudo apt-get install hardinfo -y
 
 # 其他设置篇
 
+## screenfetch
+
+```
+sudo apt install screenfetch
+```
+
+![](http://ojoba1c98.bkt.clouddn.com/img/individuation/screenfetch.png)
+
 ## 点击图标最小化
+
+试了之后发现这种交互也不太好，如果开了多个窗口，全部都一起最小化了...
+
 ```
 gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
 ```
@@ -932,9 +915,26 @@ sudo update-grub2
 gnome-session-properties
 ```
 
-## 好玩的Docky
+## 统一Win10和Ubuntu18.04双系统的时间
+
+装了双系统会出现win10中的时间总是慢8个小时（时区不对）
+
 ```
-sudo apt install docky
+统一Win10和Ubuntu18.04双系统的时间
+```
+
+### 方式一
+
+```
+timedatectl set-local-rtc 1 --adjust-system-clock
+```
+
+### 方式二
+
+```
+sudo apt install ntpdate
+sudo ntpdate time.windows.com
+sudo hwclock --localtime --systohc
 ```
 
 ## 提高逼格
