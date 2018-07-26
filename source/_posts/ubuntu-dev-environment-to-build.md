@@ -9,7 +9,53 @@ tags: [Ubuntu,IDE,JDK,Tomcat]
 
 <!--more-->
 # 安装JDK以及配置环境变量
-## 安装JDK
+
+## 通过Apt安装
+
+> ***[https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux](https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux)***
+
+### OpenJDK
+
+JDK8:
+
+```
+sudo apt install openjdk-8-jdk
+```
+
+JDK9:
+
+```
+sudo apt install openjdk-9-jdk
+```
+
+JDK11:
+
+```
+sudo apt install openjdk-11-jdk
+```
+
+### OracleJDK
+
+```
+sudo add-apt-repository ppa:webupd8team/java && sudo apt update
+```
+
+JDK8:
+
+```
+sudo apt install oracle-java8-set-default
+```
+
+JDK9:
+
+```
+sudo apt install oracle-java9-set-default
+```
+
+## 手动安装
+
+### 安装JDK
+
 安装之前当然是老规矩地下载`jdk`：*[Oracle JDK官方下载](http://www.oracle.com/technetwork/java/javase/downloads/index.html)*
 
 ```
@@ -29,7 +75,7 @@ sudo rm -rf jdk
 sudo ln -s jdk* jdk
 ```
 
-## 配置环境变量
+### 配置环境变量
 
 - 放到 `/usr/local` 里面的程序，建议使用系统变量。
 - 用户变量
@@ -610,6 +656,19 @@ redis-cli
 - `hgetall(key)`：返回名称为key的hash中所有的键（field）及其对应的value
 
 
+## 附加3：慢查询查看
+
+> Redis 通过 `slowlog-log-slower-than` 和 `slowlog-max-len` 分别配置慢查询的阈值，以及慢查询记录的日志长度。 `slowlog-log-slower-than` 默认值 10*1000 **微秒**，当命令执行时间查过设定时，那么将会被记录在慢查询日志中。如果`slowlog-log-slower-than=0`会记录所有的命令，`slowlog-log-slower-than<0` 对于任何命令都不会进行记录。
+
+参数设定：
+
+```
+config set slowlog-log-slower-than 20000
+config set slowlog-max-len 1000
+config rewrite
+```
+
+> 如果要 Redis 将配置**持久化**到本地配置文件，需要执行 `config rewrite` 命令.
 
 # 安装Maven
 

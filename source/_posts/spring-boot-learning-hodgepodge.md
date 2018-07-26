@@ -1712,6 +1712,36 @@ com.yangbingdong.configuration.WebMvcMessageConvertConfiguration
 
 需要更灵活的配置可以实现`Condition`或`SpringBootCondition`通过`@Conditional(XXXCondition.class)`实现类加载判断。
 
+# 自定义Banner
+
+新建一个`banner.txt`到`resources`目录下：
+
+```
+${AnsiColor.BRIGHT_GREEN}
+                   ${AnsiColor.BRIGHT_YELLOW}_ooOoo_${AnsiColor.BRIGHT_YELLOW}
+                  ${AnsiColor.BRIGHT_YELLOW}o8888888o${AnsiColor.BRIGHT_YELLOW}
+                  ${AnsiColor.BRIGHT_YELLOW}88${AnsiColor.BRIGHT_GREEN}" ${AnsiStyle.BOLD}${AnsiColor.BRIGHT_RED}. ${AnsiColor.BRIGHT_GREEN}"${AnsiColor.BRIGHT_YELLOW}88${AnsiColor.BRIGHT_GREEN}
+                  (| -_- |)
+                  ${AnsiColor.BRIGHT_YELLOW}O${AnsiColor.BRIGHT_GREEN}\  =  /${AnsiColor.BRIGHT_YELLOW}O${AnsiColor.BRIGHT_GREEN}
+               ____/`---'\____
+             .'  \\|     |//  `.
+            /  \\|||  :  |||//  \
+           /  _||||| -:- |||||-  \
+           |   | \\\  -  /// |   |
+           | \_|  ''\---/''  |   |
+           \  .-\__  `-`  ___/-. /
+         ___`. .'  /--.--\  `. . __
+      ."" '<  `.___\_<|>_/___.'  >'"".
+     | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+     \  \ `-.   \_ __\ /__ _/   .-` /  /
+======`-.____`-.___\_____/___.-`____.-'======
+                   `=---='
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^         ${spring-boot.formatted-version}
+         ${AnsiStyle.BOLD}${AnsiColor.BRIGHT_GREEN}佛祖保佑       永无BUG
+
+${AnsiStyle.NORMAL}
+```
+
 # 优雅停机
 
 可参考：***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
