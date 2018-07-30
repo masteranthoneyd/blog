@@ -906,7 +906,6 @@ docker build -t <image-name> .
 - *shell* 格式：`RUN <命令>`，就像直接在命令行中输入的命令一样。刚才写的 Dockrfile 中的 `RUN` 指令就是这种格式。
 ```
 RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
-
 ```
 
 - *exec* 格式：`RUN ["可执行文件", "参数1", "参数2"]`，这更像是函数调用中的格式。
@@ -970,7 +969,6 @@ ADD ubuntu-xenial-core-cloudimg-amd64-root.tar.gz /
 如果使用 `shell` 格式的话，实际的命令会被包装为 `sh -c` 的参数的形式进行执行。比如：
 ```
 CMD echo $HOME
-
 ```
 
 在实际执行中，会将其变更为：
@@ -1115,6 +1113,28 @@ FROM elasticsearch:5.5
 HEALTHCHECK --interval=5s --timeout=2s --retries=12 \
   CMD curl --silent --fail localhost:9200/_cluster/health || exit 1
 ```
+
+## ENTRYPOINT与CMD使用区别
+
+|                     | No ENTRYPOINT       | ENTRYPOINT entry arg0 | ENTRYPOINT [“entry”, “arg0”]   |
+| ------------------- | ------------------- | --------------------- | ------------------------------ |
+| No CMD              | error, not allowed  | /bin/sh -c entry arg0 | entry arg0                     |
+| CMD [“cmd”, “arg1”] | cmd arg1            | /bin/sh -c entry arg0 | entry arg0 cmd arg1            |
+| CMD cmd arg1        | /bin/sh -c cmd arg1 | /bin/sh -c entry arg0 | entry arg0 /bin/sh -c cmd arg1 |
+
+上表源于官方文档中的[Understand how CMD and ENTRYPOINT interact](https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact)，有所简化。
+
+1. ENTRYPOINT和CMD至少要有一个。
+2. 使用`ENTRYPOINT entry arg0`形式，与CMD将没有任何配合。因此，除非特定需求，否则不推荐这种使用方式。
+3. 右下角`entry arg0 /bin/sh -c cmd arg1`这种形式，几乎没有什么使用场景，反而是常见错误，应该尽量避免。
+
+本质上，其实可以理解为ENTRYPOINT是真正的Docker可执行入口，而CMD则是可选参数。 之所以在很多情况下直接写CMD也能生效，是因为ENTRYPOINT就相当于是指定Shell，而CMD则是指定Shell中执行的命令。 注意，只是『相当于』。
+
+### 注意PID
+
+原则上，一个Docker容器里应该只有一个进程，其PID为1。 Docker外部的操作，比如`docker stop`，就是向这个进程**发送信号**。 **如果那个唯一的前台进程PID不为1，那么就会收不到信号，只能在超时（默认约10秒）后被kill**。
+
+在Dockerfile中使用`ENTRYPOINT entry arg0`这种形式时，`entry`的位置总是应该使用`exec`，后面再接其它内容。 比如，`ENTRYPOINT exec top`，这可以确保`top`命令是PID为1的进程。 否则，`ENTRYPOINT top`的形式，PID为1的进程就是`/bin/sh -c top`，而`top`则被挤到了另外一个进程。
 
 ## 踩坑
 

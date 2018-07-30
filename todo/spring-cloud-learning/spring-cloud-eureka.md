@@ -1,4 +1,4 @@
-# Step1、利用IDEA的Spring Initializr构建高可用Eureka工程
+## Step1、利用IDEA的Spring Initializr构建高可用Eureka工程
 
 项目结构：
 
@@ -21,13 +21,8 @@ public class EurekaserverApplication {
 server.port=5001
 spring.application.name=eureka-center-server
 eureka.instance.hostname=peer1
-#eureka.instance.prefer-ip-address=true
-#eureka.instance.instance-id=${spring.cloud.client.ipAddress}:${server.port}
-#eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=true
 eureka.server.enable-self-preservation=false
-#eureka.instance.ip-address=true
-spring.output.ansi.enabled=ALWAYS
 eureka.client.serviceUrl.defaultZone=http://peer2:5002/eureka/
 ```
 
@@ -36,34 +31,26 @@ eureka.client.serviceUrl.defaultZone=http://peer2:5002/eureka/
 server.port=5002
 spring.application.name=eureka-center-server
 eureka.instance.hostname=peer2
-#eureka.instance.prefer-ip-address=true
-#eureka.instance.instance-id=${spring.cloud.client.ipAddress}:${server.port}
-#eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=true
 eureka.server.enable-self-preservation=false
-#eureka.instance.ip-address=true
 spring.output.ansi.enabled=ALWAYS
 eureka.client.serviceUrl.defaultZone=http://peer1:5001/eureka/
 ```
 
-# Step2、创建Dockerfile
+## Step2、创建Dockerfile
 
 在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
 
 ```
-FROM yangbingdong/docker-oraclejdk8
-MAINTAINER ybd <yangbingdong1994@gmail.com>
-VOLUME /tmp
+FROM yangbingdong/docker-oraclejdk8:latest
+MAINTAINER yangbingdong1994@gmail.com
 ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS=""
 ADD $PROJECT_NAME app.jar
-
 RUN sh -c 'touch /app.jar'
-
-CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker1} -jar /app.jar"]
-# ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
+ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dspring.profiles.active=${ACTIVE:-docker} -jar /app.jar
 ```
 
-# Step3、添加插件
+##Step3、添加插件
 
 在完整的`pom.xml`
 
@@ -248,7 +235,7 @@ CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspri
 * 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入`docker-maven-plugin`插件的`<resources>`配置里
 * `spring-boot-maven-plugin`插件一定要在其他构建插件之上，否则打包文件会有问题。
 
-# Step4、构建
+## Step4、构建
 
 如果`<pushImage>false</pushImage>`则install阶段将不提交Docker镜像，只有maven的`deploy`阶段才提交。
 
@@ -335,7 +322,7 @@ null: null
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/duplicate02.png)
 
-# Step5、运行
+## Step5、运行
 
 运行程序
 
@@ -348,80 +335,97 @@ docker run --name discover-server2 -e ACTIVE=peer2 -p 5002:5002 -d --network=hos
 
 这样一个简单的基于Docker的高可用Eureka就运行起来了。
 
-# 高可用Eureka Server
+## 高可用Eureka Server容器版
 
 **基于Compose运行高可用的Eureka**
 
-## `application.yml`
+### `application.yml`
 
 ```
 spring:
   application:
-    name: eureka-center-server
-  cloud:
-    inetutils:
-      preferred-networks: ${PREFERRED_NETWORKS}
-  output:
-    ansi:
-      enabled: always
-security:
-  basic:
-    enabled: true     # 开启基于HTTP basic的认证
-  user:
-    name: ${SECURITY_NAME}
-    password: ${SECURITY_PASSWORD}
----
-spring:
-  profiles: docker1
-server:
-  port: ${PORT}
+    name: discovery
+  profiles:
+    active: single
+  security:  # 安全认证帐号密码
+    user:
+      name: ibalife 
+      password: ibalife
 eureka:
+  environment: prod # 在Eureka控制面板中显示prod环境
+  client:
+    fetch-registry: true
+    register-with-eureka: true # 注册自己
   instance:
-    hostname: docker-eureka1
     prefer-ip-address: true
     ip-address: ${eureka.instance.hostname}
-    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
-    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+
+management:  # Spring Boot Admin 使用的端点
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+```
+
+### `application-cluster1.yml`
+
+```
+server:
+  port: 8761
+eureka:
+  instance:
+    hostname: eureka-cluster1
+    metadata-map:  # Spring Boot Admin 使用
+      user.name: ibalife
+      user.password: ibalife
   client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+    service-url:
+      defaultZone: http://ibalife:ibalife@eureka-cluster2:8762/eureka/,http://ibalife:ibalife@eureka-cluster3:8763/eureka/
   server:
-    enable-self-preservation: false
----
-spring:
-  profiles: docker2
+    enable-self-preservation: false # 关闭自我保护模式
+```
+
+### `application-cluster2.yml`
+
+```
 server:
-  port: ${PORT}
+  port: 8762
 eureka:
   instance:
-    hostname: docker-eureka2
-    prefer-ip-address: true
-    ip-address: ${eureka.instance.hostname}
-    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
-    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
+    hostname: eureka-cluster2
+    metadata-map:
+      user.name: ibalife
+      user.password: ibalife
   client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
-  server:
-    enable-self-preservation: false
----
-spring:
-  profiles: docker3
-server:
-  port: ${PORT}
-eureka:
-  instance:
-    hostname: docker-eureka3
-    prefer-ip-address: true
-    ip-address: ${eureka.instance.hostname}
-    instance-id: ${eureka.instance.hostname}:${spring.cloud.client.ipAddress}:${server.port}
-    lease-renewal-interval-in-seconds: ${LEASE_RENEWAL_INTERVAL_INSECONDS}
-  client:
-    serviceUrl:
-      defaultZone: ${ADDITIONAL_EUREKA_SERVER_LIST}
+    service-url:
+      defaultZone: http://ibalife:ibalife@eureka-cluster1:8761/eureka/,http://ibalife:ibalife@eureka-cluster3:8763/eureka/
   server:
     enable-self-preservation: false
 ```
+
+### `application-cluster3.yml`
+
+```
+server:
+  port: 8761
+eureka:
+  instance:
+    hostname: eureka-cluster1
+    metadata-map:
+      user.name: ibalife
+      user.password: ibalife
+  client:
+    service-url:
+      defaultZone: http://ibalife:ibalife@eureka-cluster2:8762/eureka/,http://ibalife:ibalife@eureka-cluster3:8763/eureka/
+  server:
+    enable-self-preservation: false # 关闭自我保护模式
+```
+
+### Security配置
 
 开启`basic`的认证需要添加依赖：
 
@@ -432,147 +436,91 @@ eureka:
 </dependency>
 ```
 
-## `docker-compose.yml`
+配置类：
 
 ```
-version: "3.4"
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+	private static final String EUREKA = "/eureka/**";
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().ignoringAntMatchers(EUREKA);
+		super.configure(http);
+	}
+}
+```
+
+
+
+### `docker-compose.yml`
+
+```
+version: '3.4'
 services:
-  docker-eureka1:
-    image: ${IMAGE}
-    env_file:
-      - .env
+  eureka-cluster1:
+    image: eureka-cluster:latest
     environment:
-      - ACTIVE=docker1
-      - PORT=${EUREKA1_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+      - ACTIVE=cluster1
+      - JAVA_OPTS=-Xms512m -Xmx512m
     ports:
-      - ${EUREKA1_PORT}:${EUREKA1_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 20s
-      update_config:
-        parallelism: 1
-        delay: 20s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
+      - 8761:8761
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA1_PORT}/health/"]
+      test: ["CMD", "curl", "-f", "http://ibalife:ibalife@localhost:8761/actuator/health"]
       interval: 1m30s
-      timeout: 15s
+      timeout: 10s
       retries: 3
-
-  docker-eureka2:
-    image: ${IMAGE}
-    env_file:
-      - .env
+      start_period: 30s
+    networks:
+      backend:
+        aliases:
+          - eureka-cluster1
+  eureka-cluster2:
+    image: eureka-cluster:latest
     environment:
-      - ACTIVE=docker2
-      - PORT=${EUREKA2_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka3:${EUREKA3_PORT}/eureka/
+      - ACTIVE=cluster2
+      - JAVA_OPTS=-Xms512m -Xmx512m
     ports:
-      - ${EUREKA2_PORT}:${EUREKA2_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 20s
-      update_config:
-        parallelism: 1
-        delay: 20s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
+      - 8762:8762
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA2_PORT}/health/"]
+      test: ["CMD", "curl", "-f", "http://ibalife:ibalife@localhost:8762/actuator/health"]
       interval: 1m30s
-      timeout: 15s
+      timeout: 10s
       retries: 3
-
-  docker-eureka3:
-    image: ${IMAGE}
-    env_file:
-      - .env
+      start_period: 30s
+    networks:
+      backend:
+        aliases:
+          - eureka-cluster2
+  eureka-cluster3:
+    image: eureka-cluster:latest
     environment:
-      - ACTIVE=docker3
-      - PORT=${EUREKA3_PORT}
-      - ADDITIONAL_EUREKA_SERVER_LIST=http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka2:${EUREKA2_PORT}/eureka/,http://${SECURITY_NAME}:${SECURITY_PASSWORD}@docker-eureka1:${EUREKA1_PORT}/eureka/
+      - ACTIVE=cluster3
+      - JAVA_OPTS=-Xms512m -Xmx512m
     ports:
-      - ${EUREKA3_PORT}:${EUREKA3_PORT}
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 20s
-      update_config:
-        parallelism: 1
-        delay: 20s
-    networks:
-      eureka-net:
-        aliases:
-          - eureka
+      - 8763:8763
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-fs", "http://localhost:${EUREKA3_PORT}/health/"]
+      test: ["CMD", "curl", "-f", "http://ibalife:ibalife@localhost:8763/actuator/health"]
       interval: 1m30s
-      timeout: 15s
+      timeout: 10s
       retries: 3
+      start_period: 30s
+    networks:
+      backend:
+        aliases:
+          - eureka-cluster3
 
-# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 name
 networks:
-  eureka-net:
+  backend:
     external:
-      name: ${BACKEND_NETWORK:-backend}
+      name: backend
 ```
 
-`.env`
-
-```
-IMAGE=192.168.6.113:8888/discover-server/eureka-center-server
-PREFERRED_NETWORKS=10.10
-LEASE_RENEWAL_INTERVAL_INSECONDS=15
-SECURITY_NAME=admin
-SECURITY_PASSWORD=admin123
-EUREKA1_PORT=5001
-EUREKA2_PORT=5002
-EUREKA3_PORT=5003
-```
-
-从部署模版中可以看出这三个Eureka实例在网络上的别名(alias)都是`eureka`，对于客户端可以在配置文件中指定这个别名即可，不必指定三个示例的名字。
-
-`application.yml`
-
-```
-eureka.client.serviceUrl.defaultZone=http://${EUREKA_SERVER_ADDRESS}:5001/eureka/
-```
-
-Eureka Server的地址通过`${EUREKA_SERVER_ADDRESS}` 环境变量传入。
-
-```
-services:
-  web:
-    image: demo-web
-    networks:
-      - eureka-net
-    environment:
-      - EUREKA_SERVER_ADDRESS=eureka
-```
-
-另外要注意的是所有依赖于Eureka的应用服务都要挂到`eureka-net`网络上，否则无法和Eureka Server通信。
-
-## 启动
+### 启动
 
 启动前确保创建好了网络：
 
@@ -601,7 +549,13 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/cnm-demo.png)
 
-# Eureka Edgware.RELEASE版本注册优化
+### 踩坑
+
+在Docker中程序，如果PID不是1，是接收不到`docker-compose down`发出的`sigterm`信号从而导致只能等待被Kill，不能向注册中心注销。
+
+解决方法是在Dockerfile中的入口使用`ENTRYPOINT exec java -jar ... `这种方式 
+
+### Eureka Edgware.RELEASE版本注册优化
 
 在`Edgware.RELEASE`版本中相比之前的步骤，省略了在主函数上添加`@EnableDiscoveryClient`注解这一过程。Spring Cloud默认认为客户端是要完成向注册中心进行注册的。
 
@@ -622,7 +576,6 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 ```
 spring.application.name=EUREKA-CLIENT
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka
-
 ```
 
 启动Eureka Client客户端，访问<http://localhost:8761/eureka>
@@ -637,7 +590,7 @@ spring cloud提供了一个参数，该参数的作用是控制是否要向Eurek
 spring.cloud.service-registry.auto-registration.enabled = xxx
 ```
 
-可以在Junit测试中通过该变量关闭服务发现：
+可以在**JUnit测试**中通过该变量关闭服务发现：
 
 ```
 @BeforeClass
@@ -646,7 +599,7 @@ public static void beforeClass() {
 }
 ```
 
-# Eureka的自我保护模式
+### Eureka的自我保护模式
 
 当Eureka提示下面一段话的时候，就表示它已经进入保护模式：
 
@@ -680,7 +633,7 @@ eureka:
 **注意：**
 **更改Eureka更新频率将打破服务器的自我保护功能，生产环境下不建议自定义这些配置。**
 
-# Finally
+## Finally
 
 > 参考
 >

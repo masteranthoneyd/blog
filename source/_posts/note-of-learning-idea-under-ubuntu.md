@@ -20,6 +20,8 @@ tags: [Ubuntu, IDE]
 
 # License
 
+## 2018.1.5以前版本
+
 注册码可以自己读娘，或者使用授权服务器
 
 博主用的是基于docker的授权服务器：
@@ -58,6 +60,10 @@ server {
 ```
 nginx -s reload
 ```
+
+## 2018.2版本
+
+> ***[rover大神](https://rover12421.com/)***
 
 # Personal Setting
 

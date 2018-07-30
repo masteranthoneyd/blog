@@ -100,12 +100,13 @@ MAINTAINER yangbingdong <yangbingdong1994@gmail.com>
 ENV PROJECT_NAME="@project.build.finalName@.@project.packaging@" JAVA_OPTS=""
 ADD $PROJECT_NAME app.jar
 RUN sh -c 'touch /app.jar'
-CMD ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=${ACTIVE:-docker} -jar /app.jar"]
-# ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
+ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dspring.profiles.active=${ACTIVE:-docker} -jar /app.jar
 ```
 
 * 通过`@@`动态获取打包后的项目名（需要插件，下面会介绍）
 * `Dspring.profiles.active=${ACTIVE:-docker}`可以通过docker启动命令`-e ACTIVE=docker`参数修改配置
+
+**注意**：如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可是使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
 
 ### pom文件添加Docker插件
 
