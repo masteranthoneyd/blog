@@ -79,8 +79,6 @@ sudo chmod -R 777 /usr/bin/lantern
 sudo apt install -y gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2-engines-pixbuf libxml2-utils
 ```
 
-
-
 ### 安装Flatabulous主题
 
 `Flatabulous`主题是一款`Ubuntu`下扁平化主题，也是我试过众多主题中最喜欢的一个！最终效果如上述图所示。
