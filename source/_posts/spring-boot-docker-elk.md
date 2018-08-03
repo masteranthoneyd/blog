@@ -20,7 +20,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 - Docker
 - IDE（使用IDEA）
 - Maven环境
-- Docker私有仓库
+- Docker私有仓库，可以使用Harbor(***[Ubuntu中安装Harbor](/2018/docker-visual-management-and-orchestrate-tools/#Harbor)***)
 
 集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
@@ -106,7 +106,9 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 * 通过`@@`动态获取打包后的项目名（需要插件，下面会介绍）
 * `Dspring.profiles.active=${ACTIVE:-docker}`可以通过docker启动命令`-e ACTIVE=docker`参数修改配置
 
-**注意**：如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可是使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
+#### 注意PID
+
+如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可是使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
 
 ### pom文件添加Docker插件
 
@@ -127,7 +129,7 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
         </executions>
     </plugin>
 
-    <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中 -->
+    <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中，这种方式是方便通过手动构建镜像） -->
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -140,10 +142,10 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
                     <goal>copy-resources</goal>
                 </goals>
                 <configuration>
-                    <!-- 编译后Dockerfile的输出位置 -->
+                <!-- 编译后Dockerfile的输出位置 -->
                     <outputDirectory>${dockerfile.compiled.position}</outputDirectory>
                     <resources>
-                        <!-- Dockerfile位置 -->
+                    	<!-- Dockerfile位置 -->
                         <resource>
                             <directory>${project.basedir}/src/main/docker</directory>
                             <filtering>true</filtering>
@@ -151,8 +153,27 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
                     </resources>
                 </configuration>
             </execution>
+            <execution>
+                <id>copy-jar</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                    <outputDirectory>${dockerfile.compiled.position}</outputDirectory>
+                    <resources>
+                        <resource>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                        </resource>
+                    </resources>
+                </configuration>
+            </execution>
         </executions>
     </plugin>
+
 
     <!-- 集成Docker maven 插件 -->
     <plugin>

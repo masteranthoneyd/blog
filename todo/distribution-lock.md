@@ -1,4 +1,4 @@
-# 分布式锁
+# 分布式锁实现
 
 > Raft算法：*[http://thesecretlivesofdata.com/raft/](http://thesecretlivesofdata.com/raft/)*
 
@@ -19,6 +19,8 @@
 下面我们简单介绍下这几种锁的实现。
 
 ### 基于数据库
+
+> 虽然这种方式基本上不会被用于生产环境
 
 基于数据库的锁实现也有两种方式，一是基于数据库表，另一种是基于数据库排他锁。
 
@@ -76,9 +78,74 @@ public void lock(){
 
 基于zookeeper临时有序节点可以实现的分布式锁。每个客户端对某个方法加锁时，在zookeeper上的与该方法对应的指定节点的目录下，生成一个唯一的瞬时有序节点。 判断是否获取锁的方式很简单，只需要判断有序节点中序号最小的一个。 当释放锁的时候，只需将这个瞬时节点删除即可。同时，其可以避免服务宕机导致的锁无法释放，而产生的死锁问题。
 
-提供的第三方库有[curator](https://curator.apache.org/)，具体使用读者可以自行去看一下。Curator提供的InterProcessMutex是分布式锁的实现。acquire方法获取锁，release方法释放锁。另外，锁释放、阻塞锁、可重入锁等问题都可以有有效解决。讲下阻塞锁的实现，客户端可以通过在ZK中创建顺序节点，并且在节点上绑定监听器，一旦节点有变化，Zookeeper会通知客户端，客户端可以检查自己创建的节点是不是当前所有节点中序号最小的，如果是就获取到锁，便可以执行业务逻辑。
+提供的第三方库有[curator](https://curator.apache.org/)，具体使用读者可以自行去看一下。Curator提供的`InterProcessMutex`是分布式锁的实现。`acquire`方法获取锁，release方法释放锁。另外，锁释放、阻塞锁、可重入锁等问题都可以有有效解决。讲下阻塞锁的实现，客户端可以通过在ZK中创建顺序节点，并且在节点上绑定监听器，一旦节点有变化，Zookeeper会通知客户端，客户端可以检查自己创建的节点是不是当前所有节点中序号最小的，如果是就获取到锁，便可以执行业务逻辑。
 
-最后，Zookeeper实现的分布式锁其实存在一个缺点，那就是性能上可能并没有缓存服务那么高。因为每次在创建锁和释放锁的过程中，都要动态创建、销毁瞬时节点来实现锁功能。ZK中创建和删除节点只能通过Leader服务器来执行，然后将数据同不到所有的Follower机器上。并发问题，可能存在网络抖动，客户端和ZK集群的session连接断了，zk集群以为客户端挂了，就会删除临时节点，这时候其他客户端就可以获取到分布式锁了。
+根据Zookeeper的这些特性，我们来看看如何利用这些特性来实现分布式锁：
+
+- 创建一个锁目录`lock`
+- 线程A获取锁会在`lock`目录下，创建临时顺序节点
+- 获取锁目录下所有的子节点，然后获取比自己小的兄弟节点，如果不存在，则说明当前线程顺序号最小，获得锁
+- 线程B创建临时节点并获取所有兄弟节点，判断自己不是最小节点，**设置监听(`watcher`)比自己次小的节点**
+- 线程A处理完，删除自己的节点，线程B监听到变更事件，判断自己是最小的节点，获得锁
+
+最后，Zookeeper实现的分布式锁其实存在一个缺点，那就是**性能上可能并没有缓存服务那么高**。因为每次在创建锁和释放锁的过程中，都要动态创建、销毁瞬时节点来实现锁功能。ZK中创建和删除节点只能通过Leader服务器来执行，然后将数据同不到所有的Follower机器上。并发问题，可能存在网络抖动，客户端和ZK集群的session连接断了，zk集群以为客户端挂了，就会删除临时节点，这时候其他客户端就可以获取到分布式锁了。
+
+下面是简单例子：
+
+```
+public class CuratorTest {
+	private static String address = "127.0.0.1:2181";
+
+
+	public static void main(String[] args) {
+		RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+		CuratorFramework client = CuratorFrameworkFactory.newClient(address, retryPolicy);
+		client.start();
+		//创建分布式锁, 锁空间的根节点路径为/curator/lock
+		InterProcessMutex mutex = new InterProcessMutex(client, "/curator/lock");
+		ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+		CompletionService<Object> completionService = new ExecutorCompletionService<>(fixedThreadPool);
+		for (int i = 0; i < 5; i++) {
+			completionService.submit(() -> {
+				boolean flag = false;
+				try {
+					//尝试获取锁，最多等待5秒
+					flag = mutex.acquire(5, TimeUnit.SECONDS);
+					Thread currentThread = Thread.currentThread();
+					if (flag) {
+						System.out.println("线程" + currentThread.getId() + "获取锁成功");
+					} else {
+						System.out.println("线程" + currentThread.getId() + "获取锁失败");
+					}
+					//模拟业务逻辑，延时4秒
+					Thread.sleep(4000);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (flag) {
+						try {
+							mutex.release();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				return null;
+			});
+		}
+		// 等待线程跑完
+		int count = 0;
+		while (count < 5) {
+			if (completionService.poll() != null) {
+				count++;
+			}
+		}
+		System.out.println("=========  Complete!");
+		client.close();
+		fixedThreadPool.shutdown();
+	}
+}
+```
 
 ### 基于缓存
 
@@ -86,13 +153,41 @@ public void lock(){
 
 ## 基于redis的分布式锁实现
 
-## 
+> 首先，为了确保分布式锁可用，我们至少要确保锁的实现同时满足以下四个条件：
+>
+> 1. **互斥性。**在任意时刻，只有一个客户端能持有锁。
+> 2. **不会发生死锁。**即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。
+> 3. **具有容错性。**只要大部分的Redis节点正常运行，客户端就可以加锁和解锁。
+> 4. **解铃还须系铃人。**加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。
 
-# 参考资料
+下面是正确的实现姿势。（使用Spring Data Redis）
 
-1. [Java分布式锁三种实现方案](https://www.jianshu.com/p/535efcab356d)
-2. [Java注解的基础与高级应用](http://linbinghe.com/2017/ac8515d0.html)
-3. [基于 AOP 和 Redis 实现的分布式锁](http://blog.csdn.net/qq1013598664/article/details/71642140)
-4. [如何高效排查系统故障？一分钱引发的系统设计“踩坑”案例](https://yq.aliyun.com/articles/272539)
-5. [用redis实现分布式锁](http://www.jeffkit.info/2011/07/1000/?spm=5176.100239.blogcont60663.8.9f4d4a8ltDsSf)
+### 依赖
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-pool2</artifactId>
+</dependency>
+```
+
+### 加锁
+
+```
+@Autowired
+private StringRedisTemplate stringRedisTemplate;
+
+private Boolean setNxEx(String key, String value) {
+	return stringRedisTemplate.execute((RedisCallback<Boolean>) connection -> {
+		StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
+		return stringRedisConn.set(key, value, Expiration.from(1L, TimeUnit.MINUTES), SET_IF_ABSENT);
+	});
+}
+```
+
 

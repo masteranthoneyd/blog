@@ -530,7 +530,7 @@ ContiPerf是一个轻量级的**测试**工具，基于**JUnit**4 开发，可�
 ```
 public class ContiPerfTest { 
     @Rule 
-    publicContiPerfRule i = newContiPerfRule(); 
+    public ContiPerfRule i = new ContiPerfRule(); 
    
     @Test 
     @PerfTest(invocations = 1000, threads = 40) 
