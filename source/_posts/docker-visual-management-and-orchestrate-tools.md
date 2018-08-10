@@ -1398,7 +1398,7 @@ docker-machine create -d virtualbox test
 
 `--engine-registry-mirror https://registry.docker-cn.com` 配置 Docker 的仓库镜像
 
-`--engine-insecure-registry`
+`--engine-insecure-registry` 可以使用http的仓库
 
 `--virtualbox-memory 2048` 配置主机内存
 
@@ -1516,75 +1516,7 @@ $ docker-machine COMMAND --help
 
 **注意：**docker-machine 安装的 Docker 在 `/etc/systemd/system` 目录下多出了一个 Docker 相关的目录：`docker.service.d`。这个目录中只有一个文件 `10-machine.conf`，这个配置文件至关重要，因为它会覆盖 Docker 默认安装时的配置文件，从而以 Docker Machine 指定的方式启动 Docker daemon。至此我们有了一个可以被远程访问的 Docker daemon。
 
-### 加入其他物理主机
-
-> ***[https://docs.docker.com/machine/drivers/generic/](https://docs.docker.com/machine/drivers/generic/)***
-
-在使用 docker-machine 进行远程安装前我们需要做一些准备工作：
-**1.    在目标主机上创建一个用户并加入sudo 组**
-**2.    为该用户设置 sudo 操作不需要输入密码**
-**3.    把本地用户的 ssh public key 添加到目标主机上**
-
-**注意**：如果远程物理级已经安装过docker，docker-machine会把远程的docker重置，镜像以及容器都没了...
-
-比如我们要在远程主机上添加一个名为 nick 的用户并加入 sudo 组：
-
-```
-$ sudo adduser nick
-$ sudo usermod -a -G sudo nick
-```
-
-然后设置 sudo 操作不需要输入密码：
-
-```
-$ sudo visudo
-```
-
-把下面一行内容添加到`%sudo ALL=(ALL:ALL) ALL`**之后**并保存文件，否则不生效：
-
-```
-%sudo  ALL=(ALL:ALL) ALL
-nick   ALL=(ALL:ALL) NOPASSWD: ALL
-```
-
-最后把本地用户的 ssh public key 添加到目标主机上：
-
-```
-$ ssh-copy-id -i ~/.ssh/id_rsa.pub nick@xxx.xxx.xxx.xxx
-```
-
-这几步操作的主要目的是获得足够的权限可以远程的操作目标主机。
-
-然后添加machine：
-
-```
-docker-machine create \               
-  --driver generic \
-  --generic-ip-address=192.168.6.105 \
-  --generic-ssh-key ~/.ssh/id_rsa \
-  --generic-ssh-user=dworker \
-  --engine-registry-mirror https://vioqnt7w.mirror.aliyuncs.com \
-  --engine-insecure-registry 192.168.6.113:8888 \
-  qww-machine
-  [machine name]
-```
-
-如果已安装docker：
-
-```
-docker-machine create -d none --url=tcp://192.168.6.105:2375 vmware_docker01
-```
-
-### 添加镜像加速
-
-```
-$ docker-machine ssh default
-$> sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=$REGISTRY_MIRROR |g" /var/lib/boot2docker/profile
-$> exit
-$ docker-machine restart default
-```
-
-## 使用KVM引擎启动
+### 使用KVM引擎启动
 
 ***[https://github.com/dhiltgen/docker-machine-kvm](https://github.com/dhiltgen/docker-machine-kvm)***
 
@@ -1596,10 +1528,16 @@ sudo apt install libvirt-bin qemu-kvm
 
 到 ***[Release](https://github.com/dhiltgen/docker-machine-kvm/releases)*** 页面下载相关驱动。
 
+Ubuntu 16.04:
+
+```
+sudo curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.10.0/docker-machine-driver-kvm-ubuntu16.04 > /usr/local/bin/docker-machine-driver-kvm && sudo chmod +x /usr/local/bin/docker-machine-driver-kvm
+```
+
 最后启动：
 
 ```
-docker-machine create -d kvm myengine0
+docker-machine create -d kvm --engine-registry-mirror=https://vioqnt8w.mirror.aliyuncs.com  --engine-insecure-registry=192.168.122.213 test01
 ```
 
 ## Swarm Mode

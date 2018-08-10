@@ -4,7 +4,10 @@ date: 2017-01-20 11:31:22
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
 ---
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/maxresdefault.jpg)
+
 # 前言
+
 最近公司的电脑由于不明原因老是奔溃，重装过两次，在家里也比较喜欢折腾系统，为了不用每次都度娘谷歌，记录下来，一条龙走过。博主是搞爪哇开发的，那么以下搭建针对的是爪哇环境开发
 
 <!--more-->
