@@ -492,7 +492,33 @@ service ssh restart
 
 # 多用户管理
 
-***[https://github.com/mmmwhy/ss-panel-and-ss-py-mu](https://github.com/mmmwhy/ss-panel-and-ss-py-mu)***
+***[https://github.com/mmmwhy/ss-panel-and-ss-py-mu](https://github.com/mmmwhy/ss-panel-and-ss-py-mu)*** :
+
+**ss-panel mod魔改版一键脚本**
+
+```
+yum install screen wget -y &&screen -S ss 
+wget -N --no-check-certificate https://raw.githubusercontent.com/mmmwhy/ss-panel-and-ss-py-mu/master/ss-panel-v3-mod.sh && chmod +x ss-panel-v3-mod.sh && bash ss-panel-v3-mod.sh
+```
+
+**ss-panel v3一键脚本**
+
+```
+yum install screen wget -y &&screen -S ss
+wget -N --no-check-certificate https://raw.githubusercontent.com/mmmwhy/ss-panel-and-ss-py-mu/master/ss-panel_node.sh && chmod +x ss-panel_node.sh && bash ss-panel_node.sh
+```
+
+选项都差不多,直接输入`1`安装即可
+
+装完之后可以直接访问ip
+
+默认账号：`91vps`
+
+默认密码：`91vps`
+
+phymyadmin 访问 `ip:888`
+
+安装时间可能稍长，耐心等候。。。
 
 ***[https://github.com/Ehco1996/django-sspanel](https://github.com/Ehco1996/django-sspanel)***
 
@@ -500,13 +526,7 @@ service ssh restart
 
 ***[https://91vps.win/](https://91vps.win/)***
 
-# 黑科技加速系列
-
-## FinalSpeed
-***[91yun发布的finalspeed一键安装包](https://www.91yun.org/archives/2775)***
-***[锐速替代品双边加速FinalSpeed客户端下载及教程 ，Openvz福音](https://www.91yun.org/archives/615)***
-## 锐速
-***[锐速破解版linux一键自动安装包](https://www.91yun.org/archives/683)***
+# Shadowsocks Optimize
 
 ## Google BBR
 ***[一键安装最新内核并开启 BBR 脚本](https://teddysun.com/489.html)***
@@ -525,7 +545,7 @@ chmod +x bbr.sh && \
 ./bbr.sh
 ```
 
-安装完后，会提示要重启 VPS，选择 Y 回车重启即可。
+安装完后，会提示要重启 VPS，选择 **`Y`** 回车重启即可。
 
 重启后输入
 
@@ -533,7 +553,47 @@ chmod +x bbr.sh && \
 lsmod | grep bbr
 ```
 
-出现 tcp_bbr 即说明 BBR 已经启动。
+出现 `tcp_bbr` 即说明 BBR 已经启动。
+
+### 开启TCP Fast Open
+
+这个需要服务器和客户端都是Linux 3.7+的内核，一般Linux的服务器发行版只有debian jessie有3.7+的，客户端用Linux更是珍稀动物，所以这个不多说，如果你的服务器端和客户端都是Linux 3.7+的内核，那就在服务端和客户端的`vi /etc/sysctl.conf`文件中再加上一行。
+
+```
+# turn on TCP Fast Open on both client and server side
+net.ipv4.tcp_fastopen = 3
+```
+
+然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`。这样速度也将会有非常显著的提升。
+
+###  TCP优化
+
+1.修改文件句柄数限制
+如果是ubuntu/centos均可修改`/etc/sysctl.conf`
+找到`fs.file-max`这一行，修改其值为`1024000`，并保存退出。然后执行`sysctl -p`使其生效
+修改`vi /etc/security/limits.conf`文件，加入
+
+```
+*               soft    nofile           512000
+*               hard    nofile          1024000
+```
+
+针对centos,还需要修改`vi /etc/pam.d/common-session`文件，加入
+`session required pam_limits.so`
+
+2.修改`vi /etc/profile`文件，加入
+`ulimit -SHn 1024000`
+然后重启服务器执行`ulimit -n`，查询返回1024000即可。
+
+```
+sysctl.conf报错解决方法
+修复modprobe的：
+rm -f /sbin/modprobe 
+ln -s /bin/true /sbin/modprobe
+修复sysctl的：
+rm -f /sbin/sysctl 
+ln -s /bin/true /sbin/sysctl
+```
 
 ## Kcptun
 
@@ -812,6 +872,85 @@ DAEMON_PURGE = 1h #当以后台方式运行时，清除机制在 HOSTS_DENY 中�
 Github: ***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
 
 教程: ***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
+
+# VPS Speed Test
+
+## speedtest
+
+下载：
+
+```
+wget https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py && \
+chmod +x speedtest.py
+```
+
+运行：
+
+```
+./speedtest.py
+
+#或者
+python speedtest.py
+```
+
+结果：
+
+```
+[root@li1890-191 ~]# ./speedtest.py
+Retrieving speedtest.net configuration...
+Testing from Linode (123.456.789.123)...
+Retrieving speedtest.net server list...
+Selecting best server based on ping...
+Hosted by IPA CyberLab (Bunkyo) [5.97 km]: 2.998 ms
+Testing download speed................................................................................
+Download: 2036.69 Mbit/s
+Testing upload speed................................................................................................
+Upload: 208.17 Mbit/s
+
+```
+
+## speedtest-cli
+
+> 地址：***[https://github.com/sivel/speedtest-cli](https://github.com/sivel/speedtest-cli)***
+
+pip方式安装
+
+```
+pip install speedtest-cli
+```
+
+或github安装
+
+```
+git clone https://github.com/sivel/speedtest-cli.git
+python speedtest-cli/setup.py install
+```
+用法：
+
+```
+
+```
+
+1、list
+
+根据距离显示所有的节点服务器列表。
+
+2、列出所有北京节点服务器
+
+```
+[root@li1890-191 ~]# speedtest-cli --list | grep Beijing
+ 4713) China Mobile Group Beijing Co.Ltd (Beijing, China) [2093.67 km]
+ 5505) Beijing Broadband Network (Beijing, China) [2093.67 km]
+ 5145) Beijing Unicom (Beijing, China) [2093.67 km]
+18462) Beijing Broadband Network (Beijing, China) [2093.67 km]
+```
+
+3、选择节点测试下载速度
+
+```
+speedtest-cli --server=6611
+```
+
 
 [^1]: 防火长城（英语：Great Firewall( of China)，常用简称：GFW，中文也称中国国家防火墙，中国大陆民众俗称防火墙等），是对中华人民共和国政府在其互联网边界审查系统（包括相关行政审查系统）的统称。此系统起步于1998年，其英文名称得自于2002年5月17日Charles R. Smith所写的一篇关于中国网络审查的文章《The Great Firewall of China》，取與Great Wall（长城）相谐的效果，简写为Great Firewall，缩写GFW。隨着使用的拓广，中文「墙」和英文「GFW」有时也被用作动词，网友所說的「被墙」即指被防火长城所屏蔽，「翻墙」也被引申为浏览国外网站、香港等特区网站的行为。
 
