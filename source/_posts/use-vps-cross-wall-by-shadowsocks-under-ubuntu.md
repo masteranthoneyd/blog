@@ -539,13 +539,146 @@ lsmod | grep bbr
 
 ***[Kcptun 服务端一键安装脚本](https://blog.kuoruan.com/110.html)***
 
-# VPS防DDOS攻击
+# VPS Security
 
 > 公司刚买了一个Linode VPS 2TB流量的，不到几天就被DDOS攻击，直到余额被扣完停机。。。
 >
 > 吓得我马上谷歌了一些防御措施
 
-## 开启UFW防火墙
+## 修改SSH登录端口
+
+### Ubuntu
+
+1、用下面命令进入配置文件`vi /etc/ssh/sshd_config`
+2、找到`#port 22`，将前面的`#`去掉，然后修改端口 `port 12345`（自己设定）。
+3、然后重启ssh服务
+
+```
+#Debian/ubuntu  /etc/init.d/ssh restart   or    service ssh restart
+#CentOS         service sshd restart
+```
+
+### CentOS
+
+1、临时关闭SELinux：
+
+```
+setenforce 0
+```
+
+2、修改SSH端口
+
+```
+vi /etc/ssh/sshd_config
+
+#在Port 22下面加一行，以端口2333为例，Port 2333
+
+#重启ssh服务：
+systemctl restart sshd.service
+```
+
+3、防火墙中放行新加入端口
+
+```
+firewall-cmd --permanent --add-port=2333/tcp
+```
+
+4、用该命令查询
+
+```
+firewall-cmd --permanent --query-port=2333/tcp
+```
+
+如果是`yes`就是添加成功，如果是no就是没成功
+
+5、成功后重载防火墙
+
+```
+firewall-cmd --reload
+```
+
+6、关闭SELinux
+
+查看SELinux状态`SELINUX`，如果是`enabled`就是开启状态
+
+`vi /etc/selinux/config`
+
+修改`SELINUX=disabled`
+
+最后重启vps试试用新的`2333`端口登录，如果登录成功再`vi /etc/ssh/sshd_config`把`Port 22`端口删除，再重启ssh服务就好了。
+
+## 使用密钥登录SSH
+
+1、服务端生成密钥
+
+```
+#生成SSH密钥对
+ssh-keygen -t rsa
+
+Generating public/private rsa key pair.
+#建议直接回车使用默认路径
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+#输入密码短语（留空则直接回车）
+Enter passphrase (empty for no passphrase): 
+#重复密码短语
+Enter same passphrase again: 
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+aa:8b:61:13:38:ad:b5:49:ca:51:45:b9:77:e1:97:e1 root@localhost.localdomain
+The key's randomart image is:
++--[ RSA 2048]----+
+|    .o.          |
+|    ..   . .     |
+|   .  . . o o    |
+| o.  . . o E     |
+|o.=   . S .      |
+|.*.+   .         |
+|o.*   .          |
+| . + .           |
+|  . o.           |
++-----------------+
+```
+
+2、复制密钥对
+
+> 也可以手动在客户端建立目录和authorized_keys，注意修改权限
+
+```
+#复制公钥到无密码登录的服务器上,22端口改变可以使用下面的命令
+#ssh-copy-id -i ~/.ssh/id_rsa.pub "-p 10022 user@server"
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.15.241
+```
+
+3、关闭密码登陆(编辑`/etc/ssh/sshd_config`)
+
+```
+#禁用密码验证
+PasswordAuthentication no
+
+#启用密钥验证
+RSAAuthentication yes
+PubkeyAuthentication yes
+
+#指定公钥数据库文件
+AuthorizedKeysFile .ssh/authorized_keys
+
+#root 用户能否通过 SSH 登录
+PermitRootLogin yes
+```
+
+4、重启SSH
+
+```
+#RHEL/CentOS系统
+service sshd restart
+#ubuntu系统
+service ssh restart
+#debian系统
+/etc/init.d/ssh restart
+```
+
+## 开启UFW防火墙（Ubuntu）
 
 ```
 ufw enable
@@ -558,6 +691,8 @@ ufw allow from [remote_ip]
 
 `DDOS deflate`是一款免费的用来防御和减轻DDOS攻击的脚本。它通过netstat监测跟踪创建大量网络连接的IP地址，在检测到某个结点超过预设的限制时，该程序会通过APF或IPTABLES禁止或阻挡这些IP。
 
+**安装**：
+
 ```
 wget http://www.moerats.com/usr/down/DDOS/deflate.sh && \
 chmod +x deflate.sh && \
@@ -568,13 +703,13 @@ chmod +x deflate.sh && \
 
 ```
 ##### Paths of the script and other files
-PROGDIR=”/usr/local/ddos”
-PROG=”/usr/local/ddos/ddos.sh”
-IGNORE_IP_LIST=”/usr/local/ddos/ignore.ip.list” 
+PROGDIR="/usr/local/ddos"
+PROG="/usr/local/ddos/ddos.sh"
+IGNORE_IP_LIST="/usr/local/ddos/ignore.ip.list"
 # 白名单.如有反向代理,注意添加本机地址和本机外网IP地址,防止提供反向代理的主机被判定为攻击.
-CRON=”/etc/cron.d/ddos.cron”
-APF=”/etc/apf/apf”
-IPT=”/sbin/iptables”##### frequency in minutes for running the script
+CRON="/etc/cron.d/ddos.cron"
+APF="/etc/apf/apf"
+IPT="/sbin/iptables"##### frequency in minutes for running the script
 
 ##### Caution: Every time this setting is changed, run the script with cron
 ##### option so that the new frequency takes effect
@@ -597,7 +732,7 @@ KILL=1
 ##### An email is sent to the following address when an IP is banned. 
 # 当单IP发起的连接数超过阀值后,将发邮件给指定的收件人.
 ##### Blank would suppress sending of mails
-EMAIL_TO=”root” 
+EMAIL_TO="root" 
 # 这里是邮箱，可以把root替换成你的邮箱
 
 ##### Number of seconds the banned ip should remain in blacklist. 
@@ -613,7 +748,7 @@ ddos -d
 
 Ubuntu中可能会报错：
 
-```
+```shell
 root@localhost:~# ddos -d
 /usr/local/sbin/ddos: 13: [: /usr/local/ddos/ddos.conf: unexpected operator
 DDoS-Deflate version 0.6
@@ -630,8 +765,47 @@ dpkg-reconfigure dash
 
 这个方法比较省时省力。denyhosts 是 Python 语言写的一个程序，它会分析 sshd 的日志文件，当发现重复的失败登录时就会记录 IP 到 /etc/hosts.deny 文件，从而达到自动屏 IP 的功能：
 ```shell
-apt-get install denyhosts
+# Debian/Ubuntu：
+sudo apt install denyhosts
+ 
+# RedHat/CentOS
+yum install denyhosts
 ```
+
+默认配置就能很好的工作，如要个性化设置可以修改 `/etc/denyhosts.conf`
+
+```
+SECURE_LOG = /var/log/auth.log #ssh 日志文件，它是根据这个文件来判断的。
+HOSTS_DENY = /etc/hosts.deny #控制用户登陆的文件
+PURGE_DENY = #过多久后清除已经禁止的，空表示永远不解禁
+BLOCK_SERVICE = sshd #禁止的服务名，如还要添加其他服务，只需添加逗号跟上相应的服务即可
+DENY_THRESHOLD_INVALID = 5 #允许无效用户失败的次数
+DENY_THRESHOLD_VALID = 10 #允许普通用户登陆失败的次数
+DENY_THRESHOLD_ROOT = 1 #允许root登陆失败的次数
+DENY_THRESHOLD_RESTRICTED = 1
+WORK_DIR = /var/lib/denyhosts #运行目录
+SUSPICIOUS_LOGIN_REPORT_ALLOWED_HOSTS=YES
+HOSTNAME_LOOKUP=YES #是否进行域名反解析
+LOCK_FILE = /var/run/denyhosts.pid #程序的进程ID
+ADMIN_EMAIL = root@localhost #管理员邮件地址,它会给管理员发邮件
+SMTP_HOST = localhost
+SMTP_PORT = 25
+SMTP_FROM = DenyHosts <nobody@localhost>
+SMTP_SUBJECT = DenyHosts Report
+AGE_RESET_VALID=5d #用户的登录失败计数会在多久以后重置为0，(h表示小时，d表示天，m表示月，w表示周，y表示年)
+AGE_RESET_ROOT=25d
+AGE_RESET_RESTRICTED=25d
+AGE_RESET_INVALID=10d
+RESET_ON_SUCCESS = yes #如果一个ip登陆成功后，失败的登陆计数是否重置为0
+DAEMON_LOG = /var/log/denyhosts #自己的日志文件
+DAEMON_SLEEP = 30s #当以后台方式运行时，每读一次日志文件的时间间隔。
+DAEMON_PURGE = 1h #当以后台方式运行时，清除机制在 HOSTS_DENY 中终止旧条目的时间间隔,这个会影响PURGE_DENY的间隔。
+```
+
+查看已拦截的IP`cat /etc/hosts.deny`
+查看拦截记录`cat /etc/hosts.deny | wc -l`
+重启服务`service denyhosts restart`
+写入自启`echo "service denyhosts restart" >> /etc/rc.local`
 
 ## vDDoS（只支持CentOS和CloudLinux）
 
