@@ -296,45 +296,6 @@ var disqus = {
 流程就没什么好说的了，如上图，在前端页面上测试 disqus 加载是否成功，如果成功则显示 disqus 的评论框，反之加载独立的评论框...
 具体请看***[https://ycwalker.com/2017/06/01/about-diqus-proxy/](https://ycwalker.com/2017/06/01/about-diqus-proxy/)***
 
-### Deploy Disqus-Proxy
-首先你得有一台**可以访问[Disqus](https://disqus.com/)**的VPS[^1]... 博主用的是***[Linode](www.linode.com)***
-
-### Node.js
-后端采用了`Koa` 框架和 `async/await` 语法，`Node.js` 版本 `7.6` 以上。
-
-![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/node-js-version.png)
-
-### Clone Project
-`cd`到想要安装的目录下，然后：
-```bash
-git clone https://github.com/ciqulover/disqus-proxy
-```
-
-### Dependency
-要运行起来首先要安装依赖，`cd`到项目里面执行：
-```bash
-npm i --production
-// 或者
-yarn install --production
-```
-
-### Configuration
-配置 `server` 目录下的`config.js`：
-```json
-module.exports = {
-  // 服务端端口，需要与 disqus-proxy 前端设置一致
-  port: 5509,
-  // 你的 diqus secret key
-  api_secret: 'your secret key',
-  // 你的 disqus 名称
-  username:'ciqu',
-  // 服务端 socks5 代理转发，便于在本地测试，生产环境通常为 null
-  socks5Proxy: null,
-  // 日志输出位置, 输出到文件或控制台 'file' | 'console'
-  log: 'console'
-}
-```
-
 ### Get Api-secret 
 `api-secret` 需要你在 ***[Disqus Api](https://disqus.com/api/applications/)*** 的官方网站上开启 **API** 权限，申请成功后会得到这个秘钥。
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/disqus-api-applcation.png)
@@ -342,26 +303,23 @@ module.exports = {
 并且需要在后台的 `Settings` => `Community` 里开启访客评论：
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/disqus-admin-setting.png)
 
-### Start Up
-使用 `pm2` 启动：
-```bash
-cd server
-npm i pm2 -g
-pm2 start index.js
+### Deploy Disqus-Proxy
+
+首先你得有一台**可以访问[Disqus](https://disqus.com/)**的VPS[^1]... 博主用的是***[Linode](www.linode.com)***
+
+Docker方式启动：
+
 ```
-如果你在配置文件中选择 `log` 类型为`file`, 那么输出的日志文件将在默认为 server 目录下的`disqus-proxy.log`
-
-使用`netstat`查看项目监听情况：
-
-```bash
-netstat -nutpl
+docker run -d --name disqus-proxy --restart=always -p 5509:5509 \
+-e API_SECRECT=your_serect \
+-e SHORT_NAME=your_short_name \
+ycwalker/disqus-proxy-server 
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/disqus-proxy-startup.png)
-
-那么后端的工作就完成了～
+更多方式请移步到 ***[https://github.com/ciqulover/disqus-proxy-server](https://github.com/ciqulover/disqus-proxy-server)***
 
 ### NexT Configuration
+
 #### Copy Static File
 将`disqus-proxy`项目中`/build/static`文件复制到博客`../next/source/`下。
 `static`文件中应该包含`main.0d0338ae.js`和`main.0603c539.css`。
@@ -491,7 +449,7 @@ image_minifier:
 
 这是翻墙状态：
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/comment02.png)
-这是disqus_proxy：
+这是`disqus_proxy`：
 ![](http://ojoba1c98.bkt.clouddn.com/img/disqus-proxy/comment01.png)
 
 ## 修改文章页宽

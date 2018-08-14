@@ -406,9 +406,43 @@ server{
 
 这里有***[更多](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)***的可能更加有用的配置代理连接的指令。
 
+## 快速查看配置文件的方法
 
+nginx的配置放在nginx.conf文件中，一般我们可以使用以下命令查看服务器中存在的nginx.conf文件。
 
+```
+locate nginx.conf
+/usr/local/etc/nginx/nginx.conf
+/usr/local/etc/nginx/nginx.conf.default
+...1234
+```
 
+如果服务器中存在多个nginx.conf文件，我们并不知道实际上调用的是哪个配置文件，因此我们**必须找到实际调用的配置文件**才能进行修改。 
+
+## 查看NGINX实际调用的配置文件
+
+### 1.查看NGINX路径
+
+```
+ps aux|grep nginx
+root              352   0.0  0.0  2468624    924   ??  S    10:43上午   0:00.08 nginx: worker process  
+root              232   0.0  0.0  2459408    532   ??  S    10:43上午   0:00.02 nginx: master process /usr/local/opt/nginx/bin/nginx -g daemon off;  
+root             2345   0.0  0.0  2432772    640 s000  S+    1:01下午   0:00.00 grep nginx1234
+```
+
+NGINX的路径为：`/usr/local/opt/nginx/bin/nginx` 
+
+### 2.查看NGINX配置文件路径
+
+使用NGINX的 `-t` 参数进行配置检查，即可知道实际调用的配置文件路径及是否调用有效。
+
+```
+/usr/local/opt/nginx/bin/nginx -t
+nginx: the configuration file /usr/local/etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /usr/local/etc/nginx/nginx.conf test is successful123
+```
+
+测试可知，NGINX的配置文件路径为：`/usr/local/etc/nginx/nginx.conf` 且调用有效。
 
 # 最后
 > 参考：
