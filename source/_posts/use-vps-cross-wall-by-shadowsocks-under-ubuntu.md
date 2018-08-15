@@ -871,8 +871,6 @@ DAEMON_PURGE = 1h #当以后台方式运行时，清除机制在 HOSTS_DENY 中�
 
 Github: ***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
 
-教程: ***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
-
 # VPS Speed Test
 
 ## speedtest
@@ -926,10 +924,6 @@ git clone https://github.com/sivel/speedtest-cli.git
 python speedtest-cli/setup.py install
 ```
 用法：
-
-```
-
-```
 
 1、list
 

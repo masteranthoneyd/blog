@@ -304,8 +304,6 @@ sudo apt install fonts-wqy-microhei
 
 > 到此，主题已经比较桑心悦目了，接下来推荐一些常用的软件，提高你的工作效率！
 
-***
-
 # 软件篇
 
 ## Wechat for Ubuntu
