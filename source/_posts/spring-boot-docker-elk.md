@@ -384,6 +384,10 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 以上是将Jar复制到`target`的`docker`目录中，因为真正的Dockerfile也是在里面，方便使用`docker build`命令构建Docker镜像
 
+## Maven构建镜像指定时间戳版本号
+
+
+
 ## Demo地址
 
 ***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker)***

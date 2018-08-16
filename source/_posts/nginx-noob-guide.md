@@ -254,8 +254,13 @@ nginx -V
 ```
 
 # NGINX初学
-## 启动，停止和重新加载配置
+## 校验，启动，停止和重新加载配置
+
 ```shell
+# 校验
+nginx -t 
+
+# 停止、退出、重新加载配置、重启
 nginx -s stop|quit|reload|reopen
 ```
 
@@ -268,8 +273,6 @@ kill -s QUIT 1888 #1888是nginx的PID
 ps -ax | grep nginx
 ```
 如果要了解更多的有关信号发送的信息，请查看***[控制nginx](http://nginx.org/en/docs/control.html)***。
-
-
 
 ## 配置文件的结构
 
@@ -444,7 +447,37 @@ nginx: configuration file /usr/local/etc/nginx/nginx.conf test is successful123
 
 测试可知，NGINX的配置文件路径为：`/usr/local/etc/nginx/nginx.conf` 且调用有效。
 
+## 拒绝或允许指定IP
+
+NGINX拒绝或允许指定IP,是使用模块HTTP访问控制模块（HTTP Access）.
+控制规则按照声明的顺序进行检查，首条匹配IP的访问规则将被启用。
+如下例：
+
+```
+location / {
+  deny    192.168.1.1;
+  allow   192.168.1.0/24;
+  allow   10.1.1.0/16;
+  deny    all;
+}
+```
+
+上面的例子中仅允许192.168.1.0/24和10.1.1.0/16网络段访问这个`location`字段，但192.168.1.1是个例外。
+注意规则的匹配顺序，如果你使用过Apache你可能会认为你可以随意控制规则的顺序并且他们能够正常的工作，但实际上不行，下面的这个例子将拒绝掉所有的连接：
+
+```
+location / {
+  #这里将永远输出403错误。
+  deny all;
+  #这些指令不会被启用，因为到达的连接在第一条已经被拒绝
+  deny    192.168.1.1;
+  allow   192.168.1.0/24;
+  allow   10.1.1.0/1
+}
+```
+
 # 最后
+
 > 参考：
 > ***[Installing NGINX Open Source](https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/)***
 > ***[Nginx 初学者指南](https://www.crazy-code.tech/index.php/2016/11/11/nginx-beginner-guide/)***

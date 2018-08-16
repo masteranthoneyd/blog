@@ -738,13 +738,43 @@ service ssh restart
 /etc/init.d/ssh restart
 ```
 
-## 开启UFW防火墙（Ubuntu）
+## 防火墙
+
+### Ubuntu防火墙UFW
 
 ```
 ufw enable
 ufw allow ssh
 ufw allow [shadowsocks_port]
 ufw allow from [remote_ip]
+```
+
+### CentOS
+
+```
+# 显示状态
+firewall-cmd --state
+
+# 启用
+systemctl start firewalld.service
+
+# Postgresql端口设置。允许192.168.142.166访问5432端口
+firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.142.166" port protocol="tcp" port="5432" accept"
+
+# redis端口设置。允许192.168.142.166访问6379端口
+firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.142.166" port protocol="tcp" port="6379" accept"
+
+# 查看配置结果，验证配置
+firewall-cmd --list-all
+
+# 删除规则
+firewall-cmd --permanent --remove-rich-rule="rule family="ipv4" source address="192.168.142.166" port protocol="tcp" port="11300" accept"
+
+# 更新防火墙规则
+firewall-cmd --reload
+
+# 重启防火墙
+systemctl restart firewalld.service
 ```
 
 ## DDOS deflate

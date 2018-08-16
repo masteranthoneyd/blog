@@ -10,7 +10,6 @@ tags: [Ubuntu]
 # Preface
 
 > =.= 这里只记录一些个人比较常用到的[*Ubuntu*](https://www.ubuntu.com)命令
-> 那些太基本以及太高深的就......
 
 
 <!--more-->
@@ -869,12 +868,5 @@ echo "test test " > /var/test_boot_up.log
 ![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
 
 出现类似情况，可以找到`/etc/apt/sources.list.d`目录，删除对应的`.list`文件即可
-
-
-
-
-
-
-
 
 
