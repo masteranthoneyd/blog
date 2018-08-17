@@ -1,9 +1,7 @@
----
 title: Spring Boot应用集成Docker并结合Kafka、ELK管理Docker日志
 date: 2018-04-02 13:00:19
 categories: [Programming, Java, Spring Boot]
 tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
----
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
 
@@ -24,7 +22,26 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
-## Maven setting.xml密码加密配置
+## 安全认证配置
+
+> 当我们 push 镜像到 Docker 仓库中时，不管是共有还是私有，经常会需要安全认证，登录完成之后才可以进行操作。当然，我们可以通过命令行 `docker login -u user_name -p password docker_registry_host` 登录，但是对于自动化流程来说，就不是很方便了。使用 docker-maven-plugin 插件我们可以很容易实现安全认证。
+
+### 普通配置
+
+`settings.xml`：
+
+```
+<server>
+    <id>docker-registry</id>
+    <username>admin</username>
+    <password>12345678</password>
+    <configuration>
+        <email>yangbingdong1994@gmail.com</email>
+    </configuration>
+</server>
+```
+
+### Maven 密码加密配置
 
 `settings.xml`配置私有库的访问：
 
@@ -108,18 +125,20 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 
 #### 注意PID
 
-如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可是使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
+如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可以使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
 
-### pom文件添加Docker插件
+### pom文件添加构建Docker镜像的相关插件
 
-在完整的`pom.xml`
+> 继承`spring-boot-starter-parent`，除了`docker-maven-plugin`，下面的3个插件都不用填写版本号，因为parent中已经定义版本号
+
+#### spring-boot-maven-plugin
+
+这个不用多介绍了，打包Spring Boot Jar包的
 
 ```
-<plugins>
     <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring-boot.version}</version>
         <executions>
             <execution>
                 <goals>
@@ -128,12 +147,16 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
             </execution>
         </executions>
     </plugin>
+```
 
-    <!-- resources插件，使用@变量@形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中，这种方式是方便通过手动构建镜像） -->
+#### maven-resources-plugin
+
+resources插件，使用`@变量@`形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中，这种方式是方便手动构建镜像）
+
+```
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>${resources.plugin.version}</version>
         <executions>
             <execution>
                 <id>prepare-dockerfile</id>
@@ -153,6 +176,7 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
                     </resources>
                 </configuration>
             </execution>
+            <!-- 将Jar复制到target的docker目录中，因为真正的Dockerfile也是在里面，方便使用docker build命令构建Docker镜像 -->
             <execution>
                 <id>copy-jar</id>
                 <phase>package</phase>
@@ -173,47 +197,98 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
             </execution>
         </executions>
     </plugin>
+```
 
+#### build-helper-maven-plugin
 
-    <!-- 集成Docker maven 插件 -->
+这个是为了给镜像添加基于时间戳的版本号，maven也有自带的获取时间戳的变量`maven.build.timestamp.format` + `maven.build.timestamp`:
+
+```
+<maven.build.timestamp.format>yyyy-MM-dd_HH-mm-ss<maven.build.timestamp.format>
+
+# 获取时间戳
+${maven.build.timestamp}
+```
+
+但是这个时区是`UTC`，接近于格林尼治标准时间，所以出来的时间会比但前的时间慢8个小时。
+
+如果要使用`GMT+8`，就需要`build-helper-maven-plugin`插件，当然也有其他的实现方式，这里不做展开。
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>timestamp-property</id>
+                    <goals>
+                        <goal>timestamp-property</goal>
+                    </goals>
+                    <configuration>
+                    	<!-- 其他地方可通过${timestamp}获取时间戳 -->
+                        <name>timestamp</name>
+                        <pattern>yyyyMMddHHmm</pattern>
+                        <timeZone>GMT+8</timeZone>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
+然后可以在pom中使用`${timestamp}`获取时间戳。
+
+#### docker-maven-plugin
+
+这也是集成并构建Docker镜像的关键
+
+```
     <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>${docker-maven-plugin.version}</version>
+        <!--  -->
+        <!-- 绑定打包阶段执行Docker镜像操作 -->
         <executions>
-            <!-- 打包时构建镜像 -->
             <execution>
+                <!-- 打包阶段构建镜像 -->
                 <phase>package</phase>
                 <goals>
                     <goal>build</goal>
                 </goals>
             </execution>
-            <!-- 部署时推送镜像到私有库 -->
             <execution>
+                <!-- 部署阶段Push镜像 -->
                 <id>push-image</id>
-                <phase>install</phase>
+                <phase>deploy</phase>
                 <goals>
                     <goal>push</goal>
                 </goals>
+                <!-- Push指定镜像 -->
                 <configuration>
-                    <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:${docker-latest-tag}</imageName>
-                    <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:${project.version}</imageName>
+                    <!--<imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:${docker-latest-tag}</imageName>-->
+                    <!--suppress UnresolvedMavenProperty -->
+                    <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:${timestamp}</imageName>
                 </configuration>
             </execution>
         </executions>
         <configuration>
-            <!-- 是否构建镜像 -->
+            <!-- 是否跳过所有构建Docker镜像阶段 -->
             <skipDocker>${docker.skip.build}</skipDocker>
-            <!--最后镜像产生了两个tag，版本和和最新的-->
+            <!-- 是否跳过Push阶段 -->
+            <skipDockerPush>${docker.skip.push}</skipDockerPush>
             <forceTags>true</forceTags>
+            <!-- 最大重试次数 -->
+            <retryPushCount>2</retryPushCount>
             <imageTags>
-                <imageTag>${project.version}</imageTag>
-                <imageTag>${docker-latest-tag}</imageTag>
+                <!-- 使用时间戳版本号 -->
+                <!--suppress UnresolvedMavenProperty -->
+                <imageTag>${timestamp}</imageTag>
             </imageTags>
-            <!--install阶段也上传，否则只有deploy阶段上传-->
-            <pushImage>${docker.push.image}</pushImage>
-            <!-- 配置镜像名称，遵循Docker的命名规范： springio/image -->
-            <imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
+            <!-- 配置镜像名称，遵循Docker的命名规范： springio/image --><imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
             <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于编译后位置 -->
             <dockerDirectory>${dockerfile.compiled.position}</dockerDirectory>
             <resources>
@@ -223,12 +298,11 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
                     <include>${project.build.finalName}.jar</include>
                 </resource>
             </resources>
-            <!-- push到私有的hub -->
+            <!-- 被推送服务器的配置ID，与setting中的一直 -->
             <serverId>docker-registry</serverId>
-            <registryUrl>${docker.registry.url}</registryUrl>
+            <!--<registryUrl>${docker.registry.url}</registryUrl>-->
         </configuration>
     </plugin>
-</plugins>
 ```
 
 主要`properties`:
@@ -236,12 +310,11 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 ```
 <properties>
     <!-- ########## Docker 相关变量 ########## -->
-    <resources.plugin.version>3.0.2</resources.plugin.version>
     <docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
     <!-- resource插件编译Dockerfile后的位置-->
     <dockerfile.compiled.position>${project.build.directory}/docker</dockerfile.compiled.position>
-    <docker.skip.build>true</docker.skip.build>
-    <docker.push.image>false</docker.push.image>
+    <docker.skip.build>false</docker.skip.build>
+    <docker.skip.push>false</docker.push.image>
     <docker.registry.url>192.168.0.202:8080</docker.registry.url>
     <docker.registry.name>dev-images</docker.registry.name>
     <docker-latest-tag>latest</docker-latest-tag>
@@ -257,6 +330,24 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 * 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等），则使用`@@`占位符（如`@project.build.finalName@`）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`，非继承Spring Boot 的pom文件，则使用`${}`占位符
 * 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入`docker-maven-plugin`插件的`<resources>`配置里
 * **`spring-boot-maven-plugin`插件一定要在其他构建插件之上，否则打包文件会有问题。**
+
+
+
+`docker-maven-plugin` 插件还提供了很多很实用的配置，稍微列举几个参数吧。
+
+| 参数                                      | 说明                                                         | 默认值 |
+| ----------------------------------------- | ------------------------------------------------------------ | ------ |
+| `<forceTags>true</forceTags>`             | build 时强制覆盖 tag，配合 imageTags 使用                    | false  |
+| `<noCache>true</noCache>`                 | build 时，指定 –no-cache 不使用缓存                          | false  |
+| `<pullOnBuild>true</pullOnBuild>`         | build 时，指定 –pull=true 每次都重新拉取基础镜像             | false  |
+| `<pushImage>true</pushImage>`             | build 完成后 push 镜像                                       | false  |
+| `<pushImageTag>true</pushImageTag>`       | build 完成后，push 指定 tag 的镜像，配合 imageTags 使用      | false  |
+| `<retryPushCount>5</retryPushCount>`      | push 镜像失败，重试次数                                      | 5      |
+| `<retryPushTimeout>10</retryPushTimeout>` | push 镜像失败，重试时间                                      | 10s    |
+| `<rm>true</rm>`                           | build 时，指定 –rm=true 即 build 完成后删除中间容器          | false  |
+| `<useGitCommitId>true</useGitCommitId>`   | build 时，使用最近的 git commit id 前7位作为tag，例如：image:b50b604，前提是不配置 newName | false  |
+
+更多参数可查看插件中的定义。
 
 ### 命令构建
 
@@ -356,37 +447,6 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 ### 添加运行时JVM参数
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
-
-## 打包时复制Jar包到指定文件
-
-在`maven-resources-plugin`的`<executions>`标签中添加：
-
-```
-<execution>
-    <id>copy-jar</id>
-    <phase>package</phase>
-    <goals>
-        <goal>copy-resources</goal>
-    </goals>
-    <configuration>
-        <outputDirectory>${dockerfile.compiled.position}</outputDirectory>
-        <resources>
-            <resource>
-                <directory>${project.build.directory}</directory>
-                <includes>
-                    <include>*.jar</include>
-                </includes>
-            </resource>
-        </resources>
-    </configuration>
-</execution>
-```
-
-以上是将Jar复制到`target`的`docker`目录中，因为真正的Dockerfile也是在里面，方便使用`docker build`命令构建Docker镜像
-
-## Maven构建镜像指定时间戳版本号
-
-
 
 ## Demo地址
 

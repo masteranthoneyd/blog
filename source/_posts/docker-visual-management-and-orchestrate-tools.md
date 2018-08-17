@@ -153,34 +153,6 @@ docker-compose up -d
 
 这是因为 Docker 默认**不允许非 `HTTPS` 方式推送镜像**。我们可以通过 Docker 配置来**取消这个限制**，或者配置能够通过 `HTTPS` 访问的私有仓库。
 
-有两种方式达到效果
-
-#### 方案一
-
-首先修改`/etc/default/docker`
-
-```
-DOCKER_OPTS="--insecure-registry 192.168.1.102:8888"
-```
-
-修改`/lib/systemd/system/docker.service`：
-
-```
-# 找到ExecStart=/usr/bin/dockerd -H fd:// 
-# 前面添加EnvironmentFile=-/etc/default/docker，后面追加$DOCKER_OPTS
-
-EnvironmentFile=-/etc/default/docker
-ExecStart=/usr/bin/dockerd -H fd:// $DOCKER_OPTS
-```
-
-重启docker：
-
-```
-sudo systemctl daemon-reload && sudo systemctl restart docker
-```
-
-#### 方案二
-
 如果是`systemd` 的系统例如`Ubuntu16.04+`、`Debian 8+`、`centos 7`，可以在`/etc/docker/daemon.json` 中写入如下内容：
 
 ```
@@ -190,26 +162,10 @@ sudo systemctl daemon-reload && sudo systemctl restart docker
 }
 ```
 
-然后重启docker：
+然后重新加载Docker：
 
 ```
-sudo systemctl daemon-reload && sudo systemctl restart docker
-```
-
-**centos下是这样的**：
-
-修改`/etc/sysconfig/docker`：
-
-```
-# OPTIONS='--selinux-enabled --log-driver=journald --signature-verification=false  -H'后面追加 --insecure-registry 10.0.11.150:5000
-
-OPTIONS='--selinux-enabled --log-driver=journald --signature-verification=false  -H --insecure-registry 10.0.11.150:5000'
-```
-
-重启：
-
-```
-sudo systemctl restart docker
+sudo systemctl reload docker
 ```
 
 ### Login and Push
