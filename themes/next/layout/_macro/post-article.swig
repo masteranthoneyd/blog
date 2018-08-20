@@ -117,11 +117,6 @@
           {% endif %}
 
 
-       <span id="busuanzi_container_page_pv">
-       &nbsp; | &nbsp; 热度&nbsp; <span id="busuanzi_value_page_pv"></span>°C
-       </span>
-
-
           {% if post.comments %}
 
           {% endif %}

@@ -59,14 +59,14 @@ sudo visudo
 
 ## 中文输入法
 
-如果觉得用不惯Ubuntu自带的ibus，可以选择装回fcitx：
+如果觉得用不惯Ubuntu自带的`ibus`，可以选择装回`fcitx`：
 
 ```
 sudo apt install fcitx fcitx-googlepinyin im-config
 im-config
 ```
 
-`im-config`中指定fcitx的配置即可。
+`im-config`中指定`fcitx`的配置即可。
 
 # 科学上网篇
 
@@ -226,7 +226,11 @@ hardcode-tray --conversion-tool Inkscape
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/user-themes.png)
 
-## 安装Oh-My-Zsh
+为什么单独的模块，迷…
+
+## Oh-My-Zsh
+
+### 安装
 
 
 终端采用`zsh`和`oh-my-zsh`，既美观又简单易用，主要是能提高你的逼格！！！
@@ -241,6 +245,8 @@ sudo apt-get install zsh
 ```
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 ```
+
+### 语法高亮
 
 安装插件`highlight`，**高亮语法**：
 
@@ -257,6 +263,8 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 
 重新打开终端即可生效！
 
+### 调色
+
 最后，修改以下配色，会让你的终端样式看起来更舒服，在终端任意地方右键，进入配置文件(`profile`)->外观配置(`profile Preferences`)，弹出如下界面，进入`colors`一栏:
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh02.png)
 
@@ -270,11 +278,25 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 - 粗体字颜色：与文本颜色相同
 - 背景颜色：`#002B36`
 
-**主题**：
+### 主题
 
 在`~/.oh-my-zsh/themes`中查看主题。
 
-然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可（感觉ys这个主题不错）。
+然后编辑`~/.zshrc`，找到`ZSH_THEME`修改为你想要的主题即可（感觉`ys`这个主题不错）。
+
+`agnoster`这款主题也不错，但需要先安装一些 *[字体样式](https://github.com/powerline/fonts)*：
+
+```
+sudo apt-get install fonts-powerline
+```
+
+或者通过源码安装：
+
+```
+git clone git@github.com:powerline/fonts.git
+cd fonts
+./install.sh
+```
 
 ## 安装字体
 
@@ -285,8 +307,17 @@ sudo apt install fonts-wqy-microhei
 
 然后通过`gnome-tweak-tool`来替换字体
 
+## GRUB 2 美化
 
-> 到此，主题已经比较桑心悦目了，接下来推荐一些常用的软件，提高你的工作效率！
+> 由于安装了多系统，恰好Ubuntu的GRUB2提供了切换系统的选择，但是界面不咋样
+
+前往 ***[https://www.gnome-look.org/browse/cat/109/](https://www.gnome-look.org/browse/cat/109/)*** 选择一款合适自己的主题安装
+
+博主推荐 ***[Grub-theme-vimix](https://www.gnome-look.org/p/1009236/)*** 或 ***[Blur grub](https://www.gnome-look.org/p/1220920/)*** 
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/stylish.png)
+
+根据提示下载源码执行安装脚本即可。
 
 # 软件篇
 
@@ -884,6 +915,7 @@ sudo gedit /etc/default/grub
 将`GRUB_TIMEOUT=10`中的`10`改为你想要修改的等待时间，比如`3`，网上很多的教程都是到这一步，其实是不行的，估计都是乱转一气。到这里还有最重要的一步，就是使用`#`号将`GRUB_HIDDEN_TIMEOUT=0`标注,然后再次回到终端，输入下面的命令刷新`/boot/grub/grub.cfg`文件：
 ```
 sudo update-grub2
+
 ```
 
 ## 启动项管理

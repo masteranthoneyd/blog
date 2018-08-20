@@ -1,7 +1,9 @@
+---
 title: Spring Boot应用集成Docker并结合Kafka、ELK管理Docker日志
 date: 2018-04-02 13:00:19
 categories: [Programming, Java, Spring Boot]
 tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
+---
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/java-docker.png)
 
@@ -241,7 +243,7 @@ ${maven.build.timestamp}
 
 然后可以在pom中使用`${timestamp}`获取时间戳。
 
-当然，也可以使用另外一种方式实现，打包前`export`一个格式化日期的环境变量，`pom.xml`中获取这个变量：
+当然，也可以使用**另外一种方式实现**，打包前`export`一个格式化日期的环境变量，`pom.xml`中获取这个变量：
 
 * `export DOCKER_IMAGE_TAGE_DATE=yyyy-MM-dd_HH-mm`
 * `mvn help:system`可查看所有环境变量
