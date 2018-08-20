@@ -123,6 +123,8 @@ sudo apt install ultra-flat-icons
 
 #### Arc-Theme
 
+> ***[https://github.com/horst3180/arc-theme](https://github.com/horst3180/arc-theme)***
+
 这也是一款很漂亮的主题
 
 ```
@@ -318,6 +320,10 @@ sudo apt install fonts-wqy-microhei
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/stylish.png)
 
 根据提示下载源码执行安装脚本即可。
+
+## 壁纸推荐
+
+推荐一个不错的壁纸下载网站： ***[https://pixabay.com](https://pixabay.com)***
 
 # 软件篇
 
