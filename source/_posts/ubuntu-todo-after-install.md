@@ -57,6 +57,17 @@ sudo visudo
 
 这样所有sudo组内的用户使用sudo时就不需要密码了。
 
+## 中文输入法
+
+如果觉得用不惯Ubuntu自带的ibus，可以选择装回fcitx：
+
+```
+sudo apt install fcitx fcitx-googlepinyin im-config
+im-config
+```
+
+`im-config`中指定fcitx的配置即可。
+
 # 科学上网篇
 
 ## 方式一：下载Lantern
@@ -68,20 +79,32 @@ sudo dpkg -i lantern.deb
 sudo chmod -R 777 /usr/bin/lantern
 ```
 
-## 方式二：自搭建Shadowsocks
+## 方式二：自搭建 Shadowsocks
 ***[Access Blocked Sites(翻墙):VPS自搭建ShadowSocks与加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
 
 # 主题美化篇
 
 ## 使用Tweaks对gnome进行美化
 
+### 依赖安装
+
 ```
-sudo apt install -y gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2-engines-pixbuf libxml2-utils
+sudo apt install -y \
+gnome-tweak-tool \
+gnome-shell-extensions \
+chrome-gnome-shell \
+gtk2-engines-pixbuf \
+libxml2-utils
 ```
 
-### 安装Flatabulous主题
+### 主题安装
 
-`Flatabulous`主题是一款`Ubuntu`下扁平化主题，也是我试过众多主题中最喜欢的一个！最终效果如上述图所示。
+推荐一个网站 ***[Gnome Look](https://www.gnome-look.org/)***，这里面有大量的主题，并且都是以压缩包形式的，应用程序和shell的主题都是放在`/usr/share/themes`目录下面，图标的主题都是放在 
+`/usr/share/icons`目录下，并且注意一下解压后shell的主题文件夹的二级目录应该是`/gnome-shell`，然后分别放到对应的目录，就能在**gnome-tweak**工具里面识别了
+
+#### Flatabulous
+
+`Flatabulous`主题是一款`Ubuntu`下扁平化主题.
 
 执行以下命令安装`Flatabulous`主题：
 
@@ -98,56 +121,17 @@ sudo apt update
 sudo apt install ultra-flat-icons
 ```
 
-### 主题
+#### Arc-Theme
 
-选择一款叫 Arc-Theme 的主题，包括了 GNOME Shell 主题和 GTK 主题。
-安装前需要以下依赖包（直接使用 `sudo apt install` 安装即可）：
-
-- `autoconf`
-- `automake`
-- `pkg-config`
-- `libgtk-3-dev`
-- `git`
-
-#### 从 Github 上获取项目
+这也是一款很漂亮的主题
 
 ```
-git clone https://github.com/horst3180/arc-theme --depth 1 && cd arc-theme
+sudo apt install arc-theme
 ```
 
-#### 构建项目并安装
-
-```
-./autogen.sh --prefix=/usr
-sudo make install
-```
-
-#### 其它选项
-
-```
---disable-transparency     在 GTK3 主题中禁用透明度
---disable-light            禁用 Arc Light
---disable-darker           禁用 Arc Darker
---disable-dark             禁用 Arc Dark
---disable-cinnamon         禁用 Cinnamon
---disable-gnome-shell      禁用 GNOME Shell
---disable-gtk2             禁用 GTK2
---disable-gtk3             禁用 GTK3
---disable-metacity         禁用 Metacity
---disable-unity            禁用 Unity
---disable-xfwm             禁用 XFWM
---with-gnome=<version>     为特定的 GNOME 版本 (3.14, 3.16, 3.18, 3.20, 3.22) 构建主题
-```
-
-#### 选择主题
+选择主题
 
 安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可。
-
-如果没有这个工具那就：
-
-```
-sudo apt install gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2-engines-pixbuf libxml2-utils
-```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
 
@@ -155,7 +139,7 @@ sudo apt install gnome-tweak-tool gnome-shell-extensions chrome-gnome-shell gtk2
 
 [**项目地址**](https://github.com/snwh/paper-icon-theme) ，其他热门主题 [**Numix**](https://github.com/snwh/paper-gtk-theme) 、 [**Paper**](https://github.com/numixproject/numix-gtk-theme)
 
-### Icon
+### 图标安装
 
 #### Numix
 
@@ -199,11 +183,11 @@ sudo apt install papirus-icon-theme
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop2.png)
 
-**下安装一下Chrome支持**：
+**[Dash To Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)**: 虽然Ubuntu18已经有了一个Dock，但定制性不强。这个Dock插件提供了很多选项定制，个人比较喜欢的一个选项就是隔离工作区。
 
-```
-sudo apt install chrome-gnome-shell
-```
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/dock02.png)
+
+![](http://ojoba1c98.bkt.clouddn.com/img/gnome/dock01.png)
 
 [**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
 
@@ -366,7 +350,6 @@ sudo apt install smartgithg
 卸载：
 ```
 sudo apt remove smartgithg
-
 ```
 
 ## Typora(Markdown编辑器)
@@ -449,7 +432,7 @@ sudo gedit /opt/staruml/www/license/node/LicenseManagerDomain.js
 
 ## VirtualBox
 ```
-sudo apt-get install virtualbox
+sudo apt install virtualbox
 ```
 
 ## KVM
@@ -489,8 +472,7 @@ sudo dpkg -i scrt-8.3.2-1584.ubuntu16-64.x86_64.deb
 准备：
 
 ```
-wget http://download.boll.me/securecrt_linux_crack.pl
-
+wget http://download.boll.me/securecrt_linux_crack.pl && \
 sudo apt install perl
 ```
 
@@ -527,7 +509,7 @@ sudo apt install wiznote
 ```
 sudo apt install vim
 ```
-## Wps
+## WPS
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux。
 先不要执行dpkg -i 去执行安装。这个地方有个问题，就是ubuntu 16 版本不支持32位的支持库，所以需要安装一下支持库。
 32位的支持库名为：ia32-libs
@@ -777,8 +759,6 @@ services:
 
 2、进入 *[百度网盘直接下载助手(显示直接下载入口)](https://greasyfork.org/zh-CN/scripts/36549-%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%8A%A9%E6%89%8B-%E6%98%BE%E7%A4%BA%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%85%A5%E5%8F%A3)* ，点击`安装`或者`install`,完了直接刷新界面，进入到自己的百度云盘选择所需的下载文件即可。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baidupan.jpg)
-
 ### BaiduExporter
 
 > 博主使用的是BaiduExporter，上面那个下载助手导出来链接在我这边并不能下载成功。。囧
@@ -868,7 +848,7 @@ sudo apt install tickys
 ### Hardinfo
 
 ```
-sudo apt-get install hardinfo -y
+sudo apt install hardinfo -y
 ```
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/System%20Information_002.png)
@@ -933,7 +913,7 @@ sudo ntpdate time.windows.com
 sudo hwclock --localtime --systohc
 ```
 
-## 提高逼格
+## 终端高逼格屏保
 ```
 sudo apt install cmatrix
 cmatrix -b
@@ -941,3 +921,10 @@ cmatrix -b
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/individuation/cmatrix.png)
 
+够骚气。。。
+
+# Finally
+
+使用Ubuntu的这一路过来真的是跌跌撞撞，一路摸爬滚打不断谷歌百度解决各种奇怪的系统问题，磨合了也有好长一段日子，重装系统的次数也数不过来了，有一段时间甚至觉得重装系统已是日常，有时候一装就是到凌晨2点。。。给我最大的收获并不是觉得自己用Ubuntu用得多牛X，而是锻炼了自己的耐性，小强般的韧性。曾经一度想放弃Ubuntu，但一路都在边缘徘徊，还是坚持了下来。。。
+
+本文将定期更新，与时俱进~

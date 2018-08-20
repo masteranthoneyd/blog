@@ -3,11 +3,11 @@ date: 2018-04-02 13:00:19
 categories: [Programming, Java, Spring Boot]
 tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/dev-ops)
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/java-docker.png)
 
 # Preface
 
-> 微服务架构下，微服务在带来良好的设计和架构理念的同时，也带来了运维上的额外复杂性，尤其是在服务部署和服务监控上。单体应用是集中式的，就一个单体跑在一起，部署和管理的时候非常简单，而微服务是一个网状分布的，有很多服务需要维护和管理，对它进行部署和维护的时候则比较复杂。
+> 微服务架构下，微服务在带来良好的设计和架构理念的同时，也带来了运维上的额外复杂性，尤其是在服务部署和服务监控上。单体应用是集中式的，就一个单体跑在一起，部署和管理的时候非常简单，而微服务是一个网状分布的，有很多服务需要维护和管理，对它进行部署和维护的时候则比较复杂。集成Docker之后，我们可以很方便地部署以及编排服务，ELK的集中式日志管理可以让我们很方便地聚合Docker日志。
 
 <!--more-->
 
@@ -241,6 +241,12 @@ ${maven.build.timestamp}
 
 然后可以在pom中使用`${timestamp}`获取时间戳。
 
+当然，也可以使用另外一种方式实现，打包前`export`一个格式化日期的环境变量，`pom.xml`中获取这个变量：
+
+* `export DOCKER_IMAGE_TAGE_DATE=yyyy-MM-dd_HH-mm`
+* `mvn help:system`可查看所有环境变量
+* 所有的环境变量都可以用以`env.`开头的Maven属性引用: `${env.DOCKER_IMAGE_TAGE_DATE}`
+
 #### docker-maven-plugin
 
 这也是集成并构建Docker镜像的关键
@@ -351,7 +357,7 @@ ${maven.build.timestamp}
 
 ### 命令构建
 
-如果`<pushImage>false</pushImage>`则install阶段将不提交Docker镜像，只有maven的`deploy`阶段才提交。
+如果`<skipDockerPush>false</skipDockerPush>`则install阶段将不提交Docker镜像，只有maven的`deploy`阶段才提交。
 
 ```
 mvn clean install

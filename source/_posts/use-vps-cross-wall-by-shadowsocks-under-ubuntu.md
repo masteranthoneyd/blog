@@ -5,16 +5,16 @@ categories: [VPS]
 tags: [VPS,ShadowSocks]
 ---
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/whats-shadowsocks-04.png)
-# 前言
-> 最近在玩***[VPS](http://baike.baidu.com/link?url=ehKAXxj45AdvSmxPRwiao9anB3Tej-jwgKXWMkTuA43M2479GPT-FkH6zMhI59Eip_iY5abNL2jODlGC4WiLW_)***，作为没有Google就活不下去的开发人员，穿墙已是日常= =...使用别人的VPN或者Sock5代理显然是不安全的，个人信息随时被截获，那么拥有一台自己VPS也是必需的，价格也可以很便宜（绝对不是在打广告）
+# Preface
+> 最近在玩***[VPS](http://baike.baidu.com/link?url=ehKAXxj45AdvSmxPRwiao9anB3Tej-jwgKXWMkTuA43M2479GPT-FkH6zMhI59Eip_iY5abNL2jODlGC4WiLW_)***，作为没有Google就活不下去的开发人员，翻山越岭已是日常= =...使用别人的VPN或者Sock5代理显然是不安全的，个人信息随时被截获，那么拥有一台自己VPS也是必需的，价格也可以很便宜（绝对不是在打广告）
 
 <!--more-->
 # ShadowSocks介绍
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-shadowsocks/shadowsocks.png)
 
-## 什么是ShadowSocks(影梭)
-ShadowSocks 是由***[clowwindy](https://github.com/shadowsocks/shadowsocks)***所开发的一个开源 Socks5 代理。如其***[官网](http://shadowsocks.org/en/index.html)***所言 ，它是 “`A secure socks5 proxy, designed to protect your Internet traffic`” （一个安全的 `Socks5` 代理）。其作用，亦如该项目主页的 ***[wiki](https://github.com/shadowsocks/shadowsocks/wiki)***（***[中文版](https://github.com/shadowsocks/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)***） 中所说，“`A fast tunnel proxy that helps you bypass firewalls`” （一个**可穿透防火墙**的快速代理）。
+## What is ShadowSocks
+ShadowSocks(影梭) 是由***[clowwindy](https://github.com/shadowsocks/shadowsocks)***所开发的一个开源 Socks5 代理。如其***[官网](http://shadowsocks.org/en/index.html)***所言 ，它是 “`A secure socks5 proxy, designed to protect your Internet traffic`” （一个安全的 `Socks5` 代理）。其作用，亦如该项目主页的 ***[wiki](https://github.com/shadowsocks/shadowsocks/wiki)***（***[中文版](https://github.com/shadowsocks/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)***） 中所说，“`A fast tunnel proxy that helps you bypass firewalls`” （一个**可穿透防火墙**的快速代理）。
 不过，在中国，由于***[GFW](https://zh.wikipedia.org/wiki/%E9%98%B2%E7%81%AB%E9%95%BF%E5%9F%8E)***[^1]的存在，更多的网友用它来进行**科学上网**。
 
 ## This is a story...
@@ -63,21 +63,154 @@ Vultr的服务器托管在全球14个数据中心，即时开通使用。大陆�
 ***[Linode](https://www.linode.com)*** 是VPS 服务商中的大哥，高富帅般的存在。价格相对较高，但是性能，稳定性等各方面也非常给力。 VPS 采用 Xen 架构，不过最近的周年庆开始升级到 KVM 架构，VPS 性能进一步提升。推荐给对连接速度和网络延迟有极致追求的用户。
 Linode只能使用**信用卡支付**，官方会随机手工抽查，被抽查到的话需要上传信用卡正反面照片以及可能还需要身份证正反面照片，只要材料真实齐全，审核速度很快，一般一个小时之内就可以全部搞定。账户成功激活以后，就可以安心使用了。
 
-# SSH无密码登录VPS
+# 准备工作
+
+## 准备一台VPS
+
+博主选择***[Linode](https://www.linode.com)***
+
+## SSH无密码登录VPS
+
 参考 ***[免密码登录远程服务器](/2017/node-of-linux-command/#免密码登录远程服务器)***
 
 # ShadowSocks服务端安装
-> 这里博主选择的VPS的操作系统是**Ubuntu14.04**,因为16.04不明原因安装失败。
-> 另外，**搬瓦工**可以一键安装Shadowsocks和OpenVPN（只支持CentOS），但处于爱折腾，手动安装。
+> 安装方式各种各样。。。推荐Docker安装
 
-## 安装
+## 基于Docker安装
+
+详细教程不在本篇范围内，请看***[Docker入门笔记](/2017/docker-learning)***
+以下是最简单快捷高效的安装方式：
+
+```
+curl -fsSL get.docker.com -o get-docker.sh
+sh get-docker.sh
+```
+
+就是这么粗暴的两条命令=.=
+这里可能会有个小问题，如果VPS使用的`IPv6`可能会导致`apt update`失败，解决办法是把上面下载的`get-docker.sh`里面所有的`apt-get update`改为`apt-get Acquire::ForceIPv4=true update`。
+
+### 拉取镜像
+
+`Showdowsocks`镜像：***[https://hub.docker.com/r/mritd/shadowsocks/](https://hub.docker.com/r/mritd/shadowsocks/)***
+
+```
+docker pull mritd/shadowsocks:latest
+```
+
+### 运行
+
+**With Kcptun**
+
+```
+docker run -dt --name ssserver --restart=always -p 6443:6443 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpserver" -k "-t 127.0.0.1:6443 -l :6500 -mode fast2"
+```
+
+**说明：**
+
+- `-m` : 参数后指定一个 `shadowsocks` 命令，如 `ss-local`，不写默认为 `ss-server`；该参数用于 shadowsocks 在客户端和服务端工作模式间切换，可选项如下: `ss-local`、`ss-manager`、`ss-nat`、`ss-redir`、`ss-server`、`ss-tunnel`
+- `-s` : 参数后指定一个 `shadowsocks-libev` 的参数字符串，所有参数将被拼接到 `ss-server` 后
+- `-x` : 指定该参数后才会开启 `kcptun` 支持，否则将默认禁用 `kcptun`
+- `-e` : 参数后指定一个 `kcptun` 命令，如 `kcpclient`，不写默认为 `kcpserver`；该参数用于 kcptun 在客户端和服务端工作模式间切换，可选项如下: `kcpserver`、`kcpclient`
+- `-k` : 参数后指定一个 `kcptun` 的参数字符串，所有参数将被拼接到 `kcptun` 后
+
+**Without Kcptun**
+
+```
+docker run -dt --name ssserver --restart=always -p 6443:6443 mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open"
+```
+
+ss命令说明：
+
+- `-s` : 监听服务ip，为服务器本地
+- `-p` : 端口
+- `-m` : 加密算法
+- `-k` : 密码
+- `--fast-open` : 开启TCP `fast-open`
+
+kcptun命令自行度娘=.=
+
+## 脚本一键安装
+
+> 更多精彩被容请移步到 ***[https://teddysun.com/](https://teddysun.com/)***
+
+root用户执行：
+
+```
+wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-all.sh
+chmod +x shadowsocks-all.sh
+./shadowsocks-all.sh 2>&1 | tee shadowsocks-all.log
+```
+
+### 安装完成后，脚本提示如下
+
+```
+Congratulations, your_shadowsocks_version install completed!
+Your Server IP        :your_server_ip
+Your Server Port      :your_server_port
+Your Password         :your_password
+Your Encryption Method:your_encryption_method
+
+Your QR Code: (For Shadowsocks Windows, OSX, Android and iOS clients)
+ ss://your_encryption_method:your_password@your_server_ip:your_server_port
+Your QR Code has been saved as a PNG file path:
+ your_path.png
+
+Welcome to visit:https://teddysun.com/486.html
+Enjoy it!
+```
+
+### 卸载方法
+
+若已安装多个版本，则卸载时也需多次运行（每次卸载一种）
+
+使用root用户登录，运行以下命令：
+
+```
+./shadowsocks-all.sh uninstall
+```
+
+### 启动脚本
+
+启动脚本后面的参数含义，从左至右依次为：启动，停止，重启，查看状态。
+
+**Shadowsocks-Python** 版：
+`/etc/init.d/shadowsocks-python start | stop | restart | status`
+
+**ShadowsocksR** 版：
+`/etc/init.d/shadowsocks-r start | stop | restart | status`
+
+**Shadowsocks-Go** 版：
+`/etc/init.d/shadowsocks-go start | stop | restart | status`
+
+**Shadowsocks-libev** 版：
+`/etc/init.d/shadowsocks-libev start | stop | restart | status`
+
+### 各版本默认配置文件
+
+**Shadowsocks-Python** 版：
+`/etc/shadowsocks-python/config.json`
+
+**ShadowsocksR** 版：
+`/etc/shadowsocks-r/config.json`
+
+**Shadowsocks-Go** 版：
+`/etc/shadowsocks-go/config.json`
+
+**Shadowsocks-libev** 版：
+`/etc/shadowsocks-libev/config.json`
+
+## 手动安装
+
+### 安装
+
 ```shell
 apt-get update
 apt-get install python-pip
 pip install shadowsocks
 ```
 
-## 修改配置文件
+### 修改配置文件
+
 ```shell
 vi /etc/shadowsocks.json
 ```
@@ -103,12 +236,11 @@ vi /etc/shadowsocks.json
 | timeout     | 超时时间（秒）                                  |
 | method      | 加密方法，可选择 “bf-cfb”, “aes-256-cfb”, “des-cfb”, “rc4″, 等等。默认是一种不安全的加密，推荐用 “aes-256-cfb” |
 
-
-
 只需要把 `my_server_ip`换成你VPS的IP，并且把 `mypassword` 换成你自己的密码，注意：这个密码不是你登录VPS的密码，是你一会从ShadowSocks客户端登录的时候用的密码.
 `server_port`默认8388也行，你修改也行，这个端口是ShadowSocks客户端登录时用的端口号，如果你修改了，最好改成1024至65536之间的一个数字，并且自己一定要记住。其它的都默认就好。
 
-## 启动服务
+### 启动服务
+
 下面就可以开始启动ShadowSocks服务端了。ShadowSocks服务端自身就已经支持后台运行了，所以，通过下面的命令启动之后，只要你的VPS不关机不重启，ShadowSocks服务端就会一直在后台运行。
 ```shell
 ssserver -c /etc/shadowsocks.json -d start
@@ -126,20 +258,30 @@ vi /etc/rc.local
 ```
 粘贴完成后，和上面编辑配置文件一样，选按键盘左上角的“ESC”键，然后输入”:wq”，保存退出。这样，开机就会自动启动ShadowSocks了。不信，你可以试一下。
 
-## 或者一键安装...
-***[一键安装脚本](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/#番外篇二：一键安装脚本)***
-
-
-
 # ShadowSocks客户端安装
 ## 安装与启动
-Ubuntu使用ShadowSocks客户端有两种方式：
-1、安装ShadowSocks命令行程序，配置命令。
-2、安装ShadowSocks GUI图形界面程序，配置。
 
-> 博主推荐第一种，配置好后基本不用管。但使用的前提是你的服务端已经搭建好或者你有别人提供的SS 服务，下面我们来看怎么在Ubuntu上使用ShadowSocks
+### Docker
 
-### 方法一
+**With Kcptun**
+
+```
+docker run -dt --name ssclient --restart=always -p 1080:1080 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-local" -s "-s 127.0.0.1 -p 6500 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpclient" -k "-r server-ip:6500 -l :6500 -mode fast2"
+```
+
+**Without Kcptun**
+
+```
+docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:latest -m "ss-local" -s "-s server-ip -p 6443 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open"
+```
+
+**注意：**
+如果使用了**With Kcptun**，ss的监听ip填本地 `127.0.0.1`，`server-ip`填服务器`ip`。
+
+测试了一下，在开启了BBR情况下，**without kcptun**更快。
+对于一般情况（没有开启BBR或其他加速），**with kcptun**速度有所提升。
+
+### pip 安装
 #### 安装
 用PIP安装很简单：
 ```shell
@@ -189,7 +331,7 @@ sslocal -s 11.22.33.44 -p 50003 -k "123456" -l 1080 -t 600 -m aes-256-cfb
 
 如果你选择这一种请跳过第二种。你可以去系统的代理设置按照说明设置代理，但一般是全局的，然而我们访问baidu,taobao等着些网站如果用代理就有点绕了，而且还会浪费服务器流量。我们最好配置我们的浏览器让它可以自动切换，该用代理用代理该直接连接自动直接连接。所以请看配置浏览器。
 
-### 方法二
+### Shadowsocks Qt5
 安装GUI 图形界面程序，然后按照提示配置相对应的参数。安装教程地址：***[ShadowSocks-qt5 安装指南](https://github.com/shadowsocks/shadowsocks-qt5/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)***
 
 在ubuntu上可以这样，通过PPA源安装，**仅支持Ubuntu 14.04或更高版本**。
@@ -238,7 +380,7 @@ sudo systemctl enable supervisor
 然后重启即可
 
 # 番外篇：服务端一键安装
-## 番外篇一：搬瓦工一键安装
+## 搬瓦工一键安装
 搬瓦工早就知道广大使用者的~~阴谋~~意图，所以特意提供了**一键无脑安装Shadowsocks**。
 注意：**目前只支持CentOS**。
 进入KiwiVM后，在左边的选项栏的最下面：
@@ -247,100 +389,11 @@ sudo systemctl enable supervisor
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/one-key-install-shadowsocks01.png)
 点GO Back可看到相关信息了
 
-## 番外篇二：一键安装脚本
-这个就不多说了，直接贴上网址：***[Shadowsocks 一键安装脚本（四合一）](https://shadowsocks.be/11.html)***
-
-更多脚本请看：***[https://github.com/iMeiji/shadowsocks_install](https://github.com/iMeiji/shadowsocks_install)***
-
-# 基于Docker安装
-
-## 安装Docker
-
-详细教程不在本篇范围内，请看***[Docker入门笔记](/2017/docker-learning)***
-以下是最简单快捷高效的安装方式：
-
-```
-curl -fsSL get.docker.com -o get-docker.sh
-sh get-docker.sh
-```
-
-就是这么粗暴的两条命令=.=
-这里可能会有个小问题，如果VPS使用的`IPv6`可能会导致`apt update`失败，解决办法是把上面下载的`get-docker.sh`里面所有的`apt-get update`改为`apt-get Acquire::ForceIPv4=true update`。
-
-## 拉取镜像
-
-`Showdowsocks`镜像：***[https://hub.docker.com/r/mritd/shadowsocks/](https://hub.docker.com/r/mritd/shadowsocks/)***
-根据需要选择自己喜欢的Tag
-
-```
-docker pull mritd/shadowsocks:latest
-```
-
-## 启动示例
-
-```
-docker run -dt --name ss -p 6443:6443 mritd/shadowsocks -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k test123 --fast-open"
-```
-
-**说明：**
-
-- `-m` : 参数后指定一个 `shadowsocks` 命令，如 `ss-local`，不写默认为 `ss-server`；该参数用于 shadowsocks 在客户端和服务端工作模式间切换，可选项如下: `ss-local`、`ss-manager`、`ss-nat`、`ss-redir`、`ss-server`、`ss-tunnel`
-- `-s` : 参数后指定一个 `shadowsocks-libev` 的参数字符串，所有参数将被拼接到 `ss-server` 后
-- `-x` : 指定该参数后才会开启 `kcptun` 支持，否则将默认禁用 `kcptun`
-- `-e` : 参数后指定一个 `kcptun` 命令，如 `kcpclient`，不写默认为 `kcpserver`；该参数用于 kcptun 在客户端和服务端工作模式间切换，可选项如下: `kcpserver`、`kcpclient`
-- `-k` : 参数后指定一个 `kcptun` 的参数字符串，所有参数将被拼接到 `kcptun` 后
-
-## Shadowsocks Server
-
-**With Kcptun**
-
-```
-docker run -dt --name ssserver --restart=always -p 6443:6443 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpserver" -k "-t 127.0.0.1:6443 -l :6500 -mode fast2"
-```
-
-**Without Kcptun**
-
-```
-docker run -dt --name ssserver --restart=always -p 6443:6443 mritd/shadowsocks:latest -m "ss-server" -s "-s 0.0.0.0 -p 6443 -m aes-256-cfb -k 123456 --fast-open"
-```
-
-ss命令说明：
-
-- `-s` : 监听服务ip，为服务器本地
-- `-p` : 端口
-- `-m` : 加密算法
-- `-k` : 密码
-- `--fast-open` : 开启TCP `fast-open`
-
-kcptun命令自行度娘=.=
-
-## Shadowsocks Client
-
-**With Kcptun**
-
-```
-docker run -dt --name ssclient --restart=always -p 1080:1080 -p 6500:6500/udp mritd/shadowsocks:latest -m "ss-local" -s "-s 127.0.0.1 -p 6500 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open" -x -e "kcpclient" -k "-r server-ip:6500 -l :6500 -mode fast2"
-```
-
-**Without Kcptun**
-
-```
-docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:latest -m "ss-local" -s "-s server-ip -p 6443 -b 0.0.0.0 -l 1080 -m aes-256-cfb -k 123456 --fast-open"
-```
-
-**注意：**
-如果使用了**With Kcptun**，ss的监听ip填本地 `127.0.0.1`，`server-ip`填服务器`ip`。
-
-## Test
-
-测试了一下，在开启了BBR情况下，**without kcptun**更快。
-对于一般情况（没有开启BBR或其他加速），**with kcptun**速度有所提升。
-
 # 使用ShadowSocks代理实现科学上网
 
 **毕竟Shadowsocks是sock5代理，不能接受http协议，所以我们需要把sock5转化成http流量。**
 
-## 方式一：配置浏览器代理
+## 配置浏览器代理
 假如你上面任选一种方式已经开始运行`sslocal`了，火狐那个代理插件老是订阅不了`gfwlist`所以配置自动模式的话不好使。这里用的是chrome，你可以在Ubuntu软件中心下载得到。
 
 ### 安装插件
@@ -358,7 +411,7 @@ docker run -dt --name ssclient --restart=always -p 1080:1080 mritd/shadowsocks:l
 点击浏览器右上角的SwitchyOmega图标，下面选择自动切换，然后打开google.com试试，其他的就不在这贴图了。
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/proxy04.png)
 
-## 方式二：GenPAC全局代理
+## GenPAC全局代理
 如果不想每个浏览器都要设置代理，可以通过GenPAC实现全局代理。
 ### 安装
 pip：
@@ -408,7 +461,7 @@ sudo pip uninstall genpac
 `file:///home/ybd/Data/application/shadowsocks/autoproxy.pac`
 点击“应用到整个系统”，接下来可以愉悦的跨过墙了～
 
-## 方式三：通过proxychains
+## Proxychains 代理
 安装proxychains：
 ```shell
 sudo apt install proxychains
@@ -427,7 +480,7 @@ proxychains firefox
 使用`shadowsocks`+`proxychains`代理打开新的Firefox实现浏览器翻墙。 
 也可以通过输入`proxychains bash`建立一个新的`shell`，基于这个`shell`运行的所有命令都将使用代理。
 
-## 方式四：Privoxy
+## Privoxy
 
 Privoxy是一款带过滤功能的代理服务器，针对HTTP、HTTPS协议。通过Privoxy的过滤功能，用户可以保护隐私、对网页内容进行过滤、管理cookies，以及拦阻各种广告等。Privoxy可以用作单机，也可以应用到多用户的网络。
 
@@ -466,6 +519,9 @@ export https_proxy="127.0.0.1:8118"
 ```
 
 # ShadowSocks优化
+
+> 更多详情请见：***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
+
 ## 开启TCP Fast Open
 **这个需要服务器和客户端都是Linux 3.7+的内核**
 在服务端和客户端的`/etc/sysctl.conf`都加上：
@@ -486,9 +542,6 @@ vi /etc/ssh/sshd_config
 ```shell
 service ssh restart
 ```
-
-
-跟多详情请见：***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
 
 # 多用户管理
 
@@ -520,6 +573,8 @@ phymyadmin 访问 `ip:888`
 
 安装时间可能稍长，耐心等候。。。
 
+下面是其他的开源多用户管理平台
+
 ***[https://github.com/Ehco1996/django-sspanel](https://github.com/Ehco1996/django-sspanel)***
 
 ***[搭建-sspanel-v3-魔改版记录](https://github.com/iMeiji/shadowsocks_install/wiki/%E6%90%AD%E5%BB%BA-sspanel-v3-%E9%AD%94%E6%94%B9%E7%89%88%E8%AE%B0%E5%BD%95)***
@@ -543,6 +598,7 @@ phymyadmin 访问 `ip:888`
 wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && \
 chmod +x bbr.sh && \
 ./bbr.sh
+
 ```
 
 安装完后，会提示要重启 VPS，选择 **`Y`** 回车重启即可。
@@ -555,7 +611,7 @@ lsmod | grep bbr
 
 出现 `tcp_bbr` 即说明 BBR 已经启动。
 
-### 开启TCP Fast Open
+## 开启TCP Fast Open
 
 这个需要服务器和客户端都是Linux 3.7+的内核，一般Linux的服务器发行版只有debian jessie有3.7+的，客户端用Linux更是珍稀动物，所以这个不多说，如果你的服务器端和客户端都是Linux 3.7+的内核，那就在服务端和客户端的`vi /etc/sysctl.conf`文件中再加上一行。
 
@@ -566,7 +622,7 @@ net.ipv4.tcp_fastopen = 3
 
 然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`。这样速度也将会有非常显著的提升。
 
-###  TCP优化
+## TCP优化
 
 1.修改文件句柄数限制
 如果是ubuntu/centos均可修改`/etc/sysctl.conf`
@@ -974,6 +1030,11 @@ python speedtest-cli/setup.py install
 ```
 speedtest-cli --server=6611
 ```
+
+# Finally
+
+低调使用。。。
+
 
 [^1]: 防火长城（英语：Great Firewall( of China)，常用简称：GFW，中文也称中国国家防火墙，中国大陆民众俗称防火墙等），是对中华人民共和国政府在其互联网边界审查系统（包括相关行政审查系统）的统称。此系统起步于1998年，其英文名称得自于2002年5月17日Charles R. Smith所写的一篇关于中国网络审查的文章《The Great Firewall of China》，取與Great Wall（长城）相谐的效果，简写为Great Firewall，缩写GFW。隨着使用的拓广，中文「墙」和英文「GFW」有时也被用作动词，网友所說的「被墙」即指被防火长城所屏蔽，「翻墙」也被引申为浏览国外网站、香港等特区网站的行为。
 
