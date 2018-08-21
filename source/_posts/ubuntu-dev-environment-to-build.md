@@ -198,25 +198,60 @@ MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu
 
 桌面版个人使用就解压到`/home/{user}`目录下就可以了
 
-
 # 安装MySQL以及GUI工具
+
+## 基于Docker安装
+
+### 拉取镜像
+
+```
+docker pull mysql:5.7
+```
+
+### 运行实例
+
+```
+MYSQL=/home/ybd/data/docker/mysql && \
+docker run --name=mysql -p 3306:3306  \
+-v $MYSQL/data:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=root -d mysql \
+--character-set-server=utf8mb4 \
+--collation-server=utf8mb4_unicode_ci \
+--sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION \
+--lower-case-table-names=1
+```
+
+### 终端链接
+
+```
+sudo apt-get install mysql-client
+
+// 链接
+mysql -h 127.0.0.1 -P 3306 -u root -p
+```
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/mysqlStartup.png)
+
+## 手动折腾安装
 
 ***以`mysql5.7`以上版本为例 --> `mysql-5.7.10-linux-glibc2.5-x86_64.tar.gz`***
 
-## 必须要先安装依赖的libaio才能正常按照mysql
+### 必须要先安装依赖的libaio才能正常按照mysql
+
 ```
 sudo apt-get update
 sudo apt-get install libaio-dev
 ```
 
-## 创建用户组以及用户
+### 创建用户组以及用户
+
 ```
 sudo groupadd mysql
 sudo useradd -r -g mysql -s /bin/false mysql
 ```
 
-## 尽量把mysql安装到/usr/local目录下面
+### 尽量把mysql安装到/usr/local目录下面
+
 ```
 cd /usr/local
 sudo cp /home/data/software/DataBase/mysql/mysql-5.7.10-linux-glibc2.5-x86_64.tar.gz ./
@@ -226,7 +261,8 @@ sudo tar zxvf mysql-5.7.10-linux-glibc2.5-x86_64.tar.gz
 sudo ln -s mysql-5.7.10-linux-glibc2.5-x86_64 mysql
 ```
 
-## 创建必须的目录和进行授权
+### 创建必须的目录和进行授权
+
 ```
 cd mysql
 sudo mkdir mysql-files
@@ -235,7 +271,8 @@ sudo chown -R mysql .
 sudo chgrp -R mysql .
 ```
 
-## 执行安装脚本
+### 执行安装脚本
+
 ```
 sudo bin/mysqld --initialize --user=mysql   
 sudo bin/mysql_ssl_rsa_setup
@@ -244,20 +281,20 @@ sudo bin/mysql_ssl_rsa_setup
 在初始化的时候，一定要仔细看屏幕，最后大概有一行:`[Note] A temporary password is generated for root@localhost: kklNBwkei1.t`
 注意这是`root`的临时密码,记录下来以便后面修改密码！
 
-## 重新对一些主要的目录进行授权，确保安全性
+### 重新对一些主要的目录进行授权，确保安全性
 
 ```
 sudo chown -R root .
 sudo chown -R mysql data mysql-files
 ```
 
-## 从默认的模板创建配置文件，需要在文件中增加 skip-grant-tables ，以便启动mysql以后修改root用户的密码
+### 从默认的模板创建配置文件，需要在文件中增加 skip-grant-tables ，以便启动mysql以后修改root用户的密码
 
 ```
 sudo cp support-files/my-default.cnf ./my.cnf 
 ```
 
-## 测试启动，修改密码
+### 测试启动，修改密码
 
 ```
 # 后台启动mysql
@@ -265,32 +302,35 @@ sudo bin/mysqld_safe --user=mysql &
 # 启动
 ./bin/mysql -u root -p
 ```
-### 方式一
+#### 方式一
+
 因为前面修改了`my.cnf`文件，增加了 `skip-grant-tables` 参数，所以不需要用户名即可登陆
 进去后立即修改`root`用户的密码，密码的字段是 `authentication_string`
 ```
 update mysql.user set authentication_string=password('root') where user='root';
 ```
 修改密码后，再把`my.cnf`里面的 `skip-grant-tables` 去掉
-### 方式二
+#### 方式二
+
 修改密码也可以使用安装到时候提示到**随机密码**进行登录，然后使用下面到命令修改密码。
 建议用下面的方式设置数据库的密码
 ```
 alter user user() identified by 'root';
 ```
 
-## 复制启动脚本到合适的位置
+### 复制启动脚本到合适的位置
+
 ```
 sudo cp support-files/mysql.server /etc/init.d/mysql
 ```
 
-##  (Optional)增加自动启动
+### (Optional)增加自动启动
 
 ``` 
 sudo update-rc.d -f mysql defaults
 ```
 
-## 增加`mysql`命令的路径到`PATH`环境变量
+### 增加`mysql`命令的路径到`PATH`环境变量
 
 ```
 sudo touch /etc/profile.d/mysql.sh
@@ -300,22 +340,25 @@ sudo chmod 644 /etc/profile.d/mysql.sh
 ```
 ***<font color=red>到此，mysql的安装基本完成</font>***
 
-## 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
+### 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
 lower_case_table_names=1
 character_set_server=utf8
 ```
 
-## 查看以及修改MySQL字符编码
-### 查看
+### 查看以及修改MySQL字符编码
+
+#### 查看
+
 ```
 mysql> show variables like 'collation_%';
 
 mysql> show variables like 'character_set_%';
 ```
 
-### 修改
+#### 修改
+
 ```
 mysql> set character_set_client=utf8;
 Query OK, 0 rows affected (0.00 sec)
@@ -345,7 +388,8 @@ mysql> set collation_server=utf8mb4_general_ci;
 Query OK, 0 rows affected (0.01 sec)
 ```
 
-## 如果登录mysql出现以下错误
+### 如果登录mysql出现以下错误
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/mysql-problom.png)
 **则可能配置未加载或服务未启动，请重启系统，然后启动mysql服务**
 ```
@@ -357,7 +401,8 @@ sudo service mysql start
 sudo service mysql stop
 ```
 
-## 开启远程链接
+### 开启远程链接
+
 链接mysql后：
 ```
 use mysql
@@ -370,21 +415,9 @@ flush privileges;
 select host,user from user;
 ```
 
+## Mysql GUI
 
-## 附加：基于Docker
-### 拉取镜像
-
-```
-docker pull mysql:5.7
-```
-
-### 运行实例
-
-```
-MYSQL=/home/ybd/data/docker/mysql && docker run --name=mysql -p 3306:3306  -v $MYSQL/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION --lower-case-table-names=1
-```
-
-### 终端客户端
+### 传统终端客户端
 
 ```
 sudo apt-get install mysql-client
@@ -393,11 +426,70 @@ sudo apt-get install mysql-client
 mysql -h 127.0.0.1 -P 3306 -u root -p
 ```
 
+### 智能补全命令客户端
 
+这个一个智能补全并且高亮语法的终端客户端 ***[mycli](https://github.com/dbcli/mycli)***
 
-# Navicat Premium
+![](http://ojoba1c98.bkt.clouddn.com/img/mysql-related-learning/mycli.gif)
 
-## 破解
+安装：
+
+```
+sudo apt install mycli
+```
+
+使用：
+
+```
+$ mycli --help
+Usage: mycli [OPTIONS] [DATABASE]
+
+  A MySQL terminal client with auto-completion and syntax highlighting.
+
+  Examples:
+    - mycli my_database
+    - mycli -u my_user -h my_host.com my_database
+    - mycli mysql://my_user@my_host.com:3306/my_database
+
+Options:
+  -h, --host TEXT               Host address of the database.
+  -P, --port INTEGER            Port number to use for connection. Honors
+                                $MYSQL_TCP_PORT.
+  -u, --user TEXT               User name to connect to the database.
+  -S, --socket TEXT             The socket file to use for connection.
+  -p, --password TEXT           Password to connect to the database.
+  --pass TEXT                   Password to connect to the database.
+  --ssl-ca PATH                 CA file in PEM format.
+  --ssl-capath TEXT             CA directory.
+  --ssl-cert PATH               X509 cert in PEM format.
+  --ssl-key PATH                X509 key in PEM format.
+  --ssl-cipher TEXT             SSL cipher to use.
+  --ssl-verify-server-cert      Verify server's "Common Name" in its cert
+                                against hostname used when connecting. This
+                                option is disabled by default.
+  -v, --version                 Output mycli's version.
+  -D, --database TEXT           Database to use.
+  -R, --prompt TEXT             Prompt format (Default: "\t \u@\h:\d> ").
+  -l, --logfile FILENAME        Log every query and its results to a file.
+  --defaults-group-suffix TEXT  Read MySQL config groups with the specified
+                                suffix.
+  --defaults-file PATH          Only read MySQL options from the given file.
+  --myclirc PATH                Location of myclirc file.
+  --auto-vertical-output        Automatically switch to vertical output mode
+                                if the result is wider than the terminal
+                                width.
+  -t, --table                   Display batch output in table format.
+  --csv                         Display batch output in CSV format.
+  --warn / --no-warn            Warn before running a destructive query.
+  --local-infile BOOLEAN        Enable/disable LOAD DATA LOCAL INFILE.
+  --login-path TEXT             Read this path from the login file.
+  -e, --execute TEXT            Execute command and quit.
+  --help                        Show this message and exit.
+```
+
+### Navicat Premium
+
+#### 破解
 
 1. 到*[官网](https://www.navicat.com/download)*下载对应系统版本，这里选择linux版本，并解压
 
@@ -443,8 +535,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/navicat12.png)
 
-
-## 创建快捷方式
+#### 创建快捷方式
 
 ```
 cd /usr/share/applications/
@@ -468,7 +559,7 @@ Terminal=0
 
 > 参考：***[https://www.52pojie.cn/thread-705020-1-1.html]( https://www.52pojie.cn/thread-705020-1-1.html)***
 
-## 后台运行
+#### 后台运行
 
 ```
 nohup /home/ybd/data/application/navicat/navicat120_premium_en_x64/start_navicat > /dev/null 2>&1 &
