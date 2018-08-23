@@ -133,6 +133,29 @@ admin:
       BucketName: blog
       bucketHost: ojoba1c98.bkt.clouddn.com
 
+# hexo-helper-live2d配置，参考https://github.com/EYHN/hexo-helper-live2d/blob/master/README.zh-CN.md
+live2d:
+  enable: true
+  scriptFrom: local
+  pluginRootPath: live2dw/
+  pluginJsPath: lib/
+  pluginModelPath: assets/
+  tagMode: false
+  debug: false
+  model:
+    scale: 1
+    use: live2d-widget-model-wanko
+  display:
+    superSample: 2 # 超采样等级
+    width: 100 
+    height: 100
+    position: left # 位置
+  mobile:
+    show: false
+  react:
+    opacityDefault: 0.9 # 默认透明度
+    opacityOnHover: 0.5 # 鼠标移上透明度
+
 # 文件压缩选项
 all_minifier: true
 

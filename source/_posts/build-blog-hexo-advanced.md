@@ -768,7 +768,89 @@ npm install hexo-wordcount --save
 
 看到了吧，这个就是传值传过去的，你想显示什么就在这里面大肆的去改动吧。其实在第二个框中，就可以把值都改掉，不用接受传值的方式，完全自己可以重写。不过我不建议那样做，因为传值这样只要是后续页面需要这几个值那么就都会通过取值去传过去，要是在刚才footer文件中直接写死，后续不一定哪个页面需要传值，但是值为空了或者还是原来的，可就尴尬了。所以还是这样改动吧。
 
+## 给博客添加吉祥物
+
+> 详细信息： ***[https://github.com/EYHN/hexo-helper-live2d/blob/master/README.zh-CN.md](https://github.com/EYHN/hexo-helper-live2d/blob/master/README.zh-CN.md)***
+
+效果图：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/hexo-helper-live2d.png)
+
+安装依赖：
+
+```
+npm install --save hexo-helper-live2d
+npm install --save live2d-widget-model-wanko
+```
+
+**站点配置**添加：
+
+```
+# hexo-helper-live2d配置，参考https://github.com/EYHN/hexo-helper-live2d/blob/master/README.zh-CN.md
+live2d:
+  enable: true
+  scriptFrom: local
+  pluginRootPath: live2dw/
+  pluginJsPath: lib/
+  pluginModelPath: assets/
+  tagMode: false
+  debug: false
+  model:
+    scale: 1
+    use: live2d-widget-model-wanko
+  display:
+    superSample: 2 # 超采样等级
+    width: 100 
+    height: 100
+    position: left # 位置
+  mobile:
+    show: false
+  react:
+    opacityDefault: 0.9 # 默认透明度
+    opacityOnHover: 0.5 # 鼠标移上透明度
+```
+
+## 侧栏加入已运行的时间
+
+`themes/next/layout/_custom`中添加`sidebar.swig`文件：
+
+```html
+<div id="days"></div>
+    <script>
+    function show_date_time(){
+        window.setTimeout("show_date_time()", 1000);
+        BirthDay=new Date("01/10/2017 12:34:56");
+        today=new Date();
+        timeold=(today.getTime()-BirthDay.getTime());
+        sectimeold=timeold/1000
+        secondsold=Math.floor(sectimeold);
+        msPerDay=24*60*60*1000
+        e_daysold=timeold/msPerDay
+        daysold=Math.floor(e_daysold);
+        e_hrsold=(e_daysold-daysold)*24;
+        hrsold=setzero(Math.floor(e_hrsold));
+        e_minsold=(e_hrsold-hrsold)*60;
+        minsold=setzero(Math.floor((e_hrsold-hrsold)*60));
+        seconds=setzero(Math.floor((e_minsold-minsold)*60));
+        document.getElementById('days').innerHTML="已运行"+daysold+"天"+hrsold+"小时"+minsold+"分"+seconds+"秒";
+    }
+function setzero(i){
+    if (i<10)
+    {i="0" + i};
+    return i;
+}
+show_date_time();
+</script>
+```
+
+在`themes/next/layout/_macro/sidebar.swig`中的`</section>`之前添加
+
+```
+{% include '../_custom/sidebar.swig' %}
+```
+
 # 元素微调自定义篇
+
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
 那就是通过浏览器元素定位，调到自己喜欢的样式，然后加到`themes/next/source/css/_custom/custom.styl`文件下面。
 ## 定位元素
@@ -826,7 +908,6 @@ a:hover {
     border-bottom-color: #ff106c;
 }
 
-
 // 文章背景框框
 .post {
     margin-top: 10px;
@@ -871,6 +952,21 @@ code {
     border-radius: 3px;
 }
 
+// 文章标题动态效果 next/source/css/_common/components/post/post-title.styl中.posts-expand .post-title-link确保`position: relative;`属性存在，如果需要标题呈现链接效果颜色，将`color`元素去除即可
+.posts-expand .post-title-link::before {
+    background-image: linear-gradient(90deg, #a166ab 0%, #ef4e7b 25%, #f37055 50%, #ef4e7b 75%, #a166ab 100%);
+}
+
+// 文章内标题样式（左边的竖线）
+.post-body h2, h3, h4, h5, h6 {
+    border-left: 4px solid #657b83;
+    padding-left: 10px;
+}
+
+.post-body h1 {
+    border-left: 5px solid #657b83;
+    padding-left: 10px;
+}
 
 body {
     color: #444;

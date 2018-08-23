@@ -65,7 +65,6 @@ a:hover {
 // 站点描述
 .site-description {
     font-size: 16px;
-
 }
 
 // 头部inner
@@ -116,6 +115,31 @@ body {
     color: #444;
     font-size: 16px;
     background: rgba(240, 240, 240, 0.1);
+}
+
+
+// 文章标题动态效果 next/source/css/_common/components/post/post-title.styl中.posts-expand .post-title-link确保`position: relative;`属性存在，如果需要标题呈现链接效果颜色，将`color`元素去除即可
+.posts-expand .post-title-link::before {
+    background-image: linear-gradient(90deg, #a166ab 0%, #ef4e7b 25%, #f37055 50%, #ef4e7b 75%, #a166ab 100%);
+}
+
+// 文章内标题样式（左边的竖线）
+.post-body h2, h3, h4, h5, h6 {
+    border-left: 4px solid #657b83;
+    padding-left: 10px;
+}
+
+.post-body h1 {
+    border-left: 5px solid #657b83;
+    padding-left: 10px;
+}
+
+// 自定义的侧栏时间样式
+#days {
+    display: block;
+    color: rgb(7, 179, 155);
+    font-size: 15px;
+    margin-top: 15px;
 }
 
 // 下载样式
