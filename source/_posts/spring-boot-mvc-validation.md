@@ -459,6 +459,10 @@ public class GlobalControllerAdvisor implements ResponseBodyAdvice {
 
 >  `RequestBodyAdvice`的`beforeBodyRead`在拦截器之后执行，所以可以在拦截器做签名检验，然后在`RequestBodyAdvice`中解密请求参数
 
+## Spring Boot和Feign中使用Java 8时间日期API（LocalDate等）的序列化问题
+
+***[http://blog.didispace.com/Spring-Boot-And-Feign-Use-localdate/](http://blog.didispace.com/Spring-Boot-And-Feign-Use-localdate/)***
+
 # Validation
 
 ## 常用注解（大部分**JSR**中已有）
