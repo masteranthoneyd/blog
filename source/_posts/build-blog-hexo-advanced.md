@@ -528,9 +528,6 @@ $code-border-radius             = 4px
 
 我们在`/themes/hexo-theme-next/layout/_macro/`目录下新建`post-article.swig`,把这些`post.swig`中的内容复制过去，而且加上上面的统计代码，然后在`/themes/hexo-theme-next/layout/post.swig`上面`% import '_macro/post.swig' as post_template %`中的`post.swig`改成`post-article.swig`，这样子就解决啦。就是在主页上的博客名字下面不会有阅读人数，进入博客才能看见
 
-## 添加最近访客
-**多说评论关闭**
-
 ## 添加Fork me on GitHub
 去网址*[https://github.com/blog/273-github-ribbons](https://github.com/blog/273-github-ribbons)*挑选自己喜欢的样式，并复制代码，添加到`themes\next\layout\_layout.swig`的`body`标签之内即可
 **记得把里面的url换成自己的!**
@@ -655,9 +652,6 @@ eg :
 canvas_nest: true
 ```
 至此，大功告成，运行hexo clean 和 hexo g hexo s之后就可以看到效果了
-
-## 多说评论优化以及美化
-update：由于多说即将关闭，此博客将使用Disqus作为评论系统
 
 ## 添加音乐
 去往*[网易云音乐](http://music.163.com/)*搜索喜欢的音乐，点击生成外链播放器，复制代码直接放到博文末尾即可，`height`设为0可隐藏播放器，但仍然可以播放音乐，`auto`设成0可手动播放，默认是1自动播放，可把代码放到`themes/next/layout/_custom/sidebar.swig`文件里，播放器会显示在站点预览中
@@ -877,12 +871,12 @@ var titleTime;
 document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         $('[rel="shortcut icon"]').attr('href', "/TEP.png");
-        document.title = ' 出BUG啦！！！！';
+        document.title = 'w(ﾟДﾟ)w 出BUG啦！！！！';
         clearTimeout(titleTime);
     }
     else {
         $('[rel="shortcut icon"]').attr('href', "/favicon.png");
-        document.title = ' 又好了-.-。。。 ' + OriginTitile;
+        document.title = '♪(^∇^*)又好了。。。 ' + OriginTitile;
         titleTime = setTimeout(function () {
             document.title = OriginTitile;
         }, 2000);
@@ -895,6 +889,10 @@ document.addEventListener('visibilitychange', function () {
 ```
 <script type="text/javascript" src="/js/src/dytitle.js"></script>
 ```
+## 修改文章底部的那个带#号的标签
+
+修改模板`/themes/next/layout/_macro/post.swig`，搜索 `rel="tag">#`，将 # 换成`<i class="fa fa-tag"></i>`
+
 # 元素微调自定义篇
 
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
