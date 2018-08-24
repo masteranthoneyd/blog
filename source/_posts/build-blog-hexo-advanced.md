@@ -752,21 +752,19 @@ npm install hexo-wordcount --save
 修改之后的样子大概是这样的：
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/result.png)
 
-1、找到 \themes\next\layout\partials\下面的footer.swig文件，打开会发现，如下图的语句：
+1、找到 `\themes\next\layout\partials\`下面的`footer.swig`文件，打开会发现，如下图的语句：
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/footer.png)
 
 - 第一个框 是下面侧栏的“日期❤ XXX”
-  如果想像我一样加东西，一定要在双大括号外面写。如：xxx{{config.author}},当然你要是想改彻底可以变量都删掉，看个人意愿。
+  如果想像我一样加东西，一定要在双大括号外面写。如：`xxx{{config.author}}`,当然你要是想改彻底可以变量都删掉，看个人意愿。
 
 - 第二个，是图一当中 “由Hexo驱动” 的Hexo链接，先给删掉防止跳转，如果想跳转当然也可以自己写地址，至于中文一会处理。注意删除的时候格式不能错，只把`<a>...</a>`标签这部分删除即可，留着两个单引号'',否则会出错哦。
 
 - 第三个框也是最后一个了，这个就是更改图一后半部分“主题-Next.XX”,这个比较爽直接将<a>..</a>都删掉，同样中文“主题”一会处理，删掉之后在上一行 ‘-’后面可以随意加上你想显示的东西，不要显示敏感信息哟，请自重。
 
-2、接下来，处理剩余的中文信息。找到这个地方\themes\next\languages\ 下面的语言文件zh-Hans.yml（这里以中文为例，有的习惯用英文的配置文件，道理一样，找对应位置即可）
+2、接下来，处理剩余的中文信息。找到这个地方`\themes\next\languages\` 下面的语言文件zh-Hans.yml（这里以中文为例，有的习惯用英文的配置文件，道理一样，找对应位置即可）
 打开之后，如图：
 ![](http://ojoba1c98.bkt.clouddn.com/img/build-hexo/languages.png)
-
-看到了吧，这个就是传值传过去的，你想显示什么就在这里面大肆的去改动吧。其实在第二个框中，就可以把值都改掉，不用接受传值的方式，完全自己可以重写。不过我不建议那样做，因为传值这样只要是后续页面需要这几个值那么就都会通过取值去传过去，要是在刚才footer文件中直接写死，后续不一定哪个页面需要传值，但是值为空了或者还是原来的，可就尴尬了。所以还是这样改动吧。
 
 ## 给博客添加吉祥物
 
@@ -814,7 +812,7 @@ live2d:
 
 `themes/next/layout/_custom`中添加`sidebar.swig`文件：
 
-```html
+```html themes/next/layout/_custom https://reuixiy.github.io/technology/computer/computer-aided-art/2017/06/09/hexo-next-optimization.html 链接
 <div id="days"></div>
     <script>
     function show_date_time(){
@@ -849,6 +847,18 @@ show_date_time();
 {% include '../_custom/sidebar.swig' %}
 ```
 
+样式：
+
+```diff themes/next/source/css/_custom/custom.styl
+// 自定义的侧栏时间样式
+#days {
+    display: block;
+    color: #fffa74;
+    font-size: 14px;
+    margin-top: 15px;
+}
+```
+
 ## 更改标签云（tagcloud）的颜色
 
 `themes/next/layout/page.swig`找到`tagcloud并替换`:
@@ -857,6 +867,34 @@ show_date_time();
 {{ tagcloud({min_font: 13, max_font: 31, amount: 1000, color: true, start_color: '#9733EE', end_color: '#FF512F'}) }}
 ```
 
+## 设置动态title
+
+`themes/next/source/js/src`下创建`dytitle.js`：
+
+```
+var OriginTitile = document.title;
+var titleTime;
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+        $('[rel="shortcut icon"]').attr('href', "/TEP.png");
+        document.title = ' 出BUG啦！！！！';
+        clearTimeout(titleTime);
+    }
+    else {
+        $('[rel="shortcut icon"]').attr('href', "/favicon.png");
+        document.title = ' 又好了-.-。。。 ' + OriginTitile;
+        titleTime = setTimeout(function () {
+            document.title = OriginTitile;
+        }, 2000);
+    }
+});
+```
+
+修改`themes/next/layout/layout.swing`,在 `</body>` 之前添加：:
+
+```
+<script type="text/javascript" src="/js/src/dytitle.js"></script>
+```
 # 元素微调自定义篇
 
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
@@ -958,6 +996,17 @@ code {
     color: #E6006B;
     background: white;
     border-radius: 3px;
+}
+
+// 文章```代码块顶部样式
+.highlight figcaption {
+    margin: 0em;
+    padding: 0.5em;
+    background: #eee;
+    border-bottom: 1px solid #e9e9e9;
+}
+.highlight figcaption a {
+    color: rgb(80, 115, 184);
 }
 
 // 文章标题动态效果 next/source/css/_common/components/post/post-title.styl中.posts-expand .post-title-link确保`position: relative;`属性存在，如果需要标题呈现链接效果颜色，将`color`元素去除即可
@@ -1257,7 +1306,72 @@ border-top-color: #9954bb;
 ```
 这也是调用了***[Font Awesome](http://fontawesome.io/examples/)***的方法。
 
+## 代码高亮相关
+
+先看一则代码
+
+```diff Hello World示例 http://yangbingdong.com 这是链接
+	public static void main(String[] args) {
++		System.out.println("Hello World!");
+-		System.out.println("Hello World!");
+	}
+```
+
+正确姿势，代码片段开头：
+
+```
+[language] [title] [url] [link-text]
+```
+
+- `[language]` 是代码语言的名称，用来设置代码块颜色高亮，非必须；
+- `[title]` 是顶部左边的说明，非必须；
+- `[url]` 是顶部右边的超链接地址，非必须；
+- `[link text]` 如它的字面意思，超链接的名称，非必须。
+
+这 4 项应该是根据空格来分隔，而不是`[]`，故请不要加`[]`。除非如果你想写后面两个，但不想写前面两个，那么就必须加`[]`了，要这样写：`[] [] [url] [link text]`。
+
+首先关于代码块颜色高亮，高亮的模式可以在**主题配置文件**中设置：
+
+```
+# Code Highlight theme
+# Available value:
+#    normal | night | night eighties | night blue | night bright
+# https://github.com/chriskempson/tomorrow-theme
+
+highlight_theme: normal
+```
+
+要颜色正确高亮，代码语言的名称肯定要写对，各种支持语言的名称可以查看[这篇文章](https://almostover.ru/2016-07/hexo-highlight-code-styles/)。也可以在站点配置文件`_config.yml`中设置自动高亮：
+
+```diff blog/_config.yml
+highlight:
+  enable: true
+  line_number: true
+# 代码自动高亮
+-  auto_detect: false
++  auto_detect: true
+```
+
+上边的diff是通过在`[language]`填写diff，然后在相应代码前面加上`-`和`+`
+
+顶部的文字样式：
+
+```
+// 文章```代码块顶部样式
+.highlight figcaption {
+    margin: 0em;
+    padding: 0.5em;
+    background: #eee;
+    border-bottom: 1px solid #e9e9e9;
+}
+.highlight figcaption a {
+    color: rgb(80, 115, 184);
+}
+```
+
+
 # 域名绑定篇
+
 博客托管在Github和Coding，所以个人博客地址是Github或Coding的二级域名，不容易让人记住，也很难让百度收录，所以很多人都自己注册域名，和博客地址绑定，这样只要输入自己申请的域名，就能跳转到博客首页，也算是真正拥有了个人网站了
 ## 购买域名
 博主选择***[万网](https://wanwang.aliyun.com/)***购买的域名，可以淘宝账号登陆，之后支付宝付款
@@ -1619,7 +1733,6 @@ admin:
 
 ```
 npm install hexo-reference --save
-
 ```
 
 ## 字数与阅读时间插件
@@ -1634,8 +1747,6 @@ npm install hexo-wordcount --save
 NexT作者给我们的建议就是使用***[Data Files](https://hexo.io/docs/data-files.html)***，具体详情请戳进 ***[Theme configurations using Hexo data files            #328](https://github.com/iissnan/hexo-theme-next/issues/328)***
 
 
-
-
 # 最后
 
 一路摸爬滚打下来也挺折腾的，不过确实满满的成就感，学到了很多
@@ -1645,6 +1756,7 @@ NexT作者给我们的建议就是使用***[Data Files](https://hexo.io/docs/dat
 > ***[http://codepub.cn/2016/03/20/Hexo-blog-theme-switching-from-Jacman-to-NexT-Mist/](http://codepub.cn/2016/03/20/Hexo-blog-theme-switching-from-Jacman-to-NexT-Mist/)*** 
 > ***[http://www.shellsec.com/news/34054.html](http://www.shellsec.com/news/34054.html)***
 > ***[https://www.0101tx.com/pages/hexonextsanf.html](https://www.0101tx.com/pages/hexonextsanf.html)***
+> ***[https://reuixiy.github.io/technology/computer/computer-aided-art/2017/06/09/hexo-next-optimization.html](https://reuixiy.github.io/technology/computer/computer-aided-art/2017/06/09/hexo-next-optimization.html)***
 
 
 [^1]: basic footnote content

@@ -80,6 +80,7 @@
 
 
 {% include '_scripts/third-party/mob_share.swig' %}
-
+<!--卖萌-->
+<script type="text/javascript" src="/js/src/dytitle.js"></script>
 </body>
 </html>
