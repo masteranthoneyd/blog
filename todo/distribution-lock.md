@@ -2,7 +2,7 @@
 
 # Preface
 
-> 在现代互联网，通常都是伴随着分布式、高并发等，在某些业务中例如下订单扣减库存，如果不对库存资源做临界处理，在并发量大的时候会出现库存不准确的情况。在单个服务的情况下可以通过Java自带的一些锁对临界资源进行处理，例如`synchronized`、`Reentrantlock`，甚至是通过无锁技术（比如`RangeBuffer`）都可以实现同一个JVM内的锁。But，在弹性扩容情况下
+> 在现代互联网，通常都是伴随着分布式、高并发等，在某些业务中例如下订单扣减库存，如果不对库存资源做临界处理，在并发量大的时候会出现库存不准确的情况。在单个服务的情况下可以通过Java自带的一些锁对临界资源进行处理，例如`synchronized`、`Reentrantlock`，甚至是通过无锁技术（比如`RangeBuffer`）都可以实现同一个JVM内的锁。But，在**能够弹性伸缩的分布式环境**下，Java内置的锁显然不能够满足需求，需要借助外部进程实现分布式锁。
 
 # 几种实现方式
 
@@ -10,13 +10,13 @@
 
 常见的是秒杀场景，订单服务部署了多个实例。如秒杀商品有4个，第一个用户购买3个，第二个用户购买2个，理想状态下第一个用户能购买成功，第二个用户提示购买失败，反之亦可。而实际可能出现的情况是，两个用户都得到库存为4，第一个用户买到了3个，更新库存之前，第二个用户下了2个商品的订单，更新库存为2，导致出错。
 
-在上面的场景中，商品的库存是共享变量，面对高并发情形，需要保证对资源的访问互斥。在单机环境中，Java中其实提供了很多并发处理相关的API，但是这些API在分布式场景中就无能为力了。也就是说单纯的Java API并不能提供分布式锁的能力。分布式系统中，由于分布式系统的分布性，即多线程和多进程并且分布在不同机器中，synchronized和lock这两种锁将**失去原有锁的效果**，需要我们自己实现分布式锁。
+在上面的场景中，商品的库存是共享变量，面对高并发情形，需要保证对资源的访问互斥。在单机环境中，Java中其实提供了很多并发处理相关的API，但是这些API在分布式场景中就无能为力了。也就是说单纯的Java API并不能提供分布式锁的能力。分布式系统中，由于分布式系统的分布性，即多线程和多进程并且分布在不同机器中，`synchronized`和`lock`这两种锁将**失去原有锁的效果**，需要我们自己实现分布式锁。
 
 常见的锁方案如下：
 
-- 基于数据库实现分布式锁
-- 基于缓存，实现分布式锁，如`Redis`
-- 基于`Zookeeper`实现分布式锁
+- 基于数据库实现分布式锁（基本用来玩的）
+- 基于缓存，实现分布式锁，如`Redis`（业界常用方式）
+- 基于`Zookeeper`实现分布式锁（性能低）
 
 下面我们简单介绍下这几种锁的实现。
 
@@ -149,11 +149,11 @@ public class CuratorTest {
 }
 ```
 
-### 基于缓存
+## 基于缓存
 
 相对于基于数据库实现分布式锁的方案来说，基于缓存来实现在性能方面会表现的更好一点，存取速度快很多。而且很多缓存是可以集群部署的，可以解决单点问题。基于缓存的锁有好几种，如memcached、redis，下面主要讲解基于redis的分布式实现。
 
-# 基于redis的分布式锁实现
+# 基于Redis的分布式锁实现
 
 > 首先，为了确保分布式锁可用，我们至少要确保锁的实现同时满足以下四个条件：
 >
@@ -178,7 +178,7 @@ public class CuratorTest {
 </dependency>
 ```
 
-## 加锁
+## 加锁姿势
 
 ```
 @Autowired
@@ -191,5 +191,60 @@ private Boolean setNxEx(String key, String value) {
 	});
 }
 ```
+
+执行上面的`setNxEx()`方法就只会导致两种结果：
+
+1. 当前没有锁（key不存在），那么就进行加锁操作，并对锁设置个有效期，同时value表示加锁的客户端。
+2. 已有锁存在，不做任何操作。
+
+网上有许多教程在加锁的步骤都**不是原子性**的，有些是先加锁，成功后再设置过期时间；有些将过期时间设置为value，获取锁失败会判断value是否小于当前时间，是则删除在设置新的值。这些方法由于不是原子性，在极端情况（比如多线程，或者代码执行到某一行就宕机了等等）必然会导致锁失效或死锁等情况...
+
+在上面`stringRedisConn.set(...)`方法中，确保了上锁与设置过期时间的原子性。
+
+## 解锁姿势
+
+配置类：
+
+```
+@Bean
+public RedisScript<Boolean> releaseLockScript(DLockConfigProperty dLockConfigProperty) {
+	DefaultRedisScript<Boolean> redisScript = new DefaultRedisScript<>();
+	String scriptLocation = "scripts/release_lock.lua";
+	redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource(scriptLocation)));
+	redisScript.setResultType(Boolean.class);
+	return redisScript;
+}
+```
+
+Lua脚本：
+
+```
+if redis.call('GET', KEYS[1]) == ARGV[1] then
+    return 1 == redis.call('DEL', KEYS[1])
+else
+    return false
+end
+```
+
+核心代码：
+
+```
+@Resource
+private StringRedisTemplate stringRedisTemplate;
+
+@Resource
+private RedisScript<Boolean> script;
+
+public void release(String key, String value) {
+    stringRedisTemplate.execute(script, singletonList(key), value)
+}
+```
+
+除了配置，解锁就一行代码搞定，虽然简洁，里面也是有很多学问滴。。。
+
+为什么要用Lua脚本？确保原子性，如何保证，请看官网对`eval`命令的相关解释。上面脚本表达的意思很简单，对比传进来的value是否相等，是则删除锁。value可使用UUID作为当前线程的标识符，**只有但前线程才能解锁**。
+
+网上的错误姿势一般都是执行完业务代码直接删除锁，这样会导致删除了其他线程获的锁。
+
 
 
