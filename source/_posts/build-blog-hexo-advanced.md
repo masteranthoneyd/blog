@@ -849,6 +849,14 @@ show_date_time();
 {% include '../_custom/sidebar.swig' %}
 ```
 
+## 更改标签云（tagcloud）的颜色
+
+`themes/next/layout/page.swig`找到`tagcloud并替换`:
+
+```
+{{ tagcloud({min_font: 13, max_font: 31, amount: 1000, color: true, start_color: '#9733EE', end_color: '#FF512F'}) }}
+```
+
 # 元素微调自定义篇
 
 那么如何把字体、页宽、按钮大小等等一些细节的东西调到自己喜欢的样式呢？
