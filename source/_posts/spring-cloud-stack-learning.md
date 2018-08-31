@@ -19,6 +19,8 @@ tags: [Java, Spring Cloud]
 
 # Eureka
 
+> Eureka是Netflix开发的服务发现组件，本身是一个基于REST的服务。Spring Cloud将它集成在其子项目`spring-cloud-netflix`中，以实现Spring Cloud的服务发现功能。
+
 
 ## 单节点
 
@@ -30,6 +32,7 @@ tags: [Java, Spring Cloud]
     <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 </dependency>
 
+<!-- Base认证需要，前端账户密码登陆 -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
@@ -142,6 +145,14 @@ spring:
     user:
       name: ybd 
       password: ybd
+  cloud:  # 忽略以下网卡
+    inetutils:
+      ignored-interfaces:
+      - eth0
+      - eth1
+      - eth2
+      - eth3
+      - lo
 eureka:
   environment: prod # 在Eureka控制面板中显示prod环境
   client:  # 以下两项默认为true
@@ -169,8 +180,10 @@ server:
   port: 8761
 eureka:
   instance:
-    hostname: eureka-cluster1
-    metadata-map:  # Spring Boot Admin 使用
+    prefer-ip-address: true  # 优先使用ip
+    ip-address: eureka-cluster1 # ip地址，这里对应的是docker compose文件中的网络别名aliases
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+    metadata-map:  # spring boot admin 会通过eureka读取该信息从而通过认证拿到相关服务发现信息
       user.name: ybd
       user.password: ybd
   client:
@@ -187,7 +200,8 @@ server:
   port: 8762
 eureka:
   instance:
-    hostname: eureka-cluster2
+    prefer-ip-address: true  # 优先使用ip
+    ip-address: eureka-cluster2 # ip地址，这里对应的是docker compose文件中的网络alias
     metadata-map:
       user.name: ybd
       user.password: ybd
@@ -205,7 +219,8 @@ server:
   port: 8763
 eureka:
   instance:
-    hostname: eureka-cluster3
+    prefer-ip-address: true  # 优先使用ip
+    ip-address: eureka-cluster3 # ip地址，这里对应的是docker compose文件中的网络alias
     metadata-map:
       user.name: ybd
       user.password: ybd
@@ -231,14 +246,19 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://ybd:ybd@localhost:8761/actuator/health"]
-      interval: 1m30s
+      interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 15s
+    deploy:
+      placement:
+        constraints:
+        - node.hostname == node1
     networks:
       backend:
         aliases:
           - eureka-cluster1
+          
   eureka-cluster2:
     image: eureka-cluster:latest
     environment:
@@ -249,14 +269,19 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://ybd:ybd@localhost:8762/actuator/health"]
-      interval: 1m30s
+      interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 15s
+    deploy:
+      placement:
+        constraints:
+        - node.hostname == node2
     networks:
       backend:
         aliases:
           - eureka-cluster2
+          
   eureka-cluster3:
     image: eureka-cluster:latest
     environment:
@@ -267,10 +292,14 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://ybd:ybd@localhost:8763/actuator/health"]
-      interval: 1m30s
+      interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 15s
+    deploy:
+      placement:
+        constraints:
+        - node.hostname == node3
     networks:
       backend:
         aliases:
@@ -310,6 +339,30 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 我们的app通过合适的`network`交互应该是这样的：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-cloud-docker-integration/cnm-demo.png)
+
+#### 注意事项（ip与hostname混乱）
+
+之前使用Docker Compose方式启动服务没什么问题，后来换成Docker Swarm方式启动，在Eureka的面板中发现有些服务是ip，有些是hostname，但都注册成功，不过某些服务相互之间又访问不了。Google一番后的解决方案：
+
+Server端跟Client端都使用以下配置：
+
+```
+spring:
+  cloud:  
+    inetutils:
+      ignored-interfaces:
+      - eth0
+      - eth1
+      - eth2
+      - eth3
+      - lo
+      
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: eureka-cluster1 # 这里对应上面compose文件中的aliases
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+```
 
 ### 踩坑(容器中服务下线无法向注册中心注销服务)
 

@@ -432,7 +432,9 @@ autoload -Uz compinit && compinit -i
 exec $SHELL -l
 ```
 
-### Compose 模板文件
+### Compose 文件指令
+
+> 最新参看文档： ***[https://docs.docker.com/compose/compose-file/](https://docs.docker.com/compose/compose-file/)***
 
 默认的模板文件名称为 `docker-compose.yml`，格式为 YAML 格式。
 
@@ -563,9 +565,9 @@ deploy:
     condition: on-failure
 ```
 
-##### mode
+##### `mode`
 
-首先 deploy 提供了一个模式选项，它的值有 global 和 replicated 两个，默认是 replicated 模式。
+首先 deploy 提供了一个模式选项，它的值有 `global` 和 `replicated` 两个，默认是 `replicated` 模式。
 
 这两个模式的区别是：
 
@@ -576,24 +578,22 @@ deploy:
 
 但是随着这次更新把 stack 加进来了，deploy 也就水到渠成加进了 Compose 功能中。
 
-##### replicas
+##### `replicas`
 
 上面说到可以指定副本数量，其中 replicas 就是用于指定副本数量的选项。
 
 ```
 deploy:
   replicas: 6
-
 ```
 
 部署服务栈：
 
 ```
 docker stack deploy --compose-file docker-compose.yml
-
 ```
 
-##### placement
+##### `placement`
 
 这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器，下面是官方的说明：
 
@@ -619,19 +619,19 @@ services:
           - spread: node.labels.zone
 ```
 
-##### update_config
+##### `update_config`
 
 早在上一个版本中，Swarm 就提供了一个升级回滚的功能。当服务升级出现故障时，超过重试次数则停止升级的功能，这也很方便，避免让错误的应用替代现有正常服务。
 
 这个选项用于告诉 Compose 使用怎样的方式升级，以及升级失败后怎样回滚原来的服务。
 
-- parallelism: 服务中多个容器同时更新。
-- delay: 设置每组容器更新之间的延迟时间。
-- failure_action: 设置更新失败时的动作，可选值有 continue 与 pause (默认是：pause)。
-- monitor: 每次任务更新失败后监视故障的持续时间 (ns|us|ms|s|m|h) (默认：0s)。
-- max_failure_ratio: 更新期间容忍的故障率。
+- `parallelism`: 服务中多个容器同时更新。
+- `delay`: 设置每组容器更新之间的延迟时间。
+- `failure_action`: 设置更新失败时的动作，可选值有 continue 与 pause (默认是：pause)。
+- `monitor`: 每次任务更新失败后监视故障的持续时间 (ns|us|ms|s|m|h) (默认：0s)。
+- `max_failure_ratio`: 更新期间容忍的故障率。
 
-##### resources
+##### `resources`
 
 看例子：
 
@@ -643,19 +643,18 @@ resources:
   reservations:
     cpus: '0.0001'
     memory: 20M
-
 ```
 
-知道干啥用了吧，这是一个新的语法选项，替代了之前的类似 cpu_shares, cpu_quota, cpuset, mem_limit, memswap_limit 这种选项。统一起来好看点。
+知道干啥用了吧，这是一个新的语法选项，替代了之前的类似 `cpu_shares`, `cpu_quota`, `cpuset`, `mem_limit`, `memswap_limit` 这种选项。统一起来好看点。
 
-##### restart_policy
+##### `restart_policy`
 
 设置如何重启容器，毕竟有时候容器会意外退出。
 
-- condition：设置重启策略的条件，可选值有 none, on-failure 和 any (默认：any)。
-- delay：在重新启动尝试之间等待多长时间，指定为持续时间（默认值：0）。
-- max_attempts：设置最大的重启尝试次数，默认是永不放弃，哈哈，感受到一股运维的绝望。
-- window：在决定重新启动是否成功之前要等待多长时间，默认是立刻判断，有些容器启动时间比较长，指定一个“窗口期”非常重要。
+- `condition`：设置重启策略的条件，可选值有 none, on-failure 和 any (默认：any)。
+- `delay`：在重新启动尝试之间等待多长时间，指定为持续时间（默认值：0）。
+- `max_attempts`：设置最大的重启尝试次数，默认是永不放弃，哈哈，感受到一股运维的绝望。
+- `window`：在决定重新启动是否成功之前要等待多长时间，默认是立刻判断，有些容器启动时间比较长，指定一个“窗口期”非常重要。
 
 #### `devices`
 
@@ -664,7 +663,6 @@ resources:
 ```
 devices:
   - "/dev/ttyUSB1:/dev/ttyUSB0"
-
 ```
 
 #### `depends_on`
@@ -751,7 +749,6 @@ env_file:
 ```
 # common.env: Set development environment
 PROG_ENV=development
-
 ```
 
 #### `environment`
@@ -917,7 +914,6 @@ services:
 networks:
   some-network:
   other-network:
-
 ```
 
 Docker 网络类型，有 `bridge` `overlay`，默认为`bridge`。其中 `overlay` 网络类型用于 `Swarm mode`
@@ -928,7 +924,6 @@ Docker 网络类型，有 `bridge` `overlay`，默认为`bridge`。其中 `overl
 
 ```
 pid: "host"
-
 ```
 
 #### `ports`
@@ -943,7 +938,6 @@ ports:
  - "8000:8000"
  - "49100:22"
  - "127.0.0.1:8001:8001"
-
 ```
 
 *注意：当使用 HOST:CONTAINER 格式来映射端口时，如果你使用的容器端口小于 60 并且没放到引号里，可能会得到错误结果，因为 YAML 会自动解析 xx:yy 这种数字格式为 60 进制。为避免出现这种问题，建议数字串都采用引号包括起来的字符串格式。*
@@ -979,7 +973,6 @@ secrets:
 security_opt:
     - label:user:USER
     - label:role:ROLE
-
 ```
 
 #### `stop_signal`
@@ -988,7 +981,6 @@ security_opt:
 
 ```
 stop_signal: SIGUSR1
-
 ```
 
 #### `sysctls`
@@ -1003,7 +995,6 @@ sysctls:
 sysctls:
   - net.core.somaxconn=1024
   - net.ipv4.tcp_syncookies=0
-
 ```
 
 #### `ulimits`
@@ -1018,7 +1009,6 @@ sysctls:
     nofile:
       soft: 20000
       hard: 40000
-
 ```
 
 #### `volumes`
@@ -1042,21 +1032,18 @@ volumes:
 
 ```
 entrypoint: /code/entrypoint.sh
-
 ```
 
 指定容器中运行应用的用户名。
 
 ```
 user: nginx
-
 ```
 
 指定容器中工作目录。
 
 ```
 working_dir: /code
-
 ```
 
 指定容器中搜索域名、主机名、mac 地址等。
@@ -1065,42 +1052,36 @@ working_dir: /code
 domainname: your_website.com
 hostname: test
 mac_address: 08-00-27-00-0C-0A
-
 ```
 
 允许容器中运行一些特权命令。
 
 ```
 privileged: true
-
 ```
 
 指定容器退出后的重启策略为始终重启。该命令对保持服务始终运行十分有效，在生产环境中推荐配置为 `always` 或者 `unless-stopped`。
 
 ```
 restart: always
-
 ```
 
 以只读模式挂载容器的 root 文件系统，意味着不能对容器内容进行修改。
 
 ```
 read_only: true
-
 ```
 
 打开标准输入，可以接受外部输入。
 
 ```
 stdin_open: true
-
 ```
 
 模拟一个伪终端。
 
 ```
 tty: true
-
 ```
 
 #### 读取变量
@@ -1127,7 +1108,6 @@ db:
 ```
 # 支持 # 号注释
 MONGO_VERSION=3.6
-
 ```
 
 执行 `docker-compose up` 则会启动一个 `mongo:3.6` 镜像的容器。
@@ -1224,11 +1204,6 @@ networks:
 
 volumes:
   db-data:
-
-作者：左蓝
-链接：https://www.jianshu.com/p/748416621013
-來源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
 
