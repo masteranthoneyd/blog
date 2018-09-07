@@ -335,7 +335,16 @@ sudo apt install fonts-wqy-microhei
 
 下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
 
+## Wine-QQ与Wine-TIM的Appimage版本
+
+Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme765cs/Wine-QQ-TIM)***
+
+下载玩对应的Appimage后，右键属性，在权限中允许执行，然后可以直接打开了
+
 ## QQ轻聊版
+
+> 这种方式比较麻烦，可以直接才上面的Appimage
+
 虽然不太想安装QQ，但工作时候团队交流需要，QQ国际版又太难看，所以装个Deepin的轻聊版。
 工具包下载：***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools>qq4Ubuntu`)
 

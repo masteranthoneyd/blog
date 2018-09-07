@@ -7,6 +7,8 @@ tags: [VPS,ShadowSocks]
 ![](http://ojoba1c98.bkt.clouddn.com/img/vps/whats-shadowsocks-04.png)
 # Preface
 > 最近在玩***[VPS](http://baike.baidu.com/link?url=ehKAXxj45AdvSmxPRwiao9anB3Tej-jwgKXWMkTuA43M2479GPT-FkH6zMhI59Eip_iY5abNL2jODlGC4WiLW_)***，作为没有Google就活不下去的开发人员，翻山越岭已是日常= =...使用别人的VPN或者Sock5代理显然是不安全的，个人信息随时被截获，那么拥有一台自己VPS也是必需的，价格也可以很便宜（绝对不是在打广告）
+>
+> 如果是要使用Linode作为VPS的并且还没注册的朋友，可以填上我的邀请码: `79e24952d46644605b071a55c4fda3b23e1d1a5a` 
 
 <!--more-->
 # ShadowSocks介绍
@@ -63,11 +65,15 @@ Vultr的服务器托管在全球14个数据中心，即时开通使用。大陆�
 ***[Linode](https://www.linode.com)*** 是VPS 服务商中的大哥，高富帅般的存在。价格相对较高，但是性能，稳定性等各方面也非常给力。 VPS 采用 Xen 架构，不过最近的周年庆开始升级到 KVM 架构，VPS 性能进一步提升。推荐给对连接速度和网络延迟有极致追求的用户。
 Linode只能使用**信用卡支付**，官方会随机手工抽查，被抽查到的话需要上传信用卡正反面照片以及可能还需要身份证正反面照片，只要材料真实齐全，审核速度很快，一般一个小时之内就可以全部搞定。账户成功激活以后，就可以安心使用了。
 
+博主的邀请码: `79e24952d46644605b071a55c4fda3b23e1d1a5a`
+
 # 准备工作
 
 ## 准备一台VPS
 
 博主选择***[Linode](https://www.linode.com)***
+
+博主的邀请码: `79e24952d46644605b071a55c4fda3b23e1d1a5a`
 
 ## SSH无密码登录VPS
 
