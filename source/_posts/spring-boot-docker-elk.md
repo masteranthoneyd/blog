@@ -105,7 +105,7 @@ ENV https_proxy=
 docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/docker-oraclejdk8 .
 ```
 
-其中`HTTP_PROXY`是sock5代理转过来的http代理，通过`--build-arg`参数传入，注意**不能**是`127.0.0.1`或`localhost`。
+其中`HTTP_PROXY`是http代理，通过`--build-arg`参数传入，注意**不能**是`127.0.0.1`或`localhost`。
 
 ## 开始集成
 
@@ -464,7 +464,7 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/elk-arch1.png)
 
-传统的应用可以将日志存到日志中，但集成Docker之后，日志怎么处理？放到容器的某个目录然后挂在出来？这样也可以，但这样就相当于给容器与外界绑定了一个状态，弹性伸缩怎么办？个人还是觉得通过队列与ELK管理Docker日志比较合理，而且Log4j2原生支持Kafka的Appender。
+传统的应用可以将日志存到日志中，但集成Docker之后，日志怎么处理？放到容器的某个目录然后挂在出来？这样也可以，但这样就相当于给容器与外界绑定了一个状态，弹性伸缩怎么办？个人还是觉得通过队列与ELK管理Docker日志比较合理，而且Log4j2**原生支持Kafka的Appender**。
 
 ## 镜像准备
 
@@ -480,124 +480,41 @@ docker pull docker.elastic.co/logstash/logstash:6.2.3
 
 注意ELK版本最好保持一致
 
-## 程序Log4j2配置
-
-**SpringBoot版本：2.0**
-
-`log4j2.xml`:
-
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration status="OFF" monitorInterval="30">
-    <properties>
-        <Property name="fileName">logs</Property>
-        <Property name="fileGz">logs/7z</Property>
-        <Property name="PID">????</Property>
-        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} | %5p | ${sys:PID} | %15.15t | %-50.50c{1.} | %5L | %M | %msg%n%xwEx
-        </Property>
-    </properties>
-
-    <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-        </Console>
-
-        <Kafka name="kafka" topic="log-collect">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-            <Property name="bootstrap.servers">192.168.6.113:9092</Property>
-            <Property name="request.timeout.ms">5000</Property>
-            <Property name="transaction.timeout.ms">5000</Property>
-            <Property name="max.block.ms">3000</Property>
-        </Kafka>
-        
-        <Async name="async" includeLocation="true">
-            <AppenderRef ref="kafka"/>
-        </Async>
-    </Appenders>
-
-    <Loggers>
-        <AsyncRoot level="info" includeLocation="true">
-            <AppenderRef ref="console"/>
-            <AppenderRef ref="async"/>
-        </AsyncRoot>
-    </Loggers>
-</configuration>
-```
-
-* `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
-* `topic`要与下面Logstash的一致
-* KafkaAppender默认是同步阻塞模式，使用`Async`包装成异步
-* `max.block.ms`默认为60s，在kafka异常时可能导致日志很久才出来
-* 更多配置请看 ***[官方说明](https://logging.apache.org/log4j/2.x/manual/appenders.html#KafkaAppender)***
-
-打印日志：
-
-```
-@Slf4j
-@Component
-public class LogIntervalSender {
-	private AtomicInteger atomicInteger = new AtomicInteger(0);
-
-	@Scheduled(fixedDelay = 2000)
-	public void doScheduled() {
-		try {
-			int i = atomicInteger.incrementAndGet();
-			randomThrowException(i);
-			log.info("{} send a message: the sequence is {} , random uuid is {}", currentThread().getName(), i, randomUUID());
-		} catch (Exception e) {
-			log.error("catch an exception:", e);
-		}
-	}
-
-	private void randomThrowException(int i) {
-		if (i % 10 == 0) {
-			throw new RuntimeException("this is a random exception, sequence = " + i);
-		}
-	}
-}
-```
-
-## Kafka Compose
+## 启动Kafka与Zookeeper
 
 这里直接使用docker-compose（需要先创建外部网络）:
 
 ```
-version: '3.4'
+version: '3'
 services:
   zoo:
     image: zookeeper:latest
     ports:
-      - "2181:2181"
+    - "2181:2181"
     restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 60s
-        max_attempts: 5
-      placement:
-        constraints:
-          - node.hostname == ybd-PC
-    networks: 
-      - backend
+    networks:
+      backend:
+        aliases:
+        - zoo
 
   kafka:
-    image: wurstmeister/kafka:1.0.0
+    image: wurstmeister/kafka:1.1.0
     ports:
-      - "9092:9092"
+    - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.6.113
-      KAFKA_ZOOKEEPER_CONNECT: zoo:2181
+    - KAFKA_PORT=9092
+    - KAFKA_ADVERTISED_HOST_NAME=192.168.6.113
+    - KAFKA_ZOOKEEPER_CONNECT=zoo:2181
+    - KAFKA_ADVERTISED_PORT=9092
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - zoo
+    - zoo
     restart: always
-    networks: 
-      - backend
+    networks:
+      backend:
+        aliases:
+        - kafka
 
 networks:
   backend:
@@ -605,7 +522,7 @@ networks:
       name: backend
 ```
 
-* `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Spring Boot应用使用Docker network可忽略这个
+* `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Docker环境下换成`kafka`（与别名`aliases的值保持一致`），其他Docker应用可通过`kafka:9092`这个域名访问到Kafka。
 
 ## ELK Compose
 
@@ -689,7 +606,84 @@ networks:
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana.png)
 
-通过这种方式管理容器应用的日志很舒服。
+## 程序Log4j2配置
+
+**SpringBoot版本：2.0**
+
+`log4j2.xml`:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF" monitorInterval="30">
+    <properties>
+        <Property name="fileName">logs</Property>
+        <Property name="fileGz">logs/7z</Property>
+        <Property name="PID">????</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} | %5p | ${sys:PID} | %15.15t | %-50.50c{1.} | %5L | %M | %msg%n%xwEx
+        </Property>
+    </properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+        </Console>
+
+        <Kafka name="kafka" topic="log-collect">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+            <Property name="bootstrap.servers">192.168.6.113:9092</Property>
+            <Property name="request.timeout.ms">5000</Property>
+            <Property name="transaction.timeout.ms">5000</Property>
+            <Property name="max.block.ms">3000</Property>
+        </Kafka>
+        
+        <Async name="async" includeLocation="true">
+            <AppenderRef ref="kafka"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <AsyncRoot level="info" includeLocation="true">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="async"/>
+        </AsyncRoot>
+    </Loggers>
+</configuration>
+```
+
+* `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
+* `topic`要与下面Logstash的一致
+* KafkaAppender默认是同步阻塞模式，使用`Async`包装成异步
+* `max.block.ms`默认为60s，在kafka异常时可能导致日志很久才出来
+* 更多配置请看 ***[官方说明](https://logging.apache.org/log4j/2.x/manual/appenders.html#KafkaAppender)***
+
+打印日志：
+
+```
+@Slf4j
+@Component
+public class LogIntervalSender {
+	private AtomicInteger atomicInteger = new AtomicInteger(0);
+
+	@Scheduled(fixedDelay = 2000)
+	public void doScheduled() {
+		try {
+			int i = atomicInteger.incrementAndGet();
+			randomThrowException(i);
+			log.info("{} send a message: the sequence is {} , random uuid is {}", currentThread().getName(), i, randomUUID());
+		} catch (Exception e) {
+			log.error("catch an exception:", e);
+		}
+	}
+
+	private void randomThrowException(int i) {
+		if (i % 10 == 0) {
+			throw new RuntimeException("this is a random exception, sequence = " + i);
+		}
+	}
+}
+```
 
 # log-pilot
 

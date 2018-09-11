@@ -240,7 +240,7 @@ list = list.stream()
 
 # Plugin
 
-## 简洁代码风格Lombok
+## Lombok
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件，
 打开IDEA的Settings面板，并选择Plugins选项，然后点击 “Browse repositories..” 
 ![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok01.png)
@@ -378,40 +378,25 @@ Zookeeper UI，支持删除操作
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/find-bug.png)
 装完之后右键最下面会多出一个`FindBugs`的选项
 
+## Maven Helper
 
-## 热部署插件JRebel安装与激活
-> 每次修改java文件都需要重启tomcat，很痛苦有木有？ 推荐给大家一个很好用的热部署插件，JRebel，目前是最好的，在使用过程中应该90%的编辑操作都是可以reload的，爽歪歪，节约我们大量的开发时间，提高开发效率。
+这个主要可以分析maven依赖冲突。
 
-### 安装
-两种方式安装：
-#### 方式一
-下载安装，前往***[JRebe官网下载地址](https://zeroturnaround.com/software/jrebel/download/nightly-build/#!/intellij)***，选择对应IDE的版本下载，然后安装（下面照搬官网说的...）：
-1、Open File > Settings (Preferences on macOS). Select Plugins.
-2、Press Install plugin from disk…
-3、Browse to the downloaded archive and press OK. Complete the installation.
+安装之后，打开`pom.xml`文件，会看到多了一个Dependency Analyzer的面板，点击可以进入分析面板：
 
-#### 方式二
-直接安装：
-1、Open File > Settings. Select Plugins.
-2、Press Browse Repositories.
-3、Find JRebel. Press Install plugin.
-4、Next → ***[Activation](https://zeroturnaround.com/software/jrebel/quickstart/intellij/#!/activation)***
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper01.png)
 
-### 激活
-先戳进***[官网](https://my.jrebel.com/)***，使用Facebook或Twitter注册登录，之后就可以免费申请激活码了：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/myrebel-activation-code.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper02.png)
 
-打开 `Help` > `JRebel` > `Activation`，将申请的激活码复制进去，稍等片刻完成激活。
+另外，右键项目也会多两个Maven的bar：
 
-### 工程配置
-打开  `view` > `tool window` > `Jrebel`，在弹出框中勾选你要热部署的项目：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/jrebel-project-setting.png)
-在tomcat配置中勾选图示选项：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/jrebel-tomcat-setting.png)
-**deployment 要选择后缀为explored的工程**。
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper03.png)
 
-### 启动
-点击 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/jrebel-startup.png) JRebel图标，启动项目
+## Statistic
+
+这个插件可以统计代码数量：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper04.png)
 
 ## Stackoverflow
 
@@ -433,17 +418,17 @@ Zookeeper UI，支持删除操作
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/background-image-plus.png)
 
-## activate-power-mode 或 Power mode ||
-
-这个抖动的窗口老年人实在受不了...
-
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
-
 ## Enso
 
 它可以将测试名转化成一个句子，一目了然地显示测试的内容。这意味着当你在注视任何类的时候， Enso 都会展示其说明文档。
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/plugin-enso.png)
+
+## activate-power-mode 或 Power mode ||
+
+这个抖动的窗口老年人实在受不了...
+
+![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
 
 # VM Options
 

@@ -11,6 +11,94 @@ tags: [Ubuntu]
 
 <!--more-->
 
+# 启动盘制作篇
+
+## Windows中利用UltraISO制作
+
+在Windows环境下一般是通过 ***[UltraISO](https://www.ultraiso.com/)*** 制作U盘启动盘（最好是**FAT32**格式），步骤通常如下（安装UltraISO前提下）：
+
+* 选择并打开系统镜像（iso）
+* 选择 `启动` -> `写入硬盘映像` ，会弹出一个写入硬盘映像的对话框
+* 选择对应U盘
+* 点击 `便捷启动` -> `写入新的驱动器引导扇区` -> `Syslinux`
+* 最后再点击 `写入` 等待完成即可
+
+图就不贴了，搜索引擎上一大堆。
+
+接下来要介绍的是在Linux环境中制作启动盘
+
+## Linux中利用DD命令制作
+
+### Step 1
+
+U盘插入电脑后，用`lsblk`命令查看一下
+
+```
+$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0 111.8G  0 disk 
+├─sda1   8:1    0   512M  0 part /boot/efi
+├─sda2   8:2    0    14G  0 part /usr
+├─sda3   8:3    0    14G  0 part /opt
+├─sda4   8:4    0   4.7G  0 part /boot
+└─sda5   8:5    0  78.7G  0 part /home
+sdb      8:16   0 931.5G  0 disk 
+├─sdb1   8:17   0 745.1G  0 part /
+└─sdb2   8:18   0   8.4G  0 part [SWAP]
+sdc      8:32   1  14.5G  0 disk 
+└─sdc4   8:36   1  14.5G  0 part /media/ybd/SSS_X64FRE_
+```
+
+很明显，`/media/ybd/SSS_X64FRE_`这个挂载的就是U盘，U盘对应的路径是`/dev/sdc`如果不确定，可以进去看一下文件目录。
+
+> 找到对应的挂载目录很重要，少有不慎，可能会导致整个系统瘫痪 23333...........
+
+### Step 2
+
+需要卸载掉挂载的目录：
+
+```
+umount /media/ybd/SSS_X64FRE_
+```
+
+再用`lsblk`确认一下
+
+```
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0 111.8G  0 disk 
+├─sda1   8:1    0   512M  0 part /boot/efi
+├─sda2   8:2    0    14G  0 part /usr
+├─sda3   8:3    0    14G  0 part /opt
+├─sda4   8:4    0   4.7G  0 part /boot
+└─sda5   8:5    0  78.7G  0 part /home
+sdb      8:16   0 931.5G  0 disk 
+├─sdb1   8:17   0 745.1G  0 part /
+└─sdb2   8:18   0   8.4G  0 part [SWAP]
+sdc      8:32   1  14.5G  0 disk 
+└─sdc4   8:36   1  14.5G  0 part 
+```
+
+可以看到已经没有挂载了
+
+### Step 3
+
+用`dd`命令将iso映像写入U盘（一般Linux的镜像是直接将整个安装系统包括引导直接压缩进iso当中）
+
+```
+sudo dd if=ubuntu-16.04-desktop-amd64.iso of=/dev/sdc bs=1M
+```
+
+过程中不会有任何输入，并且时间可能稍久，完成后会输出这样的信息：
+
+```
+/dev/sdc bs=1M
+1520+0 records in
+1520+0 records out
+1593835520 bytes (1.6 GB) copied, 493.732 s, 3.2 MB/s
+```
+
+到此制作完成。
+
 # 系统篇
 
 ## 换源
