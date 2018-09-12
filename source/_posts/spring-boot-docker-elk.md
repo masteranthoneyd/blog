@@ -1,5 +1,5 @@
 ---
-title: Spring Boot应用集成Docker并结合Kafka、ELK管理Docker日志
+title: Spring Boot应用集成Docker并结合Log4j2、Kafka、ELK管理Docker日志
 date: 2018-04-02 13:00:19
 categories: [Programming, Java, Spring Boot]
 tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
@@ -12,6 +12,326 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 > 微服务架构下，微服务在带来良好的设计和架构理念的同时，也带来了运维上的额外复杂性，尤其是在服务部署和服务监控上。单体应用是集中式的，就一个单体跑在一起，部署和管理的时候非常简单，而微服务是一个网状分布的，有很多服务需要维护和管理，对它进行部署和维护的时候则比较复杂。集成Docker之后，我们可以很方便地部署以及编排服务，ELK的集中式日志管理可以让我们很方便地聚合Docker日志。
 
 <!--more-->
+
+# Log4j2 Related
+
+## 使用Log4j2
+
+下面是 Log4j2  官方性能测试结果：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/log4j2-performance.png)
+
+### Maven配置
+
+```
+<!-- Spring Boot 依赖-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <!-- 去除 logback 依赖 -->
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<!-- 日志 Log4j2 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-log4j2</artifactId>
+</dependency>
+
+<!-- Log4j2 异步支持 -->
+<dependency>
+    <groupId>com.lmax</groupId>
+    <artifactId>disruptor</artifactId>
+    <version>3.3.8</version>
+</dependency>
+```
+
+**注意**：
+
+* 需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
+* `Disruptor`需要**3.3.8**以及以上版本
+
+### 开启全局异步以及Disruptor参数设置
+
+> 官方说明： ***[https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync](https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync)***
+
+添加`Disruptor`依赖后只需要添加启动参数：
+
+```
+-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+```
+
+也可以在程序启动时添加系统参数。
+
+> 若想知道Disruptor是否生效，可以在`AsyncLogger#logMessage`中断点
+
+加大队列参数：
+
+```
+-DAsyncLogger.RingBufferSize=262144
+-DAsyncLoggerConfig.RingBufferSize=262144 
+```
+
+设置队列满了时的处理策略：丢弃，否则默认blocking，异步就与同步无异了：
+
+```
+-Dlog4j2.AsyncQueueFullPolicy=Discard
+```
+
+### application.yml简单配置
+
+```
+logging:
+  config: classpath:log4j2.xml # 指定log4j2配置文件的路径，默认就是这个
+  pattern:
+    console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
+```
+
+### log4j2.xml完整配置
+
+上面是简单的打印，生产环境需要采用以下xml的配置：
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF" monitorInterval="30">
+    <properties>
+        <Property name="UNKNOWN" value="????"/>
+        <Property name="KAFKA_SERVERS" value="${spring:youngboss.kafka.bootstrap}"/>
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | ${spring:spring.application.name} | %5p | %X{IP} | %X{UA} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
+    </properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+        </Console>
+
+        <Kafka name="kafka" topic="log-collect" ignoreExceptions="false">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+            <Property name="bootstrap.servers">${KAFKA_SERVERS}</Property>
+            <Property name="request.timeout.ms">5000</Property>
+            <Property name="transaction.timeout.ms">5000</Property>
+            <Property name="max.block.ms">3000</Property>
+        </Kafka>
+
+        <RollingFile name="failoverKafkaLog" fileName="./failoverKafka/failover.log"
+                     filePattern="./failoverKafka/failover.%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+
+        <Failover name="failover" primary="kafka" retryIntervalSeconds="300">
+            <Failovers>
+                <AppenderRef ref="failoverKafkaLog"/>
+            </Failovers>
+        </Failover>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO" includeLocation="true">
+            <AppenderRef ref="failover"/>
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+
+</configuration>
+```
+
+- 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
+- Kafka地址通过`${spring:youngboss.kafka.bootstrap}`读取配置文件获取，这个需要自己拓展Log4j，具体请看下面的获取Application配置
+- `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`，通过`MDC.put(key, value)`放进去，同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
+- `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时，日志触发Failover，写到文件中，不阻塞程序，进而保证了吞吐。`retryIntervalSeconds`的默认值是1分钟，是通过异常来切换的，所以可以适量加大间隔。
+- `KafkaAppender` `ignoreExceptions` 必须设置为`false`，否则无法触发Failover
+- `KafkaAppender` `max.block.ms`默认是1分钟，当Kafka宕机时，尝试写Kafka需要1分钟才能返回Exception，之后才会触发Failover，当请求量大时，log4j2 队列很快就会打满，之后写日志就Blocking，严重影响到主服务响应
+
+### 也可以使用log4j2.yml
+
+需要引入依赖以识别：
+
+```
+<!-- 加上这个才能辨认到log4j2.yml文件 -->
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+</dependency>
+```
+
+`log4j2.yml`:
+
+```
+Configuration:
+  status: "OFF"
+  monitorInterval: 10
+
+  Properties:
+    Property:
+      - name: log.level.console
+        value: debug
+      - name: PID
+        value: ????
+      - name: LOG_PATTERN
+        value: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{${sys:PID}}{magenta} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx"
+
+  Appenders:
+    Console:  #输出到控制台
+      name: CONSOLE
+      target: SYSTEM_OUT
+      ThresholdFilter:
+        level: ${sys:log.level.console} # “sys:”表示：如果VM参数中没指定这个变量值，则使用本文件中定义的缺省全局变量值
+        onMatch: ACCEPT
+        onMismatch: DENY
+      PatternLayout:
+        pattern: ${LOG_PATTERN}
+        charset: UTF-8
+  Loggers:
+    Root:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE
+    AsyncRoot:
+      level: info
+      includeLocation: true
+      AppenderRef:
+        - ref: CONSOLE
+```
+
+更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
+
+## 日志配置文件中获取Application配置
+
+### Logback
+
+方法1: 使用`logback-spring.xml`，因为`logback.xml`加载早于`application.properties`，所以如果你在`logback.xml`使用了变量时，而恰好这个变量是写在`application.properties`时，那么就会获取不到，只要改成`logback-spring.xml`就可以解决。
+
+方法2: 使用`<springProperty>`标签，例如：
+
+```
+<springProperty scope="context" name="LOG_HOME" source="logback.file"/>
+```
+
+### Log4j2
+
+只能写一个Lookup：
+
+```
+/**
+ * @author ybd
+ * @date 18-5-11
+ * @contact yangbingdong1994@gmail.com
+ */
+@Plugin(name = LOOK_UP_PREFIX, category = StrLookup.CATEGORY)
+public class SpringEnvironmentLookup extends AbstractLookup {
+	public static final String LOOK_UP_PREFIX = "spring";
+	private static LinkedHashMap profileYmlData;
+	private static LinkedHashMap metaYmlData;
+	private static boolean profileExist;
+	private static Map<String, String> map = new HashMap<>(16);
+	private static final String PROFILE_PREFIX = "application";
+	private static final String PROFILE_SUFFIX = ".yml";
+	private static final String META_PROFILE = PROFILE_PREFIX + PROFILE_SUFFIX;
+	private static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
+
+	static {
+		try {
+			metaYmlData = new Yaml().loadAs(new ClassPathResource(META_PROFILE).getInputStream(), LinkedHashMap.class);
+			Properties properties = System.getProperties();
+			String active = properties.getProperty(SPRING_PROFILES_ACTIVE);
+			if (isBlank(active)) {
+				active = getValueFromData(SPRING_PROFILES_ACTIVE, metaYmlData);
+			}
+			if (isNotBlank(active)) {
+				String configName = PROFILE_PREFIX + "-" + active + PROFILE_SUFFIX;
+				ClassPathResource classPathResource = new ClassPathResource(configName);
+				profileExist = classPathResource.exists();
+				if (profileExist) {
+					profileYmlData = new Yaml().loadAs(classPathResource.getInputStream(), LinkedHashMap.class);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("SpringEnvironmentLookup initialize fail");
+		}
+	}
+
+	@Override
+	public String lookup(LogEvent event, String key) {
+		return map.computeIfAbsent(key, SpringEnvironmentLookup::resolveYmlMapByKey);
+	}
+
+	private static String resolveYmlMapByKey(String key) {
+		Assert.isTrue(isNotBlank(key), "key can not be blank!");
+		String[] keyChain = key.split("\\.");
+		String value = null;
+		if (profileExist) {
+			value = getValueFromData(key, profileYmlData);
+		}
+		if (isBlank(value)) {
+			value = getValueFromData(key, metaYmlData);
+		}
+		return value;
+	}
+
+	private static String getValueFromData(String key, LinkedHashMap dataMap) {
+		String[] keyChain = key.split("\\.");
+		int length = keyChain.length;
+		if (length == 1) {
+			return getFinalValue(key, dataMap);
+		}
+		String k;
+		LinkedHashMap[] mapChain = new LinkedHashMap[length];
+		mapChain[0] = dataMap;
+		for (int i = 0; i < length; i++) {
+			if (i == length - 1) {
+				return getFinalValue(keyChain[i], mapChain[i]);
+			}
+			k = keyChain[i];
+			Object o = mapChain[i].get(k);
+			if (Objects.isNull(o)) {
+				return "";
+			}
+			if (o instanceof LinkedHashMap) {
+				mapChain[i + 1] = (LinkedHashMap) o;
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+		return "";
+	}
+
+	private static String getFinalValue(String k, LinkedHashMap ymlData) {
+		return defaultIfNull((String) ymlData.get(k), "");
+	}
+}
+```
+
+然后在`log4j2.xml`中这样使用 `${spring:spring.application.name}`
+
+## 自定义字段
+
+可以利用`MDC`实现当前线程自定义字段
+
+```
+MDC.put("IP", IpUtil.getIpAddr(request));
+```
+
+`log4j2.xml`中这样获取`%X{IP}`
 
 # Spring Boot Docker Integration
 
@@ -712,3 +1032,15 @@ docker run --rm --label aliyun.logs.demo=stdout -p 8080:8080 192.168.0.202:8080/
 * 日志稍微延迟
 * 日志顺序混乱
 * 异常堆栈不集中
+
+# Finally
+
+> 参考:
+>
+> ***[https://www.yinchengli.com/2016/09/16/logstash/](https://www.yinchengli.com/2016/09/16/logstash/)***
+>
+> ***[https://www.jianshu.com/p/ba1aa0c52942](https://www.jianshu.com/p/ba1aa0c52942)***
+>
+> ***[https://www.jianshu.com/p/eb10c414a93f](https://www.jianshu.com/p/eb10c414a93f)***
+>
+> ***[https://my.oschina.net/kkrgwbj/blog/734530](https://my.oschina.net/kkrgwbj/blog/734530)***
