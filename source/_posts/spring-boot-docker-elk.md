@@ -106,7 +106,7 @@ logging:
 <configuration status="OFF" monitorInterval="30">
     <properties>
         <Property name="UNKNOWN" value="????"/>
-        <Property name="KAFKA_SERVERS" value="${spring:youngboss.kafka.bootstrap}"/>
+        <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
         <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | ${spring:spring.application.name} | %5p | %X{IP} | %X{UA} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
     </properties>
 
@@ -152,13 +152,15 @@ logging:
 
 </configuration>
 ```
-
+- `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
+- `topic`要与Logstash中配置的一致
 - 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
-- Kafka地址通过`${spring:youngboss.kafka.bootstrap}`读取配置文件获取，这个需要自己拓展Log4j，具体请看下面的获取Application配置
+- Kafka地址通过`${spring:ybd.kafka.bootstrap}`读取配置文件获取，这个需要自己拓展Log4j，具体请看下面的获取Application配置
 - `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`，通过`MDC.put(key, value)`放进去，同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
 - `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时，日志触发Failover，写到文件中，不阻塞程序，进而保证了吞吐。`retryIntervalSeconds`的默认值是1分钟，是通过异常来切换的，所以可以适量加大间隔。
 - `KafkaAppender` `ignoreExceptions` 必须设置为`false`，否则无法触发Failover
 - `KafkaAppender` `max.block.ms`默认是1分钟，当Kafka宕机时，尝试写Kafka需要1分钟才能返回Exception，之后才会触发Failover，当请求量大时，log4j2 队列很快就会打满，之后写日志就Blocking，严重影响到主服务响应
+- 日志的格式采用`" | "`作为分割符方便后面Logstash进行切分字段
 
 ### 也可以使用log4j2.yml
 
@@ -792,10 +794,10 @@ Docker Hub中的ELK镜像并不是最新版本的，我们需要到官方的网�
 
 ```
 docker pull zookeeper
-docker pull wurstmeister/kafka:1.0.0
-docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.3
-docker pull docker.elastic.co/kibana/kibana:6.2.3
-docker pull docker.elastic.co/logstash/logstash:6.2.3
+docker pull wurstmeister/kafka:1.1.0
+docker pull docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+docker pull docker.elastic.co/kibana/kibana:6.3.0
+docker pull docker.elastic.co/logstash/logstash:6.3.0
 ```
 
 注意ELK版本最好保持一致
@@ -805,7 +807,7 @@ docker pull docker.elastic.co/logstash/logstash:6.2.3
 这里直接使用docker-compose（需要先创建外部网络）:
 
 ```
-version: '3'
+version: '3.4'
 services:
   zoo:
     image: zookeeper:latest
@@ -844,7 +846,9 @@ networks:
 
 * `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Docker环境下换成`kafka`（与别名`aliases的值保持一致`），其他Docker应用可通过`kafka:9092`这个域名访问到Kafka。
 
-## ELK Compose
+## ELK
+
+### Logstash 配置
 
 `logstash.conf`配置文件(**注意下面的topics要与上面log4j2.xml中的一样**):
 
@@ -853,156 +857,172 @@ input {
     kafka {
         bootstrap_servers => ["kafka:9092"]
         auto_offset_reset => "latest"
-#        consumer_threads => 5
+        consumer_threads => 3 # 3个消费线程，默认是1个
         topics => ["log-collect"]
-    } 
+    }
 }
 filter {
-  #Only matched data are send to output.
+  mutate{  # 切分日志信息并添加相应字段
+    split => [ "message"," | " ]
+
+    add_field => {
+      "timestamp" => "%{[message][0]}"
+    }
+
+    add_field => {
+      "level" => "%{[message][2]}"
+    }
+
+    add_field => {
+      "server_name" => "%{[message][1]}"
+    }
+
+    add_field => {
+      "ip" => "%{[message][3]}"
+
+    }
+
+    add_field => {
+      "device" => "%{[message][4]}"
+    }
+
+    add_field => {
+      "thread_class_method" => "%{[message][5]}"
+    }
+
+    add_field => {
+      "content" => "%{[message][6]}"
+    }
+
+    remove_field => [ "message" ]
+  }
+
+  date {  # 将上面得到的日期信息，也就是日志打印的时间作为时间戳
+    match => [ "timestamp", "yyyy-MM-dd HH:mm:ss.SSS" ]
+    locale => "en"
+    target => [ "@timestamp" ]
+    timezone => "Asia/Shanghai" # 这里如果不设置时区，在Kibana中展示的时候会多了8个小时
+  }
+
+  geoip { # 分析ip
+    source => "ip"
+  }
+
+  useragent { # 分析User-Agent
+    source => "device"
+    target => "userDevice"
+    remove_field => [ "device" ]
+  }
+
 }
 output {
-    stdout {
-      codec => rubydebug { }
-    }
-    elasticsearch {
-        action => "index"                #The operation on ES
-        codec  => rubydebug
-        hosts  => ["elasticsearch:9200"]      #ElasticSearch host, can be array.
-        index  => "logstash-%{+YYYY.MM.dd}"      #The index to write data to.
+    stdout{ codec => rubydebug } # 输出到控制台
+    elasticsearch { # 输出到 Elasticsearch
+        action => "index"
+        hosts  => ["elk-elasticsearch:9200"]
+        index  => "logstash-%{server_name}-%{+yyyy.MM.dd}"
+        document_type => "%{server_name}"
     }
 }
+
+
 ```
+
+`logstash.conf`:
+
+```
+http.host: "0.0.0.0"
+xpack.monitoring.elasticsearch.url: http://elk-elasticsearch:9200 # Docker版的Logstash此配置的默认地址是http://elasticsearch:9200
+```
+
+### 启动ELK
 
 `docker-compose.yml`:
 
 ```
 version: '3.4'
 services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.3
-    ports:
-      - "9200:9200"
+  elk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+#    ports:
+#      - "9200:9200"
     restart: always
     environment:
       - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - network.host=0.0.0.0
+      - discovery.zen.minimum_master_nodes=1
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    deploy:
+      placement:
+        constraints:
+        - node.role == manager
     networks:
-      - backend
+      backend:
+        aliases:
+          - elk-elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.2.3
+    image: docker.elastic.co/kibana/kibana:6.3.0
     ports:
       - "5601:5601"
     restart: always
+    deploy:
+      placement:
+        constraints:
+        - node.role == manager
     networks:
-      - backend
+      backend:
+        aliases:
+          - kibana
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elk-elasticsearch:9200
     depends_on:
-      - elasticsearch
+      - elk-elasticsearch
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.2.3
-    ports:
-      - "4560:4560"
+    image: docker.elastic.co/logstash/logstash:6.3.0
+#    ports:
+#      - "4560:4560"
     restart: always
+    environment:
+      - LS_JAVA_OPTS=-Xmx512m -Xms512m
     volumes:
-      - /docker/elk/logstash/config/logstash.conf:/etc/logstash.conf
+      - ./config/logstash.conf:/etc/logstash.conf
+      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml
+    deploy:
+      placement:
+        constraints:
+        - node.role == manager
     networks:
-      - backend
+      backend:
+        aliases:
+          - logstash
     depends_on:
-      - elasticsearch
+      - elk-elasticsearch
     entrypoint:
       - logstash
       - -f
       - /etc/logstash.conf
 
 # docker network create -d=overlay --attachable backend
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
 networks:
   backend:
     external:
       name: backend
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana.png)
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana02.png)
 
-## 程序Log4j2配置
+# Docker Swarm环境下获取ClientIp
 
-**SpringBoot版本：2.0**
+在Docker Swarm环境中，服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip，搜索了一大圈，最终的解决方安是通过Nginx转发中添加参数，后端再获取。
 
-`log4j2.xml`:
-
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration status="OFF" monitorInterval="30">
-    <properties>
-        <Property name="fileName">logs</Property>
-        <Property name="fileGz">logs/7z</Property>
-        <Property name="PID">????</Property>
-        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} | %5p | ${sys:PID} | %15.15t | %-50.50c{1.} | %5L | %M | %msg%n%xwEx
-        </Property>
-    </properties>
-
-    <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-        </Console>
-
-        <Kafka name="kafka" topic="log-collect">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-            <Property name="bootstrap.servers">192.168.6.113:9092</Property>
-            <Property name="request.timeout.ms">5000</Property>
-            <Property name="transaction.timeout.ms">5000</Property>
-            <Property name="max.block.ms">3000</Property>
-        </Kafka>
-        
-        <Async name="async" includeLocation="true">
-            <AppenderRef ref="kafka"/>
-        </Async>
-    </Appenders>
-
-    <Loggers>
-        <AsyncRoot level="info" includeLocation="true">
-            <AppenderRef ref="console"/>
-            <AppenderRef ref="async"/>
-        </AsyncRoot>
-    </Loggers>
-</configuration>
-```
-
-* `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
-* `topic`要与下面Logstash的一致
-* KafkaAppender默认是同步阻塞模式，使用`Async`包装成异步
-* `max.block.ms`默认为60s，在kafka异常时可能导致日志很久才出来
-* 更多配置请看 ***[官方说明](https://logging.apache.org/log4j/2.x/manual/appenders.html#KafkaAppender)***
-
-打印日志：
+在`location`中添加
 
 ```
-@Slf4j
-@Component
-public class LogIntervalSender {
-	private AtomicInteger atomicInteger = new AtomicInteger(0);
-
-	@Scheduled(fixedDelay = 2000)
-	public void doScheduled() {
-		try {
-			int i = atomicInteger.incrementAndGet();
-			randomThrowException(i);
-			log.info("{} send a message: the sequence is {} , random uuid is {}", currentThread().getName(), i, randomUUID());
-		} catch (Exception e) {
-			log.error("catch an exception:", e);
-		}
-	}
-
-	private void randomThrowException(int i) {
-		if (i % 10 == 0) {
-			throw new RuntimeException("this is a random exception, sequence = " + i);
-		}
-	}
-}
+proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
 ```
 
 # log-pilot
