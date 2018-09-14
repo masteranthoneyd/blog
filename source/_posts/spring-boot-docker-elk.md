@@ -859,7 +859,7 @@ networks:
 
 * `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Docker环境下换成`kafka`（与别名`aliases的值保持一致`），其他Docker应用可通过`kafka:9092`这个域名访问到Kafka。
 
-## ELK
+## ELK配置以及启动
 
 ### X-Pack 破解
 
@@ -875,7 +875,11 @@ docker cp ${CONTAINER_NAME}:/usr/share/elasticsearch/lib ./lib
 
 #### 反编译并修改源码
 
-找到`org.elasticsearch.license.LicenseVerifier.class` ，`org.elasticsearch.xpack.core.XPackBuild.class`，使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）
+找到下面两个类：
+```
+org.elasticsearch.license.LicenseVerifier.class org.elasticsearch.xpack.core.XPackBuild.class
+```
+使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/luyten.png)
 
@@ -1176,7 +1180,7 @@ networks:
 
 ```
 docker-compose up -d
-docker exec ${CONTAINER_NAME} curl -XPUT -u elastic 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
+docker exec ${CONTAINER_NAME} curl -XPUT 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
 ```
 
 大概是下面这个样子：
@@ -1192,8 +1196,7 @@ Creating elk_logstash_1          ... done
 Creating elk_kibana_1            ... done
 
 # ybd @ ybd-PC in ~/data/git-repo/bitbucket/ms-base/docker-compose/elk on git:master x [20:53:58] 
-$ docker exec elk_elk-elasticsearch_1 curl -XPUT -u elastic 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
-Enter host password for user 'elastic':
+$ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  1278  100    46  100  1232    328   8786 --:--:-- --:--:-- --:--:--  8800
