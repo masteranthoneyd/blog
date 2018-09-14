@@ -107,7 +107,8 @@ logging:
     <properties>
         <Property name="UNKNOWN" value="????"/>
         <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
-        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | ${spring:spring.application.name} | %5p | %X{IP} | %X{UA} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
+        <Property name="SERVER_NAME" value="${spring:spring.application.name}"/>
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | ${SERVER_NAME} | %5p | %X{IP} | %X{UA} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
     </properties>
 
     <Appenders>
@@ -125,8 +126,8 @@ logging:
             <Property name="max.block.ms">3000</Property>
         </Kafka>
 
-        <RollingFile name="failoverKafkaLog" fileName="./failoverKafka/failover.log"
-                     filePattern="./failoverKafka/failover.%d{yyyy-MM-dd}.log">
+        <RollingFile name="failoverKafkaLog" fileName="./failoverKafka/${SERVER_NAME}.log"
+                     filePattern="./failoverKafka/${SERVER_NAME}.%d{yyyy-MM-dd}.log">
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
@@ -778,6 +779,18 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
 
+## Docker Swarm环境下获取ClientIp
+
+在Docker Swarm环境中，服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip，搜索了一大圈，最终的解决方安是通过Nginx转发中添加参数，后端再获取。
+
+在`location`中添加
+
+```
+proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
+```
+
+后端获取第一个Ip。
+
 ## Demo地址
 
 ***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-docker)***
@@ -848,7 +861,114 @@ networks:
 
 ## ELK
 
-### Logstash 配置
+### X-Pack 破解
+
+#### 复制Jar包
+
+先启动一个Elasticsearch的容器，将Jar包copy出来：
+
+```
+export CONTAINER_NAME=elk_elk-elasticsearch_1
+docker cp ${CONTAINER_NAME}:/usr/share/elasticsearch/modules/x-pack-core/x-pack-core-6.4.0.jar ./
+docker cp ${CONTAINER_NAME}:/usr/share/elasticsearch/lib ./lib
+```
+
+#### 反编译并修改源码
+
+找到`org.elasticsearch.license.LicenseVerifier.class` ，`org.elasticsearch.xpack.core.XPackBuild.class`，使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/luyten.png)
+
+将两个类复制IDEA，修改为如下样子：
+
+```
+package org.elasticsearch.license;
+
+public class LicenseVerifier
+{
+	public static boolean verifyLicense(final License license, final byte[] publicKeyData) {
+		return true;
+	}
+
+	public static boolean verifyLicense(final License license) {
+		return true;
+	}
+}
+
+```
+
+```
+package org.elasticsearch.xpack.core;
+
+import org.elasticsearch.common.SuppressForbidden;
+import org.elasticsearch.common.io.PathUtils;
+
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+
+public class XPackBuild
+{
+	public static final XPackBuild CURRENT;
+	private String shortHash;
+	private String date;
+
+	@SuppressForbidden(reason = "looks up path of xpack.jar directly")
+	static Path getElasticsearchCodebase() {
+		final URL url = XPackBuild.class.getProtectionDomain().getCodeSource().getLocation();
+		try {
+			return PathUtils.get(url.toURI());
+		}
+		catch (URISyntaxException bogus) {
+			throw new RuntimeException(bogus);
+		}
+	}
+
+	XPackBuild(final String shortHash, final String date) {
+		this.shortHash = shortHash;
+		this.date = date;
+	}
+
+	public String shortHash() {
+		return this.shortHash;
+	}
+
+	public String date() {
+		return this.date;
+	}
+
+	static {
+		final Path path = getElasticsearchCodebase();
+		String shortHash = null;
+		String date = null;
+		Label_0157: {
+			shortHash = "Unknown";
+			date = "Unknown";
+		}
+		CURRENT = new XPackBuild(shortHash, date);
+	}
+}
+```
+
+再编译放回jar包中:
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/jar-archive.png)
+
+### 配置文件
+
+#### Elasticsearch
+
+`elasticsearch.yml`:
+
+```
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+discovery.zen.minimum_master_nodes: 1
+xpack.security.enabled: false # 不启用密码登陆
+xpack.monitoring.collection.enabled: true
+```
+
+#### Logstash
 
 `logstash.conf`配置文件(**注意下面的topics要与上面log4j2.xml中的一样**):
 
@@ -922,17 +1042,55 @@ output {
         hosts  => ["elk-elasticsearch:9200"]
         index  => "logstash-%{server_name}-%{+yyyy.MM.dd}"
         document_type => "%{server_name}"
+        # user => "elastic" # 如果选择开启xpack security需要输入帐号密码
+        # password => "changeme"
     }
 }
 
 
 ```
 
-`logstash.conf`:
+`logstash.yml`:
 
 ```
 http.host: "0.0.0.0"
 xpack.monitoring.elasticsearch.url: http://elk-elasticsearch:9200 # Docker版的Logstash此配置的默认地址是http://elasticsearch:9200
+
+# xpack.monitoring.elasticsearch.username: "elastic" # 如果选择开启xpack security需要输入帐号密码
+# xpack.monitoring.elasticsearch.password: "changeme"
+```
+
+#### Kibana
+
+`kibana.yml`:
+
+```
+server.name: kibana
+server.host: "0"
+elasticsearch.url: http://elk-elasticsearch:9200
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+#elasticsearch.username: "elastic"
+#elasticsearch.password: "changeme"
+```
+
+### 申请License
+
+转到 ***[License申请地址](https://license.elastic.co/registration)*** ，下载之后然后修改license中的`type`、`max_nodes`、`expiry_date_in_millis`：
+
+```
+{
+  "license": {
+    "uid": "fe8c9a81-6651-4327-89a3-c9a33bfd8e3f",
+    "type": "platinum",  // 这个类型是白金会员
+    "issue_date_in_millis": 1536883200000,
+    "expiry_date_in_millis": 2855980923000, // 过期时间
+    "max_nodes": 100,  // 集群节点数量
+    "issued_to": "xxxx",
+    "issuer": "Web Form",
+    "signature": "AAAAAwAAAA0imCa5T/HVBQyiUbSBAAABmC9ZN0hjZDBGYnVyRXpCOW5Bb3FjZDAxOWpSbTVoMVZwUzRxVk1PSmkxaktJRVl5MUYvUWh3bHZVUTllbXNPbzBUemtnbWpBbmlWRmRZb25KNFlBR2x0TXc2K2p1Y1VtMG1UQU9TRGZVSGRwaEJGUjE3bXd3LzRqZ05iLzRteWFNekdxRGpIYlFwYkJiNUs0U1hTVlJKNVlXekMrSlVUdFIvV0FNeWdOYnlESDc3MWhlY3hSQmdKSjJ2ZTcvYlBFOHhPQlV3ZHdDQ0tHcG5uOElCaDJ4K1hob29xSG85N0kvTWV3THhlQk9NL01VMFRjNDZpZEVXeUtUMXIyMlIveFpJUkk2WUdveEZaME9XWitGUi9WNTZVQW1FMG1DenhZU0ZmeXlZakVEMjZFT2NvOWxpZGlqVmlHNC8rWVVUYzMwRGVySHpIdURzKzFiRDl4TmM1TUp2VTBOUlJZUlAyV0ZVL2kvVk10L0NsbXNFYVZwT3NSU082dFNNa2prQ0ZsclZ4NTltbU1CVE5lR09Bck93V2J1Y3c9PQAAAQAWq5AoReLA+uTiRhQ8M0qYERXNidAAsVw0LeN5H7qRXFBAvB+rId4vZNj2DN5W5GuaxuiUhiytvV6maf4ArTsROCMUKGyO9RH24bYgnRbbf6MwB8EBHjSZ6+D8ysCVgfyqAAEKURGSMWszi2mR9R+DINtaeFJnb4B1GeAppbwl7qGGetAQm0vbF7ncyojIfjFthmMUomwo3vs0his5e3UPumItGc57LEk2s5gx95NNP8aFsJXSSFHgWDWwJs18XSl3NZItnEWNfy9lEJeAkR+LWISfizZIfViOTlcDBVGKR7w8u8D5QXFUVdsTi2XU5qfIWFb78BOtpCHIlU+AjB6m",
+    "start_date_in_millis": 1536883200000
+  }
+}
 ```
 
 ### 启动ELK
@@ -940,30 +1098,31 @@ xpack.monitoring.elasticsearch.url: http://elk-elasticsearch:9200 # Docker版的
 `docker-compose.yml`:
 
 ```
-version: '3.4'
+version: '3'
 services:
   elk-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
 #    ports:
 #      - "9200:9200"
     restart: always
     environment:
       - discovery.type=single-node
-      - cluster.name=docker-cluster
-      - network.host=0.0.0.0
-      - discovery.zen.minimum_master_nodes=1
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+    - ./crack/x-pack-core-6.4.0.jar:/usr/share/elasticsearch/modules/x-pack-core/x-pack-core-6.4.0.jar
+    - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    - ./config/license.json:/usr/share/elasticsearch/license.json
     deploy:
       placement:
         constraints:
         - node.role == manager
     networks:
-      backend:
+      backend-swarm:
         aliases:
           - elk-elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.3.0
+    image: docker.elastic.co/kibana/kibana:6.4.0
     ports:
       - "5601:5601"
     restart: always
@@ -972,16 +1131,16 @@ services:
         constraints:
         - node.role == manager
     networks:
-      backend:
+      backend-swarm:
         aliases:
           - kibana
-    environment:
-      - ELASTICSEARCH_URL=http://elk-elasticsearch:9200
+    volumes:
+    - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elk-elasticsearch
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.3.0
+    image: docker.elastic.co/logstash/logstash:6.4.0
 #    ports:
 #      - "4560:4560"
     restart: always
@@ -995,7 +1154,7 @@ services:
         constraints:
         - node.role == manager
     networks:
-      backend:
+      backend-swarm:
         aliases:
           - logstash
     depends_on:
@@ -1005,25 +1164,68 @@ services:
       - -f
       - /etc/logstash.conf
 
-# docker network create -d=overlay --attachable backend
-# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
+# docker network create -d=overlay --attachable backend-swarm
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend-swarm
 networks:
-  backend:
+  backend-swarm:
     external:
-      name: backend
+      name: backend-swarm
 ```
+
+启动后需要手动请求更新License：
+
+```
+docker-compose up -d
+docker exec ${CONTAINER_NAME} curl -XPUT -u elastic 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
+```
+
+大概是下面这个样子：
+
+```
+# ybd @ ybd-PC in ~/data/git-repo/bitbucket/ms-base/docker-compose/elk on git:master x [20:52:51] 
+$ docker-compose up -d                                                   
+
+Creating elk_elk-elasticsearch_1 ... done
+
+Creating elk_elk-elasticsearch_1 ... 
+Creating elk_logstash_1          ... done
+Creating elk_kibana_1            ... done
+
+# ybd @ ybd-PC in ~/data/git-repo/bitbucket/ms-base/docker-compose/elk on git:master x [20:53:58] 
+$ docker exec elk_elk-elasticsearch_1 curl -XPUT -u elastic 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
+Enter host password for user 'elastic':
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1278  100    46  100  1232    328   8786 --:--:-- --:--:-- --:--:--  8800
+{"acknowledged":true,"license_status":"valid"}
+```
+
+
+![](http://ojoba1c98.bkt.clouddn.com/kibana-license.png)
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana02.png)
 
-# Docker Swarm环境下获取ClientIp
+## Kibana相关设置
 
-在Docker Swarm环境中，服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip，搜索了一大圈，最终的解决方安是通过Nginx转发中添加参数，后端再获取。
+### 显示所有插件
 
-在`location`中添加
+在Kibana首页最下面找到：
 
-```
-proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
-```
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana-full-plugin-button.png)
+
+### Discover每页显示行数
+
+找到Advanced Setting![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana-admin-setting.png)
+
+点进去找到 `discover:sampleSize`再点击Edit修改:
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana-page-size.png)
+
+### 时区
+
+Kibana默认读取浏览器时区，可通过`dateFormat:tz`进行修改：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana-timezone.png)
 
 # log-pilot
 
