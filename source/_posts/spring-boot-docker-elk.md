@@ -1121,7 +1121,7 @@ services:
         constraints:
         - node.role == manager
     networks:
-      backend-swarm:
+      backend:
         aliases:
           - elk-elasticsearch
 
@@ -1135,7 +1135,7 @@ services:
         constraints:
         - node.role == manager
     networks:
-      backend-swarm:
+      backend:
         aliases:
           - kibana
     volumes:
@@ -1158,7 +1158,7 @@ services:
         constraints:
         - node.role == manager
     networks:
-      backend-swarm:
+      backend:
         aliases:
           - logstash
     depends_on:
@@ -1168,12 +1168,13 @@ services:
       - -f
       - /etc/logstash.conf
 
-# docker network create -d=overlay --attachable backend-swarm
-# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend-swarm
+# docker network create -d=overlay --attachable backend
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
 networks:
-  backend-swarm:
+  backend:
     external:
-      name: backend-swarm
+      name: backend
+
 ```
 
 启动后需要手动请求更新License：
@@ -1229,6 +1230,85 @@ $ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/lic
 Kibana默认读取浏览器时区，可通过`dateFormat:tz`进行修改：
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/kibana-timezone.png)
+
+# Spring Boot 集成 Elastic APM
+
+## 运行APM Server
+
+`docker-compose`:
+
+```
+version: '3'
+services:
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:6.4.0
+    ports:
+      - "8200:8200"
+    volumes:
+    - ./config/apm-server.yml:/usr/share/apm-server/apm-server.yml
+    deploy:
+      placement:
+        constraints:
+        - node.role == manager
+    networks:
+      backend-swarm:
+        aliases:
+          - apm-server
+
+# docker network create -d=overlay --attachable backend-swarm
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend-swarm
+networks:
+  backend-swarm:
+    external:
+      name: backend-swarm
+```
+
+`apm-server.yml`:
+
+```
+apm-server:
+  host: "0.0.0.0:8200"
+
+setup.template.settings:
+
+  index:
+    number_of_shards: 1
+    codec: best_compression
+    
+output.elasticsearch:
+  hosts: ["elk-elasticsearch:9200"]
+
+  indices:
+  - index: "apm-%{[beat.version]}-sourcemap"
+    when.contains:
+      processor.event: "sourcemap"
+
+  - index: "apm-%{[beat.version]}-error-%{+yyyy.MM.dd}"
+    when.contains:
+      processor.event: "error"
+
+  - index: "apm-%{[beat.version]}-transaction-%{+yyyy.MM.dd}"
+    when.contains:
+      processor.event: "transaction"
+
+  - index: "apm-%{[beat.version]}-span-%{+yyyy.MM.dd}"
+    when.contains:
+      processor.event: "span"
+
+  - index: "apm-%{[beat.version]}-metric-%{+yyyy.MM.dd}"
+    when.contains:
+      processor.event: "metric"
+
+  - index: "apm-%{[beat.version]}-onboarding-%{+yyyy.MM.dd}"
+    when.contains:
+      processor.event: "onboarding"
+
+logging.level: warning
+
+logging.metrics.enabled: false
+```
+
+这个配置文件从容器中`/usr/share/apm-server/apm-server.yml`复制出来稍微改一下
 
 # log-pilot
 

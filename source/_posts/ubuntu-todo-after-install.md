@@ -415,7 +415,7 @@ sudo apt install fonts-wqy-microhei
 
 # 软件篇
 
-> Java后端环境搭建请看： ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
+> Java开发者的环境搭建请看： ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
 
 ## Wechat for Ubuntu
 下载地址：
