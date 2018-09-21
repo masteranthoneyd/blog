@@ -22,7 +22,7 @@
 
 ## 基于数据库
 
-> 虽然这种方式基本上不会被用于生产环境
+> 虽然这种方式基本上**不会被用于生产环境**
 
 基于数据库的锁实现也有两种方式，一是基于数据库表，另一种是基于数据库排他锁。
 
@@ -32,9 +32,12 @@
 
 具体使用的方法，当需要锁住某个方法时，往该表中插入一条相关的记录。这边需要注意，方法名是有唯一性约束的，如果有多个请求同时提交到数据库的话，数据库会保证只有一个操作可以成功，那么我们就可以认为操作成功的那个线程获得了该方法的锁，可以执行方法体内容。
 
-执行完毕，需要delete该记录。
+执行完毕，需要`delete`该记录。
 
-当然，笔者这边只是简单介绍一下。对于上述方案可以进行优化，如应用主从数据库，数据之间双向同步。一旦挂掉快速切换到备库上；做一个定时任务，每隔一定时间把数据库中的超时数据清理一遍；使用while循环，直到insert成功再返回成功，虽然并不推荐这样做；还可以记录当前获得锁的机器的主机信息和线程信息，那么下次再获取锁的时候先查询数据库，如果当前机器的主机信息和线程信息在数据库可以查到的话，直接把锁分配给他就可以了，实现可重入锁。
+当然，这边只是简单介绍一下。对于上述方案可以进行优化，如应用主从数据库，数据之间双向同步。一旦挂掉快速切换到备库上；做一个定时任务，每隔一定时间把数据库中的超时数据清理一遍；使用`while`循环，直到`insert`成功再返回成功，虽然并不推荐这样做；还可以记录当前获得锁的机器的主机信息和线程信息，那么下次再获取锁的时候先查询数据库，如果当前机器的主机信息和线程信息在数据库可以查到的话，直接把锁分配给他就可以了，实现**可重入锁**。
+
+> - **可重入锁**：可以再次进入方法A，就是说在释放锁前此线程可以再次进入方法A（方法A递归）。
+> - **不可重入锁（自旋锁）**：不可以再次进入方法A，也就是说获得锁进入方法A是此线程在释放锁钱唯一的一次进入方法A。
 
 ### 基于数据库排他锁
 
@@ -63,7 +66,7 @@ public void lock(){
 
 ```
 
-在查询语句后面增加for update，数据库会在查询过程中给数据库表增加排他锁。当某条记录被加上排他锁之后，其他线程无法再在该行记录上增加排他锁。其他没有获取到锁的就会阻塞在上述select语句上，可能的结果有2种，在超时之前获取到了锁，在超时之前仍未获取到锁。
+在查询语句后面增加`for update`，数据库会在查询过程中给数据库表增加排他锁。当某条记录被加上排他锁之后，其他线程无法再在该行记录上增加排他锁。其他没有获取到锁的就会阻塞在上述`select`语句上，可能的结果有2种，在超时之前获取到了锁，在超时之前仍未获取到锁。
 
 获得排它锁的线程即可获得分布式锁，当获取到锁之后，可以执行方法的业务逻辑，执行完方法之后，释放锁`connection.commit()`。
 
@@ -78,7 +81,7 @@ public void lock(){
 
 ## 基于Zookeeper
 
-基于Zookeeper临时有序节点可以实现的分布式锁。每个客户端对某个方法加锁时，在Zookeeper上的与该方法对应的指定节点的目录下，生成一个唯一的瞬时有序节点。 判断是否获取锁的方式很简单，只需要判断有序节点中序号最小的一个。 当释放锁的时候，只需将这个瞬时节点删除即可。同时，其可以避免服务宕机导致的锁无法释放，而产生的死锁问题。
+基于Zookeeper**临时有序节点**可以实现的分布式锁。每个客户端对某个方法加锁时，在Zookeeper上的与该方法对应的指定节点的目录下，生成一个唯一的瞬时有序节点。 判断是否获取锁的方式很简单，只需要判断有序节点中序号最小的一个。 当释放锁的时候，只需将这个瞬时节点删除即可。同时，其可以避免服务宕机导致的锁无法释放，而产生的死锁问题。
 
 提供的第三方库有[curator](https://curator.apache.org/)，具体使用读者可以自行去看一下。Curator提供的`InterProcessMutex`是分布式锁的实现。`acquire`方法获取锁，release方法释放锁。另外，锁释放、阻塞锁、可重入锁等问题都可以有有效解决。讲下阻塞锁的实现，客户端可以通过在ZK中创建顺序节点，并且在节点上绑定监听器，一旦节点有变化，Zookeeper会通知客户端，客户端可以检查自己创建的节点是不是当前所有节点中序号最小的，如果是就获取到锁，便可以执行业务逻辑。
 
@@ -151,7 +154,7 @@ public class CuratorTest {
 
 ## 基于缓存
 
-相对于基于数据库实现分布式锁的方案来说，基于缓存来实现在性能方面会表现的更好一点，存取速度快很多。而且很多缓存是可以集群部署的，可以解决单点问题。基于缓存的锁有好几种，如memcached、redis，下面主要讲解基于redis的分布式实现。
+相对于基于数据库实现分布式锁的方案来说，基于缓存来实现在性能方面会表现的更好一点，存取速度快很多。而且很多缓存是可以集群部署的，可以解决单点问题。基于缓存的锁有好几种，如Memcached、Redis，下面主要讲解基于Redis的分布式实现。
 
 # 基于Redis的分布式锁实现
 
@@ -162,9 +165,11 @@ public class CuratorTest {
 > 3. **具有容错性。**只要大部分的Redis节点正常运行，客户端就可以加锁和解锁。
 > 4. **解铃还须系铃人。**加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。
 
+## 基于Spring Data Redis
+
 下面是正确的实现姿势。（使用Spring Data Redis）
 
-## 依赖
+### 依赖
 
 ```
 <dependency>
@@ -178,7 +183,7 @@ public class CuratorTest {
 </dependency>
 ```
 
-## 加锁姿势
+### 加锁姿势
 
 ```
 @Autowired
@@ -201,7 +206,7 @@ private Boolean setNxEx(String key, String value) {
 
 在上面`stringRedisConn.set(...)`方法中，确保了上锁与设置过期时间的原子性。
 
-## 解锁姿势
+### 解锁姿势
 
 配置类：
 
@@ -245,6 +250,119 @@ public void release(String key, String value) {
 为什么要用Lua脚本？确保原子性，如何保证，请看官网对`eval`命令的相关解释。上面脚本表达的意思很简单，对比传进来的value是否相等，是则删除锁。value可使用UUID作为当前线程的标识符，**只有但前线程才能解锁**。
 
 网上的错误姿势一般都是执行完业务代码直接删除锁，这样会导致删除了其他线程获的锁。
+
+上面实现的分布式锁是不支持可重入的，需要额外的编码，业界当然早就开源了类似的框架，比如下面介绍的Redisson。
+
+## 基于Redisson
+
+> ***[Redisson](https://github.com/redisson/redisson)*** 是一个在Redis的基础上实现的Java驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的Java常用对象，还提供了许多分布式服务。其中包括(`BitSet`, `Set`, `Multimap`, `SortedSet`, `Map`, `List`, `Queue`, `BlockingQueue`, `Deque`, `BlockingDeque`, `Semaphore`, `Lock`, `AtomicLong`, `CountDownLatch`, `Publish / Subscribe`, `Bloom filter`, `Remote service`, `Spring cache`, `Executor service`, `Live Object service`, `Scheduler service`) Redisson提供了使用Redis的最简单和最便捷的方法。Redisson的宗旨是促进使用者对Redis的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。
+
+Redisson提供的众多功能中有一项就是可重入锁（Reentrant Lock），具体用法可参考 ***[文档](https://github.com/redisson/redisson/wiki/8.-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8)*** 
+
+主要依赖：
+
+```
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-transport-native-epoll</artifactId>
+    <classifier>linux-x86_64</classifier>
+</dependency>
+
+<dependency>
+    <groupId>org.redisson</groupId>
+    <artifactId>redisson</artifactId>
+    <version>3.7.5</version>
+</dependency>
+```
+
+核心代码：
+
+```
+@Data
+@Slf4j
+public class RedissonDLock implements DLock {
+
+	private final Long waitTime;
+	private final Long leaseTime;
+	private final TimeUnit timeUnit;
+	private final RedissonClient redisson;
+
+	public RedissonDLock(DLockConfigProperty property) {
+		// 设置一些基本属性
+		this.waitTime = property.getWaitTime();
+		this.leaseTime = property.getLeaseTime();
+		this.timeUnit = property.getTimeUnit();
+
+		Config config = new Config();
+		SingleServerConfig singleServerConfig = config.useSingleServer();
+		singleServerConfig.setAddress("redis://" + property.getHost() + ":" + property.getPort());
+		if (property.getPassword() != null && property.getPassword().trim().length() > 0) {
+			singleServerConfig.setPassword(property.getPassword());
+		}
+		try {
+			Class.forName("io.netty.channel.epoll.Epoll");
+			// 如果是Linux系统可采用Epoll算法，需要引入 netty-transport-native-epoll
+			if (Epoll.isAvailable()) {
+				config.setTransportMode(TransportMode.EPOLL);
+				log.info("Starting with optional epoll library");
+			} else {
+				log.info("Starting without optional epoll library");
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		redisson = Redisson.create(config);
+	}
+
+	@Override
+	public void tryLockAndAction(LockKeyGenerator lockKeyGenerator, AfterAcquireAction acquireAction) {
+		tryLockAndAction(lockKeyGenerator, acquireAction, waitTime, leaseTime, timeUnit);
+	}
+
+	@Override
+	public void tryLockAndAction(LockKeyGenerator lockKeyGenerator, AfterAcquireAction acquireAction, Long waitTime, Long leaseTime, TimeUnit timeUnit) {
+		tryLockAndAction(lockKeyGenerator, acquireAction, DEFAULT_FAIL_ACQUIRE_ACTION, waitTime, leaseTime, timeUnit);
+	}
+
+	@Override
+	public void tryLockAndAction(LockKeyGenerator lockKeyGenerator, AfterAcquireAction acquireAction, FailAcquireAction failAcquireAction, Long waitTime, Long leaseTime, TimeUnit timeUnit) {
+		try (LockHolder holder = new LockHolder(redisson.getLock(lockKeyGenerator.getLockKey()))) {
+			boolean acquire = holder.getLock().tryLock(waitTime, leaseTime, timeUnit);
+			if (acquire) {
+				acquireAction.doAction();
+			} else {
+				failAcquireAction.doOnFail();
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public <T> T tryLockAndExecuteCommand(LockKeyGenerator lockKeyGenerator, AfterAcquireCommand<T> command, FailAcquireAction failAcquireAction, Long waitTime, Long leaseTime, TimeUnit timeUnit) throws Throwable {
+		try (LockHolder holder = new LockHolder(redisson.getLock(lockKeyGenerator.getLockKey()))) {
+			boolean acquire = holder.getLock().tryLock(waitTime, leaseTime, timeUnit);
+			if (acquire) {
+				return command.executeCommand();
+			}
+			failAcquireAction.doOnFail();
+		}
+		return null;
+	}
+
+	@Data
+	@Accessors(chain = true)
+	@AllArgsConstructor
+	private static class LockHolder implements AutoCloseable {
+		private RLock lock;
+
+		@Override
+		public void close() {
+			lock.unlockAsync();
+		}
+	}
+}
+```
 
 
 

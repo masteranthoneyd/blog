@@ -802,6 +802,24 @@ slowlog get [n] // n 表示返回的日志记录条数
 - 由于慢查询日志是一个先进先出的队列，也就是说如果慢查询比较多的情况下，可能
   会丢失部分慢查询命令，为了防止这种情况发生，可以定期执行 slow get 命令将慢查询日志持久化到其他存储中（例如 MySQL），然后可以制作可视化界面进行查询。
 
+## 附录4：rdb文件分析
+
+首先查看Redis的dump目录设置:
+
+```
+CONFIG GET dir
+```
+
+再使用`bgsave`命令导出`dump.rdb`，将`dump.rdb`复制出来，再使用 ***[rdr](https://github.com/xueqiu/rdr)*** 分析：
+
+```
+./rdr show -p 8080 *.rdb
+```
+
+效果图：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/rdr.png)
+
 # 安装Maven
 
 ## 下载

@@ -879,11 +879,11 @@ docker cp ${CONTAINER_NAME}:/usr/share/elasticsearch/lib ./lib
 ```
 org.elasticsearch.license.LicenseVerifier.class org.elasticsearch.xpack.core.XPackBuild.class
 ```
-使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）
+使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译
 
 ![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/luyten.png)
 
-将两个类复制IDEA，修改为如下样子：
+将两个类复制IDEA（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**），修改为如下样子：
 
 ```
 package org.elasticsearch.license;
@@ -945,7 +945,7 @@ public class XPackBuild
 		final Path path = getElasticsearchCodebase();
 		String shortHash = null;
 		String date = null;
-		Label_0157: {
+		Label_0157: {  // 将try-catch去掉
 			shortHash = "Unknown";
 			date = "Unknown";
 		}
@@ -1308,7 +1308,34 @@ logging.level: warning
 logging.metrics.enabled: false
 ```
 
-这个配置文件从容器中`/usr/share/apm-server/apm-server.yml`复制出来稍微改一下
+这个配置文件从容器中`/usr/share/apm-server/apm-server.yml`复制出来稍微改了一下Elasticsearch的Url。
+
+若开启了X-Pack，则需要在yml中配置帐号密码：
+
+```
+output.elasticsearch:
+    hosts: ["<es_url>"]
+    username: <username>
+    password: <password>
+```
+
+## 集成到Spring Boot
+
+下载 ***[APM代理依赖](http://search.maven.org/#search%7Cga%7C1%7Ca%3Aelastic-apm-agent)***
+
+在启动参数中添加:
+
+```
+java -javaagent:/path/to/elastic-apm-agent-<version>.jar \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \ 
+     -Delastic.apm.application_packages=org.example \ 
+     -jar my-application.jar
+```
+
+启动后在Kibana的APM模块中更新一下索引，效果图大概是这样的：
+
+![](http://ojoba1c98.bkt.clouddn.com/img/docker-logs-collect/apm.png)
 
 # log-pilot
 
