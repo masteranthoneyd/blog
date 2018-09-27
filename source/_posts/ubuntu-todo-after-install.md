@@ -425,6 +425,8 @@ sudo apt install fonts-wqy-microhei
 
 下载最新版本，解压后打开目录里面的`electronic-wechat`，然后创建个软连接换个图标拉倒桌面就可以了
 
+另外，Github中还有一个Linux版的Wechat： ***[https://github.com/eNkru/electron-wechat](https://github.com/eNkru/electron-wechat)***
+
 ## Wine-QQ与Wine-TIM的Appimage版本
 
 Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme765cs/Wine-QQ-TIM)***

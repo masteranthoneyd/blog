@@ -1,12 +1,12 @@
 # 测试篇
 
-## 使用AssertJ
+# 使用AssertJ
 
 > [AssertJ Core features highlight](http://joel-costigliola.github.io/assertj/assertj-core-features-highlight.html)
 
 如果是Spring Boot 1.x版本，在`spring-boot-starter-test`模块中，AssertJ的版本依然停留在`2.x`，为了可以使用新功能，我们可以引入新版本的AssertJ（**Spring Boot 2已经是最新版的AssertJ**）:
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -26,289 +26,631 @@
 </dependency>
 ```
 
-AsserJ的API很多，功能非常强大，直接贴上代码：
+## 字符串断言
 
+```java
+@Test
+public void testString() {
+	String str = null;
+	// 断言null或为空字符串
+	assertThat(str).isNullOrEmpty();
+	// 断言空字符串
+	assertThat("").isEmpty();
+	// 断言字符串相等 断言忽略大小写判断字符串相等
+	assertThat("Frodo").isEqualTo("Frodo").isEqualToIgnoringCase("frodo");
+	// 断言开始字符串 结束字符穿 字符串长度
+	assertThat("Frodo").startsWith("Fro").endsWith("do").hasSize(5);
+	// 断言包含字符串 不包含字符串
+	assertThat("Frodo").contains("rod").doesNotContain("fro");
+	// 断言字符串只出现过一次
+	assertThat("Frodo").containsOnlyOnce("do");
+	// 判断正则匹配
+	assertThat("Frodo").matches("..o.o").doesNotMatch(".*d");
+}
 ```
-package com.yangbingdong.springboottestassertj.assertj;
 
-import com.yangbingdong.springboottestassertj.domain.Person;
-import org.assertj.core.util.Maps;
-import org.junit.Test;
+## 数字断言
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+```java
+@Test
+public void testNumber() {
+	Integer num = null;
+	// 断言空
+	assertThat(num).isNull();
+	// 断言相等
+	assertThat(42).isEqualTo(42);
+	// 断言大于 大于等于
+	assertThat(42).isGreaterThan(38).isGreaterThanOrEqualTo(38);
+	// 断言小于 小于等于
+	assertThat(42).isLessThan(58).isLessThanOrEqualTo(58);
+	// 断言0
+	assertThat(0).isZero();
+	// 断言正数 非负数
+	assertThat(1).isPositive().isNotNegative();
+	// 断言负数 非正数
+	assertThat(-1).isNegative().isNotPositive();
+}
+```
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatIOException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.atIndex;
-import static org.assertj.core.api.Assertions.contentOf;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.util.DateUtil.parse;
-import static org.assertj.core.util.DateUtil.parseDatetimeWithMs;
-import static org.assertj.core.util.Lists.newArrayList;
+## 时间断言
 
-/**
- * @author ybd
- * @date 18-2-8
- * @contact yangbingdong@1994.gmail
- */
-public class AssertJTestDemo {
+```java
+@Test
+public void testDate() {
+	// 断言与指定日期相同 不相同 在指定日期之后 在指定日期之钱
+	assertThat(parse("2014-02-01")).isEqualTo("2014-02-01").isNotEqualTo("2014-01-01")
+								   .isAfter("2014-01-01").isBefore(parse("2014-03-01"));
+	// 断言 2014 在指定年份之前 在指定年份之后
+	assertThat(new Date()).isBeforeYear(2020).isAfterYear(2013);
+	// 断言时间再指定范围内 不在指定范围内
+	assertThat(parse("2014-02-01")).isBetween("2014-01-01", "2014-03-01").isNotBetween(
+			parse("2014-02-02"), parse("2014-02-28"));
 
-	/**
-	 * 字符串断言
+	// 断言两时间相差100毫秒
+	Date d1 = new Date();
+	Date d2 = new Date(d1.getTime() + 100);
+	assertThat(d1).isCloseTo(d2, 100);
+
+	// sets dates differing more and more from date1
+	Date date1 = parseDatetimeWithMs("2003-01-01T01:00:00.000");
+	Date date2 = parseDatetimeWithMs("2003-01-01T01:00:00.555");
+	Date date3 = parseDatetimeWithMs("2003-01-01T01:00:55.555");
+	Date date4 = parseDatetimeWithMs("2003-01-01T01:55:55.555");
+	Date date5 = parseDatetimeWithMs("2003-01-01T05:55:55.555");
+
+	// 断言 日期忽略毫秒，与给定的日期相等
+	assertThat(date1).isEqualToIgnoringMillis(date2);
+	// 断言 日期与给定的日期具有相同的年月日时分秒
+	assertThat(date1).isInSameSecondAs(date2);
+	// 断言 日期忽略秒，与给定的日期时间相等
+	assertThat(date1).isEqualToIgnoringSeconds(date3);
+	// 断言 日期与给定的日期具有相同的年月日时分
+	assertThat(date1).isInSameMinuteAs(date3);
+	// 断言 日期忽略分，与给定的日期时间相等
+	assertThat(date1).isEqualToIgnoringMinutes(date4);
+	// 断言 日期与给定的日期具有相同的年月日时
+	assertThat(date1).isInSameHourAs(date4);
+	// 断言 日期忽略小时，与给定的日期时间相等
+	assertThat(date1).isEqualToIgnoringHours(date5);
+	// 断言 日期与给定的日期具有相同的年月日
+	assertThat(date1).isInSameDayAs(date5);
+}
+```
+
+## 集合断言
+
+```java
+@Test
+public void testList() {
+	// 断言 列表是空的
+	assertThat(newArrayList()).isEmpty();
+	// 断言 列表的开始 结束元素
+	assertThat(newArrayList(1, 2, 3)).startsWith(1).endsWith(3);
+	// 断言 列表包含元素 并且是排序的
+	assertThat(newArrayList(1, 2, 3)).contains(1, atIndex(0)).contains(2, atIndex(1)).contains(3)
+									 .isSorted();
+	// 断言 被包含与给定列表
+	assertThat(newArrayList(3, 1, 2)).isSubsetOf(newArrayList(1, 2, 3, 4));
+	// 断言 存在唯一元素
+	assertThat(newArrayList("a", "b", "c")).containsOnlyOnce("a");
+}
+```
+
+## Map断言
+
+```java
+@Test
+public void testMap() {
+	Map<String, Object> foo = Maps.newHashMap("A", 1);
+	foo.put("B", 2);
+	foo.put("C", 3);
+
+	// 断言 map 不为空 size
+	assertThat(foo).isNotEmpty().hasSize(3);
+	// 断言 map 包含元素
+	assertThat(foo).contains(entry("A", 1), entry("B", 2));
+	// 断言 map 包含key
+	assertThat(foo).containsKeys("A", "B", "C");
+	// 断言 map 包含value
+	assertThat(foo).containsValue(3);
+}
+```
+
+## 类断言
+
+```java
+@Test
+public void testClass() {
+	// 断言 是注解
+	assertThat(Magical.class).isAnnotation();
+	// 断言 不是注解
+	assertThat(Ring.class).isNotAnnotation();
+	// 断言 存在注解
+	assertThat(Ring.class).hasAnnotation(Magical.class);
+	// 断言 不是借口
+	assertThat(Ring.class).isNotInterface();
+	// 断言 是否为指定Class实例
+	assertThat("string").isInstanceOf(String.class);
+	// 断言 类是给定类的父类
+	assertThat(Person1.class).isAssignableFrom(Employee.class);
+}
+
+@Magical
+public enum Ring {
+	oneRing, vilya, nenya, narya, dwarfRing, manRing;
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Magical {
+}
+
+public class Person1 {
+}
+
+public class Employee extends Person1 {
+}
+```
+
+## 异常断言
+
+```java
+@Test
+public void testException() {
+	assertThatThrownBy(() -> { throw new Exception("boom!"); }).isInstanceOf(Exception.class)
+															   .hasMessageContaining("boom");
+
+	assertThatExceptionOfType(IOException.class).isThrownBy(() -> { throw new IOException("boom!"); })
+												.withMessage("%s!", "boom")
+												.withMessageContaining("boom")
+												.withNoCause();
+
+	/*
+	 * assertThatNullPointerException
+	 * assertThatIllegalArgumentException
+	 * assertThatIllegalStateException
+	 * assertThatIOException
 	 */
-	@Test
-	public void testString() {
-		String str = null;
-		// 断言null或为空字符串
-		assertThat(str).isNullOrEmpty();
-		// 断言空字符串
-		assertThat("").isEmpty();
-		// 断言字符串相等 断言忽略大小写判断字符串相等
-		assertThat("Frodo").isEqualTo("Frodo").isEqualToIgnoringCase("frodo");
-		// 断言开始字符串 结束字符穿 字符串长度
-		assertThat("Frodo").startsWith("Fro").endsWith("do").hasSize(5);
-		// 断言包含字符串 不包含字符串
-		assertThat("Frodo").contains("rod").doesNotContain("fro");
-		// 断言字符串只出现过一次
-		assertThat("Frodo").containsOnlyOnce("do");
-		// 判断正则匹配
-		assertThat("Frodo").matches("..o.o").doesNotMatch(".*d");
+	assertThatIOException().isThrownBy(() -> { throw new IOException("boom!"); })
+						   .withMessage("%s!", "boom")
+						   .withMessageContaining("boom")
+						   .withNoCause();
+}
+```
+
+## 文件断言
+
+```java
+@Test
+public void testFile() throws Exception {
+	File xFile = writeFile("xFile", "The Truth Is Out There");
+
+	assertThat(xFile).exists().isFile().isRelative();
+
+	assertThat(xFile).canRead().canWrite();
+
+	assertThat(contentOf(xFile)).startsWith("The Truth").contains("Is Out").endsWith("There");
+}
+
+private File writeFile(String fileName, String fileContent) throws Exception {
+	return writeFile(fileName, fileContent, Charset.defaultCharset());
+}
+
+private File writeFile(String fileName, String fileContent, Charset charset) throws Exception {
+	File file = new File("target/" + fileName);
+	BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
+	out.write(fileContent);
+	out.close();
+	return file;
+}
+```
+
+## 对象列表断言
+
+```java
+@Test
+public void personListTest() {
+	List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
+	assertThat(personList).extracting(Person::getName).contains("A", "B").doesNotContain("D");
+}
+
+@Test
+public void personListTest1() {
+	List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
+	assertThat(personList).flatExtracting(Person::getName).contains("A", "B").doesNotContain("D");
+}
+```
+
+## 断言添加描述
+
+```java
+@Test
+public void addDesc() {
+	Person person = new Person("ybd", 18);
+	assertThat(person.getAge()).as("check %s's age", person.getName()).isEqualTo(18);
+}
+```
+
+## 官方例子
+
+***[https://github.com/joel-costigliola/assertj-examples](https://github.com/joel-costigliola/assertj-examples)***
+
+# JMH基准测试
+
+## 导入Jar包
+
+```xml
+<dependency>
+    <groupId>org.openjdk.jmh</groupId>
+    <artifactId>jmh-core</artifactId>
+    <version>1.21</version>
+</dependency>
+<dependency>
+    <groupId>org.openjdk.jmh</groupId>
+    <artifactId>jmh-generator-annprocess</artifactId>
+    <version>1.21</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+## 例子
+
+我们来测试一下Snowflake的性能：
+
+```java
+@BenchmarkMode(Mode.Throughput)
+@Warmup(iterations = 3, time = 1)
+@Measurement(iterations = 4, time = 2)
+@Threads(10)
+@Fork(1)
+@OutputTimeUnit(TimeUnit.SECONDS)
+public class SnowflakeTest {
+	private static final Snowflake[] SNOWFLAKES = IntStream.rangeClosed(1, 8)
+														   .mapToObj(Snowflake::create)
+														   .toArray(value -> new Snowflake[8]);
+
+	private static final AtomicLong ATOMIC_LONG = new AtomicLong(0);
+
+	@Benchmark
+	public long getId() {
+		return SNOWFLAKES[(int) (ATOMIC_LONG.incrementAndGet() & (1 << 3) - 1)].nextId();
 	}
 
-	/**
-	 * 数字断言
-	 */
-	@Test
-	public void testNumber() {
-		Integer num = null;
-		// 断言空
-		assertThat(num).isNull();
-		// 断言相等
-		assertThat(42).isEqualTo(42);
-		// 断言大于 大于等于
-		assertThat(42).isGreaterThan(38).isGreaterThanOrEqualTo(38);
-		// 断言小于 小于等于
-		assertThat(42).isLessThan(58).isLessThanOrEqualTo(58);
-		// 断言0
-		assertThat(0).isZero();
-		// 断言正数 非负数
-		assertThat(1).isPositive().isNotNegative();
-		// 断言负数 非正数
-		assertThat(-1).isNegative().isNotPositive();
-	}
 
-	/**
-	 * 时间断言
-	 */
-	@Test
-	public void testDate() {
-		// 断言与指定日期相同 不相同 在指定日期之后 在指定日期之钱
-		assertThat(parse("2014-02-01")).isEqualTo("2014-02-01").isNotEqualTo("2014-01-01")
-									   .isAfter("2014-01-01").isBefore(parse("2014-03-01"));
-		// 断言 2014 在指定年份之前 在指定年份之后
-		assertThat(new Date()).isBeforeYear(2020).isAfterYear(2013);
-		// 断言时间再指定范围内 不在指定范围内
-		assertThat(parse("2014-02-01")).isBetween("2014-01-01", "2014-03-01").isNotBetween(
-				parse("2014-02-02"), parse("2014-02-28"));
-
-		// 断言两时间相差100毫秒
-		Date d1 = new Date();
-		Date d2 = new Date(d1.getTime() + 100);
-		assertThat(d1).isCloseTo(d2, 100);
-
-		// sets dates differing more and more from date1
-		Date date1 = parseDatetimeWithMs("2003-01-01T01:00:00.000");
-		Date date2 = parseDatetimeWithMs("2003-01-01T01:00:00.555");
-		Date date3 = parseDatetimeWithMs("2003-01-01T01:00:55.555");
-		Date date4 = parseDatetimeWithMs("2003-01-01T01:55:55.555");
-		Date date5 = parseDatetimeWithMs("2003-01-01T05:55:55.555");
-
-		// 断言 日期忽略毫秒，与给定的日期相等
-		assertThat(date1).isEqualToIgnoringMillis(date2);
-		// 断言 日期与给定的日期具有相同的年月日时分秒
-		assertThat(date1).isInSameSecondAs(date2);
-		// 断言 日期忽略秒，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringSeconds(date3);
-		// 断言 日期与给定的日期具有相同的年月日时分
-		assertThat(date1).isInSameMinuteAs(date3);
-		// 断言 日期忽略分，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringMinutes(date4);
-		// 断言 日期与给定的日期具有相同的年月日时
-		assertThat(date1).isInSameHourAs(date4);
-		// 断言 日期忽略小时，与给定的日期时间相等
-		assertThat(date1).isEqualToIgnoringHours(date5);
-		// 断言 日期与给定的日期具有相同的年月日
-		assertThat(date1).isInSameDayAs(date5);
-	}
-
-	/**
-	 * 集合断要
-	 */
-	@Test
-	public void testList() {
-		// 断言 列表是空的
-		assertThat(newArrayList()).isEmpty();
-		// 断言 列表的开始 结束元素
-		assertThat(newArrayList(1, 2, 3)).startsWith(1).endsWith(3);
-		// 断言 列表包含元素 并且是排序的
-		assertThat(newArrayList(1, 2, 3)).contains(1, atIndex(0)).contains(2, atIndex(1)).contains(3)
-										 .isSorted();
-		// 断言 被包含与给定列表
-		assertThat(newArrayList(3, 1, 2)).isSubsetOf(newArrayList(1, 2, 3, 4));
-		// 断言 存在唯一元素
-		assertThat(newArrayList("a", "b", "c")).containsOnlyOnce("a");
-	}
-
-	/**
-	 * Map断言
-	 */
-	@Test
-	public void testMap() {
-		Map<String, Object> foo = Maps.newHashMap("A", 1);
-		foo.put("B", 2);
-		foo.put("C", 3);
-
-		// 断言 map 不为空 size
-		assertThat(foo).isNotEmpty().hasSize(3);
-		// 断言 map 包含元素
-		assertThat(foo).contains(entry("A", 1), entry("B", 2));
-		// 断言 map 包含key
-		assertThat(foo).containsKeys("A", "B", "C");
-		// 断言 map 包含value
-		assertThat(foo).containsValue(3);
-	}
-
-	/**
-	 * 类断言
-	 */
-	@Test
-	public void testClass() {
-		// 断言 是注解
-		assertThat(Magical.class).isAnnotation();
-		// 断言 不是注解
-		assertThat(Ring.class).isNotAnnotation();
-		// 断言 存在注解
-		assertThat(Ring.class).hasAnnotation(Magical.class);
-		// 断言 不是借口
-		assertThat(Ring.class).isNotInterface();
-		// 断言 是否为指定Class实例
-		assertThat("string").isInstanceOf(String.class);
-		// 断言 类是给定类的父类
-		assertThat(Person1.class).isAssignableFrom(Employee.class);
-	}
-
-	/**
-	 * 异常断言
-	 */
-	@Test
-	public void testException() {
-		assertThatThrownBy(() -> { throw new Exception("boom!"); }).isInstanceOf(Exception.class)
-		  .hasMessageContaining("boom");
-
-		assertThatExceptionOfType(IOException.class).isThrownBy(() -> { throw new IOException("boom!"); })
-													.withMessage("%s!", "boom")
-													.withMessageContaining("boom")
-													.withNoCause();
-
-		/*
-		 * assertThatNullPointerException
-		 * assertThatIllegalArgumentException
-		 * assertThatIllegalStateException
-		 * assertThatIOException
-		 */
-		assertThatIOException().isThrownBy(() -> { throw new IOException("boom!"); })
-							   .withMessage("%s!", "boom")
-							   .withMessageContaining("boom")
-							   .withNoCause();
-	}
-
-	/**
-	 * 断言添加描述
-	 */
-	@Test
-	public void addDesc() {
-		Person person = new Person("ybd", 18);
-		assertThat(person.getAge()).as("check %s's age", person.getName()).isEqualTo(18);
-	}
-
-	/**
-	 * 断言对象列表
-	 */
-	@Test
-	public void personListTest() {
-		List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
-		assertThat(personList).extracting(Person::getName).contains("A", "B").doesNotContain("D");
-	}
-
-	@Test
-	public void personListTest1() {
-		List<Person> personList = Arrays.asList(new Person("A", 1), new Person("B", 2), new Person("C", 3));
-		assertThat(personList).flatExtracting(Person::getName).contains("A", "B").doesNotContain("D");
-	}
-
-	/**
-	 * 断言文件
-	 * @throws Exception
-	 */
-	@Test
-	public void testFile() throws Exception {
-		File xFile = writeFile("xFile", "The Truth Is Out There");
-
-		assertThat(xFile).exists().isFile().isRelative();
-
-		assertThat(xFile).canRead().canWrite();
-
-		assertThat(contentOf(xFile)).startsWith("The Truth").contains("Is Out").endsWith("There");
-	}
-
-	private File writeFile(String fileName, String fileContent) throws Exception {
-		return writeFile(fileName, fileContent, Charset.defaultCharset());
-	}
-
-	private File writeFile(String fileName, String fileContent, Charset charset) throws Exception {
-		File file = new File("target/" + fileName);
-		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
-		out.write(fileContent);
-		out.close();
-		return file;
-	}
-
-	@Magical
-	public enum Ring {
-		oneRing, vilya, nenya, narya, dwarfRing, manRing;
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Magical {
-	}
-
-	public class Person1 {
-	}
-
-	public class Employee extends Person1 {
+	public static void main(String[] args) throws RunnerException {
+		Options options = new OptionsBuilder().include(SnowflakeTest.class.getSimpleName())
+											  .build();
+		new Runner(options).run();
 	}
 }
 ```
 
-更多请看官方例子：***[https://github.com/joel-costigliola/assertj-examples](https://github.com/joel-costigliola/assertj-examples)***
+输出结果：
 
-# JMH基准测试
+```
+Benchmark             Mode  Cnt         Score       Error  Units
+SnowflakeTest.getId  thrpt    4  32751461.735 ± 88155.402  ops/s
+```
+
+注解都可以换成方法的方式在main方法中指定，比如这样：
+
+```
+Options opt = new OptionsBuilder().include(SnowflakeTest.class.getSimpleName())
+								  .forks(1)
+								  .measurementIterations(3)
+								  .measurementTime(TimeValue.seconds(1))
+								  .warmupIterations(3)
+								  .warmupTime(TimeValue.seconds(1))
+								  .build();
+```
+
+# 注解分析
+
+下面我把一些常用的注解全部分析一遍，看完之后你就可以得心应手的使用了。
+
+## @BenchmarkMode
+
+基准测试类型，对应Mode选项，可用于**类或者方法**上。 需要注意的是，这个注解的value是一个数组，可以把几种Mode集合在一起执行，如：`@BenchmarkMode({Mode.SampleTime, Mode.AverageTime})`
+
+- Throughput：整体吞吐量，每秒执行了多少次调用。
+- AverageTime：用的平均时间，每次操作的平均时间。
+- SampleTime：随机取样，最后输出取样结果的分布，例如“99%的调用在xxx毫秒以内，99.99%的调用在xxx毫秒以内”。
+- SingleShotTime：上模式都是默认一次 iteration 是 1s，唯有 SingleShotTime 是只运行一次。往往同时把 warmup 次数设为0，用于测试冷启动时的性能。
+- All：上面的所有模式都执行一次，适用于内部JMH测试。
+
+## @Warmup
+
+预热所需要配置的一些基本测试参数。可用于**类或者方法**上。一般我们前几次进行程序测试的时候都会比较慢，所以要让程序进行几轮预热，保证测试的准确性。为什么需要预热？因为 JVM 的 JIT 机制的存在，如果某个函数被调用多次之后，JVM 会尝试将其编译成为机器码从而提高执行速度。所以为了让 benchmark 的结果更加接近真实情况就需要进行预热。
+
+- iterations：预热的次数。
+- time：每次预热的时间。
+- timeUnit：时间的单位，默认秒。
+- batchSize：批处理大小，每次操作调用几次方法。
+
+## @Measurement
+
+实际调用方法所需要配置的一些基本测试参数。可用于**类或者方法**上。参数和@Warmup一样。
+
+## @Threads
+
+每个进程中的测试线程，可用于**类或者方法**上。一般选择为cpu乘以2。如果配置了 `Threads.MAX` ，代表使用 `Runtime.getRuntime().availableProcessors()` 个线程。
+
+## @Fork
+
+进行 fork 的次数。可用于**类或者方法**上。如果 fork 数是2的话，则 JMH 会 fork 出两个进程来进行测试。
+
+## @Benchmark
+
+方法级注解，表示该方法是需要进行 benchmark 的对象，用法和 JUnit 的 @Test 类似。
+
+## @Param
+
+@Param 可以用来指定某项参数的多种情况。只能作用在**字段**上。特别适合用来测试一个函数在不同的参数输入的情况下的性能。使用该注解必须定义 `@State` 注解。
+
+```
+@Param(value = {"a", "b", "c"})
+private String param;
+```
+
+最后的结果可能是这个样子的：
+
+```
+Benchmark                    (param)  Mode  Cnt    Score   Error  Units
+FirstBenchMark.stringConcat        a    ss       330.752          us/op
+FirstBenchMark.stringConcat        b    ss       186.050          us/op
+FirstBenchMark.stringConcat        c    ss       222.559          us/op
+```
+
+## @Setup&@TearDown
+
+@Setup主要实现测试前的初始化工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
+
+@TearDown主要实现测试完成后的垃圾回收等工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
+
+这两个注解都有一个 `Level` 的枚举value，它有三个值（默认的是Trial）：
+
+- Trial：在每次Benchmark的之前/之后执行。
+- Iteration：在每次Benchmark的iteration的之前/之后执行。
+- Invocation：每次调用Benchmark标记的方法之前/之后都会执行。
+
+可见，Level的粒度从Trial到Invocation越来越细。
+
+```
+@TearDown(Level.Iteration)
+public void check() {
+    assert x > Math.PI : "Nothing changed?";
+}
+
+@Benchmark
+public void measureRight() {
+    x++;
+}
+
+@Benchmark
+public void measureWrong() {
+    double x = 0;
+    x++;
+}
+```
+
+## @State
+
+该注解定义了给定类实例的可用范围。JMH可以在多线程同时运行的环境测试，因此需要选择正确的状态。只能作用在**类**上。被该注解定义的类通常作为 `@Benchmark` 标记的方法的入参，JMH根据scope来进行实例化和共享操作，当然@State可以被继承使用，如果父类定义了该注解，子类则无需定义。
+
+Scope有如下3种值：
+
+- Benchmark：同一个benchmark在多个线程之间共享实例。
+- Group：同一个线程在同一个group里共享实例。group定义参考注解 `@Group` 。
+- Thread：不同线程之间的实例不共享。
+
+首先说一下Benchmark，对于同一个@Benchmark，所有线程共享实例，也就是只会new Person 1次
+
+```
+@State(Scope.Benchmark)
+public static class BenchmarkState {
+    Person person = new Person(21, "ben", "benchmark");
+    volatile double x = Math.PI;
+}
+
+@Benchmark
+public void measureShared(BenchmarkState state) {
+    state.x++;
+}
+
+public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+            .include(JMHSample_03_States.class.getSimpleName())
+            .threads(8)
+            .warmupTime(TimeValue.seconds(1))
+            .measurementTime(TimeValue.seconds(1))
+            .forks(1)
+            .build();
+
+    new Runner(opt).run();
+}
+```
+
+再说一下thread，这个比较好理解，不同线程之间的实例不共享。对于上面我们设定的线程数为8个，也就是会new Person 8次。
+
+```
+@State(Scope.Thread)
+public static class ThreadState {
+    Person person = new Person(21, "ben", "thread");
+    volatile double x = Math.PI;
+}
+
+@Benchmark
+public void measureUnshared(ThreadState state) {
+    state.x++;
+}
+```
+
+而对于Group来说，同一个group的作为一个执行单元，所以 `measureGroup` 和 `measureGroup2` 共享8个线程，所以一个方法也就会执行new Person 4次。
+
+```
+@State(Scope.Group)
+public static class GroupState {
+    Person person = new Person(21, "ben", "group");
+    volatile double x = Math.PI;
+}
+
+@Benchmark
+@Group("ben")
+public void measureGroup(GroupState state) {
+    state.x++;
+}
+
+@Benchmark
+@Group("ben")
+public void measureGroup2(GroupState state) {
+    state.x++;
+}
+```
+
+## @Group
+
+结合@Benchmark一起使用，把多个基准方法归为一类，只能作用在**方法**上。同一个组中的所有测试设置相同的名称(否则这些测试将独立运行——没有任何警告提示！)
+
+## @GroupThreads
+
+定义了多少个线程参与在组中运行基准方法。只能作用在**方法**上。
+
+## @OutputTimeUnit
+
+这个比较简单了，基准测试结果的时间类型。可用于**类或者方法**上。一般选择秒、毫秒、微秒。
+
+## @CompilerControl
+
+该注解可以控制方法编译的行为，可用于**类或者方法或者构造函数**上。它内部有6种模式，这里我们只关心三种重要的模式：
+
+- CompilerControl.Mode.INLINE：强制使用内联。
+- CompilerControl.Mode.DONT_INLINE：禁止使用内联。
+- CompilerControl.Mode.EXCLUDE：禁止编译方法。
+
+```
+public void target_blank() {
+}
+
+@CompilerControl(CompilerControl.Mode.DONT_INLINE)
+public void target_dontInline() {
+}
+
+@CompilerControl(CompilerControl.Mode.INLINE)
+public void target_inline() {
+}
+
+@CompilerControl(CompilerControl.Mode.EXCLUDE)
+public void target_exclude() {
+}
+
+@Benchmark
+public void baseline() {
+}
+
+@Benchmark
+public void blank() {
+    target_blank();
+}
+
+@Benchmark
+public void dontinline() {
+    target_dontInline();
+}
+
+@Benchmark
+public void inline() {
+    target_inline();
+}
+
+@Benchmark
+public void exclude() {
+    target_exclude();
+}
+```
+
+最后得出的结果也表名，使用内联优化会影响实际的结果：
+
+```
+Benchmark                                Mode  Cnt   Score   Error  Units
+JMHSample_16_CompilerControl.baseline    avgt    3   0.338 ± 0.475  ns/op
+JMHSample_16_CompilerControl.blank       avgt    3   0.343 ± 0.213  ns/op
+JMHSample_16_CompilerControl.dontinline  avgt    3   2.247 ± 0.421  ns/op
+JMHSample_16_CompilerControl.exclude     avgt    3  82.814 ± 7.333  ns/op
+JMHSample_16_CompilerControl.inline      avgt    3   0.322 ± 0.023  ns/op
+```
+
+# 6、避免JIT优化
+
+我们在测试的时候，一定要避免JIT优化。对于有一些代码，编译器可以推导出一些计算是多余的，并且完全消除它们。 如果我们的基准测试里有部分代码被清除了，那测试的结果就不准确了。比如下面这一段代码：
+
+```
+private double x = Math.PI;
+
+@Benchmark
+public void baseline() {
+    // do nothing, this is a baseline
+}
+
+@Benchmark
+public void measureWrong() {
+    // This is wrong: result is not used and the entire computation is optimized away.
+    Math.log(x);
+}
+
+@Benchmark
+public double measureRight() {
+    // This is correct: the result is being used.
+    return Math.log(x);
+}
+```
+
+由于 `measureWrong` 方法被编译器优化了，导致效果和 `baseline` 方法一样变成了空方法，结果也证实了这一点：
+
+```
+Benchmark                           Mode  Cnt   Score   Error  Units
+JMHSample_08_DeadCode.baseline      avgt    5   0.311 ± 0.018  ns/op
+JMHSample_08_DeadCode.measureRight  avgt    5  23.702 ± 0.320  ns/op
+JMHSample_08_DeadCode.measureWrong  avgt    5   0.306 ± 0.003  ns/op
+```
+
+如果我们想方法返回值还是void，但是需要让Math.log(x)的耗时加入到基准运算中，我们可以使用JMH提供给我们的类 `Blackhole` ，使用它的 `consume`来避免JIT的优化消除。
+
+```
+@Benchmark
+public void measureRight_2(Blackhole bh) {
+    bh.consume(Math.log(x));
+}
+```
+
+但是有返回值的方法就不会被优化了吗？你想的太多了。。。重新改改刚才的代码，让字段 `x` 变成final的。
+
+```
+private final double x = Math.PI;
+```
+
+运行后的结果发现 `measureRight` 被JIT进行了优化，从 `23.7ns/op` 降到了 `2.5ns/op`
+
+```
+JMHSample_08_DeadCode.measureRight    avgt    5  2.587 ± 0.081  ns/op
+```
+
+当然 `Math.log(Math.PI );` 这种返回写法和字段定义成final一样，都会被进行优化。
+
+优化的原因是因为JVM认为每次计算的结果都是相同的，于是就会把相同代码移到了JMH的循环之外。
+
+**结论：**
+
+1. 基准测试方法一定不要返回void。
+2. 如果要使用void返回，可以使用 `Blackhole` 的 `consume` 来避免JIT的优化消除。
+3. 计算不要引用常量，否则会被优化到JMH的循环之外。
+
+## IDEA插件
+
+在插件中直接搜JMH，该插件可以右键生成JMH方法，不用写main方法也能执行`@Benchmark`的方法
+
+## 参考
+
+> ***[http://benjaminwhx.com/2018/06/15/%E4%BD%BF%E7%94%A8JMH%E5%81%9A%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95/](http://benjaminwhx.com/2018/06/15/%E4%BD%BF%E7%94%A8JMH%E5%81%9A%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95/)***
 
 # Gatling性能测试
 
@@ -343,7 +685,7 @@ Gatling 是一个功能强大的负载测试工具。它是为易用性、可维
 
 3、点击`record`并在Firefox进行相应操作，然后点击`Stop`，会生成类似下面的脚本：
 
-```
+```java
 package computerdatabase 
 
 import io.gatling.core.Predef._ 
@@ -395,7 +737,7 @@ class BasicSimulation extends Simulation {
 
 3、编写测试脚本
 
-```
+```java
 class ApiGatlingSimulationTest extends Simulation {
 
   val scn: ScenarioBuilder = scenario("AddAndFindPersons").repeat(100, "n") {
@@ -419,7 +761,7 @@ class ApiGatlingSimulationTest extends Simulation {
 
 4、配置pom
 
-```
+```xml
 <properties>
     <gatling-plugin.version>2.2.4</gatling-plugin.version>
     <gatling-charts-highcharts.version>2.3.0</gatling-charts-highcharts.version>
@@ -463,7 +805,7 @@ class ApiGatlingSimulationTest extends Simulation {
 
 6、运行测试
 
-```
+```shell
 mvn gatling:execute
 ```
 ![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/idea-gatling-test.jpg)
@@ -484,7 +826,7 @@ mvn gatling:execute
 
 这是由于**使用了Log4J2**，把Gatling自带的Logback排除了（同一个项目），把`<exclusions>`这一段注释掉就没问题了：
 
-```
+```xml
 <dependency>
     <groupId>io.gatling.highcharts</groupId>
     <artifactId>gatling-charts-highcharts</artifactId>
@@ -513,21 +855,21 @@ ContiPerf是一个轻量级的**测试**工具，基于**JUnit**4 开发，可�
 
 引入依赖:
 
-```
-        <!-- 性能测试 -->
-        <dependency>
-            <groupId>org.databene</groupId>
-            <artifactId>contiperf</artifactId>
-            <scope>test</scope>
-            <version>2.1.0</version>
-        </dependency>
+```xml
+<!-- 性能测试 -->
+<dependency>
+    <groupId>org.databene</groupId>
+    <artifactId>contiperf</artifactId>
+    <scope>test</scope>
+    <version>2.1.0</version>
+</dependency>
 ```
 
 ## ContiPerf介绍
 
 可以指定在线程数量和执行次数，通过限制最大时间和平均执行时间来进行效率测试，一个简单的例子如下：
 
-```
+```java
 public class ContiPerfTest { 
     @Rule 
     public ContiPerfRule i = new ContiPerfRule(); 
@@ -545,7 +887,7 @@ public class ContiPerfTest {
 
 也可以通过对类指定`@PerfTest`和`@Required`，表示类中方法的默认设置，如下：
 
-```
+```java
 @PerfTest(invocations = 1000, threads = 40) 
 @Required(max = 1200, average = 250, totalTime = 60000) 
 public class ContiPerfTest { 

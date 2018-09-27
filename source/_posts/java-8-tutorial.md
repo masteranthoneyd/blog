@@ -64,7 +64,7 @@ public interface ActionListener {
   void actionPerformed(ActionEvent e);
 }
 
-button.addActionListener(new ActionListener) {
+button.addActionListener(new ActionListener()) {
   public void actionPerformed(ActionEvent e) {
     ui.dazzle(e.getModifiers());
   }
@@ -109,18 +109,20 @@ Collections.sort(names, (a, b) -> b.compareTo(a));
 
 ## Lexiacal Scope
 ### 访问局部变量
-1. 可以直接在Lambda表达式中访问外层的局部变量，但是和匿名对象不同的是，Lambda表达式的局部变量可以**不用声明为`final`**，不过局部变量必须不可被后面的代码修改（**即隐性的具有final的语义**）。
-  eg：下面代码无法编译
+1、可以直接在Lambda表达式中访问外层的局部变量，但是和匿名对象不同的是，Lambda表达式的局部变量可以**不用声明为`final`**，不过局部变量必须不可被后面的代码修改（**即隐性的具有final的语义**）。
+eg：下面代码无法编译
+
 ```java
 int num = 1; 
-Converter<Integer, String> s =  
-	(param) -> String.valueOf(param + num);  
+Converter<Integer, String> s =  (param) -> String.valueOf(param + num);  
 num = 5; 
 ```
 在Lambda表达式中试图修改局部变量是不允许的！
-2. 在 Lambda 表达式当中被引用的变量的值**不可以被更改**。
-3. 在 Lambda 表达式当中**不允许**声明一个与局部变量同名的参数或者局部变量。
-4. ​
+
+2、在 Lambda 表达式当中被引用的变量的值**不可以被更改**。
+
+3、在 Lambda 表达式当中**不允许**声明一个与局部变量同名的参数或者局部变量。
+
 ### 访问对象字段与静态变量
 和局部变量不同的是，Lambda内部对于实例的字段（即：成员变量）以及静态变量是**即可读又可写**。
 
@@ -460,17 +462,17 @@ Collectors 实用类提供了许多静态工厂方法，用来创建常见收集
 
 `collect vs. reduce`，两者都是 `Stream` 接口的方法，区别在于：
 - 语意问题    
-  - reduce 方法旨在把两个值结合起来生成一个新值，是不可变的归约；
-  - collect 方法设计就是要改变容器，从而累积要输出的结果
+  - `reduce` 方法旨在把两个值结合起来生成一个新值，是不可变的归约；
+  - `collect` 方法设计就是要改变容器，从而累积要输出的结果
 - 实际问题    
-  - 以错误的语义使用 reduce 会导致归约过程不能并行工作
+  - 以错误的语义使用 `reduce` 会导致归约过程不能并行工作
 
 分组和分区
 - 分组：`Collectors.groupingBy`
   - 多级分组
   - 按子数组收集数据: `maxBy`
     - 把收集器的结果转换为另一种结果 `collectingAndThen`
-    - 与 groupingBy 联合使用的其他收集器例子：`summingInt`,`mapping`
+    - 与 `groupingBy` 联合使用的其他收集器例子：`summingInt`,`mapping`
 - 分区：`Collectors.partitioningBy`是分组的特殊情况，由一个谓词作为分类函数(分区函数)，返回一个Map，只有两个Boolean类型的key。
 
 #### Ex1:使用collect()生成Collection
@@ -609,7 +611,270 @@ System.out.println(hints2.length);          // 2
 @interface MyAnnotation {}
 ```
 
+# Time API
+
+## 现有API存在的问题
+
+- 线程安全: `Date`和`Calendar`**不是线程安全的**，你需要编写额外的代码处理线程安全问题
+- API设计和易用性: 由于`Date`和`Calendar`的设计不当你无法完成日常的日期操作
+- `ZonedDate`和`Time`: 你必须编写额外的逻辑处理时区和那些旧的逻辑
+
+好在[JSR 310](http://link.zhihu.com/?target=http%3A//jcp.org/en/jsr/detail%3Fid%3D310)规范中为Java8添加了新的API
+在`java.time`包中，新的API纠正了过去的缺陷
+
+## 新的日期API
+
+- `ZoneId`: 时区ID，用来确定`Instant`和`LocalDateTime`互相转换的规则
+- `Instant`: 用来表示时间线上的一个点
+- `LocalDate`: 表示没有时区的日期, `LocalDate`是不可变并且**线程安全**的
+- `LocalTime`: 表示没有时区的时间, `LocalTime`是不可变并且**线程安全**的
+- `LocalDateTime`: 表示没有时区的日期时间, `LocalDateTime`是不可变并且线程安全的
+- `Clock`: 用于访问当前时刻、日期、时间，用到时区
+- `Duration`: 用秒和纳秒表示时间的数量
+
+最常用的就是`LocalDate`、`LocalTime`、`LocalDateTime`
+
+## Clock
+
+`Clock`提供了对当前时间和日期的访问功能。`Clock`是对当前时区敏感的，并可用于替代`System.currentTimeMillis()`方法来获取当前的毫秒时间。当前时间线上的时刻可以用`Instance`类来表示。Instance也能够用于创建原先的`java.util.Date`对象。
+
+```
+Clock clock = Clock.systemDefaultZone();
+long millis = clock.millis();
+
+Instant instant = clock.instant();
+Date legacyDate = Date.from(instant); // legacy java.util.Date
+```
+
+## Timezones
+
+时区类可以用一个`ZoneId`来表示。时区类的对象可以通过静态工厂方法方便地获取。时区类还定义了一个偏移量，用来在当前时刻或某时间与目标时区时间之间进行转换。
+
+```
+System.out.println(ZoneId.getAvailableZoneIds());
+// prints all available timezone ids
+
+ZoneId zone1 = ZoneId.of("Europe/Berlin");
+ZoneId zone2 = ZoneId.of("Brazil/East");
+System.out.println(zone1.getRules());
+System.out.println(zone2.getRules());
+
+// ZoneRules[currentStandardOffset=+01:00]
+// ZoneRules[currentStandardOffset=-03:00]
+```
+
+## LocalDate
+
+`LocalDate`代表一个IOS格式(`yyyy-MM-dd`)的日期，它有多个构造方法：
+
+```
+LocalDate.now();
+LocalDate.of(2018, 8, 15);
+LocalDate.parse("2018-08-15");
+LocalDate.parse("2018.08.15", DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+```
+
+其他API：
+
+```
+// 获取明天
+LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+// 上一个月的今天
+LocalDate prevMonth = LocalDate.now().minus(1, ChronoUnit.MONTHS);
+
+// 获取今天是星期几
+DayOfWeek thursday = LocalDate.parse("2018-09-27").getDayOfWeek();
+
+// 获取今天是几号
+int dayOfMonth = LocalDate.parse("2018-09-27").getDayOfMonth();
+
+// 今年是不是闰年
+boolean leapYear = LocalDate.now().isLeapYear();
+```
+
+日期比较：
+
+```
+LocalDate now = LocalDate.now();
+LocalDate tomorrow = now.plusDays(1);
+System.out.println(now.isBefore(tomorrow));
+System.out.println(tomorrow.isAfter(now));
+```
+
+获取这个月的第一天
+
+```
+LocalDate firstDayOfMonth = LocalDate.parse("2018-08-15").with(TemporalAdjusters.firstDayOfMonth());
+System.out.println("这个月的第一天: " + firstDayOfMonth);
+firstDayOfMonth = firstDayOfMonth.withDayOfMonth(1);
+System.out.println("这个月的第一天: " + firstDayOfMonth);
+```
+
+判断否是生日
+
+```
+LocalDate birthday = LocalDate.of(1994, 04, 15);
+MonthDay birthdayMd = MonthDay.of(birthday.getMonth(), birthday.getDayOfMonth());
+MonthDay today = MonthDay.from(LocalDate.now());
+System.out.println("否是生日: " + today.equals(birthdayMd));
+```
+
+## LocalTime
+
+构造方法与LocalDate类似：
+
+```
+LocalTime.now();
+LocalTime.parse("15:02");
+LocalTime.of(15, 02);
+```
+
+时间加减：
+
+```
+LocalTime.parse("15:02").plus(1, ChronoUnit.HOURS);
+LocalTime.now().plusHours(1);
+```
+
+获取时间的小时、分钟:
+
+```
+int hour = LocalTime.parse("15:02").getHour();
+int minute = LocalTime.parse("15:02").getMinute();
+```
+
+时间比较：
+
+```
+LocalTime.parse("15:02").isBefore(LocalTime.parse("16:02"));
+LocalTime.parse("15:02").isAfter(LocalTime.parse("16:02"));
+```
+
+一天的开始与结束：
+
+```
+System.out.println(LocalTime.MAX);
+System.out.println(LocalTime.MIN);
+```
+
+输出:
+
+```
+23:59:59.999999999
+00:00
+```
+
+## LocalDateTime
+
+这个应该是最常用的了，构造方法与上面两个类似：
+
+```
+LocalDateTime.now();
+LocalDateTime.of(2018, Month.AUGUST, 15, 15, 18);
+LocalDateTime.parse("2018-08-15T15:18:00");
+```
+
+时间加减操作与上面差不多：
+
+```
+LocalDateTime tomorrow = now.plusDays(1);
+LocalDateTime minusTowHour = now.minusHours(2);
+```
+
+时间比较:
+
+```
+tomorrow.isAfter(minusTowHour)
+```
+
+获取特定单位：
+
+```
+Month month = now.getMonth();
+```
+
+转换成`LocalDate`和`LocalTime`:
+
+```
+now.toLocalDate();
+now.toLocalTime();
+```
+
+获取某天的开始：
+
+```
+LocalDateTime localDateTime = LocalDateTime.now();
+LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+```
+
+## 日期格式化
+
+```
+LocalDateTime now = LocalDateTime.now();
+DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+System.out.println("默认格式化: " + now);
+System.out.println("自定义格式化: " + now.format(dateTimeFormatter));
+LocalDateTime localDateTime = LocalDateTime.parse("2018-08-15 15:27:44", dateTimeFormatter);
+System.out.println("字符串转LocalDateTime: " + localDateTime);
+```
+
+也可以使用`DateTimeFormatter`的`format`方法将日期、时间格式化为字符串
+
+```
+DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+String dateString = dateTimeFormatter.format(LocalDate.now());
+System.out.println("日期转字符串: " + dateString);
+```
+
+## 日期周期
+
+`Period`类用于修改给定日期或获得的两个日期之间的区别。
+
+给初始化的日期添加5天:
+
+```
+LocalDate initialDate = LocalDate.parse("2018-08-15");
+LocalDate finalDate   = initialDate.plus(Period.ofDays(5));
+```
+
+周期API中提供给我们可以比较两个日期的差别，像下面这样获取差距天数:
+
+```
+long between = ChronoUnit.DAYS.between(initialDate, finalDate);
+```
+
+上面的代码会返回5，当然你想获取两个日期相差多少小时也是简单的。
+
+## 与Date转换
+
+`Date`和`Instant`互相转换
+
+```
+Date date = Date.from(Instant.now());
+Instant instant = date.toInstant();
+```
+
+`Date`转换为`LocalDateTime`
+
+```
+LocalDateTime now = LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
+```
+
+`LocalDateTime`转`Date`
+
+```
+Date date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+```
+
+`LocalDate`转`Date`
+
+```
+Date date = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+```
+
 # Other Extend
+
 ## Lambda表达式遇上检测型异常
 
 先来看一段代码：
@@ -683,9 +948,9 @@ private static Stream<String> getLines(Path file) {
 
 ```
 @FunctionalInterface
-	public interface UncheckedFunction<T, R> {
-		R apply(T t) throws Exception;
-	}
+public interface UncheckedFunction<T, R> {
+	R apply(T t) throws Exception;
+}
 ```
 
 那么该 *`FunctionInterface`* 便可以作为类似于 `file -> File.lines(file)` 这类会抛出受检异常的 Lambda 的目标类型，此时 Lambda 中并不需要捕获异常（因为目标类型的 `apply` 方法已经将异常抛出了）—— 之所以原来的 Lambda 需要捕获异常，就是因为在流式操作 `flatMap` 中使用的 `java.util.function` 包下的 `Function<T, R>` 没有抛出异常：
@@ -1158,8 +1423,8 @@ public static Map<String, List<Integer>> getElementPositions(List<String> list) 
 
 > 参考
 > ***[Java8简明教程](http://blog.didispace.com/books/java8-tutorial/)***
+> ***[知乎专栏](https://zhuanlan.zhihu.com/java8)***
 > ***[CarpenterLee](http://www.cnblogs.com/CarpenterLee/)***
 > ***[http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)***
 > ***[http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api](http://brianway.github.io/2017/03/29/javase-java8/#%E6%B5%81stream-api)***
-> ***[http://ifeve.com/java-8-features-tutorial/](http://ifeve.com/java-8-features-tutorial/)***
 > ***[https://segmentfault.com/a/1190000007832130](https://segmentfault.com/a/1190000007832130)***

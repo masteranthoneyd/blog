@@ -1,8 +1,17 @@
+---
+title: 分布式锁的几种实现方式
+date: 2018-08-27 17:19:33
+categories: [Java]
+tags: [Java, Redis, Zookeeper, Spring Boot, Spring]
+---
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/distribute-lock/distribute-lock-banner.png)
 
 # Preface
 
 > 在现代互联网，通常都是伴随着分布式、高并发等，在某些业务中例如下订单扣减库存，如果不对库存资源做临界处理，在并发量大的时候会出现库存不准确的情况。在单个服务的情况下可以通过Java自带的一些锁对临界资源进行处理，例如`synchronized`、`Reentrantlock`，甚至是通过无锁技术（比如`RangeBuffer`）都可以实现同一个JVM内的锁。But，在**能够弹性伸缩的分布式环境**下，Java内置的锁显然不能够满足需求，需要借助外部进程实现分布式锁。
+
+<!--more-->
 
 # 几种实现方式
 
@@ -259,7 +268,7 @@ public void release(String key, String value) {
 
 Redisson提供的众多功能中有一项就是可重入锁（Reentrant Lock），具体用法可参考 ***[文档](https://github.com/redisson/redisson/wiki/8.-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8)*** 
 
-主要依赖：
+### 依赖
 
 ```
 <dependency>
@@ -275,7 +284,7 @@ Redisson提供的众多功能中有一项就是可重入锁（Reentrant Lock）�
 </dependency>
 ```
 
-核心代码：
+### 核心代码
 
 ```
 @Data
@@ -364,5 +373,111 @@ public class RedissonDLock implements DLock {
 }
 ```
 
+* 一般服务器都是Linux系统，引入`io.netty.channel.epoll.Epoll`采用Epoll方式有助于提升性能
+* 使用`try-with-resource`方式提高代码优雅性...
 
+### 注解驱动
 
+Lock注解：
+
+```
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+public @interface Lock {
+
+	String namespace() default "default";
+
+	String key();
+
+	Class<?> prefixClass();
+
+	String separator() default ":";
+
+	long waitTime() default 2L;
+
+	long leaseTime() default 5L;
+
+	TimeUnit timeUnit() default TimeUnit.SECONDS;
+}
+```
+
+切面类：
+
+```
+@Slf4j
+@Component
+@Aspect
+@Order(1)
+public class DLockAspect {
+	@Resource
+	private DLock dLock;
+
+	@Value("${spring.application.name}")
+	private String namespace;
+
+	@Around(value = "@annotation(lock)")
+	public Object doAround(ProceedingJoinPoint pjp, Lock lock) throws Throwable {
+		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+
+		Object[] args = pjp.getArgs();
+		String keySpEL = lock.key();
+		String resourceKey = parseSpel(method, args, keySpEL, String.class);
+
+		String finalKey = buildFinalKey(lock, resourceKey);
+		return dLock.tryLockAndExecuteCommand(() -> finalKey, () -> pjp.proceed(pjp.getArgs()), DEFAULT_FAIL_ACQUIRE_ACTION,
+				lock.waitTime(), lock.leaseTime(), lock.timeUnit());
+	}
+
+	private String buildFinalKey(Lock lock, String key) {
+		return namespace == null || namespace.length() == 0 ? lock.namespace() : namespace +
+				lock.separator() +
+				lock.prefixClass().getSimpleName() +
+				lock.separator() +
+				key;
+	}
+}
+```
+
+使用了 ***[SpEL](https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions)*** 解析锁的Key：
+
+```
+public final class SpelHelper {
+	private static final ExpressionParser PARSER = new SpelExpressionParser();
+	private static final LocalVariableTableParameterNameDiscoverer DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
+
+	public static <T> T parseSpel(Method method, Object[] args, String spel, Class<T> clazz) {
+		String[] parameterNames = DISCOVERER.getParameterNames(method);
+		requireNonNull(parameterNames);
+		EvaluationContext context = buildSpelContext(parameterNames, args);
+		Expression expression = PARSER.parseExpression(spel);
+		return expression.getValue(context, clazz);
+	}
+
+	private static EvaluationContext buildSpelContext(String[] parameterNames, Object[] args) {
+		EvaluationContext context = new StandardEvaluationContext();
+		for (int len = 0; len < parameterNames.length; len++) {
+			context.setVariable(parameterNames[len], args[len]);
+		}
+		context.setVariable("args", args);
+		return context;
+	}
+}
+```
+
+使用：
+
+```
+// @Lock(prefixClass = TestService.class, key = "#id")
+@Lock(prefixClass = TestService.class, key = "#args[0]")
+public void lockTest(Long id) {
+	doSomething();
+}
+```
+
+> 如果锁被早被别的线程使用，一般我们使用线程Sleep的方式等待锁释放，但Redisson的底层采用了更优雅的等待策略，通过发布订阅通知其他线程，所以性能也会有所提高。
+
+# Finally
+
+> Redisson官方文档： ***[https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95)***
