@@ -1,7 +1,7 @@
 ---
 title: 分布式锁的几种实现方式
-date: 2018-08-27 17:19:33
-categories: [Java]
+date: 2018-09-15 17:19:33
+categories: [Programming, Java]
 tags: [Java, Redis, Zookeeper, Spring Boot, Spring]
 ---
 

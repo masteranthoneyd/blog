@@ -1,6 +1,23 @@
-# 测试篇
+---
+title: Spring Boot学习之测试篇
+date: 2018-08-28 10:16:40
+categories: [Programming, Java, Spring Boot]
+tags: [Java, Spring Boot, AssertJ, JMH, Gatling, ContPerf]
+---
+
+![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-testing/java-testing.png)
+
+# Preface
+
+> 测试已经是贯穿我们程序员的日常开发流程了，无论写个main方法，还是使用测试框架Junit、AssertJ，或者压测，都是我们日常开发的一部分。也有很多互联网公司推崇TDD（测试驱动开发）的。
+>
+> 下面主要介绍`AssertJ`、`JMH`、`Gatling`以及`ContPerf`。
+
+<!--more-->
 
 # 使用AssertJ
+
+`AseertJ`: JAVA 流式断言器，什么是流式，常见的断言器一条断言语句只能对实际值断言一个校验点，而流式断言器，支持一条断言语句对实际值同时断言多个校验点。
 
 > [AssertJ Core features highlight](http://joel-costigliola.github.io/assertj/assertj-core-features-highlight.html)
 
@@ -277,6 +294,15 @@ public void addDesc() {
 
 # JMH基准测试
 
+> JMH 是一个由 OpenJDK/Oracle 里面那群开发了 Java 编译器的大牛们所开发的 Micro Benchmark Framework 。何谓 Micro Benchmark 呢？简单地说就是在 **method** 层面上的 benchmark，精度可以精确到微秒级。可以看出 JMH 主要使用在当你已经找出了热点函数，而需要对热点函数进行进一步的优化时，就可以使用 JMH 对优化的效果进行定量的分析。
+>
+> 比较典型的使用场景还有：
+>
+> - 想定量地知道某个函数需要执行多长时间，以及执行时间和输入 n 的相关性
+> - 一个函数有两种不同实现（例如实现 A 使用了 `FixedThreadPool`，实现 B 使用了 `ForkJoinPool`），不知道哪种实现性能更好
+>
+> 尽管 JMH 是一个相当不错的 Micro Benchmark Framework，但很无奈的是网上能够找到的文档比较少，而官方也没有提供比较详细的文档，对使用造成了一定的障碍。但是有个好消息是官方的 ***[Code Sample](http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/)*** 写得非常浅显易懂，
+
 ## 导入Jar包
 
 ```xml
@@ -307,7 +333,7 @@ public void addDesc() {
 public class SnowflakeTest {
 	private static final Snowflake[] SNOWFLAKES = IntStream.rangeClosed(1, 8)
 														   .mapToObj(Snowflake::create)
-														   .toArray(value -> new Snowflake[8]);
+														   .toArray(Snowflake[]::new);
 
 	private static final AtomicLong ATOMIC_LONG = new AtomicLong(0);
 
@@ -334,7 +360,7 @@ SnowflakeTest.getId  thrpt    4  32751461.735 ± 88155.402  ops/s
 
 注解都可以换成方法的方式在main方法中指定，比如这样：
 
-```
+```java
 Options opt = new OptionsBuilder().include(SnowflakeTest.class.getSimpleName())
 								  .forks(1)
 								  .measurementIterations(3)
@@ -344,50 +370,50 @@ Options opt = new OptionsBuilder().include(SnowflakeTest.class.getSimpleName())
 								  .build();
 ```
 
-# 注解分析
+## 注解分析
 
 下面我把一些常用的注解全部分析一遍，看完之后你就可以得心应手的使用了。
 
-## @BenchmarkMode
+### @BenchmarkMode
 
-基准测试类型，对应Mode选项，可用于**类或者方法**上。 需要注意的是，这个注解的value是一个数组，可以把几种Mode集合在一起执行，如：`@BenchmarkMode({Mode.SampleTime, Mode.AverageTime})`
+基准测试类型，对应Mode选项，可用于**类或者方法**上。 需要注意的是，这个注解的`value`是一个**数组**，可以把几种Mode集合在一起执行，如：`@BenchmarkMode({Mode.SampleTime, Mode.AverageTime})`
 
-- Throughput：整体吞吐量，每秒执行了多少次调用。
-- AverageTime：用的平均时间，每次操作的平均时间。
-- SampleTime：随机取样，最后输出取样结果的分布，例如“99%的调用在xxx毫秒以内，99.99%的调用在xxx毫秒以内”。
-- SingleShotTime：上模式都是默认一次 iteration 是 1s，唯有 SingleShotTime 是只运行一次。往往同时把 warmup 次数设为0，用于测试冷启动时的性能。
-- All：上面的所有模式都执行一次，适用于内部JMH测试。
+- `Throughput`：整体吞吐量，每秒执行了多少次调用。
+- `AverageTime`：用的平均时间，每次操作的平均时间。
+- `SampleTime`：随机取样，最后输出取样结果的分布，例如“99%的调用在xxx毫秒以内，99.99%的调用在xxx毫秒以内”。
+- `SingleShotTime`：上模式都是默认一次 `iteration` 是 1s，唯有 `SingleShotTime` 是只运行一次。往往同时把 `warmup` 次数设为0，用于测试冷启动时的性能。
+- `All`：上面的所有模式都执行一次，适用于内部JMH测试。
 
-## @Warmup
+### @Warmup
 
-预热所需要配置的一些基本测试参数。可用于**类或者方法**上。一般我们前几次进行程序测试的时候都会比较慢，所以要让程序进行几轮预热，保证测试的准确性。为什么需要预热？因为 JVM 的 JIT 机制的存在，如果某个函数被调用多次之后，JVM 会尝试将其编译成为机器码从而提高执行速度。所以为了让 benchmark 的结果更加接近真实情况就需要进行预热。
+预热所需要配置的一些基本测试参数。可用于**类或者方法**上。一般我们前几次进行程序测试的时候都会比较慢，所以要让程序进行几轮预热，保证测试的准确性。为什么需要预热？因为 JVM 的 JIT 机制的存在，**如果某个函数被调用多次之后**，**JVM 会尝试将其编译成为机器码从而提高执行速度**。所以为了让 benchmark 的结果更加接近真实情况就需要进行预热。
 
-- iterations：预热的次数。
-- time：每次预热的时间。
-- timeUnit：时间的单位，默认秒。
-- batchSize：批处理大小，每次操作调用几次方法。
+- `iterations`：预热的次数。
+- `time`：每次预热的时间。
+- `timeUnit`：时间的单位，默认秒。
+- `batchSize`：批处理大小，每次操作调用几次方法。
 
-## @Measurement
+### @Measurement
 
-实际调用方法所需要配置的一些基本测试参数。可用于**类或者方法**上。参数和@Warmup一样。
+实际调用方法所需要配置的一些基本测试参数。可用于**类或者方法**上。参数和**@Warmup**一样。
 
-## @Threads
+### @Threads
 
 每个进程中的测试线程，可用于**类或者方法**上。一般选择为cpu乘以2。如果配置了 `Threads.MAX` ，代表使用 `Runtime.getRuntime().availableProcessors()` 个线程。
 
-## @Fork
+### @Fork
 
 进行 fork 的次数。可用于**类或者方法**上。如果 fork 数是2的话，则 JMH 会 fork 出两个进程来进行测试。
 
-## @Benchmark
+### @Benchmark
 
 方法级注解，表示该方法是需要进行 benchmark 的对象，用法和 JUnit 的 @Test 类似。
 
-## @Param
+### @Param
 
-@Param 可以用来指定某项参数的多种情况。只能作用在**字段**上。特别适合用来测试一个函数在不同的参数输入的情况下的性能。使用该注解必须定义 `@State` 注解。
+`@Param` 可以用来指定某项参数的多种情况。只能作用在**字段**上。特别适合用来测试一个函数在不同的参数输入的情况下的性能。使用该注解必须定义 `@State` 注解。
 
-```
+```java
 @Param(value = {"a", "b", "c"})
 private String param;
 ```
@@ -401,19 +427,19 @@ FirstBenchMark.stringConcat        b    ss       186.050          us/op
 FirstBenchMark.stringConcat        c    ss       222.559          us/op
 ```
 
-## @Setup&@TearDown
+### @Setup&@TearDown
 
-@Setup主要实现测试前的初始化工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
+`@Setup`主要实现测试前的初始化工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
 
-@TearDown主要实现测试完成后的垃圾回收等工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
+`@TearDown`主要实现测试完成后的垃圾回收等工作，只能作用在**方法**上。用法和Junit一样。使用该注解必须定义 `@State` 注解。
 
 这两个注解都有一个 `Level` 的枚举value，它有三个值（默认的是Trial）：
 
-- Trial：在每次Benchmark的之前/之后执行。
-- Iteration：在每次Benchmark的iteration的之前/之后执行。
-- Invocation：每次调用Benchmark标记的方法之前/之后都会执行。
+- `Trial`：在每次Benchmark的之前/之后执行。
+- `Iteration`：在每次Benchmark的`iteration`的之前/之后执行。
+- `Invocation`：每次调用Benchmark标记的方法之前/之后都会执行。
 
-可见，Level的粒度从Trial到Invocation越来越细。
+可见，Level的粒度从`Trial`到`Invocation`越来越细。
 
 ```
 @TearDown(Level.Iteration)
@@ -433,19 +459,19 @@ public void measureWrong() {
 }
 ```
 
-## @State
+### @State
 
-该注解定义了给定类实例的可用范围。JMH可以在多线程同时运行的环境测试，因此需要选择正确的状态。只能作用在**类**上。被该注解定义的类通常作为 `@Benchmark` 标记的方法的入参，JMH根据scope来进行实例化和共享操作，当然@State可以被继承使用，如果父类定义了该注解，子类则无需定义。
+该注解定义了给定类实例的可用范围。JMH可以在多线程同时运行的环境测试，因此需要选择正确的状态。只能作用在**类**上。被该注解定义的类通常作为 `@Benchmark` 标记的方法的入参，JMH根据scope来进行实例化和共享操作，当然`@State`可以被继承使用，如果父类定义了该注解，子类则无需定义。
 
 Scope有如下3种值：
 
-- Benchmark：同一个benchmark在多个线程之间共享实例。
-- Group：同一个线程在同一个group里共享实例。group定义参考注解 `@Group` 。
-- Thread：不同线程之间的实例不共享。
+- `Benchmark`：同一个benchmark在多个线程之间共享实例。
+- `Group`：同一个线程在同一个group里共享实例。group定义参考注解 `@Group` 。
+- `Thread`：不同线程之间的实例不共享。
 
-首先说一下Benchmark，对于同一个@Benchmark，所有线程共享实例，也就是只会new Person 1次
+首先说一下`Benchmark`，对于同一个`@Benchmark`，所有线程共享实例，也就是只会new Person 1次
 
-```
+```java
 @State(Scope.Benchmark)
 public static class BenchmarkState {
     Person person = new Person(21, "ben", "benchmark");
@@ -470,9 +496,9 @@ public static void main(String[] args) throws RunnerException {
 }
 ```
 
-再说一下thread，这个比较好理解，不同线程之间的实例不共享。对于上面我们设定的线程数为8个，也就是会new Person 8次。
+再说一下`Thread`，这个比较好理解，不同线程之间的实例不共享。对于上面我们设定的线程数为8个，也就是会new Person 8次。
 
-```
+```java
 @State(Scope.Thread)
 public static class ThreadState {
     Person person = new Person(21, "ben", "thread");
@@ -487,7 +513,7 @@ public void measureUnshared(ThreadState state) {
 
 而对于Group来说，同一个group的作为一个执行单元，所以 `measureGroup` 和 `measureGroup2` 共享8个线程，所以一个方法也就会执行new Person 4次。
 
-```
+```java
 @State(Scope.Group)
 public static class GroupState {
     Person person = new Person(21, "ben", "group");
@@ -507,27 +533,27 @@ public void measureGroup2(GroupState state) {
 }
 ```
 
-## @Group
+### @Group
 
-结合@Benchmark一起使用，把多个基准方法归为一类，只能作用在**方法**上。同一个组中的所有测试设置相同的名称(否则这些测试将独立运行——没有任何警告提示！)
+结合`@Benchmark`一起使用，把多个基准方法归为一类，只能作用在**方法**上。同一个组中的所有测试设置相同的名称(否则这些测试将独立运行——没有任何警告提示！)
 
-## @GroupThreads
+### @GroupThreads
 
 定义了多少个线程参与在组中运行基准方法。只能作用在**方法**上。
 
-## @OutputTimeUnit
+### @OutputTimeUnit
 
 这个比较简单了，基准测试结果的时间类型。可用于**类或者方法**上。一般选择秒、毫秒、微秒。
 
-## @CompilerControl
+### @CompilerControl
 
 该注解可以控制方法编译的行为，可用于**类或者方法或者构造函数**上。它内部有6种模式，这里我们只关心三种重要的模式：
 
-- CompilerControl.Mode.INLINE：强制使用内联。
-- CompilerControl.Mode.DONT_INLINE：禁止使用内联。
-- CompilerControl.Mode.EXCLUDE：禁止编译方法。
+- `CompilerControl.Mode.INLINE`：强制使用内联。
+- `CompilerControl.Mode.DONT_INLINE`：禁止使用内联。
+- `CompilerControl.Mode.EXCLUDE`：禁止编译方法。
 
-```
+```java
 public void target_blank() {
 }
 
@@ -579,11 +605,11 @@ JMHSample_16_CompilerControl.exclude     avgt    3  82.814 ± 7.333  ns/op
 JMHSample_16_CompilerControl.inline      avgt    3   0.322 ± 0.023  ns/op
 ```
 
-# 6、避免JIT优化
+## 避免JIT优化
 
 我们在测试的时候，一定要避免JIT优化。对于有一些代码，编译器可以推导出一些计算是多余的，并且完全消除它们。 如果我们的基准测试里有部分代码被清除了，那测试的结果就不准确了。比如下面这一段代码：
 
-```
+```java
 private double x = Math.PI;
 
 @Benchmark
@@ -613,9 +639,9 @@ JMHSample_08_DeadCode.measureRight  avgt    5  23.702 ± 0.320  ns/op
 JMHSample_08_DeadCode.measureWrong  avgt    5   0.306 ± 0.003  ns/op
 ```
 
-如果我们想方法返回值还是void，但是需要让Math.log(x)的耗时加入到基准运算中，我们可以使用JMH提供给我们的类 `Blackhole` ，使用它的 `consume`来避免JIT的优化消除。
+如果我们想方法返回值还是`void`，但是需要让`Math.log(x)`的耗时加入到基准运算中，我们可以使用JMH提供给我们的类 `Blackhole` ，使用它的 `consume`来避免JIT的优化消除。
 
-```
+```java
 @Benchmark
 public void measureRight_2(Blackhole bh) {
     bh.consume(Math.log(x));
@@ -624,7 +650,7 @@ public void measureRight_2(Blackhole bh) {
 
 但是有返回值的方法就不会被优化了吗？你想的太多了。。。重新改改刚才的代码，让字段 `x` 变成final的。
 
-```
+```java
 private final double x = Math.PI;
 ```
 
@@ -640,9 +666,9 @@ JMHSample_08_DeadCode.measureRight    avgt    5  2.587 ± 0.081  ns/op
 
 **结论：**
 
-1. 基准测试方法一定不要返回void。
-2. 如果要使用void返回，可以使用 `Blackhole` 的 `consume` 来避免JIT的优化消除。
-3. 计算不要引用常量，否则会被优化到JMH的循环之外。
+1. 基准测试方法一定不要返回`void`。
+2. 如果要使用`void`返回，可以使用 `Blackhole` 的 `consume` 来避免JIT的优化消除。
+3. 计算**不要引用常量**，否则会被优化到JMH的循环之外。
 
 ## IDEA插件
 
