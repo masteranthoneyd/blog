@@ -720,6 +720,17 @@ MonthDay today = MonthDay.from(LocalDate.now());
 System.out.println("否是生日: " + today.equals(birthdayMd));
 ```
 
+固定的日期，比如信用卡过期时间
+
+```
+YearMonth currentYearMonth = YearMonth.now();
+System.out.printf("Days in month year %s: %d%n", currentYearMonth,currentYearMonth.lengthOfMonth()); 
+YearMonth creditCardExpiry = YearMonth.of(2018, Month.FEBRUARY); 
+System.out.printf("Your credit card expires on %s %n", creditCardExpiry); 
+```
+
+
+
 ## LocalTime
 
 构造方法与LocalDate类似：
@@ -835,7 +846,7 @@ System.out.println("日期转字符串: " + dateString);
 
 ```
 LocalDate initialDate = LocalDate.parse("2018-08-15");
-LocalDate finalDate   = initialDate.plus(Period.ofDays(5));
+LocalDate finalDate = initialDate.plus(Period.ofDays(5));
 ```
 
 周期API中提供给我们可以比较两个日期的差别，像下面这样获取差距天数:

@@ -1,15 +1,33 @@
+---
+title: 设计模式之创建型(Creational)
+date: 2018-7-12 14:34:52
+categories: [Programming, Java, Design Pattern]
+tags: [Java, Design Pattern]
+---
+
+![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern/design-pattern-creation.jpg)
+
+# Preface
+
+> 创建型模式(`Creational Pattern`)对类的实例化过程进行了抽象，能够将软件模块中对象的创建和对象的使用分离。为了使软件的结构更加清晰，外界对于这些对象只需要知道它们共同的接口，而不清楚其具体的实现细节，使整个系统的设计更加符合单一职责原则。
+>
+> 创建型模式在创建什么(What)，由谁创建(Who)，何时创建(When)等方面都为软件设计者提供了尽可能大的灵活性。创建型模式隐藏了类的实例的创建细节，通过隐藏对象如何被创建和组合在一起达到使整个系统独立的目的。
+
+<!--more-->
+
 # Singleton Pattern
-## UML
+
+
+
 ![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/singleton.png)
 
-## 什么是单例模式
 这么说吧，一个城市只能有一个市长，每当需要他的时候他总会出现，并且每次都是同一个人。总不能一个城市有两个市长吧？
 那么单例模式就是保证一个类只有一个实例化对象，并提供一个全局访问入口。
 本质就是控制实例的数量。
 
 ## 小学生式单例模式
 现在来看一个最原始的单例：
-```
+```java
 package com.yangbingdong.singleton;
 
 /**
@@ -38,7 +56,7 @@ public class SimpleSingleton {
 但若是已出来工作的写出这样的代码。。。那是找群殴。。。
 
 单例模式中注重的是**单**字，上面代码有可能造成多个实例，来一段多线程测试代码：
-```
+```java
 package com.yangbingdong.singleton;
 
 import java.util.HashSet;
@@ -94,7 +112,7 @@ public class SingletonTest {
 
 执行结果：
 
-```
+```java
 ------并发情况下我们取到的实例------
 com.yangbingdong.singleton.SimpleSingleton@3bf59e6d
 com.yangbingdong.singleton.SimpleSingleton@4e593af6
@@ -105,7 +123,7 @@ com.yangbingdong.singleton.SimpleSingleton@7eac491e
 
 ## 饿汉式
 
-```
+```java
 package com.yangbingdong.singleton;
 
 /**
@@ -130,7 +148,7 @@ public class EagerSingleton {
 
 ## 懒汉式
 
-```
+```java
 package com.yangbingdong.singleton;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -167,7 +185,7 @@ public class LazySingleton {
 
 ## 双重检查加锁
 
-```
+```java
 package com.yangbingdong.singleton;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -215,7 +233,7 @@ double check模式需要在给`instance`加上`volatile`关键字，作用是当
 线程A、B同时进入并通过了第一个`if (instance == null)`，然后A获取了锁，A把`instance`实例化并释放锁，B获取锁，但此时B自己的内存里的`instance`还是空（因为没有强制读取主存并不知道`instance`已经被实例化了），所以又实例化了一个对象。。。
 
 ## Lazy initialization holder class模式
-```
+```java
 package com.yangbingdong.singleton;
 
 /**
@@ -242,7 +260,7 @@ public class InnerClassSingleton {
 
 ## 枚举
 
-```
+```java
 package com.yangbingdong.singleton;
 
 import java.util.function.Supplier;
@@ -278,7 +296,7 @@ private Object readResolve() {
 ## Java标准库中的单例模式
 
 `java.lang.Runtime#getRuntime()`就是一个典型的代表。
-```
+```java
 class Runtime {
 	private static Runtime currentRuntime = new Runtime();
  
@@ -295,19 +313,17 @@ class Runtime {
 
 # Simple Factory Pattern
 
-## UML
 ![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/simple-factory.png)
 
-## 什么是简单工厂模式
 简单工厂模式又被称为**静态工厂方法模式**，由**一个**工厂类根据传入的参数，动态决定应该创建哪一个产品类（这些产品类继承自一个父类或接口）的实例。
 
 将“类实例化的操作”与“使用对象的操作”分开，让使用者不用知道具体参数就可以实例化出所需要的“产品”类，从而避免了在客户端代码中显式指定，实现了**解耦**；
 即使用者可直接消费产品而不需要知道其生产的细节
 
-## 上代码
+## 代码
 
 定义人类接口：
-```
+```java
 public interface Human {
 	/**
 	 * 是个人都会讲话
@@ -317,7 +333,7 @@ public interface Human {
 ```
 
 实现类（男人和女人）：
-```
+```java
 public class Man implements Human {
 	@Override
 	public void talk() {
@@ -334,7 +350,7 @@ public class Woman implements Human {
 ```
 
 工厂类：
-```
+```java
 package com.yangbingdong.simplefactory;
 
 import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.MAN;
@@ -375,7 +391,7 @@ public class HumanFactory {
 ```
 
 现在来测试一下：
-```
+```java
 package com.yangbingdong.simplefactory;
 
 import java.util.Optional;
@@ -404,7 +420,7 @@ public class SimpleFactoryTest {
 ```
 
 运行结果：
-```
+```java
 生产了男人
 I'm man! 
 
@@ -420,7 +436,7 @@ I'm woman!
 
 ## Java标准库中的简单工厂模式
 
-```
+```java
 java.util.Calendar - getInstance()
 java.util.Calendar - getInstance(TimeZone zone)
 java.util.Calendar - getInstance(Locale aLocale)
@@ -431,11 +447,7 @@ java.text.NumberFormat - getInstance(Locale inLocale)
 
 # Factory Method
 
-## UML
-
 ![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/factory-method.png)
-
-## 什么是工厂方法
 
 工厂方法模式，又称工厂模式、多态工厂模式和虚拟构造器模式，通过定义工厂父类负责定义创建对象的公共接口，而子类则负责生成具体的对象。就是一个工厂生产一个专一产品。
 
@@ -447,7 +459,7 @@ java.text.NumberFormat - getInstance(Locale inLocale)
 
 工厂接口定义统一的创建人类的借口
 
-```
+```java
 public interface HumanFactory {
 	/**
 	 * 定义抽象工厂方法
@@ -459,7 +471,7 @@ public interface HumanFactory {
 
 两个工厂实现类
 
-```
+```java
 public class ManFactory implements HumanFactory {
 	@Override
 	public Human createHuman() {
@@ -479,7 +491,7 @@ public class WomanFactory implements HumanFactory {
 
 测试类：
 
-```
+```java
 package com.yangbingdong.factorymethod;
 
 /**
@@ -500,7 +512,7 @@ public class FactoryMethodTest {
 
 运行结果：
 
-```
+```java
 生产了男人
 I'm man! 
 
@@ -520,11 +532,7 @@ I'm woman!
 
 # Abstract Factory
 
-## UML
-
 ![](http://ojoba1c98.bkt.clouddn.com/img/design-pattern-creational/abstract-factory.png)
-
-## 什么是抽象工厂模式
 
 抽象工厂模式为创建一组对象提供了一种解决方案。与工厂方法模式相比，抽象工厂模式中的具体工厂不只是创建一种产品，它负责创建一族产品。比如AMD工厂负责生产AMD全家桶，Intel工厂负责生产Intel全家桶。
 
@@ -532,7 +540,7 @@ I'm woman!
 
 首先定义CPU接口以及实现类
 
-```
+```java
 public interface CPU {
 }
 
@@ -545,7 +553,7 @@ public class IntelCPU implements CPU {
 
 主板接口以及实现类
 
-```
+```java
 public interface MainBoard {
 }
 
@@ -558,7 +566,7 @@ public class IntelMainBoard implements MainBoard {
 
 定义抽象工厂与实现类
 
-```
+```java
 public interface AbstractFactory {
 	CPU createCPU();
 
@@ -596,7 +604,7 @@ public class IntelFactory implements AbstractFactory {
 
 测试类
 
-```
+```java
 public class AbstractFactoryTest {
 	public static void main(String[] args) {
 		AbstractFactory abstractFactory = new AMDFactory();
@@ -612,7 +620,7 @@ public class AbstractFactoryTest {
 
 运行结果
 
-```
+```java
 生产了AMD的CPU
 生产了AMD的主板
 生产了Intel的CPU
@@ -627,13 +635,13 @@ public class AbstractFactoryTest {
 
 **使切换产品族变得容易**：因为一个具体的工厂实现代表的是一个产品族，比如上面例子的从Intel系列到AMD系列只需要切换一下具体工厂。
 
-缺点：
+**缺点**：
 
 **不太容易扩展新的产品**：如果需要给整个产品族添加一个新的产品，那么就需要修改抽象工厂，这样就会导致修改所有的工厂实现类
 
 ## Java标准类库中的抽象工厂模式
 
-```
+```java
 package java.util;
 
 public interface List<E> extends Collection<E> {
@@ -653,12 +661,57 @@ public interface List<E> extends Collection<E> {
 
 # Builder
 
-## UML
-
-## 什么是建造者模式
 将一个**复杂**对象的**构建**与它的表示**分离**，使得同样的构建过程可以创建不同的表示。
 
+使用***[Lombok](https://projectlombok.org)***中的`@Builder`可以很简单地实现Builder模式，`@Accessors(chain = true)`也可以实现类似的模式。
+
 ## 代码
+
+```java
+public class Summoner {
+
+    private String name;
+    private String type;
+    private String innate;
+
+    private Summoner(Builder builder) {
+        this.name = builder.name;
+        this.type = builder.type;
+        this.innate = builder.innate;
+    }
+
+    protected static class Builder {
+        private String name;
+        private String type;
+        private String innate;
+
+        protected Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        protected Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        protected Builder innate(String innate) {
+            this.innate = innate;
+            return this;
+        }
+        protected Summoner build() {
+            return new Summoner(this);
+        }
+    }
+}
+
+public class BuilderDemo {
+
+    public static void main(String[] args) {
+        Summoner monkey = new Summoner.Builder().name("齐天大圣 - 孙悟空").type("上单 - AD").innate("基石天赋 - 战争雷霆").build();
+        System.out.println(monkey.toString());
+}
+```
 
 ## 优缺点
 优点：
@@ -681,4 +734,5 @@ strBuilder.append("two");
 strBuilder.append("three");
 String str= strBuilder.toString();
 ```
+# Prototype
 
