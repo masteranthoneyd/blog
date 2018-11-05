@@ -4,7 +4,7 @@ date: 2017-01-12 23:04:36
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/activities-overview.jpg)
+![](http://img.yangbingdong.com/img/gnome/activities-overview.jpg)
 # 前言
 >  ***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本回归GNOME环境，果断升级...
 >
@@ -105,7 +105,7 @@ sudo dd if=ubuntu-16.04-desktop-amd64.iso of=/dev/sdc bs=1M
 
 更换最佳源服务器，打开 **软件和更新**（这里我选择阿里的，或者点击右边的 选择最佳服务器）：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/source-server.png)
+![](http://img.yangbingdong.com/img/individuation/source-server.png)
 
 ## 更新
 
@@ -223,7 +223,7 @@ sudo apt install arc-theme
 
 安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/gnome-tweak-tool.png)
+![](http://img.yangbingdong.com/img/gnome/gnome-tweak-tool.png)
 
 **注意** :对于高分屏，可能使用 `Arc-Theme` 显示 GNOME Shell 的字体过小，可通过修改 `/usr/share/themes/[对应 Arc 主题]/gnome-shell/gnome-shell.css` 修改 **stage** 的 `font-size` 。
 
@@ -269,15 +269,15 @@ sudo apt install papirus-icon-theme
 
 先上图...
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop1.png)
+![](http://img.yangbingdong.com/img/gnome/desktop1.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/desktop2.png)
+![](http://img.yangbingdong.com/img/gnome/desktop2.png)
 
 **[Dash To Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)**: 虽然Ubuntu18已经有了一个Dock，但定制性不强。这个Dock插件提供了很多选项定制，个人比较喜欢的一个选项就是隔离工作区。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/dock02.png)
+![](http://img.yangbingdong.com/img/gnome/dock02.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/dock01.png)
+![](http://img.yangbingdong.com/img/gnome/dock01.png)
 
 [**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
 
@@ -314,7 +314,7 @@ hardcode-tray --conversion-tool Inkscape
 
 **[User Themes](https://extensions.gnome.org/extension/19/user-themes/)** 可以使用shell-theme：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/user-themes.png)
+![](http://img.yangbingdong.com/img/individuation/user-themes.png)
 
 为什么单独的模块，迷…
 
@@ -356,11 +356,11 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 ### 调色
 
 最后，修改以下配色，会让你的终端样式看起来更舒服，在终端任意地方右键，进入配置文件(`profile`)->外观配置(`profile Preferences`)，弹出如下界面，进入`colors`一栏:
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/zsh02.png)
+![](http://img.yangbingdong.com/img/individuation/zsh02.png)
 
 
 其中，文字和背景采用系统主题，透明度设为10%，下面的`palette`样式采用`Tango`，这样一通设置后，效果如下：
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/screenfetch.png)
+![](http://img.yangbingdong.com/img/individuation/screenfetch.png)
 
 **推荐配色**：
 
@@ -405,7 +405,7 @@ sudo apt install fonts-wqy-microhei
 
 博主推荐 ***[Grub-theme-vimix](https://www.gnome-look.org/p/1009236/)*** 或 ***[Blur grub](https://www.gnome-look.org/p/1220920/)*** 
 
-![](http://ojoba1c98.bkt.clouddn.com/img/gnome/stylish.png)
+![](http://img.yangbingdong.com/img/gnome/stylish.png)
 
 根据提示下载源码执行安装脚本即可。
 
@@ -458,9 +458,9 @@ Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme7
 3、把 `apps.com.qq.im.light` 这个文件夹提取出来
 4、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
 5、然后将这个文件夹复制到系统的 `/opt/cxoffice/support` 下 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/crossover-file.png)
+![](http://img.yangbingdong.com/img/individuation/crossover-file.png)
 6、然后打开 `crossover` ，发现多了一个容器 ，点击图标即可运行QQ轻聊版 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/crossover.png)
+![](http://img.yangbingdong.com/img/individuation/crossover.png)
 7、如果运行后出现乱码，把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
 
 ## 搜狗输入法安装与崩溃处理
@@ -516,7 +516,7 @@ sudo apt install peek
 
 终端执行`peek`即可运行
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/Peek%202018-01-22%2015-49.gif)
+![](http://img.yangbingdong.com/img/individuation/Peek%202018-01-22%2015-49.gif)
 
 ## StarUml
 
@@ -595,7 +595,7 @@ sudo apt install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils virt-manage
 
 Dash里打开virt-manager:
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/kvm-manager.png)
+![](http://img.yangbingdong.com/img/individuation/kvm-manager.png)
 
 
 
@@ -632,7 +632,7 @@ whereis SecureCRT
 sudo perl securecrt_linux_crack.pl /usr/bin/SecureCRT
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/securecrt-crack.png)
+![](http://img.yangbingdong.com/img/individuation/securecrt-crack.png)
 
 然后按照提示手动输入License即可
 
@@ -741,7 +741,7 @@ sudo apt install bleachbit
 
 ### 搭建 Aria2 以及 AriaNg Web UI
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/aria2-ariaNg.jpg)
+![](http://img.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
 
 > 博主选择使用Docker
 
@@ -854,7 +854,7 @@ services:
     restart: always
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/h5ai.jpg)
+![](http://img.yangbingdong.com/img/individuation/h5ai.jpg)
 
 #### 使用nextcloud作为文件管理器
 
@@ -917,8 +917,8 @@ services:
 
 3、打开百度云盘网页版，勾选需要下载的文件，在上方会出现导出下载地选项，通过设置可以修改RCP地址
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baiduexporter1.jpg)
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/baiduexporter2.jpg)
+![](http://img.yangbingdong.com/img/individuation/baiduexporter1.jpg)
+![](http://img.yangbingdong.com/img/individuation/baiduexporter2.jpg)
 
 ## Stardict火星译王
 
@@ -975,7 +975,7 @@ sudo apt install systemback
 sudo apt install tickys
 ```
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/tickeys_v0.2.5.png)
+![](http://img.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
 
 ## 硬件信息
 
@@ -985,7 +985,7 @@ sudo apt install tickys
 
 下载链接：***[https://launchpad.net/i-nex/+download](https://launchpad.net/i-nex/+download)***
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/I-Nex%20-%20CPU_001.png)
+![](http://img.yangbingdong.com/img/individuation/I-Nex%20-%20CPU_001.png)
 
 ### Hardinfo
 
@@ -993,7 +993,7 @@ sudo apt install tickys
 sudo apt install hardinfo -y
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/System%20Information_002.png)
+![](http://img.yangbingdong.com/img/individuation/System%20Information_002.png)
 
 # 其他设置篇
 
@@ -1003,7 +1003,7 @@ sudo apt install hardinfo -y
 sudo apt install screenfetch
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/screenfetch.png)
+![](http://img.yangbingdong.com/img/individuation/screenfetch.png)
 
 ## 点击图标最小化
 
@@ -1062,7 +1062,7 @@ sudo apt install cmatrix
 cmatrix -b
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/individuation/cmatrix.png)
+![](http://img.yangbingdong.com/img/individuation/cmatrix.png)
 
 够骚气。。。
 

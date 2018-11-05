@@ -187,7 +187,7 @@ businessProxy.doBusiness();                             // 业务调用
 
 **CallBack** 子接口展示:
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-aop-and-dynamic-proxy/cglib-callback.png)
+![](http://img.yangbingdong.com/img/spring-aop-and-dynamic-proxy/cglib-callback.png)
 
 添加依赖：
 

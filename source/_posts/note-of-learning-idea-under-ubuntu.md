@@ -4,7 +4,7 @@ date: 2017-04-17 18:00:00
 categories: IDE
 tags: [Ubuntu, IDE]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea2.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea2.png)
 # Preface
 > 公司里的大牛们用的IDE基本都是IDEA~~近墨者黑~~，早就听闻IntelliJ IDEA这个大名，只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=)，再不用就要被OUT了
 > 此篇把在Ubuntu下使用IDEA的学习经验记录下来(网上还是比较少资料解决Ubuntu下IDEA的问题Orz)，以便老了记性不好可以看一看...
@@ -16,7 +16,7 @@ tags: [Ubuntu, IDE]
 这样的好处是我们不用关心更新问题，每次有新版本它都会提示，我们是需要点一下`Install`就可以了，不需要关心升级后的配置。
 还有一个好处是可以管理其他的IntelliJ软件（虽然博主只用他们的IDEA = =）...
 安装的时候注意**配置安装路径**：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
 
 # License
 
@@ -31,7 +31,7 @@ docker pull ilanyu/golang-reverseproxy
 docker run -d -p 6666:8888 ilanyu/golang-reverseproxy
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/license-server.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/license-server.png)
 
 也可以自己搭建一个基于docker的服务 = =
 
@@ -69,21 +69,21 @@ nginx -s reload
 
 博主的常用配置：
 一般会选择打开项目时最外层的窗口打开`setting`，对全局生效。
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting.png)
 
 ## 文件修改后，设置左边目录出现颜色变化
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/version-control-change.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/version-control-change.png)
 
 ## 如果只有一行方法的代码默认要展开，去掉这个勾
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/one-line-methods.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/one-line-methods.png)
 
 ## 修改字体和字号
 Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu默认的字体工具栏可能会出现乱码。
 下面三个地方，分别是窗口字体，代码字体和控制台字体：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-font.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-font.png)
 
 ## 修改VM参数
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
 通过`Toolbox`可以简单地设置VM参数，博主16G内存的主机的VM参数设置为
 ```
 -Xms512m
@@ -91,36 +91,36 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~，而且使用Ubuntu�
 -XX:ReservedCodeCacheSize=500m
 ```
 ## 设置代码不区分大小写
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
 
-## 优化导包
+## 禁止 import *
 IDEA默认检测到有5个相同包就会自动`import *`，其实没必要，需要哪个就`import`哪个。
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/import-optimizing.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/import-optimizing.png)
 
 ## 设置不自动打开上一次最后关闭的项目
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/system-setting01.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
 ## Postfix Completion
 这个本来就是默认开启的
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/postfix-completion.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/postfix-completion.png)
 
 ## 可生成SreializableID
 在 `setting>Editor>Inspections>Java>Serializtion Issues>`:
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
 钩上之后在需要生成的类上`Alt+Enter`就会出现了。
 
 ## 关闭代码拖拽功能
 一不小心手抖就改了代码...禁用！
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/dorp-function.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/dorp-function.png)
 
 ## 显示内存使用情况
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/show-memory.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/show-memory.png)
 点击内存信息展示的那个条可以进行部分的内存回收
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/menory.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/menory.png)
 
 
 ## 优化 Java 注释
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-optimize.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/code-optimize.png)
 
 ## 优化方法链
 在Java8中特别是使用Stream API，ex：
@@ -129,7 +129,7 @@ list.stream().filter(func).distinct().skip(num).limit(num).map(func).peek(func).
 ```
 写成一行太长了！！
 勾上这个选项idea将自动帮我们优化：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
 
 会变成这样
 
@@ -142,7 +142,11 @@ list = list.stream()
 
 ## 多线程自动编译
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/auto-compile.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/auto-compile.png)
+
+## 设置统一编译jdk版本（关闭module JDK）
+
+![](http://yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
 
 # Keyboard shortcuts
 
@@ -243,13 +247,13 @@ list = list.stream()
 ## Lombok
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件，
 打开IDEA的Settings面板，并选择Plugins选项，然后点击 “Browse repositories..” 
-![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok01.png)
+![](http://img.yangbingdong.com/img/lombok/installLombok01.png)
 在输入框输入”lombok”，得到搜索结果，选择第二个，点击安装，然后安装提示重启IDEA，安装成功; 
-![](http://ojoba1c98.bkt.clouddn.com/img/lombok/installLombok02.png)
+![](http://img.yangbingdong.com/img/lombok/installLombok02.png)
 
  还需要在IDEA中开启支持：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/annotation-support.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/annotation-support.png)
 
 2.在自己的项目里添加lombok的编译支持(maven项目),在pom文件里面添加如下
 indenpence
@@ -339,35 +343,35 @@ indenpence
 
 可以通过IDEA链接Docker API，前提是开启了Docker API
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration01.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration01.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration02.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration02.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/docker-integration03.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration03.png)
 
 ## Zookeeper
 
 Zookeeper UI，支持删除操作
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/zookeeper-plugin1.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin1.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
 
 ## GsonFormat
 
 复制一段JSON格式字符串
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format01.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format01.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format02.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format02.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/gson-format03.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format03.png)
 
 ## Mybatis 插件
 
 可以直接从Mapper文件跳转到xml：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/free-mybatis.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/free-mybatis.png)
 
 ## Ali规约插件 P3C
 
@@ -375,7 +379,7 @@ Zookeeper UI，支持删除操作
 文档：***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***
 
 ## FindBugs
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/find-bug.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/find-bug.png)
 装完之后右键最下面会多出一个`FindBugs`的选项
 
 ## Maven Helper
@@ -384,19 +388,19 @@ Zookeeper UI，支持删除操作
 
 安装之后，打开`pom.xml`文件，会看到多了一个Dependency Analyzer的面板，点击可以进入分析面板：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper01.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper01.png)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper02.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper02.png)
 
 另外，右键项目也会多两个Maven的bar：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper03.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper03.png)
 
 ## Statistic
 
 这个插件可以统计代码数量：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/maven-helper04.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper04.png)
 
 ## Stackoverflow
 
@@ -404,66 +408,72 @@ Zookeeper UI，支持删除操作
 
 重启后随便选中内容右键就可以看到
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
 
 ## Nyan progress bar
 
 这个是彩虹版的进度条...
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/nyan-progress-bar.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/nyan-progress-bar.png)
 
 ## Background Image Plus
 
 这是一个设置背景图的插件
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/background-image-plus.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/background-image-plus.png)
 
 ## Enso
 
 它可以将测试名转化成一个句子，一目了然地显示测试的内容。这意味着当你在注视任何类的时候， Enso 都会展示其说明文档。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/plugin-enso.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
 ## activate-power-mode 或 Power mode ||
 
 这个抖动的窗口老年人实在受不了...
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
 
 # VM Options
 
 可以通过ToolBox或IDEA选项里面设置
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/vmoption1.jpg)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption1.jpg)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
 
 优化参数：
 
 ```
--Xms512m
--Xmx2g
--XX:ReservedCodeCacheSize=480m
+-server
+-Xms2048m
+-Xmx2048m
+-Xmn1024m
+-XX:MetaspaceSize=256m
+-XX:MaxMetaspaceSize=2048m
+-XX:ReservedCodeCacheSize=512m
 -XX:+UseG1GC
 -XX:-UseParNewGC
 -XX:-UseConcMarkSweepGC
 -XX:SoftRefLRUPolicyMSPerMB=200
--XX:MaxMetaspaceSize=512m
+-XX:+UseCompressedOops
 -ea
--server
 -Dsun.io.useCanonCaches=false
 -Djava.net.preferIPv4Stack=true
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:-OmitStackTraceInFastThrow
 -Dsun.awt.keepWorkingSetOnMinimize=true
 -Dide.no.platform.update=true
+-Djdk.http.auth.tunneling.disabledSchemes=""
+-javaagent:/home/ybd/data/application/jetbrains/JetbrainsCrack.jar
+-XX:MaxJavaStackTraceDepth=10000
 ```
 
 **部分参数说明**：
 
-`-Xms512m`: 初始时内存大小，至少为`Xmx`的二分之一
+`-Xms2048m`: 初始时内存大小，至少为`Xmx`的二分之一
 
-`-Xmx2g`: 最大内存大小，若总内存小于2GB，至少为总内存的四分之一；若总内存大于2GB，设为1-4GB
+`-Xmx2048m`: 最大内存大小，若总内存小于2GB，至少为总内存的四分之一；若总内存大于2GB，设为1-4GB
 
 `-XX:+UseG1GC -XX:-UseParNewGC -XX:-UseConcMarkSweepGC`: 设置使用G1垃圾收集器 
 
@@ -497,14 +507,14 @@ EOF
 
 **目前发现的快捷键冲突：**
 1、`Ctrl+Alt+方向`，直接到系统设置里面改：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
 
 2、安装了搜狗之后，按`Ctrl+Alt+B`会启动虚拟键盘，所以在输入法里面打开Fcitx设置，在附加组件里面，点击高级，再把虚拟键盘的选项去掉：
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
 然后注销或重启电脑。
 
 3、`Ctrl+Alt+S`，这个在键盘设置里面找了很久，原来这玩意在输入法设置里面，点开输入法全局配置，把**显示高级选项**钩上，就会看到很多快捷键，我都把它们干掉了。
-![](http://ojoba1c98.bkt.clouddn.com/img/learning-idea-under-ubuntu/shurufa.png)
+![](http://img.yangbingdong.com/img/learning-idea-under-ubuntu/shurufa.png)
 
 
 # Finally

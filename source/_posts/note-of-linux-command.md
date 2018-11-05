@@ -5,7 +5,7 @@ categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/ubuntu-logo.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/ubuntu-logo.png)
 
 # Preface
 
@@ -209,7 +209,7 @@ sudo ufw reload
 # 用户与用户组相关
 
 ## 添加用户useradd
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-useradd.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/command-useradd.png)
 
 ex：
 创建`ybd`用户并且加入`ybd`用户组并且创建用户目录：
@@ -230,14 +230,14 @@ passwd ybd
 
 ## 修改用户usermod
 
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-usermod.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/command-usermod.png)
 
 ## 添加用户组groupadd
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-groupadd.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/command-groupadd.png)
 
 
 ## 修改用户组
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/command-groupmod.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/command-groupmod.png)
 
 ex:将test组的名子改成test2
 ```
@@ -865,7 +865,7 @@ echo "test test " > /var/test_boot_up.log
 
 ## apt-get update无法下载
 
-![](http://ojoba1c98.bkt.clouddn.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
+![](http://img.yangbingdong.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
 
 出现类似情况，可以找到`/etc/apt/sources.list.d`目录，删除对应的`.list`文件即可
 

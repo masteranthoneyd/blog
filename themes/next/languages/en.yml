@@ -37,7 +37,7 @@ page:
   tags: tags
 
 footer:
-  powered: " %s Personal Site"
+  powered: " %s Personal Blog"
   theme: Blog
 
 counter:

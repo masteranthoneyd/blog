@@ -4,7 +4,7 @@ date: 2017-05-03 18:23:06
 categories: [Programming, Java]
 tags: [Java]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/java/java8.jpg)
+![](http://img.yangbingdong.com/img/java/java8.jpg)
 # Preface
 > "Java is still not dead—and people are starting to figure that out."
 > Java 8是自Java  5（2004年）发布以来Java语言最大的一次版本升级，Java 8带来了很多的新特性，包括Lambda 表达式、方法引用、流(Stream API)、默认方法、Optional、组合式异步编程、新的时间 API，等等各个方面。利用这些特征，我们可以写出如同清泉般的简洁代码= =...
@@ -155,7 +155,7 @@ public class MainLambda {
 
 编译之后的结果：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java/2-Lambda.png)
+![](http://img.yangbingdong.com/img/java/2-Lambda.png)
 
 通过javap反编译命名，我们更能看出Lambda表达式内部表示的不同：
 
@@ -349,7 +349,7 @@ public Optional<Long> getPhone() {
 
 # Streams
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java/Java_stream_Interfaces.png)
+![](http://img.yangbingdong.com/img/java/Java_stream_Interfaces.png)
 
 ## 流是什么
 
@@ -388,7 +388,7 @@ Arrays.asList("a1", "a2", "b1", "c2", "c1").stream()
 
 流的流水线背后的理念类似于构建器模式。常见的中间操作有`filter`,`map`,`limit`,`sorted`,`distinct`；常见的终端操作有 `forEach`,`count`,`collect`。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java/stream.png)
+![](http://img.yangbingdong.com/img/java/stream.png)
 流的操作类型分为两种：
 * `Intermediate`：一个流可以后面跟随零个或多个 `intermediate` 操作。其目的主要是**打开流**，做出某种程度的数据映射/过滤，然后返回一个新的流，交给下一个操作使用。这类操作都是**惰性化的**（**lazy**），就是说，仅仅调用到这类方法，**并没有真正开始流的遍历**。
 * `Terminal`：一个流只能有一个 `terminal` 操作，当这个操作执行后，流就被使用“光”了，无法再被操作。所以这必定是流的**最后一个操作**。`Terminal` 操作的执行，**才会真正开始流的遍历**，并且会生成一个结果，或者一个 **side effect**。
@@ -966,7 +966,7 @@ public interface UncheckedFunction<T, R> {
 
 那么该 *`FunctionInterface`* 便可以作为类似于 `file -> File.lines(file)` 这类会抛出受检异常的 Lambda 的目标类型，此时 Lambda 中并不需要捕获异常（因为目标类型的 `apply` 方法已经将异常抛出了）—— 之所以原来的 Lambda 需要捕获异常，就是因为在流式操作 `flatMap` 中使用的 `java.util.function` 包下的 `Function<T, R>` 没有抛出异常：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/java-8-function.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/java-8-function.png)
 
 那我们如何使用 `UncheckedFunction` 到流式操作的 Lambda 中呢？
 首先我们定义一个 `Trier` 类，它的 `tryFunction` 方法提供将 `UncheckedFunction` 包装为 `Function` 的功能：
@@ -1230,13 +1230,13 @@ public static String formatList(List<String> list, String delimiter) {
 
 它的底层也是调用`StringJoiner`：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/string-join.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/string-join.png)
 
 但是我们看到了 `String.join` 方法的不足 —— 它不能指定前缀和后缀 —— 比如我们如果想要直接将 `List<String>` 格式化为 **{ 元素1, 元素2, 元素3, ... 元素N }** 呢？（此时前缀为 `"{ "`，后缀为 `" }"`）
 
 查看 `StringJoiner` 的构造方法，发现 `StringJoiner` 除了指定 分隔符 的构造方法，还有一个可以指定 分隔符、前缀和后缀 的构造方法：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/stringjoiner.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/stringjoiner.png)
 
 修改 `formatList`：
 
@@ -1268,7 +1268,7 @@ public static void main(String[] args) throws Exception {
 ```
 
 事实上，Java8 对于字符串集合的连接操作提供了一个专门的流式 API，即 `Collectors.joining` 函数：
-![img](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/collectors-joining.png)
+![img](http://img.yangbingdong.com/img/java-8-tutorial-extend/collectors-joining.png)
 
 - 无参的 `joining()` 方法，即不存在连接符（底层实现为 `StringBuilder`）；
 - `joining(CharSequence delimiter)` 方法，即分隔符为 *delimiter*（底层实现为 `StringJoiner`）；
@@ -1348,11 +1348,11 @@ public static void main(String[] args) throws Exception {
 
 在Java8之后，`Map`添加了一下新的方法签名：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/map-java-8-new-method.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/map-java-8-new-method.png)
 
 查看源码发现`computeIfAbsent`很符合上面需求：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/map-compute-if-absent.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/map-compute-if-absent.png)
 
 我们可以改造成这样子：
 
@@ -1394,7 +1394,7 @@ public static Map<String, List<Integer>> getElementPositions(List<String> list) 
 
 但是方法里面的`for`循环似乎让这个方法不太优雅了，Java8中`Iterable`提供的`foreach`并不带索引的：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/java-8-tutorial-extend/java-8-iterable-foreach.png)
+![](http://img.yangbingdong.com/img/java-8-tutorial-extend/java-8-iterable-foreach.png)
 
 我们可以自己写一个：
 

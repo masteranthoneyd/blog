@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, Reactor]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/with-reactor-response-encode/reactor.png)
+![](http://img.yangbingdong.com/img/with-reactor-response-encode/reactor.png)
 
 # Preface
 

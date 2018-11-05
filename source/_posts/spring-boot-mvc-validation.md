@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot, Spring]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-boot.png)
+![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
 
 # Preface
 
@@ -17,7 +17,7 @@ tags: [Java, Spring Boot, Spring]
 
 ## Spring MVC 流程
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/spring-mvc-process.jpg)
+![](http://img.yangbingdong.com/img/spring-boot-learning/spring-mvc-process.jpg)
 
 1、  用户发送请求至前端控制器`DispatcherServlet`。
 
@@ -374,7 +374,7 @@ public class WebConfig {
 - `Interceptor`可以访问`Action`的上下文，值栈里的对象，而`Filter`不能。
 - 在`action`的生命周期里，`Interceptor`可以被多次调用，而Filter只能在容器初始化时调用一次。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-learning/mvc-process.png)
+![](http://img.yangbingdong.com/img/spring-boot-learning/mvc-process.png)
 
 ## RequestBodyAdvice和ResponseBodyAdvice
 

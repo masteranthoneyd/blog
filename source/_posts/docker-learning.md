@@ -4,7 +4,7 @@ date: 2017-09-07 15:55:07
 categories: [Docker]
 tags: [Docker]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker.png)
+![](http://img.yangbingdong.com/img/docker/docker.png)
 # Preface
 > Docker是什么？下面是官方的一段说明：
 > ***[Docker is the world’s leading software containerization platform.](https://www.docker.com/what-docker)***
@@ -14,15 +14,15 @@ tags: [Docker]
 <!--more-->
 # Containerization VS Virtualization
 了解Docker之前，我们有必要了解一下容器化
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker2.jpg)
+![](http://img.yangbingdong.com/img/docker/compare-container-and-docker2.jpg)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/compare-container-and-docker.jpg)
+![](http://img.yangbingdong.com/img/docker/compare-container-and-docker.jpg)
 
 **容器相当于轻量级的虚拟机，但隔离性不如虚拟机**。
 
 # Story
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/old-dev-ops.jpg)
+![](http://img.yangbingdong.com/img/docker/old-dev-ops.jpg)
 
 Long long ago...
 
@@ -59,7 +59,7 @@ Q：
 
 (Java的核心理念：Write once, run anywhere)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/container-history.jpg)
+![](http://img.yangbingdong.com/img/docker/container-history.jpg)
 
 **Docker是`GO`语言编写的容器化的一种实现**，是一个**分布式**应用**构建**、**迁移**和**运行**的开放平台，它允许开发或运维人员将应用和运行应用所**依赖的文件打包到一个标准化的单元**（容器）中运行。其他的容器实现有**OpenVZ**，**Pouch**(`Ali`出品)等。
 
@@ -109,7 +109,7 @@ Q：
 
 ## Container(容器)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-component.jpg)
+![](http://img.yangbingdong.com/img/docker/docker-component.jpg)
 
 通俗来说，如果镜像是类，那么容器就是这个类的实例了，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
 
@@ -233,7 +233,7 @@ docker pull -a java
 
 ## 列出
 使用`docker images [OPTIONS] [REPOSITORY[:TAG]]`列出已下载的镜像
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/docker-images.png)
+![](http://img.yangbingdong.com/img/docker/docker-images.png)
 列表包含了仓库名、标签、镜像 ID、创建时间以及所占用的空间
 
 OPTIONS说明：
@@ -839,7 +839,7 @@ my-network
 
 # Dockerfile 详解
 
-![](http://ojoba1c98.bkt.clouddn.com/img/note-of-dockerfile/dockerfile.jpg)
+![](http://img.yangbingdong.com/img/note-of-dockerfile/dockerfile.jpg)
 
 > 制作一个镜像可以使用`docker commit`和定制Dockerfile，但推荐的是写Dockerfile。
 >
@@ -883,7 +883,7 @@ docker build -t <repo-name>/<image-name>:<tag> .
 ```
 docker build -t <image-name> .
 ```
-![](http://ojoba1c98.bkt.clouddn.com/img/note-of-dockerfile/docker-build.png)
+![](http://img.yangbingdong.com/img/note-of-dockerfile/docker-build.png)
 
 看到`Successfully built`就表示构建成功了
 
@@ -1332,7 +1332,7 @@ docker run --rm \
 
 # 使用Github自动构建Docker
 
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/github-docker.jpg)
+![](http://img.yangbingdong.com/ima/docker-automated-built/github-docker.jpg)
 
 > 一开始玩Docker总是用别人的镜像确实很爽~~歪歪~~...
 > But，如果要定制个性化的Image那就必须要自己写Dockerfile了，但是每一次修改完Dockerfile，都要经过几个步骤：
@@ -1349,7 +1349,7 @@ docker run --rm \
 2、选择 `Profile` > `Settings` > `Linked Accounts & Services`；
 3、选择需要连接的仓库服务（目前只支持`Github`和`BitBucket`）；
 4、这时候需要授权，点击授权就可以了。
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-repo-service.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/add-repo-service.png)
 
 ## 创建一个自动构建
 自动构建需要创建对应的仓库类型
@@ -1359,27 +1359,27 @@ docker run --rm \
 3、接下来会列出`User/Organizations`的所有项目，从中选择你需要的构建的项目（包含Dockerfile）；
 4、可以选择`Click here to customize`自定义路径；
 5、最后点击创建就可以了。
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/create-automated.png)
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/creating.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/create-automated.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/creating.png)
 
 ## 集成到Github
 用过`Github`自动构建当然需要`Github`的支持啦，这里只需要在Github里面点两下就配置完成，很方便：
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-integrations.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/add-integrations.png)
 在`Add Service`里面找到`Docker`并添加
 
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/github-docker-server.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/github-docker-server.png)
 
 ## 构建设置
 ### 勾选自动构建
 系统会默认帮我们勾上自动构建选项：
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/aotumated-setting.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/aotumated-setting.png)
 这时候，当我们的Dockerfile有变动会自动触发构建：
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/building.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/building.png)
 还在构建过程中我们可以点击Cancel取消构建过程。
 
 ### 添加新的构建
 Docker hub默认选择master分支作为latest版本，我们可以根据自己的标签或分支构建不同的版本：
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/add-build.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/add-build.png)
 
 （点击箭头位置会出现例子）
 这样，当我们创建一个标签如1.0.2并push上去的时候会自动触发构建～
@@ -1388,7 +1388,7 @@ Docker hub默认选择master分支作为latest版本，我们可以根据自己�
 
 ### 远程触发构建
 当然我们也可以远程触发构建，同样在Build Setting页面:
-![](http://ojoba1c98.bkt.clouddn.com/ima/docker-automated-built/remote-trigger.png)
+![](http://img.yangbingdong.com/ima/docker-automated-built/remote-trigger.png)
 然后例子已经说的很清楚了
 
 参考：***[https://docs.docker.com/docker-hub/builds/](https://docs.docker.com/docker-hub/builds/)***
@@ -1942,7 +1942,7 @@ services:
 
 # Last
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker/cmd_logic.png)
+![](http://img.yangbingdong.com/img/docker/cmd_logic.png)
 
 > 参考：
 > ***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***

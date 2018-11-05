@@ -5,7 +5,7 @@ categories: [Docker]
 tags: [Docker, Swarm]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-managerment.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-managerment.png)
 
 # Preface
 
@@ -19,7 +19,7 @@ tags: [Docker, Swarm]
 
 ## Harbor
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-arch.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-arch.png)
 
 Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，通过添加一些企业必需的功能特性，例如安全、标识和管理等，扩展了开源Docker Distribution。作为一个企业级私有Registry服务器，Harbor提供了更好的性能和安全。提升用户使用Registry构建和运行环境传输镜像的效率。Harbor支持安装在多个Registry节点的镜像资源复制，镜像全部保存在私有Registry中， 确保数据和知识产权在公司内部网络中管控。另外，Harbor也提供了高级的安全特性，诸如用户管理，访问控制和活动审计等。
 
@@ -106,11 +106,11 @@ project_creation_restriction = everyone
 
 harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.yml`也需要修改`proxy`的端口
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/proxy-port.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/proxy-port.png)
 
 还可以修改仓库的存储位置：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry-data.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry-data.png)
 
 ### Install
 
@@ -128,13 +128,13 @@ harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.y
 
 脚本会自动解压镜像文件并运行docker-compose
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-install.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-install.png)
 
 或者运行`prepare`文件再手动运行docker-compose
 
 启动之后浏览器打开刚才修改的hostname
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
 
 **帐号密码默认是** `admin/Harbor12345`，可在配置文件`harbor.conf`中修改
 
@@ -149,7 +149,7 @@ docker-compose up -d
 
 多次docker login被refuse
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/refuse.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/refuse.png)
 
 这是因为 Docker 默认**不允许非 `HTTPS` 方式推送镜像**。我们可以通过 Docker 配置来**取消这个限制**，或者配置能够通过 `HTTPS` 访问的私有仓库。
 
@@ -177,7 +177,7 @@ docker tag ubuntu:latest 192.168.1.102/library/ubuntu:latest
 docker push 192.168.1.102/library/ubuntu:latest
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-push.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-push.png)
 
 **注意**：使用`docker stack deploy`时，如果是私有镜像，需要终端登录后加上`--with-registry-auth`选项。
 
@@ -325,7 +325,7 @@ Content-Type: text/plain; charset=utf-8
 
 ## Docker Compose
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-compose-logo.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-compose-logo.png)
 
 > 官方文档：[***https://docs.docker.com/compose/***](https://docs.docker.com/compose/)
 >
@@ -1260,7 +1260,7 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ## Docker Machine
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-logo.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-logo.png)
 
 > Docker Machine 是供给和管理 docker 化主机的工具。有自己的命令行客户端 `docker-machine`。提供多种环境的 docker 主机，可以用 Docker Machine 在一个或者多个虚拟系统（本地或者远程）上安装 Docker Engine。
 
@@ -1274,7 +1274,7 @@ curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/tmp/docker-machine && \
 sudo install /tmp/docker-machine /usr/local/bin/docker-machine
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-version.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-version.png)
 
 **uninstall**：
 
@@ -1321,7 +1321,7 @@ sudo apt install virtualbox
 docker-machine create -d virtualbox test
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-create.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-create.png)
 
 你也可以在创建时加上如下参数，来配置主机或者主机上的 Docker。
 
@@ -1394,7 +1394,7 @@ docker-machine env test
 
 后续根据提示在命令行输入命令之后就可以操作 test 主机。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-env.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-env.png)
 
 通过以下命令恢复当前环境：
 
@@ -1410,7 +1410,7 @@ docker-machine ssh test
 
 连接到主机之后你就可以在其上使用 Docker 了。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-ssh.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-ssh.png)
 
 **操作命令**
 
@@ -1531,7 +1531,7 @@ Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负�
 
 工作节点是任务执行节点，管理节点将服务 (`service`) 下发至工作节点执行。管理节点默认也作为工作节点。你也可以通过配置让服务只运行在管理节点。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/swarm-diagram.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/swarm-diagram.png)
 
 #### 服务和任务
 
@@ -1546,15 +1546,15 @@ Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负�
 
 **下图解释服务、任务、容器：**
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/services-diagram.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/services-diagram.png)
 
 **服务的任务及调试说明：**
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-task.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-task.png)
 
 **服务部署的复制模式和全局模式说明：**
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
 
 ### 创建集群
 
@@ -1615,7 +1615,7 @@ docker -H 10.0.11.150:2376 info
 docker node ls
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/docker-node-ls.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-node-ls.png)
 
 说明：
 **AVAILABILITY列**：
@@ -1723,7 +1723,7 @@ docker service create \
 dockersamples/visualizer
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/visualizer.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/visualizer.png)
 
 ### Service用法
 
@@ -1785,7 +1785,7 @@ docker service update --image hub.docker.com/image service
 
 **缺点**: 不能团队分配权限，容器操作权限太大没法满足需求，部署时相应的Docker 服务也很多，需要逐一去了解容器作用。
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/rancher.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/rancher.png)
 
 ## Shipyard
 
@@ -1820,19 +1820,19 @@ curl -sSL https://shipyard-project.com/deploy | bash -s
 curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.0.0.10:4001 bash -s
 ```
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/shipyard-download.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-download.png)
 
 它会下载并启动7个镜像：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/shipyard-need-containers.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-need-containers.png)
 
 界面：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/shipyard-containers.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-containers.png)
 
 容器信息：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/shipyard-container-info.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-container-info.png)
 
 初体验来说，感觉跟下面的Portainer功能差不多，但是Registry总是添加失败
 
@@ -1840,7 +1840,7 @@ curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.
 
 [***官方网站***](https://portainer.io/)
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/portainer-demo.gif)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/portainer-demo.gif)
 
 `Portainer`是`Docker`的图形化管理工具，提供状态显示面板、应用模板快速部署、容器镜像网络数据卷的基本操作（包括上传下载镜像，创建容器等操作）、事件日志显示、容器控制台操作、`Swarm`集群和服务等集中管理和操作、登录用户管理和控制等功能。功能十分全面，基本能满足中小型单位对容器管理的全部需求。
 
@@ -1883,19 +1883,19 @@ portainer/portainer \
 
 容器管理：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-containers.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-containers.png)
 
 镜像管理：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-images.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-images.png)
 
 镜像仓库：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry.png)
 
 Endpoints：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/docker-visual-management-and-orchestrate-tools/end-point.png)
+![](http://img.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/end-point.png)
 
 **注意**：添加Endpoints先要暴露节点的2375端口。
 

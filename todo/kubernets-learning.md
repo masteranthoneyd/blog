@@ -158,7 +158,7 @@ minikube docker-env       # 查看 Minikube 的 Docker 相关信息
   minikube dashboard
   ```
 
-  ![](http://ojoba1c98.bkt.clouddn.com/img/kubernetes-learning/minikube-dashboard.png)
+  ![](http://img.yangbingdong.com/img/kubernetes-learning/minikube-dashboard.png)
 
 
 - 配置minikube的Docker环境变量

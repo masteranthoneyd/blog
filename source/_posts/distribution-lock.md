@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, Redis, Zookeeper, Spring Boot, Spring]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/distribute-lock/distribute-lock-banner.png)
+![](http://img.yangbingdong.com/img/distribute-lock/distribute-lock-banner.png)
 
 # Preface
 

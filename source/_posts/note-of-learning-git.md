@@ -5,7 +5,7 @@ categories: Git/Github
 tags: [Git,Github]
 ---
 
-![](http://ojoba1c98.bkt.clouddn.com/img/git/git-operations.png)
+![](http://img.yangbingdong.com/img/git/git-operations.png)
 # 前言
 What is Git?
 Git是目前世界上最先进的分布式版本控制系统（没有之一），而且是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目
@@ -247,14 +247,14 @@ git push origin --tags
 
 # 分支管理
 分支相当与平行宇宙，互不干扰，哪天合并了就拥有了所有平行宇宙的特性
-![](http://ojoba1c98.bkt.clouddn.com/img/git/gitBranch.png)
+![](http://img.yangbingdong.com/img/git/gitBranch.png)
 ## 创建与合并分支
 * 每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即 `master` 分支
 * 一开始的时候，`master` 分支是一条线，Git用 `master` 指向最新的提交，再用 `HEAD` 指向 `master` ，就能确定当前分支，以及当前分支的提交点
 * 当我们创建新的分支，例如 `dev` 时，Git新建了一个指针叫 `dev` ，指向 `master` 相同的提交，再把 `HEAD` 指向 `dev` ，就表示当前分支在 `dev` 上
 * Git创建一个分支很快，因为除了增加一个 `dev` 指针，改改 `HEAD` 的指向，工作区的文件都没有任何变化
 * 当 `HEAD` 指向 `dev` ，对工作区的修改和提交就是针对 `dev` 分支了，比如新提交一次后， `dev` 指针往前移动一步，而 `master` 指针不变
-  ![](http://ojoba1c98.bkt.clouddn.com/img/git/gitBranch01.png)
+  ![](http://img.yangbingdong.com/img/git/gitBranch01.png)
 
 查看分支：`git branch`
 创建分支：`git branch <name>`
@@ -265,7 +265,7 @@ git push origin --tags
 
 ## 解决冲突
 合并分支并不是每次都不会出问题，如不同的分支对同一个文件同一行都被修改过，就会出现以下情况
-![](http://ojoba1c98.bkt.clouddn.com/img/git/gitConflict.png)
+![](http://img.yangbingdong.com/img/git/gitConflict.png)
 那么再次合并有可能会冲突
 ```
 ➜  repo git:(master) git merge feature1 
@@ -305,7 +305,7 @@ Git,too fast too simple
 ➜  repo git:(master) 
 ```
 ok了，再次 `add` 和 `commit` ，现在 `master` 分支和` feature1 `分支变成了这样
-![](http://ojoba1c98.bkt.clouddn.com/img/git/gitFixConflict.png)
+![](http://img.yangbingdong.com/img/git/gitFixConflict.png)
 
 
 ## 多PC协同开发
@@ -379,7 +379,7 @@ Git真的异常强大，但命令繁多，需多加练习
 > ***参考：[廖雪峰老师的教程](http://www.liaoxuefeng.com/)***
 
 附命令图一张：
-![](http://ojoba1c98.bkt.clouddn.com/img/git/gitCommand.png)
+![](http://img.yangbingdong.com/img/git/gitCommand.png)
 
 [^1]: 集中式版本管理系统之一
 [^2]: 一个商业的版本控制系统

@@ -74,12 +74,6 @@ redis-server
 redis-cli -h 127.0.0.1 -p 6379
 ```
 
-## HelloWorld
-```
-set k1 helloword
-get k1
-```
-
 ## 配置相关
 
 > 稳定版本配置文件： ***[http://download.redis.io/redis-stable/redis.conf](http://download.redis.io/redis-stable/redis.conf)***
@@ -265,6 +259,95 @@ OK
 - `hgetall(key)`：返回名称为key的hash中所有的键（field）及其对应的value
 
 
+# 不同数据类型的常见应用场景
+
+> 为缓存而生的Redis，其所有数据都在内存中，固其最大的应用场景就是缓存了，但这只是个大的概念，其不同的数据类型都有对应的应用场景。
+
+## String
+
+### 对象存储
+
+这应该是最最最常用的场景了，将对象序列化后再`set`进去，所以选择一个好的序列化方案很重要，需要从时间复杂度以及空间复杂度这两个维度综合考虑。个人觉得`Protostuff`选当不错，基于Google的Protobuff。详情请看下面的**序列化**一节。
+
+### 计数
+
+`INCRBY`可以原子性地递增，通常用作分布式计数器，也可以用作生成ID。
+
+### 分布式锁
+
+正由于Redis是单线程客户端，这不单单是一个特性，更是一个应用场景，最常用的就是分布式锁了。
+
+```
+SET key value [EX seconds] [PX milliseconds] [NX|XX]
+```
+
+利用上面命令，可以做到加锁与过期的原子性。
+
+释放锁可以利用LUA脚本完成：
+
+```
+if redis.call("get",KEYS[1]) == ARGV[1]
+then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
+
+### 超大数量的布尔统计
+
+比如要统计几亿人的在线情况、数十亿的布尔存储（布尔标识符）都可以使用`GETBIT`、`SETBIT`、`BITCOUNT`来完成。
+
+## List
+
+### 显示最新的分页列表
+
+一种很常见的需求，分页，比如列出最新的5页评论、列出最新的某活动5页商品，在QPS高的时候，采用传统的RDBS查询往往会有性能问题。BUT，结合Redis的`LPUSH`与`LTRIM`可以优雅地缓存最新的数据并做到分页，一般大部分用户只关注前几页数据，那么后面的数据可以用数据库补上。这时候前5页的数据是走缓存的，QPS可以提高几个数量级
+
+### 消息队列
+
+Redis 的 list 数据类型对于大部分使用者来说，是实现队列服务的最经济，最简单的方式。
+
+## Set
+
+### 共同好友列表（求交集系列）
+
+社交类应用中，获取两个人或多个人的共同好友，两个人或多个人共同关注的微博这样类似的功能，用 MySQL 的话操作很复杂，可以把每个人的好友 id 存到集合中，获取共同好友的操作就可以简单到一个取交集的命令就搞定。
+
+```
+sadd user:wade james melo paul kobe
+sadd user:james wade melo paul kobe
+sadd user:paul wade james melo kobe
+sadd user:melo wade james paul kobe
+
+// 获取 wade 和 james 的共同好友
+sinter user:wade user:james
+/* 输出：
+ *      1) "kobe"
+ *      2) "paul"
+ *      3) "melo"
+ */
+ 
+ // 获取香蕉四兄弟的共同好友
+ sinter user:wade user:james user:paul user:melo
+ /* 输出：
+ *      1) "kobe"
+ */
+```
+
+类似的需求还有很多 , 必须把每个标签下的文章 id 存到集合中，可以很容易的求出几个不同标签下的共同文章；
+ 把每个人的爱好存到集合中，可以很容易的求出几个人的共同爱好。
+
+## SortedSet
+
+### 排行榜
+
+SortedSet 是在 Set 的基础上给集合中每个元素关联了一个分数，往有序集合中插入数据时会自动根据这个分数排序，很适合排行榜之类的需求：
+
+– 列出前100名高分选手
+
+– 列出某用户当前的全球排名
+
 # 慢查询查看
 
 > Redis 通过 `slowlog-log-slower-than` 和 `slowlog-max-len` 分别配置慢查询的阈值，以及慢查询记录的日志长度。 `slowlog-log-slower-than` 默认值 10*1000 **微秒**，当命令执行时间查过设定时，那么将会被记录在慢查询日志中。如果`slowlog-log-slower-than=0`会记录所有的命令，`slowlog-log-slower-than<0` 对于任何命令都不会进行记录。
@@ -333,9 +416,11 @@ CONFIG GET dir
 
 效果图：
 
-![](http://ojoba1c98.bkt.clouddn.com/img/javaDevEnv/rdr.png)
+![](http://img.yangbingdong.com/img/javaDevEnv/rdr.png)
 
-# 序列化选择
+# 序列化
+
+> ***[https://github.com/masteranthoneyd/serializer](https://github.com/masteranthoneyd/serializer)***
 
 以下是序列化框架性能对比（纳秒）
 
@@ -345,7 +430,10 @@ CPU：I7-8700
 
 内存：32G 
 
-![](http://ojoba1c98.bkt.clouddn.com/img/spring-boot-redis/serialize-performance.png)
+![](http://img.yangbingdong.com/img/spring-boot-redis/serialize-performance.png)
+
+* `Protostuff`不能直接序列化集合，需要用包装类封装起来。
+* `String`类型还是建议直接使用`StringRedisSerializer`，速度最快。
 
 # Spring Boot Redis监听keyspace event
 
@@ -369,22 +457,91 @@ CPU：I7-8700
 </dependency>
 ```
 
+## 方式一、通过`RedisMessageListenerContainer`
 
+这个类是使用线程池监听并执行后续动作的，可以添加多个监听者。
 
-## 方式一、监听RedisKeyspaceEvent
+配置类：
 
-通过创建并注册`KeyExpirationEventMessageListener`，监听到过期事件后，会发布一个`RedisKeyExpiredEvent`。
+```java
+@Configuration
+public class RedisConfig {
 
-`KeyExpirationEventMessageListener`继承`KeyspaceEventMessageListener`，`KeyspaceEventMessageListener`实现`MessageListener`，在`onMessage(...)`方法中提供了`doHandleMessage(message)`抽象方法，最终由`KeyExpirationEventMessageListener`实现：
+	@Resource
+	private LettuceConnectionFactory lettuceConnectionFactory
 
-```
-@Override
-protected void doHandleMessage(Message message) {
-	publishEvent(new RedisKeyExpiredEvent(message.getBody()));
+	@Bean
+	public RedisMessageListenerContainer redisMessageListenerContainer() {
+		RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+		redisMessageListenerContainer.setConnectionFactory(lettuceConnectionFactory);
+		redisMessageListenerContainer.addMessageListener(new KeyExpireListener(), new PatternTopic("__keyevent@*__:expired"));
+		return redisMessageListenerContainer;
+	}
+
 }
 ```
 
-## 通过`RedisMessageListenerContainer`
+监听类：
+
+```java
+public class KeyExpireListener implements MessageListener {
+	private RedisSerializer<String> stringRedisSerializer = new StringRedisSerializer();
+
+	@Override
+	public void onMessage(Message message, byte[] pattern) {
+		Thread thread = Thread.currentThread();
+		System.out.println(thread.getId() + " " + thread.getName() + " -> " + stringRedisSerializer.deserialize(pattern) + ": " + message);
+	}
+}
+```
+
+如此简单的几行代码就可以监听Redis Key过期事件，但`RedisMessageListenerContainer`默认使用`SimpleAsyncTaskExecutor`作为线程池，这个线程池比较坑的地方在于每次都是用新的线程去执行任务，不重用线程，不是真正意义上的线程池。
+
+## 方式二、监听RedisKeyspaceEvent
+
+通过创建并注册`KeyExpirationEventMessageListener`，监听到过期事件后，会发布一个`RedisKeyExpiredEvent`。
+
+`KeyExpirationEventMessageListener`继承`KeyspaceEventMessageListener`，`KeyspaceEventMessageListener`实现`MessageListener`，在`onMessage(...)`方法中提供了`doHandleMessage(message)`抽象方法，最终由`KeyExpirationEventMessageListener`实现。
+
+配之类：
+
+```
+@Configuration
+public class RedisConfig {
+
+	@Resource
+	private LettuceConnectionFactory lettuceConnectionFactory;
+
+	@Bean
+	public KeyExpirationEventMessageListener keyExpirationEventMessageListener() {
+		return new KeyExpirationEventMessageListener(redisMessageListenerContainer());
+	}
+
+	@Bean
+	public RedisMessageListenerContainer redisMessageListenerContainer() {
+		RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+		redisMessageListenerContainer.setConnectionFactory(lettuceConnectionFactory);
+		return redisMessageListenerContainer;
+	}
+
+}
+```
+
+事件监听类：
+
+```
+@Component
+public class KeyExpireApplicationEventListener implements ApplicationListener<RedisKeyExpiredEvent> {
+	@Override
+	public void onApplicationEvent(RedisKeyExpiredEvent event) {
+		System.out.println(event);
+	}
+}
+```
+
+实际上`KeyExpirationEventMessageListener`也是`MessageListener`的实现，最终还是由`RedisMessageListenerContainer`管理，没有设置线程池的话，还是使用`SimpleAsyncTaskExecutor`。。。
+
+两种方式最终都是`RedisPubSubCommands.pSubscribe(MessageListener listener, byte[]... patterns);`
 
 ## 缺点
 

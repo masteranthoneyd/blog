@@ -4,7 +4,7 @@ date: 2017-04-24 16:56:15
 categories: [Nginx]
 tags: [VPS,Nginx]
 ---
-![](http://ojoba1c98.bkt.clouddn.com/NGINX.png)
+![](http://img.yangbingdong.com/NGINX.png)
 # 前言
 > 走上了VPS这条~~不归路~~，就意味着需要会维护以及运营自己的服务器。那么这一章记录一下学习Nginx的一些东西...
 > 本文绝大部分内容来自NGINX 网站的官方手册：

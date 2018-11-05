@@ -14,8 +14,7 @@
 </div>
 
 <div class="theme-info">
-  {{ __('footer.theme') }} -
-ookamiAntD | <span class="post-count">共{{ totalcount(site) }}字</span>
+  粤ICP备18135202号-1  |  <span class="post-count">共{{ totalcount(site) }}字</span>
 </div>
 
 {% endif %}
