@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, Spring5]
 ---
 
-![](http://img.yangbingdong.com/img/spring-framework-5/spring-framework-5.png)
+![](https://cdn.yangbingdong.com/img/spring-framework-5/spring-framework-5.png)
 
 # Preface
 
@@ -251,7 +251,7 @@ Spring 5 的首要特性是新的反应式编程模型，这代表着对提供�
 
 # 使用 Spring 5 的 WebFlux 开发反应式 Web 应用
 
-![](http://img.yangbingdong.com/img/spring-framework-5/spring-webflux-reactive-mongodb-rest-api-example.png)
+![](https://cdn.yangbingdong.com/img/spring-framework-5/spring-webflux-reactive-mongodb-rest-api-example.png)
 
 ## WebFlux 简介
 

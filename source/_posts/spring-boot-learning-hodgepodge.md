@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring, Spring Boot]
 ---
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
 
 # Preface
 
@@ -31,7 +31,7 @@ tags: [Java, Spring, Spring Boot]
 
 ## 父工程
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/parent.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/parent.png)
 
 *[https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml](https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml)*
 
@@ -51,7 +51,7 @@ tags: [Java, Spring, Spring Boot]
 
 默认情况下Spring Boot打包出来的jar包是不可执行的，需要这样配置：
 
-```
+```xml
     <plugins>
         <plugin>
             <groupId>org.springframework.boot</groupId>
@@ -70,13 +70,13 @@ tags: [Java, Spring, Spring Boot]
 
 打包之后会发现有**两个**jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/repackage.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/repackage.png)
 
 ## 打包依赖了Spring Boot的工具库
 
 只需要在打包插件`spring-boot-maven-plugin`中这样配置：
 
-```
+```xml
 <build>
     <plugins>
         <plugin>
@@ -94,7 +94,7 @@ tags: [Java, Spring, Spring Boot]
 
 ## 打包契约类
 
-```
+```xml
 <build>
     <plugins>
         <plugin>
@@ -142,7 +142,7 @@ mvn -f pom_own.xml package
 
 ## 配置随机值
 
-```
+```properties
 roncoo.secret=${random.value}
 roncoo.number=${random.int}
 roncoo.bignumber=${random.long}
@@ -154,7 +154,7 @@ roncoo.number.in.range=${random.int[1024,65536]}
 
 ## 应用简单配置
 
-```
+```properties
 #端口配置：
 server.port=8090
 #应用名
@@ -174,7 +174,7 @@ spring.jackson.time-zone=Asia/Chongqing
 
 ### Properties多环境配置
 
-```
+```properties
 1. 配置激活选项
 spring.profiles.active=dev
 
@@ -187,7 +187,7 @@ application-test.properties
 
 ### YAML多环境配置
 
-```
+```yaml
 1.配置激活选项
 spring:
   profiles:
@@ -206,7 +206,7 @@ spring:
 
 ### 如何使用
 
-```
+```shell
 java -Dspring.profiles.active=dev -jar myapp.jar
 ```
 
@@ -214,7 +214,7 @@ java -Dspring.profiles.active=dev -jar myapp.jar
 
 `pom.xml`添加依赖：
 
-```
+```xml
     <dependencies>
         <!--支持热启动jar包-->
         <dependency>
@@ -239,7 +239,7 @@ java -Dspring.profiles.active=dev -jar myapp.jar
 
 `application.yml`配置文件中添加：
 
-```
+```yaml
 spring:
   devtools:
     restart:
@@ -250,7 +250,7 @@ spring:
 ```
 
 关于DevTools的键值如下：
-```
+```properties
 # DEVTOOLS (DevToolsProperties)
 spring.devtools.livereload.enabled=true # Enable a livereload.com compatible server.
 spring.devtools.livereload.port=35729 # Server port.
@@ -277,11 +277,11 @@ spring.devtools.remote.secret-header-name=X-AUTH-TOKEN # HTTP header used to tra
 
 （1）**File-Settings-Compiler-Build Project automatically**
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools01.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools01.png)
 
 （2）**ctrl + shift + alt + /,选择Registry,勾上 Compiler autoMake allow when app running**
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools02.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools02.png)
 
 OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自动去make了。
 
@@ -300,17 +300,17 @@ OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自�
 
 Tomcat:
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/tomcat-gatling-test.jpg)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/tomcat-gatling-test.jpg)
 
 Undertow:
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/undertow-gatling-test.jpg)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/undertow-gatling-test.jpg)
 
 显然Undertow的吞吐量要比Tomcat高
 
 ## Maven配置
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -345,7 +345,7 @@ Undertow:
 
 ## 监听多个端口与HTTP2支持
 
-```
+```java
 // 在@Configuration的类中添加@bean
 @Bean
 UndertowEmbeddedServletContainerFactory embeddedServletContainerFactory() {
@@ -365,7 +365,7 @@ UndertowEmbeddedServletContainerFactory embeddedServletContainerFactory() {
 
 ## Undertow相关配置
 
-```
+```properties
 # Undertow 日志存放目录
 server.undertow.accesslog.dir
 # 是否启动日志
@@ -403,13 +403,12 @@ mvn dependency:tree
 
 ## 启动异步
 
-```
+```java
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig {
   
 }
-
 ```
 
 配置完这个就已经具备异步方法功能了，只需要在方法上面添加`@Async`即可
@@ -418,7 +417,7 @@ public class SpringAsyncConfig {
 
 ## 编写异步方法
 
-```
+```java
 @Async
 public void asyncMethodWithVoidReturnType() throws InterruptedException {
 	System.out.println("Execute method asynchronously. " + Thread.currentThread().getName());
@@ -432,7 +431,7 @@ public void asyncMethodWithVoidReturnType() throws InterruptedException {
 
 ### 直接声明线程池
 
-```
+```java
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig {
@@ -470,7 +469,7 @@ public class SpringAsyncConfig {
 - `getAsyncExecutor()`: 提供线程池
 - `getAsyncUncaughtExceptionHandler()`: 异步任务异常处理
 
-```
+```java
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig implements AsyncConfigurer {
@@ -504,7 +503,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 
 有时候，存在关闭程序但还有异步任务在执行的情况，这时候，我们需要优雅地关闭线程池，只需要两个参数：
 
-```
+```java
 executor.setWaitForTasksToCompleteOnShutdown(true);
 executor.setAwaitTerminationSeconds(60);
 ```
@@ -515,7 +514,7 @@ executor.setAwaitTerminationSeconds(60);
 
 如果需要指定线程池可以这样
 
-```
+```java
 @Async("threadPoolTaskExecutor")
 public void someMethod(){...}
 
@@ -525,7 +524,7 @@ public void someMethod(){...}
 
 Service：
 
-```
+```java
 @Async("threadPoolTaskExecutor")
 @Override
 public Future<String> asyncMethodWithVoidReturnType() throws InterruptedException {
@@ -537,7 +536,7 @@ public Future<String> asyncMethodWithVoidReturnType() throws InterruptedExceptio
 
 Controller：
 
-```
+```java
 @GetMapping("/hello")
 public Mono<String> syaHello() throws InterruptedException, ExecutionException {
 	Future<String> stringFuture = someService.asyncMethodWithVoidReturnType();
@@ -548,7 +547,6 @@ public Mono<String> syaHello() throws InterruptedException, ExecutionException {
 	System.out.println(stringFuture.get());
 	return Mono.just("Hello World");
 }
-
 ```
 
 执行结果：
@@ -560,57 +558,6 @@ wait...
 wait...
 wait...
 Execute method asynchronously. asyncExecutor-1
-
-```
-
-# Spring定时任务
-
-启用：
-
-```
-@Configuration
-@EnableScheduling
-public class SpringScheduleConfig implements SchedulingConfigurer {
-
-	@Override
-	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-		taskRegistrar.setScheduler(taskExecutor());
-	}
-	
-	@Bean
-	public Executor taskExecutor() {
-		return new ScheduledThreadPoolExecutor(4,
-				new BasicThreadFactory
-						.Builder()
-						.namingPattern("schedule-pool-thread-%d")
-						.daemon(true)
-						.build());
-	}
-}
-
-```
-
-定时任务：
-
-```
-	private int i = 0;
-
-	@Scheduled(fixedDelay=1000)
-	public void doScheduled() {
-		System.out.println(Thread.currentThread().getName() + "  " + ++i);
-	}
-
-```
-
-结果：
-
-```
-schedule-pool-thread-1  2
-schedule-pool-thread-2  3
-schedule-pool-thread-1  4
-schedule-pool-thread-3  5
-schedule-pool-thread-2  6
-
 ```
 
 # Spring启动后执行程序的几种方式
@@ -629,7 +576,7 @@ schedule-pool-thread-2  6
 
 通过监听`ContextRefreshedEvent`事件：
 
-```
+```java
 public class ApplicationContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -674,7 +621,7 @@ Spring的事件处理是单线程的，所以如果一个事件被触发，除�
 
 实现`ApplicationRunner`或`CommandLineRunner`
 
-```
+```java
 @SpringBootApplication
 public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRunner{
 
@@ -707,7 +654,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 这种情况下，就会造成`onApplicationEvent`方法被执行两次。为了避免上面提到的问题，我们可以只在`root application context`初始化完成后调用逻辑代码，其他的容器的初始化完成，则不做任何处理，修改后代码 
 
-```
+```java
       @Override  
       public void onApplicationEvent(ContextRefreshedEvent event) {  
         if(event.getApplicationContext().getParent() == null){//root application context 没有parent，他就是老大.  
@@ -727,7 +674,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 3. 使用ShutdownHook:
 
-   ```
+   ```java
    public class ShutdownHook {
 
        public static void main(String[] args) throws InterruptedException {
@@ -767,7 +714,7 @@ Spring4.0的许多注解都可以用作meta annotation（元注解）。元注�
 
 自定义注解或组合注解是从其他的Spring元注解创建的，我们先看一下`@SpringBootApplication`这个神奇的注解（去除注释）：
 
-```
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -798,7 +745,7 @@ public @interface SpringBootApplication {
 
 ## 自定义组合注解
 
-```
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -841,7 +788,7 @@ public class ExampleController {
 
 与其他模块一样，使用需要引入pom依赖：
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -850,7 +797,7 @@ public class ExampleController {
 
 **引入依赖程序将自动启用AOP**，只要引入了AOP依赖后，默认已经增加了`@EnableAspectJAutoProxy`，并且默认启用**Cglib**代理：
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot-cglib-default.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-cglib-default.png)
 
 ## AOP顺序
 
@@ -862,7 +809,7 @@ public class ExampleController {
 
 ### 日志注解
 
-```
+```xml
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -876,7 +823,7 @@ public @interface ReqLog {
 
 ### 声明Pointcut
 
-```
+```java
 @Pointcut("execution(public * com.yangbingdong.docker.controller..*.*(..))")
 public void path() {}
 
@@ -889,7 +836,7 @@ public void logHttp() {}
 
 然后这样使用：
 
-```
+```java
 @Before("path() && @annotation(reqLog)")
 public void before(JoinPoint joinPoint) {
     ...
@@ -898,7 +845,7 @@ public void before(JoinPoint joinPoint) {
 
 如果要很方便地获取`@ReqLog`的`value`，我们可以将其**绑定**为参数：
 
-```
+```java
 @Pointcut("execution(public * com.yangbingdong.docker.controller..*.*(..))")
 public void path(){}
 
@@ -925,18 +872,18 @@ public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
 
 看一下有哪些方法重载：
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-reg-bean.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-reg-bean.png)
 
 注入`GenericWebApplicationContext`：
 
-```
+```java
 @Autowired
 private GenericWebApplicationContext context;
 ```
 
 注册并设置bean：
 
-```
+```java
 String beanName = lowercaseInitial(handler.getClass().getSimpleName()) + "-" + j;
 context.registerBean(beanName, handler.getClass());
 AbstractShardingHandler<AopLogEvent> shardingBean = (AbstractShardingHandler<AopLogEvent>) context.getBean(beanName);
@@ -954,7 +901,7 @@ AbstractShardingHandler<AopLogEvent> shardingBean = (AbstractShardingHandler<Aop
 
 `@SpringBootApplication`注解中包含了自动配置的入口注解：
 
-```
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -969,7 +916,7 @@ public @interface SpringBootApplication {
 }
 ```
 
-```
+```java
 @SuppressWarnings("deprecation")
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -993,7 +940,7 @@ public @interface EnableAutoConfiguration {
 
 ### @AutoConfigurationPackage
 
-```
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -1006,7 +953,7 @@ public @interface AutoConfigurationPackage {
 
 这个注解的职责就是**引入**了另外一个配置类：`AutoConfigurationPackages.Registrar`。
 
-```
+```java
 /**
  * ImportBeanDefinitionRegistrar用来从导入的Config中保存base package
  */
@@ -1029,7 +976,7 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 
 这个注解实现的功能已经比较底层了，调试看看上面的register方法什么会被调用：
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot-code.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code.png)
 
 调用参数中的`packageNames`数组中仅包含一个值：`com.example.demo`，也就是项目的root package名。
 
@@ -1047,13 +994,13 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 
 它的类图如下所示：
 
-![](http://img.yangbingdong.com/img/spring-boot-learning/spring-boot-code02.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code02.png)
 
 可以发现它除了实现几个Aware类接口外，最关键的就是实现了`DeferredImportSelector`(继承自`ImportSelector`)接口。
 
 所以我们先来看看`ImportSelector`以及`DeferredImportSelector`接口的定义：
 
-```
+```java
 public interface ImportSelector {
 
     /**
@@ -1070,7 +1017,7 @@ public interface ImportSelector {
 2. 实现了`ImportSelector`的类也可以实现一系列Aware接口，这些Aware接口中的相应方法会在`selectImports`方法之前被调用(这一点通过上面的类图也可以佐证，`EnableAutoConfigurationImportSelector`确实实现了四个Aware类型的接口)
 3. `ImportSelector`的实现和通常的`@Import`在处理方式上是一致的，然而还是可以在所有`@Configuration`类都被处理后再进行引入筛选(具体看下面即将介绍的`DeferredImportSelector`)
 
-```
+```java
 public interface DeferredImportSelector extends ImportSelector {
 
 }
@@ -1083,7 +1030,7 @@ public interface DeferredImportSelector extends ImportSelector {
 
 明确了这两个接口的意义，下面来看看是如何实现的：
 
-```
+```java
 @Override
 public String[] selectImports(AnnotationMetadata annotationMetadata) {
     if (!isEnabled(annotationMetadata)) {
@@ -1119,7 +1066,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 
 很明显，核心就在于上面的**步骤3**：
 
-```
+```java
 protected List<String> getCandidateConfigurations(AnnotationMetadata metadata,
         AnnotationAttributes attributes) {
     List<String> configurations = SpringFactoriesLoader.loadFactoryNames(
@@ -1133,7 +1080,7 @@ protected List<String> getCandidateConfigurations(AnnotationMetadata metadata,
 
 它将实现委托给了`SpringFactoriesLoader`的`loadFactoryNames`方法：
 
-```
+```java
 // 传入的factoryClass：org.springframework.boot.autoconfigure.EnableAutoConfiguration
 public static List<String> loadFactoryNames(Class<?> factoryClass, ClassLoader classLoader) {
     String factoryClassName = factoryClass.getName();
@@ -1165,7 +1112,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
 
 比如`spring-boot-autoconfigure`包：
 
-```
+```properties
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
@@ -1180,7 +1127,7 @@ org.springframework.boot.autoconfigure.cloud.CloudAutoConfiguration,\
 
 列举了非常多的自动配置候选项，挑一个AOP相关的`AopAutoConfiguration`看看究竟：
 
-```
+```java
 // 如果设置了spring.aop.auto=false，那么AOP不会被配置
 // 需要检测到@EnableAspectJAutoProxy注解存在才会生效
 // 默认使用JdkDynamicAutoProxyConfiguration，如果设置了spring.aop.proxy-target-class=true，那么使用CglibAutoProxyConfiguration
@@ -1240,7 +1187,7 @@ spring.aop.proxy-target-class=true
 
 为了给可配置的bean属性生成元数据，我们需要引入如下jar包：
 
-```
+```xml
 <!-- 将被@ConfigurationProperties注解的类的属性注入到元数据 -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1251,11 +1198,11 @@ spring.aop.proxy-target-class=true
 
 `application.properties`:
 
-```
+```properties
 ybd.datasource.driver-class-name=com.mysql.jdbc.Driver
 ybd.datasource.url=jdbc:mysql://192.168.0.200:3306/transaction_message_test?useUnicode=true&characterEncoding=utf8&useSSL=false
-ybd.datasource.username=ibalife
-ybd.datasource.password=ibalife
+ybd.datasource.username=xxx
+ybd.datasource.password=xxx
 ybd.datasource.dbcp2.validation-query=select 'x'
 ```
 
@@ -1263,7 +1210,7 @@ ybd.datasource.dbcp2.validation-query=select 'x'
 
 ### properties接收类
 
-```
+```java
 @Data
 @ConfigurationProperties(DataSourceProperties.DATASOURCE_PREFIX)
 public class DataSourceProperties {
@@ -1300,7 +1247,7 @@ public class DataSourceProperties {
 
 ### Config类
 
-```
+```java
 @Configuration
 @Import(SpringCloudConfiguration.class)
 @ConditionalOnClass({LocalXADataSource.class})
@@ -1401,7 +1348,7 @@ ${AnsiStyle.NORMAL}
 
 可参考：***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
 
-```
+```java
 package com.yangbingdong.docker.config.shutdown;
 
 import io.undertow.server.HandlerWrapper;
@@ -1430,7 +1377,7 @@ public class GracefulShutdownWrapper implements HandlerWrapper {
 }
 ```
 
-```
+```java
 package com.yangbingdong.docker.config.shutdown;
 
 import io.undertow.server.handlers.GracefulShutdownHandler;
@@ -1464,7 +1411,7 @@ public class GracefulShutdownListener implements ApplicationListener<ContextClos
 
 ```
 
-```
+```java
 package com.yangbingdong.springboot.common.config.shutdown;
 
 import io.undertow.server.HandlerWrapper;

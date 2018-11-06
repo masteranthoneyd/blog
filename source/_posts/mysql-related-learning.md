@@ -5,7 +5,7 @@ categories: [MySQL]
 tags: [MySQL]
 ---
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/MySQL.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/MySQL.png)
 
 # Preface
 
@@ -61,7 +61,7 @@ collation-server = utf8mb4_unicode_ci
 
 虽然启动成功，但发现MySQL实例是关闭的，在启动日志中发现这一条信息
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mysql-warning.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-warning.png)
 
 大概意思是**权限全局可写**，任何一个用户都可以写。MySQL担心这种文件**被其他用户恶意修改**，所以**忽略**掉这个配置文件。
 
@@ -86,7 +86,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 这个一个智能补全并且高亮语法的终端客户端 ***[mycli](https://github.com/dbcli/mycli)***
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mycli.gif)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
 
 安装：
 
@@ -147,7 +147,7 @@ Options:
 
 安装以及破解在***[另一篇博文](/2017/ubuntu-dev-environment-to-build/#Navicat-Premium)***里面。
 
-![](http://img.yangbingdong.com/img/javaDevEnv/navicat12.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
 ## Workbench
 
@@ -155,7 +155,7 @@ MySQL官方开源GUI
 
 下载地址：***[https://dev.mysql.com/downloads/workbench/](https://dev.mysql.com/downloads/workbench/)***
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/MySQL%20Workbench_001.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/MySQL%20Workbench_001.png)
 
 # 索引相关
 
@@ -165,15 +165,15 @@ MySQL官方开源GUI
 
 表结构：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain01.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain01.png)
 
 不使用索引：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain02.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain02.png)
 
 使用索引：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain03.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain03.png)
 
 可以看到，使用`explain`显示了很多列，各个关键字的含义如下：
 
@@ -235,7 +235,7 @@ MySQL官方开源GUI
 
 4. 如果列类型是**字符串**，那一定要在条件中将数据使用**引号**引用起来，否则不会使用索引
 
-   ![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain04.png)
+   ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain04.png)
 
 5. `like`的模糊查询以 `%` 开头，索引失效
 
@@ -337,7 +337,7 @@ mysql在json类型中增加了一些json相关的函数 可以参考如下
 
 ### 表结构
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain05.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain05.png)
 
 ### 插入数据
 
@@ -348,11 +348,11 @@ INSERT INTO `user_json` VALUES (1, '{\"name\": \"yang\", \"address\": \"shenyang
 
 
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain07.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain07.png)
 
 **JSON校验**：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain06.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain06.png)
 
 ### 查询
 
@@ -364,7 +364,7 @@ select data->'$.name' from user_json where data->'$.name'='yang';
 
 发现结果集是带有双引号的：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain08.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain08.png)
 
 如果想要去除双引号一般来说我们这样:
 
@@ -373,7 +373,7 @@ select JSON_UNQUOTE(json_extract(data,'$.name'))from user_json where json_extrac
 select  data->>'$.name' from user_json where data->'$.name'='yang';
 ```
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain09.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain09.png)
 
 ## JSON如何建立索引
 
@@ -385,9 +385,9 @@ ALTER TABLE user_json ADD COLUMN `virtual_name` varchar(20) GENERATED ALWAYS AS 
 ALTER TABLE user_json ADD KEY (virtual_name);
 ```
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain10.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain10.png)
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/idx-explain11.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain11.png)
 
 可以看到索引起作用了~
 
@@ -416,13 +416,13 @@ MyISAM存储引擎的特点是：**表级锁**、**不支持事务和全文索�
 
 以下是MySQL 5.7 MyISAM存储引擎的版本特性：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mysql-engine01.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine01.png)
 
 InnoDB存储引擎的特点是：**行级锁**、**事务安全（ACID兼容）**、**支持外键**、不支持FULLTEXT类型的索引(5.6.4以后版本开始支持FULLTEXT类型的索引)。InnoDB存储引擎提供了具有提交、回滚和崩溃恢复能力的事务安全存储引擎。InnoDB是**为处理巨大量时拥有最大性能而设计的**。它的CPU效率可能是任何其他基于磁盘的关系数据库引擎所不能匹敌的。
 
 以下是MySQL 5.7 InnoDB存储引擎的版本特性：
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mysql-engine02.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine02.png)
 
 *注意：* 
 InnoDB表的行锁也不是绝对的，假如在执行一个SQL语句时MySQL不能确定要扫描的范围，InnoDB表同样会锁全表，例如`update table set num=1 where name like “a%”`。
@@ -433,9 +433,9 @@ InnoDB表的行锁也不是绝对的，假如在执行一个SQL语句时MySQL不
 
 下边两张图是官方提供的MyISAM与InnoDB的压力测试结果
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mysql-engine03.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine03.png)
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mysql-engine04.png)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine04.png)
 
 可以看出，**随着CPU核数的增加**，**InnoDB的吞吐量反而越好**，而MyISAM，其吞吐量几乎没有什么变化，显然，MyISAM的表锁定机制降低了读和写的吞吐量。
 

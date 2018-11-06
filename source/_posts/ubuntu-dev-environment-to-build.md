@@ -4,7 +4,7 @@ date: 2017-01-20 11:31:22
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
 ---
-![](http://img.yangbingdong.com/img/javaDevEnv/maxresdefault.jpg)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/maxresdefault.jpg)
 
 # 前言
 
@@ -111,7 +111,7 @@ source /etc/profile.d/jdk.sh
 java -version
 javac -version
 ```
-![](http://img.yangbingdong.com/img/javaDevEnv/javaVersion.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/javaVersion.png)
 
 # 安装Scala环境
 
@@ -119,7 +119,7 @@ javac -version
 
 1、去 *[官网](http://www.scala-lang.org/download/)* 下载最新地SDK
 
-![](http://img.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
 
 2、解压到 `/usr/local` 目录，并创建软链接为 `scala` 
 
@@ -136,7 +136,7 @@ source /etc/profile.d/scala.sh
 scala -version
 ```
 
-![](http://img.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
 
 #  安装IDE
 
@@ -185,7 +185,7 @@ MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu
 ### 安装
 进过查阅，我选择官方的盒子下载：***[http://www.jetbrains.com/toolbox/app/?fromMenu](http://www.jetbrains.com/toolbox/app/?fromMenu)***
 优点是可以自动更新
-![](http://img.yangbingdong.com/img/javaDevEnv/idea.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/idea.png)
 
 ### 激活
 
@@ -230,7 +230,7 @@ sudo apt-get install mysql-client
 mysql -h 127.0.0.1 -P 3306 -u root -p
 ```
 
-![](http://img.yangbingdong.com/img/javaDevEnv/mysqlStartup.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/mysqlStartup.png)
 
 ## 手动折腾安装
 
@@ -390,7 +390,7 @@ Query OK, 0 rows affected (0.01 sec)
 
 ### 如果登录mysql出现以下错误
 
-![](http://img.yangbingdong.com/img/javaDevEnv/mysql-problom.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/mysql-problom.png)
 **则可能配置未加载或服务未启动，请重启系统，然后启动mysql服务**
 ```
 sudo service mysql start
@@ -430,7 +430,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 这个一个智能补全并且高亮语法的终端客户端 ***[mycli](https://github.com/dbcli/mycli)***
 
-![](http://img.yangbingdong.com/img/mysql-related-learning/mycli.gif)
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
 
 安装：
 
@@ -531,9 +531,9 @@ Options:
 6. 在注册界面填入序列号，然后激活。这时会提示要手动激活，ok就选这个
    接下来会有请求码，复制然后贴入控制台，就可以得到注册码了。
 
-![](http://img.yangbingdong.com/img/javaDevEnv/navicat-patch.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat-patch.png)
 
-![](http://img.yangbingdong.com/img/javaDevEnv/navicat12.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
 #### 创建快捷方式
 
@@ -642,7 +642,7 @@ sudo apt-get install -y mongodb-org
 ```
 mongo -version
 ```
-![](http://img.yangbingdong.com/img/mongodb/mongodb-version.png)
+![](https://cdn.yangbingdong.com/img/mongodb/mongodb-version.png)
 
 启动、重新启动和关闭mongodb命令:
 ```
@@ -703,7 +703,7 @@ docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 --restart=always rabbi
 
 浏览器打开`localhost:15673`，默认帐号密码都是`guest`
 
-![](http://img.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
 
 集群：[https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
 
@@ -816,7 +816,7 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --boots
 
 # 搭建ngrok配置
 
-![](http://img.yangbingdong.com/img/javaDevEnv/ngrok_p1.jpg)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/ngrok_p1.jpg)
 >ngrok 是一个反向代理，通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道。ngrok 可捕获和分析所有通道上的流量，便于后期分析和重放。可以被使用来进行微信借口的本地调试。在ngrok被墙之后，我们需要通过ngrok开源的源码自行搭建ngrok服务。
 
 参考地址：***[Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***

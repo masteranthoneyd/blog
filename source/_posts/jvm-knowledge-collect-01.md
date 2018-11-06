@@ -4,7 +4,7 @@ date: 2017-03-09 13:04:51
 categories: [Programming,Java]
 tags: [Java,JVM]
 ---
-![](http://img.yangbingdong.com/img/jvm/structure.png)
+![](https://cdn.yangbingdong.com/img/jvm/structure.png)
 
 # 前言
 > 想要深刻地理解Java，那么就要深入地理解底层——JVM(Java Virtual Machine | Java虚拟机)。
@@ -18,16 +18,16 @@ tags: [Java,JVM]
 
 ## 什么是JVM
 要想说明白什么 JVM 就不得不提另外两个概念，JRE 和 JDK，初学者总是把这几个概念搞混。
-![](http://img.yangbingdong.com/img/jvm/java-tutorial.png)
+![](https://cdn.yangbingdong.com/img/jvm/java-tutorial.png)
 JVM，JRE，JDK 都是 Java 语言的支柱，他们分工协作。但不同的是 **JDK 和 JRE 是真实存在的**，而 JVM 是一个**抽象**的概念，并不真实存在。
 
 ### JDK
 JDK(Java Development Kit) 是 Java 语言的软件开发工具包（SDK）。JDK 物理存在，是 programming tools、JRE 和 JVM 的一个集合。
-![](http://img.yangbingdong.com/img/jvm/jdk.png)
+![](https://cdn.yangbingdong.com/img/jvm/jdk.png)
 
 ### JRE
 JRE（Java Runtime Environment）Java 运行时环境，JRE 物理存在，主要由Java API 和 JVM 组成，提供了用于执行 Java 应用程序最低要求的环境。
-![](http://img.yangbingdong.com/img/jvm/jre.png)
+![](https://cdn.yangbingdong.com/img/jvm/jre.png)
 
 ### JVM（Java Virtual Machine）
 JVM(Java Virtual Machine) 是一种软件实现，执行像物理机程序的机器（即电脑）。
@@ -38,7 +38,7 @@ JVM 并不是专为 Java 所实现的运行时，实际上只要有其他编程�
 JVM实现了Java语言最重要的特征：即平台无关性。
 **平台无关性原理**：编译后的 Java程序（`.class`文件）由**JVM执行**。JVM**屏蔽了与具体平台相关的信息**，使程序可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。因此实现**Java平台无关性**。
 ## JVM结构图
-![](http://img.yangbingdong.com/img/jvm/jvm-frame-diagram.png)
+![](https://cdn.yangbingdong.com/img/jvm/jvm-frame-diagram.png)
 **JVM = 类加载器 classloader+ 执行引擎 executionengine + 运行时数据区域 runtime data area**
 首先Java源代码文件被Java编译器编译为字节码文件，然后JVM中的**类加载器**加载完毕之后，交由JVM**执行引擎**执行。在整个程序执行过程中，JVM中的**运行时数据区（内存）**会用来存储程序执行期间需要用到的数据和相关信息。
 因此，**在Java中我们常常说到的内存管理就是针对这段空间进行管理**（如何分配和回收内存空间）。
@@ -52,7 +52,7 @@ ClassLoader把硬盘上的class文件**加载到JVM中的运行时数据区域**
 ## Runtime DataArea
 JVM运行时数据区 (JVM RuntimeArea)其实就是指 JVM在**运行期间**，其**对JVM内存空间的划分和分配**。JVM在运行时将数据划分为了**以下几个区域来存储**。
 程序员写的所有程序都被加载到运行时数据区域中。
-![](http://img.yangbingdong.com/img/jvm/jvm-runtime-area.png)
+![](https://cdn.yangbingdong.com/img/jvm/jvm-runtime-area.png)
 （图注：**JDK1.7已经把常量池转移到堆里面了！**）
 ### PC寄存器（The pc Register）
 （1）每一个Java线程**都有一个PC寄存器**，用以**记录当前执行到哪个指令**。
@@ -237,8 +237,8 @@ false
 这个例子也比较简单，**就是为了证明使用`intern()`比不使用`intern()`消耗的内存更少**。
 先定义一个长度为10的Integer数组，并随机为其赋值，在通过for循环为长度为10万的String对象依次赋值，这些值都来自于Integer数组。两种情况分别运行，可通过`Window`>`Preferences`>`Java`>`InstalledJREs`设置JVM启动参数为`-agentlib:hprof=heap=dump,format=b`，将程序运行完后的hprof置于工程目录下。再通过**MAT插件**查看该`hprof`文件。
 两次实验结果如下：
-![](http://img.yangbingdong.com/img/jvm/hprof1.png)
-![](http://img.yangbingdong.com/img/jvm/hrpof2.png)
+![](https://cdn.yangbingdong.com/img/jvm/hprof1.png)
+![](https://cdn.yangbingdong.com/img/jvm/hrpof2.png)
 从运行结果来看，不使用`intern()`的情况下，程序生成了101762个String对象，而使用了`intern()`方法时，程序仅生成了1772个String对象。自然也证明了**`intern()`节省内存的结论**。
 细心的同学会发现使用了`intern()`方法后**程序运行时间有所增加**。这是因为程序中每次都是用了`new String`后又进行**`intern()`操作的耗时时间**，但是不使用`intern()`占用内存空间导致GC的时间是要远远大于这点时间的。 
 
@@ -279,14 +279,14 @@ JDK1.7以及以上：false false
 ```
 下面依据上面代码对`intern()`方法进行分析
 ### JDK1.6
-![](http://img.yangbingdong.com/img/jvm/jdk6-intern.png)
+![](https://cdn.yangbingdong.com/img/jvm/jdk6-intern.png)
 在JDK1.6中所有的输出结果都是 false，因为JDK1.6以及以前版本中，常量池是放在 Perm 区（属于方法区）中的，熟悉JVM的话应该知道这是和堆区完全分开的。
 使用**引号声明的字符串都是会直接在字符串常量池**中生成的，而 **new 出来的 String 对象是放在堆空间中的**。所以两者的内存地址肯定是不相同的，即使调用了`intern()`方法也是不影响的。如果不清楚String类的`“==”`和`equals()`的区别可以查看这篇博文***[Java面试——从Java堆、栈角度比较equals和==的区别](http://blog.csdn.net/seu_calvin/article/details/52089040)***。
 `intern()`方法在JDK1.6中的**作用**是：比如`String s=new String("SEU_Calvin")`，再调用`s.intern()`，此时返回值还是字符串`"SEU_Calvin"`，表面上看起来好像这个方法没什么用处。但实际上，在JDK1.6中它做了个小动作：检查字符串池里**是否存在`"SEU_Calvin"`这么一个字符串**，如果存在，就返回池里的字符串；如果不存在，该方法会把`"SEU_Calvin"`添加到字符串池中，然后再返回它的引用。然而在JDK1.7中却不是这样的，后面会讨论。
 
 ## JDK1.7
 针对JDK1.7以及以上的版本，我们将上面两段代码分开讨论。先看第一段代码的情况：
-![](http://img.yangbingdong.com/img/jvm/jdk7-intern1.png)
+![](https://cdn.yangbingdong.com/img/jvm/jdk7-intern1.png)
 ```java
 String s = new String("1"); 
 s.intern(); 
@@ -309,7 +309,7 @@ System.out.println(s3 == s4);
 `String s4 = "11"`， 这一行代码会**直接去常量池中创建**，但是发现已经有这个对象了，此时也就是指向 **s3 引用对象的一个引用**。因此`s3 == s4`返回了`true`。
 
 下面继续分析第二段代码：
-![](http://img.yangbingdong.com/img/jvm/jdk7-intern2.png)
+![](https://cdn.yangbingdong.com/img/jvm/jdk7-intern2.png)
 再把第二段代码贴一下便于查看：
 ```java
 String s = new String("1"); 
@@ -483,7 +483,7 @@ Copying算法将可用内存**按容量划分为大小相等的两块**，**每�
 最后，因为每次回收都只回收少量对象，所以**老年代一般使用的是标记整理算法**。
 
 **注意**，在方法区中有一个**永久代**（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：**废弃常量**和**无用的类**。
-![](http://img.yangbingdong.com/img/jvm/java-heap-memory.png)
+![](https://cdn.yangbingdong.com/img/jvm/java-heap-memory.png)
 有关查看垃圾回收信息的JVM常见配置方式：
 ```
 -XX:+PrintGCDetails
@@ -537,7 +537,7 @@ G1搜集器是当今搜集器技术发展最前沿的成果，它是一款**面�
 
 # Java类加载机制总结
 
-![](http://img.yangbingdong.com/img/jvm/class.png)
+![](https://cdn.yangbingdong.com/img/jvm/class.png)
 
 ## 类加载器的组织结构
 类加载器 `ClassLoader`是具有层次结构的，也就是父子关系。其中，**`Bootstrap`是所有类加载器的父亲**。
@@ -547,7 +547,7 @@ G1搜集器是当今搜集器技术发展最前沿的成果，它是一款**面�
 用于加载除了基本 API之外的一些拓展类。
 （3）`AppClassLoader`：加载应用程序和程序员**自定义的类**。
 运行下面的程序，结果也显示出来了：
-![](http://img.yangbingdong.com/img/jvm/classlodertest.png)
+![](https://cdn.yangbingdong.com/img/jvm/classlodertest.png)
 从运行结果可以看出加载器之间的**父子关系**，`ExtClassLoader`的父`Loader`返回了null
 原因是`BootstrapLoader`（启动类加载器）是用**`C`语言实现**的，找不到一个确定的返回父`Loader`的方式。
 
@@ -615,7 +615,7 @@ ClassLoader.loadClass(name, false);//第二个参数指Class是否被链接，�
 **通过上面的描述，如果程序依赖于`Class`是否被初始化，就必须用`Class.forName(name)`了**
 
 # 自定义类加载器
-![](http://img.yangbingdong.com/img/jvm/calssloader.png)
+![](https://cdn.yangbingdong.com/img/jvm/calssloader.png)
 ## 为什么需要自定义类加载器
 网上的大部分自定义类加载器文章，几乎都是贴一段实现代码，然后分析一两句自定义ClassLoader的原理。但是个人觉得首先得把为什么需要自定义加载器这个问题搞清楚，因为如果不明白它的作用的情况下，还要去学习它显然是很让人困惑的。
 首先介绍自定义类的**应用场景**：
@@ -764,7 +764,7 @@ System.out.println(obj.getClass().getClassLoader());//打印出我们的自定�
 ```
 
 ### 运行结果
-![](http://img.yangbingdong.com/img/jvm/result.png)
+![](https://cdn.yangbingdong.com/img/jvm/result.png)
 
 至此关于自定义`ClassLoader`的内容总结完毕。
 

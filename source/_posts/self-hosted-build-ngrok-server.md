@@ -4,14 +4,14 @@ date: 2017-04-26 18:44:20
 categories: [VPS]
 tags: [VPS,Ngrok]
 ---
-![](http://img.yangbingdong.com/ngrok.png)
+![](https://cdn.yangbingdong.com/ngrok.png)
 # 前言
 > Ngrok可以干嘛？我们经常会有 "把本机开发中的 web 项目给朋友看一下" 或 "测试一下支付宝、微信的支付功能" 这种临时需求，为此**专门**购买个域名然后在 VPS或云主机 上**部署一遍**就有点太**浪费**了。那么这时候，**Ngrok**就是个很好的东西，它可以实现我们的这种需求。而且 Ngrok 官网本身还提供了公共服务，只需要注册一个帐号，运行它的客户端，就可以快速把内网映射出去。不过这么好的服务，没多久就被**墙**了~幸好Ngrok是**开源**的，那么我们可以自己搭建一个Ngrok！
 
 <!--more-->
 # 域名泛解析
 因为内网穿透需要用到多级域名，这里，博主的这个域名是在***[Namesilo](https://www.namesilo.com/)***购买的，然后转到DNSPod解析：
-![](http://img.yangbingdong.com/DNSPod.png)
+![](https://cdn.yangbingdong.com/DNSPod.png)
 如图所示，我搞买的域名是`yangbingdong.com`,将`ngrok.yangbingdong.com`通过`A`记录解析导VPS的ip地址，再将`*.ngrok.yangbingdong.com`通过`CNAME`解析导`ngrok.yangbingdong.com`，完成泛解析。
 
 # 服务端安装
@@ -62,7 +62,7 @@ cd /usr/local/src/ngrok/bin && ./ngrokd -domain="ngrok.yangbingdong.com" -httpAd
 ```
 **`ngrok.yangbingdong.com`换成自己的域名**。其他端口可自己配置。
 顺利的话，可以正常编译，在`bin`下面可以看到「ngrokd」和「ngrok」，其中「ngrokd」是服务端执行程序，「ngrok」是客户端执行程序
-![](http://img.yangbingdong.com/ngrok-server-startup.png)
+![](https://cdn.yangbingdong.com/ngrok-server-startup.png)
 
 ## 后台运行：
 ```shell
@@ -106,7 +106,7 @@ trust_host_root_certs: false
 ```
 其中`ybd`是自定义的域名前缀，`ngrok.cfg`是上面创建的配置文件，`8080`是本地需要映射到外网的端口。
 没有意外的话访问`ybd.ngrok.yangbingdong.com:8002`就会映射到本机的`8080`端口了。
-![](http://img.yangbingdong.com/ngrok-client-startup01.png)
+![](https://cdn.yangbingdong.com/ngrok-client-startup01.png)
 
 控制台：
 

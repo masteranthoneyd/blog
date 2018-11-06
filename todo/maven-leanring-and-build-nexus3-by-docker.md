@@ -66,7 +66,7 @@ docker run --restart=always -d -p 8090:8081 --name nexus -v /some/dir/nexus-data
 
 # Repositories
 
-![](http://img.yangbingdong.com/img/docker-nexus3/nexus-repo.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/nexus-repo.png)
 
 有几个默认仓库分别是：
 
@@ -90,17 +90,17 @@ Nexus默认的仓库类型有以下四种：
 
 默认的`maven-central` 使用的是*[https://repo1.maven.org/maven2/](https://repo1.maven.org/maven2/)* 地址，速度上没有UK 的快，所以修改为*[http://uk.maven.org/maven2/](http://uk.maven.org/maven2/)* 或者阿里的镜像*[http://maven.aliyun.com/nexus/content/groups/public/](http://maven.aliyun.com/nexus/content/groups/public/)*
 
-![](http://img.yangbingdong.com/img/docker-nexus3/proxy-url.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/proxy-url.png)
 
 ## 方式二
 
 添加一个阿里云的代理仓库，然后优先级放到默认中央库之前：
 
-![](http://img.yangbingdong.com/img/docker-nexus3/nexus-proxy1.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/nexus-proxy1.png)
 
 然后再public组里面讲这个`aliyun-proxy`仓库加入，排在`maven-central`之前即可。
 
-![](http://img.yangbingdong.com/img/docker-nexus3/nexus-proxy2.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/nexus-proxy2.png)
 
 **Nexus仓库分类的概念**
 
@@ -108,7 +108,7 @@ Nexus默认的仓库类型有以下四种：
 
 2）为了方便,Maven可以从仓库组下载构件,而仓库组并没有时间的内容(下图中用虚线表示,它会转向包含的宿主仓库或者代理仓库获得实际构件的内容)
 
-![](http://img.yangbingdong.com/img/docker-nexus3/nexus-proxy3.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/nexus-proxy3.png)
 
 # Backup & Recovery
 
@@ -160,7 +160,7 @@ docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar zxvf /
 
 ## IDEA配置
 
-![](http://img.yangbingdong.com/img/docker-nexus3/download-source.png)
+![](https://cdn.yangbingdong.com/img/docker-nexus3/download-source.png)
 
 然后重新`import`就ok了
 

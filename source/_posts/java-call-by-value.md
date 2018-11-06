@@ -4,7 +4,7 @@ date: 2017-04-18 15:36:30
 categories: [Programming,Java]
 tags: [Java,Java basics]
 ---
-![](http://img.yangbingdong.com/img/java/201611161519205180.png)
+![](https://cdn.yangbingdong.com/img/java/201611161519205180.png)
 # 前言
 > 今天在逛博客的时候看到了有意思的东西，下面代码会输出什么？
 ```java
@@ -50,7 +50,7 @@ public class CallByValue {
 调用后x的值：10
 ```
 可以看到x的值并没有变化，接下来我们一起来看一下具体的执行过程：
-![](http://img.yangbingdong.com/img/java-call-by-value/java-call-by-value01.png)
+![](https://cdn.yangbingdong.com/img/java-call-by-value/java-call-by-value01.png)
  分析：
 1）value被初始化为x值的一个拷贝（也就是10）
 2）value被乘以3后等于30，但注意此时x的值仍为10！
@@ -105,7 +105,7 @@ public class CallByValue {
 调用后user的值：User [name=Lishen, age=18]	
 ```
 很显然，User的值被改变了，也就是说方法参数类型如果是引用类型的话，引用类型对应的值将会被修改，下面我们来分析一下这个过程：
-![](http://img.yangbingdong.com/img/java-call-by-value/java-call-by-value02.png)
+![](https://cdn.yangbingdong.com/img/java-call-by-value/java-call-by-value02.png)
  过程分析：
 1）student变量被初始化为user值的拷贝，这里是一个对象的引用。
 2）调用student变量的set方法作用在这个引用对象上，user和student同时引用的User对象内部值被修改。
@@ -149,7 +149,7 @@ public class CallByValue {
 调用后stu的值：User [name=stu, age=18]
 ```
 我们发现user和stu的值并没有发生变化，也就是方法并没有改变存储在变量user和stu中的对象引用。swap方法的参数x和y被初始化为**两个对象引用的拷贝**，这个方法交换的是这两个拷贝的值而已，最终，所做的事都是白费力气罢了。在方法结束后x，y将被丢弃，而原来的变量user和stu仍然引用这个方法调用之前所引用的对象。
-![](http://img.yangbingdong.com/img/java-call-by-value/java-call-by-value03.png)
+![](https://cdn.yangbingdong.com/img/java-call-by-value/java-call-by-value03.png)
 这个过程也充分说明了java程序设计语言对对象采用的不是引用调用，实际上是对象引用进行的是值传递，当然在这里我们可以简单理解为这就是按值调用和引用调用的区别，而且必须明白即使java函数在传递引用数据类型时，也只是拷贝了引用的值罢了，之所以能修改引用数据是因为它们同时指向了一个对象，但这仍然是按值调用而不是引用调用。
 总结：
 - **一个方法不能修改一个基本数据类型的参数（数值型和布尔型）**

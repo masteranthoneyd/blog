@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java]
 ---
 
-![](http://img.yangbingdong.com/img/micro-service/microservice.png)
+![](https://cdn.yangbingdong.com/img/micro-service/microservice.png)
 
 # Preface
 
@@ -111,13 +111,13 @@ SEC(Saga Execution Coordinator): 一个基于事件驱动的状态机的协调�
 
 `Sync`（请求/响应）: 串行架构
 
-![](http://img.yangbingdong.com/img/micro-service/register-sync.jpg)
+![](https://cdn.yangbingdong.com/img/micro-service/register-sync.jpg)
 优点：个人认为，只有一个优点，可以偷懒
 缺点：中心控制点承担了太多的职责，入侵式强耦合代码，如果此时多加一个业务例如创建用户团队，那就必须在原来代码基础上继续入侵代码，而且修改一行代码有可能影响到下文。
 
 `Async`（基于事件）: 并行/异步架构
 
-![](http://img.yangbingdong.com/img/micro-service/register-async.jpg)
+![](https://cdn.yangbingdong.com/img/micro-service/register-async.jpg)
 优点：客户端发起的不是一个请求，而是**发布一个事件**，然后其他协作者接收到该事件，并知道该怎么做。我们从来不会告知任何人去做任何事，基于事件的系统天生就是**异步**的。整个系统都很聪明，业务逻辑并非存在某个核心大脑，而是分布在不同的协作者中。基于事件的协作方式耦合性很低，这意味着你可以在**不改变客户端代码**的情况下，对该事件**添加新的订阅者来完成新增的功能需求**。
 
 ## Spring Cloud Framework

@@ -1,8 +1,12 @@
 # Scheduler
 
+![](https://cdn.yangbingdong.com/img/scheduler/scheduler-banner.jpg)
+
 > 本篇主要记录**任务调度**相关框架知识。
 
 # Quartz
+
+![](https://cdn.yangbingdong.com/img/scheduler/quartz-logo.jpg)
 
 > ***[官方文档](http://www.quartz-scheduler.org/documentation/)***
 >
@@ -234,7 +238,7 @@ public class CustomizedActivitySchedulerFactory implements JobFactory, Applicati
 }
 ```
 
-## Job的增删改查
+## Job的增删改
 
 ```java
 @Slf4j
@@ -443,3 +447,127 @@ scheduler.rescheduleJob(oldTriggerKey, newTrigger);
 一次拉取trigger的最大数量，默认是1，可通过`org.quartz.scheduler.batchTriggerAcquisitionMaxCount`改写。但是在集群环境下，不建议设置为很大值。如果值 > 1, 并且使用了 JDBC JobStore的话, `org.quartz.jobStore.acquireTriggersWithinLock`属性必须设置为`true`，以避免”弄脏”数据。
 
 > 更多参数配置：***[https://blog.csdn.net/zixiao217/article/details/53091812](https://blog.csdn.net/zixiao217/article/details/53091812)***
+
+### 性能问题
+
+由于Quartz的集群是通过底层调度依赖数据库的悲观锁，谁先抢到谁调度，这样会导致节点负载不均衡，并且影响性能。
+
+# Spring Scheduler
+
+> Spring Scheduler相对Quartz来说比较轻量级，通过简单的配置就可以使用了，但灵活度不如Quartz
+
+## 开启配置
+
+### Xml方式
+
+```
+<task:scheduler id="scheduler" pool-size="50"/>
+```
+
+- 如果不设置`pool-size`，默认是1，会导致任务单线程执行。
+
+### Java配置方式
+
+```
+@Configuration
+@EnableScheduling
+public class SpringScheduleConfig implements SchedulingConfigurer {
+
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		taskRegistrar.setScheduler(taskExecutor());
+	}
+	
+	@Bean
+	public Executor taskExecutor() {
+		return new ScheduledThreadPoolExecutor(4,
+				new BasicThreadFactory
+						.Builder()
+						.namingPattern("schedule-pool-thread-%d")
+						.build());
+	}
+}
+
+```
+
+* `@EnableScheduling`表示告诉Spring开启Scheduler
+* 实现`SchedulingConfigurer`是为了配置线程池
+
+## 使用
+
+### Xml方式
+
+```
+<task:scheduled-tasks scheduler="myScheduler">
+    <task:scheduled ref="doSomethingTask" method="doSomething" cron="0 * * * * *"/>
+</task:scheduled-tasks>
+```
+
+```
+@Component
+public class DoSomethingTask {
+    @Scheduled(cron="0 * * * * *")
+    public void doSomething() {
+        System.out.println("do something");
+    }
+}
+```
+
+### 注解声明方式
+
+使用`@Scheduled`可以非常简单地就声明一个任务：
+
+```
+@Component
+public class DoSomethingTask {
+    @Scheduled(cron="0 * * * * *")
+    public void doSomething() {
+        System.out.println("do something");
+    }
+}
+```
+
+`@Scheduled`有几个参数：
+
+- `cron`：cron表达式，指定任务在特定时间执行；
+
+- `fixedDelay`：表示上一次任务执行完成后多久再次执行，参数类型为long，单位ms；
+
+- `fixedDelayString`：与`fixedDelay`含义一样，只是参数类型变为String；
+
+- `fixedRate`：表示按一定的频率执行任务，参数类型为long，单位ms；
+
+- `fixedRateString`: 与`fixedRate`的含义一样，只是将参数类型变为String；
+
+- `initialDelay`：表示延迟多久再第一次执行任务，参数类型为long，单位ms；
+
+- `initialDelayString`：与`initialDelay`的含义一样，只是将参数类型变为String；
+
+- `zone`：时区，默认为当前时区，一般没有用到。
+
+# Cron表达式
+
+想了解Cron最好的方法是看***[Quartz的官方文档](http://www.quartz-scheduler.org/documentation/quartz-2.2.x/tutorials/crontrigger)***。本节也会大致介绍一下。
+
+Cron表达式由6~7项组成，中间用空格分开。从左到右依次是：秒、分、时、日、月、周几、年（可省略）。值可以是数字，也可以是以下符号：
+`*`：所有值都匹配
+`?`：无所谓，不关心，通常放在“周几”里
+`,`：或者
+`/`：增量值
+`-`：区间
+
+下面举几个例子，看了就知道了：
+`0 * * * * *`：每分钟（当秒为0的时候）
+`0 0 * * * *`：每小时（当秒和分都为0的时候）
+`*/10 * * * * *`：每10秒
+`0 5/15 * * * *`：每小时的5分、20分、35分、50分
+`0 0 9,13 * * *`：每天的9点和13点
+`0 0 8-10 * * *`：每天的8点、9点、10点
+`0 0/30 8-10 * * *`：每天的8点、8点半、9点、9点半、10点
+`0 0 9-17 * * MON-FRI`：每周一到周五的9点、10点…直到17点（含）
+`0 0 0 25 12 ?`：每年12约25日圣诞节的0点0分0秒（午夜）
+`0 30 10 * * ? 2016`：2016年每天的10点半
+
+其中的`?`在用法上其实和`*`是相同的。但是`*`语义上表示全匹配，而`?`并不代表全匹配，而是不关心。比如对于`0 0 0 5 8 ? 2016`来说，2016年8月5日是周五，`?`表示我不关心它是周几。而`0 0 0 5 8 * 2016`中的`*`表示周一也行，周二也行……语义上和2016年8月5日冲突了，你说谁优先生效呢。
+
+不记得也没关系，记住***[Cron Maker](http://www.cronmaker.com/)***也可以，它可以在线生成cron表达式。

@@ -2,15 +2,15 @@
 
 binder:
 
-![](http://img.yangbingdong.com/img/spring-cloud-learning/SCSt-with-binder.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-learning/SCSt-with-binder.png)
 
 group:
 
-![](http://img.yangbingdong.com/img/spring-cloud-learning/SCSt-groups.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-learning/SCSt-groups.png)
 
 partitioning:
 
-![](http://img.yangbingdong.com/img/spring-cloud-learning/SCSt-partitioning.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-learning/SCSt-partitioning.png)
 
 > 参考：***[https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/](https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/)***
 
@@ -192,7 +192,7 @@ public class MessageController {
 }
 ```
 
-![](http://img.yangbingdong.com/img/spring-cloud-learning/test01.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-learning/test01.png)
 
 流程是这样的：
 

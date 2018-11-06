@@ -9,9 +9,9 @@
 </div>
 
 {% if theme.copyright %}
-<div class="powered-by">
+<!-- <div class="theme-info">
   {{ __('footer.powered', '') }}
-</div>
+</div> --!>
 
 <div class="theme-info">
   粤ICP备18135202号-1  |  <span class="post-count">共{{ totalcount(site) }}字</span>

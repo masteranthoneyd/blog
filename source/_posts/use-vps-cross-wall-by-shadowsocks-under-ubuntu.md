@@ -4,7 +4,7 @@ date: 2017-04-19 18:15:57
 categories: [VPS]
 tags: [VPS,ShadowSocks]
 ---
-![](http://img.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
+![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
 # Preface
 > 最近在玩***[VPS](http://baike.baidu.com/link?url=ehKAXxj45AdvSmxPRwiao9anB3Tej-jwgKXWMkTuA43M2479GPT-FkH6zMhI59Eip_iY5abNL2jODlGC4WiLW_)***，作为没有Google就活不下去的开发人员，翻山越岭已是日常= =...使用别人的VPN或者Sock5代理显然是不安全的，个人信息随时被截获，那么拥有一台自己VPS也是必需的，价格也可以很便宜（绝对不是在打广告）
 >
@@ -13,7 +13,7 @@ tags: [VPS,ShadowSocks]
 <!--more-->
 # ShadowSocks介绍
 
-![](http://img.yangbingdong.com/img/docker-shadowsocks/shadowsocks.png)
+![](https://cdn.yangbingdong.com/img/docker-shadowsocks/shadowsocks.png)
 
 ## What is ShadowSocks
 ShadowSocks(影梭) 是由***[clowwindy](https://github.com/shadowsocks/shadowsocks)***所开发的一个开源 Socks5 代理。如其***[官网](http://shadowsocks.org/en/index.html)***所言 ，它是 “`A secure socks5 proxy, designed to protect your Internet traffic`” （一个安全的 `Socks5` 代理）。其作用，亦如该项目主页的 ***[wiki](https://github.com/shadowsocks/shadowsocks/wiki)***（***[中文版](https://github.com/shadowsocks/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)***） 中所说，“`A fast tunnel proxy that helps you bypass firewalls`” （一个**可穿透防火墙**的快速代理）。
@@ -22,16 +22,16 @@ ShadowSocks(影梭) 是由***[clowwindy](https://github.com/shadowsocks/shadowso
 ## This is a story...
 ### long long ago…
 我们的互联网通讯是这样的：
-![](http://img.yangbingdong.com/img/vps/whats-shadowsocks-01.png)
+![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-01.png)
 ### when evil comes
 然后有一天，GFW[^1] 就出现了，他像一个收过路费的强盗一样夹在了在用户和服务之间，每当用户需要获取信息，都经过了 GFW，GFW将它不喜欢的内容统统过**滤掉**，于是客户当触发 GFW 的**过滤规则**的时候，就会收到 `Connection Reset` 这样的响应内容，而无法接收到正常的内容：
-![](http://img.yangbingdong.com/img/vps/whats-shadowsocks-02.png)
+![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-02.png)
 ### ssh tunnel
 聪明的人们想到了**利用境外服务器代理**的方法来绕过 GFW 的过滤，其中包含了各种HTTP代理服务、Socks服务、VPN服务… 其中以 `ssh tunnel` 的方法比较有代表性：
 1) 首先用户和境外服务器基于 ssh 建立起一条加密的通道
 2-3) 用户通过建立起的隧道进行代理，通过 ssh server 向真实的服务发起请求
 4-5) 服务通过 ssh server，再通过创建好的隧道返回给用户
-![](http://img.yangbingdong.com/img/vps/whats-shadowsocks-03.png)
+![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-03.png)
 由于 ssh 本身就是基于 `RSA` 加密技术，所以 GFW 无法从数据传输的过程中的加密数据内容进行关键词分析，**避免了被重置链接的问题**，但由于创建隧道和数据传输的过程中，**ssh 本身的特征是明显的**，所以 GFW 一度通过分析连接的特征进行**干扰**，导致 ssh**存在被定向进行干扰的问题**。
 ### shadowsocks
 于是 clowwindy 同学**分享并开源**了他的解决方案。
@@ -39,7 +39,7 @@ ShadowSocks(影梭) 是由***[clowwindy](https://github.com/shadowsocks/shadowso
 1、6) 客户端发出的请求基于 Socks5 协议跟 ss-local 端进行通讯，由于这个 ss-local 一般是本机或路由器或局域网的其他机器，不经过 GFW，所以解决了上面被 GFW 通过特征分析进行干扰的问题
 2、5) ss-local 和 ss-server 两端通过多种可选的加密方法进行通讯，经过 GFW 的时候是常规的TCP包，没有明显的特征码而且 GFW 也无法对通讯数据进行解密
 3、4) ss-server 将收到的加密数据进行解密，还原原来的请求，再发送到用户需要访问的服务，获取响应原路返回
-![](http://img.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
+![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
 
 # VPS选择
 ## BandwagonHOST
@@ -251,7 +251,7 @@ vi /etc/shadowsocks.json
 ```shell
 ssserver -c /etc/shadowsocks.json -d start
 ```
-![](http://img.yangbingdong.com/img/vps/shadowsocks-startup.png)
+![](https://cdn.yangbingdong.com/img/vps/shadowsocks-startup.png)
 看到`started`没有，这就表示你的ShadowSocks服务端就已经启动了。此时就可以关掉你的终端，然后打开你的ShadowSocks客户端进行连接了。
 
 最后一步，将ShadowSocks加入开机启动。很简单，只需在/etc/rc.local加一句话就成。通过如下命令打开rc.local文件
@@ -306,7 +306,7 @@ pip install shadowsocks
 
 #### 启动
 安装好后，在本地我们要用到sslocal ，终端输入sslocal --help 可以查看帮助，像这样
-![](http://img.yangbingdong.com/img/vps/sslocal-help.png)
+![](https://cdn.yangbingdong.com/img/vps/sslocal-help.png)
 通过帮助提示我们知道各个参数怎么配置，比如 sslocal -c 后面加上我们的json配置文件，或者像下面这样直接命令参数写上运行。
 比如 
 ```
@@ -333,7 +333,7 @@ sslocal -s 11.22.33.44 -p 50003 -k "123456" -l 1080 -t 600 -m aes-256-cfb
 `timeout`：  超时设置 和服务端一样
 `method`：  加密方法 和服务端一样
 确定上面的配置文件没有问题，然后我们就可以在终端输入 `sslocal -c /home/ybd/shadowsocks.json` 回车运行。如果没有问题的话，下面会是这样...
-![](http://img.yangbingdong.com/img/vps/launch-sslocal.png)
+![](https://cdn.yangbingdong.com/img/vps/launch-sslocal.png)
 
 如果你选择这一种请跳过第二种。你可以去系统的代理设置按照说明设置代理，但一般是全局的，然而我们访问baidu,taobao等着些网站如果用代理就有点绕了，而且还会浪费服务器流量。我们最好配置我们的浏览器让它可以自动切换，该用代理用代理该直接连接自动直接连接。所以请看配置浏览器。
 
@@ -390,9 +390,9 @@ sudo systemctl enable supervisor
 搬瓦工早就知道广大使用者的~~阴谋~~意图，所以特意提供了**一键无脑安装Shadowsocks**。
 注意：**目前只支持CentOS**。
 进入KiwiVM后，在左边的选项栏的最下面：
-![](http://img.yangbingdong.com/img/vps/one-key-install-shadowsocks.png)
+![](https://cdn.yangbingdong.com/img/vps/one-key-install-shadowsocks.png)
 点击Install之后会出现如下界面代表安装成功：
-![](http://img.yangbingdong.com/img/vps/one-key-install-shadowsocks01.png)
+![](https://cdn.yangbingdong.com/img/vps/one-key-install-shadowsocks01.png)
 点GO Back可看到相关信息了
 
 # 使用ShadowSocks代理实现科学上网
@@ -407,15 +407,15 @@ sudo systemctl enable supervisor
 
 ### 设置代理地址
 安装好插件会自动跳到设置选项，有提示你可以跳过。左边新建情景模式-选择代理服务器-比如命名为shadowProxy（叫什么无所谓）其他默认之后创建，之后在代理协议选择SOCKS5，地址为`127.0.0.1`,端口默认`1080` 。然后保存即应用选项。
-![](http://img.yangbingdong.com/img/vps/proxy.png)
-![](http://img.yangbingdong.com/img/vps/proxy01.png)
+![](https://cdn.yangbingdong.com/img/vps/proxy.png)
+![](https://cdn.yangbingdong.com/img/vps/proxy01.png)
 
 ### 设置自动切换
 接着点击自动切换 ( Auto switch）上面的不用管，在按照规则列表匹配请求后面选择刚才新建的SS，默认情景模式选择直接连接。点击应用选项保存。再往下规则列表设置选择`AutoProxy` 然后将**[这个地址](https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt)**填进去，点击下面的立即更新情景模式，会有提示更新成功！
-![](http://img.yangbingdong.com/img/vps/proxy03.png)
+![](https://cdn.yangbingdong.com/img/vps/proxy03.png)
 
 点击浏览器右上角的SwitchyOmega图标，下面选择自动切换，然后打开google.com试试，其他的就不在这贴图了。
-![](http://img.yangbingdong.com/img/vps/proxy04.png)
+![](https://cdn.yangbingdong.com/img/vps/proxy04.png)
 
 ## GenPAC全局代理
 如果不想每个浏览器都要设置代理，可以通过GenPAC实现全局代理。
@@ -498,11 +498,11 @@ sudo apt install privoxy
 
 找到`4.1. listen-address`这一节，确认监听的端口号。
 
-![](http://img.yangbingdong.com/img/vps/privoxy-config01.png)
+![](https://cdn.yangbingdong.com/img/vps/privoxy-config01.png)
 
 找到`5.2. forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t`这一节，加上如下配置，注意最后的点号。
 
-![](http://img.yangbingdong.com/img/vps/privoxy-config02.png)
+![](https://cdn.yangbingdong.com/img/vps/privoxy-config02.png)
 
 重启一下Privoxy
 
@@ -596,7 +596,7 @@ phymyadmin 访问 `ip:888`
 
 谷歌开发的TCP加速“外挂”，目前已集成到最新的Linux内核。
 博主用的**[Linode](https://www.linode.com/)**不能直接命令更换内核，需要到管理后台设置：
-![](http://img.yangbingdong.com/img/docker-shadowsocks/change-kernel.png)
+![](https://cdn.yangbingdong.com/img/docker-shadowsocks/change-kernel.png)
 
 ### 安装
 

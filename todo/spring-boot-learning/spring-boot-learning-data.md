@@ -346,7 +346,7 @@ spring:
 | `IgnoreCase`        | `findByFirstnameIgnoreCase`                                  | `… where UPPER(x.firstame) = UPPER(?1)`                      |
 
 
-![](http://img.yangbingdong.com/img/spring-boot-data/jpa-query.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-query.png)
 
 ## 使用Tips
 
@@ -542,9 +542,9 @@ utf8mb4 = 4 byte = 1 character
 
 ### 使用AttributeConverter转换JSON字符串时，Hibernate执行insert之后再执行update
 
-![](http://img.yangbingdong.com/img/spring-boot-data/jpa-dirty01.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-dirty01.png)
 
-![](http://img.yangbingdong.com/img/spring-boot-data/jpa-dirty02.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-dirty02.png)
 
 如上图，这是利用AOP实现的操作日志记录，使用`AttributeConverter`与Fastjson实现`ReqReceiveData`转换成JSON字符串，可以看到在执行insert之后接着执行了一次update，那是因为JSON字符串字段顺序居然发生了变化！
 
@@ -556,7 +556,7 @@ value是Object类型，在set的时候调用`JSONObject.toJSON(value)`转成Obje
 
 # Elasticsearch
 
-![](http://img.yangbingdong.com/img/spring-boot-elasticsearch/es-heart.svg)
+![](https://cdn.yangbingdong.com/img/spring-boot-elasticsearch/es-heart.svg)
 
 ## 概念
 
@@ -625,4 +625,4 @@ networks:
 
 ***[https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm](https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm)***
 
-![](http://img.yangbingdong.com/img/spring-boot-elasticsearch/elasticsearch-head-plugin.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-elasticsearch/elasticsearch-head-plugin.png)

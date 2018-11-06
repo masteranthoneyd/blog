@@ -1,6 +1,20 @@
-# Redis与Spring Boot Redis相关笔记
+---
+title: Redis杂记
+date: 2018-10-06 16:15:04
+categories: [Programming, Java, Spring Boot]
+tags: [Redis, Spring Boot]
+---
 
-> Redis是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。相比`Memcached`它支持存储的类型相对更多**（字符、哈希、集合、有序集合、列表、GEO）**，**同时Redis是线程安全的**。2010年3月15日起，Redis的开发工作由VMware主持，2013年5月开始，Redis的开发由`Pivotal`赞助。
+
+# Redis Learning
+
+![](https://cdn.yangbingdong.com/img/spring-boot-redis/redis-logo.png)
+
+# Preface
+
+> Redis是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。相比`Memcached`它支持存储的类型相对更多**（字符、哈希、集合、有序集合、列表、GEO）**，**同时Redis是线程安全的**。2010年3月15日起，Redis的开发工作由VMware主持，2013年5月开始，Redis的开发由`Pivotal`赞助。 
+
+<!--more-->
 
 # 安装与配置
 
@@ -392,8 +406,8 @@ slowlog get [n] // n 表示返回的日志记录条数
 
 **慢查询最佳实践**
 
-- slowlog-max-len 配置建议：线上建议调大慢查询列表，记录慢查询时 Redis 会对长命令做截断操作，并不会占用大量内存。增大慢查询列表可以减缓慢查询被剔除的可能，例如线上可设置为 1000 以上。
-- slowlog-log-slower-than 配置建议：默认值超过 10 毫秒判定为慢查询，需要根据 Redis 并发量调整该值。由于 Redis 采用单线程响应命令，对于高流量的场景，如果命令执行时间在 1 毫秒以上，那么 Redis 最多可支撑 OPS 不到 1000。因此对于高 OPS （operation per second）场景的 Redis 建议设置为 1 毫秒。
+- `slowlog-max-len` 配置建议：线上建议调大慢查询列表，记录慢查询时 Redis 会对长命令做截断操作，并不会占用大量内存。增大慢查询列表可以减缓慢查询被剔除的可能，例如线上可设置为 1000 以上。
+- `slowlog-log-slower-than` 配置建议：默认值超过 10 毫秒判定为慢查询，需要根据 Redis 并发量调整该值。由于 Redis 采用单线程响应命令，对于高流量的场景，如果命令执行时间在 1 毫秒以上，那么 Redis 最多可支撑 OPS 不到 1000。因此对于高 OPS （operation per second）场景的 Redis 建议设置为 1 毫秒。
 - 慢查询只记录命令执行时间，并不包括命令排队和网络传输时间。因此客户端执行命
   令的时间会大于命令实际执行时间。因为命令执行排队机制，慢查询会导致其他命令级联阻塞，因此当客户端出现请求超时，需要检查该时间点是否有对应的慢查询，从
   而分析出是否为慢查询导致的命令级联阻塞。
@@ -416,9 +430,9 @@ CONFIG GET dir
 
 效果图：
 
-![](http://img.yangbingdong.com/img/javaDevEnv/rdr.png)
+![](https://cdn.yangbingdong.com/img/javaDevEnv/rdr.png)
 
-# 序列化
+# 客户端序列化选择
 
 > ***[https://github.com/masteranthoneyd/serializer](https://github.com/masteranthoneyd/serializer)***
 
@@ -430,14 +444,16 @@ CPU：I7-8700
 
 内存：32G 
 
-![](http://img.yangbingdong.com/img/spring-boot-redis/serialize-performance.png)
+![](https://cdn.yangbingdong.com/img/spring-boot-redis/serialize-performance.png)
 
 * `Protostuff`不能直接序列化集合，需要用包装类封装起来。
 * `String`类型还是建议直接使用`StringRedisSerializer`，速度最快。
 
-# Spring Boot Redis监听keyspace event
+# Spring监听Redis Keyspace Event
 
-```
+在Spring Boot应用中，可使用方式一和二，集成非常快。
+
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -505,7 +521,7 @@ public class KeyExpireListener implements MessageListener {
 
 配之类：
 
-```
+```java
 @Configuration
 public class RedisConfig {
 
@@ -529,7 +545,7 @@ public class RedisConfig {
 
 事件监听类：
 
-```
+```java
 @Component
 public class KeyExpireApplicationEventListener implements ApplicationListener<RedisKeyExpiredEvent> {
 	@Override
@@ -542,6 +558,232 @@ public class KeyExpireApplicationEventListener implements ApplicationListener<Re
 实际上`KeyExpirationEventMessageListener`也是`MessageListener`的实现，最终还是由`RedisMessageListenerContainer`管理，没有设置线程池的话，还是使用`SimpleAsyncTaskExecutor`。。。
 
 两种方式最终都是`RedisPubSubCommands.pSubscribe(MessageListener listener, byte[]... patterns);`
+
+## 方式三、结合Disruptor
+
+上面两种方式操作简单，但是如果每天有上千万的过期通知，在一个链接的情况下可能会影响吞吐量，某些业务处理比较慢，阻塞后面的通知，这种情况下我们可以结合高性能队列框架`Disruptor`异步处理。
+
+先定义Event：
+
+```java
+import org.springframework.data.redis.connection.Message;
+
+/**
+ * @author ybd
+ * @date 18-10-19
+ * @contact yangbingdong1994@gmail.com
+ */
+public class RedisKeyExpireEvent implements CleanEvent {
+    private Message message;
+    private byte[] pattern;
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public RedisKeyExpireEvent setMessage(Message message) {
+        this.message = message;
+        return this;
+    }
+
+    public byte[] getPattern() {
+        return pattern;
+    }
+
+    public RedisKeyExpireEvent setPattern(byte[] pattern) {
+        this.pattern = pattern;
+        return this;
+    }
+
+    @Override
+    public void clean() {
+        this.message = null;
+        this.pattern = null;
+    }
+}
+
+public interface CleanEvent {
+    void clean();
+}
+```
+
+* 这个Event是由用户自己定义的。
+
+定义Event处理类：
+
+```java
+import com.lmax.disruptor.WorkHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author ybd
+ * @date 18-10-19
+ * @contact yangbingdong1994@gmail.com
+ */
+@Slf4j
+@Component
+public class RedisKeyExpireEventHandler implements WorkHandler<RedisKeyExpireEvent> {
+	private RedisSerializer<String> stringRedisSerializer = new StringRedisSerializer();
+    @Override
+    public void onEvent(RedisKeyExpireEvent event) {
+        try {
+			Thread thread = Thread.currentThread();
+			log.info(thread.getId() + " " + thread.getName() + " -> " + stringRedisSerializer.deserialize(event.getPattern()) + ": " + event.getMessage());
+        } finally {
+            event.clean();
+        }
+    }
+}
+```
+
+* 实现的是`WorkHandler`而不是`EventHandler`，因为我们调用的是`disruptor.handleEventsWithWorkerPool`
+
+异常处理类：
+
+```java
+import com.lmax.disruptor.ExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+/**
+ * @author ybd
+ * @date 18-10-19
+ * @contact yangbingdong1994@gmail.com
+ */
+@Slf4j
+public class RedisKeyExpireEventExceptionHandler implements ExceptionHandler<RedisKeyExpireEvent> {
+    private StringRedisSerializer strSerial = new StringRedisSerializer();
+    @Override
+    public void handleEventException(Throwable ex, long sequence, RedisKeyExpireEvent event) {
+        String msgBody = strSerial.deserialize(event.getMessage().getBody());
+        log.error("处理Redis Key过期事件失败： " + msgBody, ex);
+    }
+
+    @Override
+    public void handleOnStartException(Throwable ex) {
+		log.error("Disruptor<RedisKeyExpireEvent> handleOnStartException:", ex);
+    }
+
+    @Override
+    public void handleOnShutdownException(Throwable ex) {
+		log.error("Disruptor<RedisKeyExpireEvent> handleOnShutdownException:", ex);
+    }
+}
+```
+
+用于发布事件的Disruptor：
+
+```java
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.EventTranslatorTwoArg;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.stream.IntStream;
+
+/**
+ * @author ybd
+ * @date 18-10-19
+ * @contact yangbingdong1994@gmail.com
+ */
+@Slf4j
+@Component
+public class RedisKeyExpireDisruptor implements InitializingBean, ApplicationListener<ContextClosedEvent> {
+    private static final int TOTAL_SHARDING = 1 << 2;
+
+    private Disruptor<RedisKeyExpireEvent> disruptor;
+
+    private EventTranslatorTwoArg<RedisKeyExpireEvent, Message, byte[]> translatorTwoArg;
+
+    private RingBuffer<RedisKeyExpireEvent> ringBuffer;
+
+    @Resource
+	private RedisKeyExpireEventHandler redisKeyExpireEventHandler;
+
+
+    @Override
+    public void afterPropertiesSet() {
+        initDisruptor();
+		RedisKeyExpireEventHandler[] handlers = buildHandler();
+        disruptor.handleEventsWithWorkerPool(handlers);
+        disruptor.start();
+        ringBuffer = disruptor.getRingBuffer();
+        translatorTwoArg = (event, sequence, message, pattern) -> event.setMessage(message).setPattern(pattern);
+        log.info("RedisKeyExpireDisruptor initialized");
+    }
+
+    private RedisKeyExpireEventHandler[] buildHandler() {
+        return IntStream.range(0, TOTAL_SHARDING)
+                        .mapToObj(i -> redisKeyExpireEventHandler)
+                        .toArray(RedisKeyExpireEventHandler[]::new);
+    }
+
+    private void initDisruptor() {
+        disruptor = new Disruptor<>(RedisKeyExpireEvent::new, 1 << 10, DisruptorUtil.getThreadFactory("keyspace-disruptor-%d"), ProducerType.SINGLE, new BlockingWaitStrategy());
+        disruptor.setDefaultExceptionHandler(new RedisKeyExpireEventExceptionHandler());
+    }
+
+    @Override
+    public void onApplicationEvent(ContextClosedEvent event) {
+        DisruptorUtil.shutDownDisruptor(disruptor);
+    }
+
+    public void publish(Message message, byte[] pattern) {
+        ringBuffer.publishEvent(translatorTwoArg, message, pattern);
+    }
+}
+```
+
+工具类：
+
+```java
+import com.lmax.disruptor.TimeoutException;
+import com.lmax.disruptor.dsl.Disruptor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author ybd
+ * @date 18-9-29
+ * @contact yangbingdong1994@gmail.com
+ */
+@Slf4j
+public final class DisruptorUtil {
+
+    public static BasicThreadFactory getThreadFactory(String pattern) {
+        return new BasicThreadFactory.Builder().namingPattern(pattern)
+                                               .daemon(true)
+                                               .build();
+    }
+
+    public static void shutDownDisruptor(Disruptor disruptor) {
+        if (disruptor != null) {
+            try {
+                disruptor.shutdown(5, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                log.error("Disruptor shutdown error!", e);
+            }
+        }
+    }
+}
+```
+
+效果图：
+
+![](https://cdn.yangbingdong.com/img/spring-boot-redis/redis-key-expire-disruptor.png)
 
 ## 缺点
 

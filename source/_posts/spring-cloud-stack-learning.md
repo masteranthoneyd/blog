@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Cloud]
 tags: [Java, Spring Cloud]
 ---
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/spring-cloud-stack.jpg)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/spring-cloud-stack.jpg)
 
 # Preface
 
@@ -322,11 +322,11 @@ docker-compse up -d
 
 此时在`Portainer`中可以看到三个容器已经启动：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/portainer-eureka.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/portainer-eureka.png)
 
 随意一个eureka端口都能看到另外两个服务：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/compose-up03.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/compose-up03.png)
 
 ### Docker Swarm启动
 
@@ -338,7 +338,7 @@ export $(cat .env) && docker stack deploy --compose-file=docker-compose.yml eure
 
 我们的app通过合适的`network`交互应该是这样的：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/cnm-demo.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/cnm-demo.png)
 
 #### 注意事项（ip与hostname混乱）
 
@@ -370,7 +370,7 @@ eureka:
 
 解决方法是在`Dockerfile`中的入口使用`ENTRYPOINT exec java -jar ... `这种方式 
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/docker-pid1.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/docker-pid1.png)
 
 ### Eureka Edgware.RELEASE版本注册优化
 
@@ -454,10 +454,10 @@ eureka:
 
 覆盖对应源码中的界面文件即可：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/eureka-ui.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/eureka-ui.png)
 
 效果图：
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/eureka-custom.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/eureka-custom.png)
 
 **注意事项**：
 
@@ -469,7 +469,7 @@ eureka:
 
 通过注册中心，服务间的基本调用如下：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/micro-rpc.jpg)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/micro-rpc.jpg)
 
 调用方式主要有三种（基本上在实际应用中都使用Feign）
 
@@ -677,13 +677,13 @@ Spring Cloud Gateway 的特征：
 
 **流程图**：
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/spring-cloud-gateway-flow.jpg)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/spring-cloud-gateway-flow.jpg)
 
 
 
 # Spring Boot Admin
 
-![](http://img.yangbingdong.com/img/spring-cloud-docker-integration/spring-boot-admin.png)
+![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/spring-boot-admin.png)
 
 ## 依赖
 
