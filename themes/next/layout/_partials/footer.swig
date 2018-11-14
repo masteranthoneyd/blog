@@ -14,7 +14,7 @@
 </div> --!>
 
 <div class="theme-info">
-  粤ICP备18135202号-1  |  <span class="post-count">共{{ totalcount(site) }}字</span>
+  <a target="_blank" href="http://www.miibeian.gov.cn/" rel="nofollow">粤ICP备18135202号-1</a>  |  <span class="post-count">共{{ totalcount(site) }}字</span>
 </div>
 
 {% endif %}

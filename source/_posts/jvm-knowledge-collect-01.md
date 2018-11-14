@@ -836,6 +836,12 @@ openFile
 
 # 最后
 
+附上两张来自 ***[无敌码农](https://mp.weixin.qq.com/s?__biz=MzU3NDY4NzQwNQ==&mid=2247483820&idx=1&sn=8418f0f6a618bb0f0ca0980af09a816f&chksm=fd2fd06eca5859786ab124dd204a7ec9b1ad3ed230b9b531086cc6729a277a05d3e8307b7e0d&scene=21#wechat_redirect)*** 的图片：
+
+![](https://cdn.yangbingdong.com/img/jvm/jvm-men-thread.webp)
+
+![](https://cdn.yangbingdong.com/img/jvm/jvm-param.webp)
+
 > **参考并转载于：**
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***
 > ***[http://blog.csdn.net/seu_calvin/article/details/51892567](http://blog.csdn.net/seu_calvin/article/details/51892567)***

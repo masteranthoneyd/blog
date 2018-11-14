@@ -17,6 +17,8 @@ tags: [Java, Design Pattern]
 
 # Singleton Pattern
 
+> 单例模式可以说简单，也可以说不简单。。。使用不当就是小学生了
+
 
 
 ![](https://cdn.yangbingdong.com/img/design-pattern-creational/singleton.png)
@@ -33,7 +35,6 @@ package com.yangbingdong.singleton;
 /**
  * @author ybd
  * @date 17-10-16
- * If you have any questions please contact yangbingdong@1994.gmail
  *
  * 小学生式单例模式
  */
@@ -71,7 +72,6 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 /**
  * @author ybd
  * @date 17-10-18
- * If you have any questions please contact yangbingdong@1994.gmail
  */
 public class SingletonTest {
 	private static final int NUM = 1000;
@@ -129,7 +129,6 @@ package com.yangbingdong.singleton;
 /**
  * @author ybd
  * @date 17-10-19
- * If you have any questions please contact yangbingdong@1994.gmail
  *
  * 饿汉式
  */
@@ -156,7 +155,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author ybd
  * @date 17-10-19
- * If you have any questions please contact yangbingdong@1994.gmail
  * 
  * 懒汉式
  */
@@ -193,7 +191,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author ybd
  * @date 17-10-19.
- * If you have any questions please contact yangbingdong@1994.gmail
  *
  * 双重检查加锁
  */
@@ -239,7 +236,6 @@ package com.yangbingdong.singleton;
 /**
  * @author ybd
  * @date 17-10-19.
- * If you have any questions please contact yangbingdong@1994.gmail
  *
  * Lazy initialization holder class模式
  */
@@ -268,7 +264,6 @@ import java.util.function.Supplier;
 /**
  * @author ybd
  * @date 17-10-19.
- * If you have any questions please contact yangbingdong@1994.gmail
  *
  * 枚举就是一个单例
  */
@@ -359,7 +354,6 @@ import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.WOMAN;
 /**
  * @author ybd
  * @date 17-10-19.
- * If you have any questions please contact yangbingdong@1994.gmail
  */
 public class HumanFactory {
 
@@ -401,7 +395,6 @@ import static com.yangbingdong.simplefactory.HumanFactory.HumanEnum.*;
 /**
  * @author ybd
  * @date 17-10-19.
- * If you have any questions please contact yangbingdong@1994.gmail
  */
 public class SimpleFactoryTest {
 	public static void main(String[] args) {
@@ -497,7 +490,6 @@ package com.yangbingdong.factorymethod;
 /**
  * @author ybd
  * @date 17-10-25.
- * If you have any questions please contact yangbingdong@1994.gmail
  */
 public class FactoryMethodTest {
    public static void main(String[] args) {
@@ -727,7 +719,7 @@ public class BuilderDemo {
 
 ## Java类库中的建造者模式
 
-```
+```java
 StringBuilder strBuilder= new StringBuilder();
 strBuilder.append("one");
 strBuilder.append("two");
@@ -736,3 +728,25 @@ String str= strBuilder.toString();
 ```
 # Prototype
 
+原型模式是`23GOF`模式的一种，其特点就是通过**克隆/拷贝**的方式来，节约创建成本和资源，被拷贝`的对象模型就称之为**原型**。
+
+JAVA中对原型模式提供了良好的支持，我们只需要实现`Cloneable`接口即可，它的目的就是将对象标记为可被复制。
+
+一般的应用场景是，对象的创建非常复杂，可以使用原型模式快捷的创建对象；或在运行过程中不知道对象的具体类型，可使用原型模式创建一个相同类型的对象，或者在运行过程中动态的获取到一个对象的状态。
+
+## 优缺点
+
+优点：
+
+* 由于clone方法是由虚拟机直接复制内存块执行，所以在速度上比使用new的方式创建对象要快。
+* 可以基于原型，快速的创建一个对象，而无需知道创建的细节。
+* 可以在运行时动态的获取对象的类型以及状态，从而创建一个对象。
+
+缺点：
+
+* 需要实现 `Cloneable`接口，`clone`位于内部，不易扩展，容易违背`开闭原则`(程序扩展,不应该修改原有代码)。
+* 默认的 `clone` 只是浅克隆，深度克隆需要额外编码比如：统一实现`Cloneable`接口，或者**序列化**方式。
+
+代码就不贴了，实际开发中估计用不到，但有一句话说得很对：存在即合理。
+
+原型模式一般伴随这工厂模式，代码可参考：***[https://github.com/masteranthoneyd/design-pattern-java/tree/master/creational/src/com/yangbingdong/prototype](https://github.com/masteranthoneyd/design-pattern-java/tree/master/creational/src/com/yangbingdong/prototype)***

@@ -6,7 +6,6 @@ tags: [Redis, Spring Boot]
 ---
 
 
-# Redis Learning
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-redis/redis-logo.png)
 
@@ -639,7 +638,7 @@ public class RedisKeyExpireEventHandler implements WorkHandler<RedisKeyExpireEve
 }
 ```
 
-* 实现的是`WorkHandler`而不是`EventHandler`，因为我们调用的是`disruptor.handleEventsWithWorkerPool`
+* 实现的是`WorkHandler`而不是`EventHandler`，因为我们调用的是`disruptor.handleEventsWithWorkerPool`，区别是`WorkerPool`可以达到Sharding的效果。
 
 异常处理类：
 
