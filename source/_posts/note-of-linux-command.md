@@ -784,6 +784,36 @@ Mem:           989M        121M         87M        7.0M        781M        662M
 Swap:          255M         14M        241M
 ```
 
+# printf进制转换
+
+> 二进制:binanry number
+>
+> 八进制:otcal number
+>
+> 十进制:decimal number
+>
+> 十六进制: hexadecimal number
+>
+> 一般使用jstack查找线程时候用到
+
+十进制转16进制:
+
+```
+printf "%x\n" 666
+```
+
+输出的是`29a`，一般16进制前面会加个`0x`表示，所以可以这样：
+
+```
+printf "0x%x\n" 666
+```
+
+16进制转十进制:
+
+```
+printf "%d\n" 0x29a
+```
+
 #  Extend
 
 ## 使用systemd设置开机启动

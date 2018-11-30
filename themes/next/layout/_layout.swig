@@ -47,8 +47,8 @@
     <footer id="footer" class="footer">
 	<!-- <img style="position: absolute;top: 0;left: 15%;border: 0;width: 200px;height: 200px;" src="http://ojoba1c98.bkt.clouddn.com/img/coding-flag.png" alt="Coding Flag"> -->
       <div class="footer-inner">
-        {% include '_partials/footer.swig' %}
         {% include '_scripts/third-party/analytics/busuanzi-counter.swig' %}
+        {% include '_partials/footer.swig' %}
         {% block footer %}{% endblock %}
       </div>
     </footer>

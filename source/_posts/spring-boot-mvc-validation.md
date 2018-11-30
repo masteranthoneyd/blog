@@ -110,7 +110,7 @@ public class WebMvcMessageConvertConfig {
 
 ### WebFlux
 
-上面针对的是Web MVC，**对于Webflux目前不支持这种方式**，可参考以下方式
+上面针对的是Web MVC，**对于Webflux目前不支持这种方式**.
 
 ## Spring Boot JSON （Date类型入参、格式化，以及如何处理null）
 
@@ -137,6 +137,12 @@ Spring boot 在spring默认基础上，自动配置添加了以下特性
 - 对静态`index.html`的支持。
 - 对自定义`Favicon`的支持。
 - 主动使用`ConfigurableWebBindingInitializer` bean
+
+## @RequestBody与@ModelAttribute
+
+`@RequestBody`：用于接收http请求中body的字符串信息，可在直接接收转换到Pojo。
+
+`@ModelAttribute`：用于直接接受`url?`后面的参数 如`url?id=123&name=456`，可在直接接收转换到Pojo。
 
 ## 模板引擎的选择
 

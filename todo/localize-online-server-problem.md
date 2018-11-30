@@ -74,8 +74,21 @@ rm -rf $pid.tmp
 /proc/${PID}/fd
 /proc/${PID}/task
 
-
 所以，只要
 ll /proc/${PID}/fd | wc -l
 ll /proc/${PID}/task | wc -l （效果等同pstree -p | wc -l）
 就能知道进程打开的句柄数和线程数。
+
+## JFR & JMC
+
+```
+Jcmd <pid> JFR.start duration=120s filename=myrecording.jfr
+```
+
+然后，使用 JMC 打开“.jfr 文件”就可以进行分析了，方法、异常、线程、IO 等应有尽有，其功能非常强大
+
+> 参考：
+>
+> ***[https://mp.weixin.qq.com/s/-K56NWVFiFsL8JSIH42QMA](https://mp.weixin.qq.com/s/-K56NWVFiFsL8JSIH42QMA)***
+>
+> ***[https://zhuanlan.zhihu.com/p/43435903](https://zhuanlan.zhihu.com/p/43435903)***
