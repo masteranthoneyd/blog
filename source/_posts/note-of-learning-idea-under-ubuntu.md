@@ -20,9 +20,11 @@ tags: [Ubuntu, IDE]
 
 # License
 
+> 可参考 ***[http://idea.lanyus.com/](http://idea.lanyus.com/)***
+
 ## 2018.1.5以前版本
 
-注册码可以自己读娘，或者使用授权服务器
+注册码可以自己读娘，或者使用授权服务器 
 
 博主用的是基于docker的授权服务器：
 
@@ -60,10 +62,6 @@ server {
 ```
 nginx -s reload
 ```
-
-## 2018.2版本
-
-> ***[rover大神](https://rover12421.com/)***
 
 # Personal Setting
 
@@ -131,6 +129,10 @@ list.stream().filter(func).distinct().skip(num).limit(num).map(func).peek(func).
 勾上这个选项idea将自动帮我们优化：
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
 
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/method-chain.png)
+
+> 钩上 `Align when multiline` 可对其方法链
+
 会变成这样
 
 ```
@@ -146,7 +148,7 @@ list = list.stream()
 
 ## 设置统一编译jdk版本（关闭module JDK）
 
-![](http://yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
 
 # Keyboard shortcuts
 
@@ -158,23 +160,22 @@ list = list.stream()
 
 ## 导航（一般都可以在Navigate里面找到）
 
-| Keyboard shortcut        | Declaration    |
-| :----------------------- | :------------- |
-| **Ctrl+N**               | 查找Java类        |
-| **Ctrl+Shift+N**         | 查找非Java文件      |
-| **Ctrl+Shift+Alt+N**     | 查找类中的方法或变量     |
-| **Double Shift**         | 查找所有           |
-| **Ctrl+Alt+Left/Right**  | 跳到光标的上/下一个位置   |
-| **F2/Shift+F2**          | 光标移动到下/上一个错误   |
-| **Ctrl+Shift+Backspace** | 跳到上一个编辑处       |
-| **Ctrl+Alt+B**           | 跳到实现类/方法       |
-| **Ctrl+U**               | 跳到父类/方法        |
-| **Alt+Up/Down**          | 光标移动到上/下一个方法   |
-| **Ctrl+F12**             | 搜索当前文件方法       |
-| **Ctrl+H/Ctrl+Shift+H**  | 显示类/方法层级       |
-| **F11/Shift+F11**        | 当前行设置书签/显示所有书签 |
-| **Ctrl+Shift+Backspace** | 跳到上一个编辑处       |
-| **Ctrl+G**               | 跳到指定行          |
+| Keyboard shortcut        | Declaration                       |
+| :----------------------- | :-------------------------------- |
+| **Ctrl+N**               | 查找Java类                        |
+| **Ctrl+Shift+N**         | 查找非Java文件                    |
+| **Ctrl+Shift+Alt+N**     | 查找**mvc接口**、类中的方法或变量 |
+| **Double Shift**         | 查找所有                          |
+| **Ctrl+Alt+Left/Right**  | 跳到光标的上/下一个位置           |
+| **F2/Shift+F2**          | 光标移动到下/上一个错误           |
+| **Ctrl+Shift+Backspace** | 跳到上一个编辑处                  |
+| **Ctrl+Alt+B**           | 跳到实现类/方法                   |
+| **Ctrl+U**               | 跳到父类/方法                     |
+| **Alt+Up/Down**          | 光标移动到上/下一个方法           |
+| **Ctrl+F12**             | 搜索当前文件方法                  |
+| **Ctrl+H/Ctrl+Shift+H**  | 显示类/方法层级                   |
+| **F11/Shift+F11**        | 当前行设置书签/显示所有书签       |
+| **Ctrl+G**               | 跳到指定行                        |
 
 ## 查找/替换（一般在Edit的find里面）
 
@@ -192,25 +193,26 @@ list = list.stream()
 
 ## 编辑
 
-| Keyboard shortcut                    | Declaration                              |
-| ------------------------------------ | ---------------------------------------- |
-| **Ctrl+D/Ctrl+Y**                    | 重复代码,未选择代码时重复当前行/删除当前行                   |
-| **Ctrl+Shift+Enter**                 | 补全语句                                     |
-| **Ctrl+P**                           | 显示方法参数                                   |
-| **Ctrl+Q**                           | 显示注释文档                                   |
-| **Alt+Insert**                       | 生成代码,生成 Getter、Setter、构造器等               |
-| **Ctrl+O/Ctrl+I**                    | 重写父类方法/实现接口方法                            |
-| **Ctrl+W**                           | 选择代码块,连续按会增加选择外层的代码块                     |
-| **Ctrl+Shift+W**                     | 与“Ctrl+W”相反,减少选择代码块                      |
-| **Ctrl+Alt+L**                       | 格式化代码                                    |
-| **Ctrl+Alt+O**                       | 优化 Imports                               |
-| **Ctrl+Shift+J**                     | 合并多行为一行                                  |
-| **Ctrl+Shift+U**                     | 对选中内容进行大小写切换                             |
-| **Ctrl+Shift+]/[**                   | 选中到代码块的开始/结束                             |
-| **Ctrl+Delete/Ctrl+Backspace**       | 删除从光标所在位置到单词结束/开头处                       |
-| **Ctrl+F4**                          | 关闭当前编辑页                                  |
-| **Alt+J/Ctrl+Alt+Shift+J**           | 匹配下一个/全部与当前选中相同的代码                       |
-| **Alt+Shift+J**                      | “Alt+J”的反选                               |
+| Keyboard shortcut                      | Declaration                                            |
+| -------------------------------------- | ------------------------------------------------------ |
+| **Ctrl+D**                             | 重复代码,未选择代码时重复当前行                        |
+| **Ctrl+Y**                             | 删除当前行                                             |
+| **Ctrl+Shift+Enter**                   | 补全语句                                               |
+| **Ctrl+P**                             | 显示方法参数                                           |
+| **Ctrl+Q**                             | 显示注释文档                                           |
+| **Alt+Insert**                         | 生成代码,生成 Getter、Setter、构造器等                 |
+| **Ctrl+O/Ctrl+I**                      | 重写父类方法/实现接口方法                              |
+| **Ctrl+W**                             | 选择代码块,连续按会增加选择外层的代码块                |
+| **Ctrl+Shift+W**                       | 与“Ctrl+W”相反,减少选择代码块                          |
+| **Ctrl+Alt+L**                         | 格式化代码                                             |
+| **Ctrl+Alt+O**                         | 优化 Imports                                           |
+| **Ctrl+Shift+J**                       | 合并多行为一行                                         |
+| **Ctrl+Shift+U**                       | 对选中内容进行大小写切换                               |
+| **Ctrl+Shift+]/[**                     | 选中到代码块的开始/结束                                |
+| **Ctrl+Delete/Ctrl+Backspace**         | 删除从光标所在位置到单词结束/开头处                    |
+| **Ctrl+F4**                            | 关闭当前编辑页                                         |
+| **Alt+J/Ctrl+Alt+Shift+J**             | 匹配下一个/全部与当前选中相同的代码                    |
+| **Alt+Shift+J**                        | “Alt+J”的反选                                          |
 | **Alt+Shift+Insert,然后Shift+Up/Down** | 同时编辑多行(退出此`Column`模式也是“Alt+Shift+Insert”) |
 
 ## 调试

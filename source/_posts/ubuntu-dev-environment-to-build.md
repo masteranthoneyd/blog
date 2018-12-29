@@ -495,10 +495,6 @@ Options:
 
 2. 到*[Github](https://github.com/DoubleLabyrinth/navicat-keygen/releases)*下载注册机，并解压
 
-   CHS - > Navicat简体中文版。
-   CHT - > Navicat繁体中文版。
-   ENG - > Navicat英文版
-
 3.  安装wine
 
    ```
@@ -510,28 +506,65 @@ Options:
 4. 进入注册机解压目录，在此目录下打开命令窗口输入
 
    ```
-   wine navicat-patcher.exe <navicat.exe path>
+   wine navicat-patcher.exe <Navicat installation path> ./RegPrivateKey.pem
    ```
 
-   `<navicat.exe path>`就是`navicat.exe`的路径，最好是完整的。
-
-   可能会出现N个error日志信息不用鸟他 能正常success就行
-   之后在当前目录下会生成对应的私钥文件`RegPrivateKey.pem`
+   `<Navicat installation path>`就是Navicat中存放`navicat.exe`的根目录。
 
 5. 接着再用`navicat-keygen.exe`生成注册码，使用命令
 
    ```
-   wine navicat-keygen.exe  RegPrivateKey.pem
+   wine navicat-keygen.exe -text ./RegPrivateKey.pem
    ```
 
-   先填名字和组织名称，之后会生成一个序列号，并要求填入请求码。
+   你会被要求选择Navicat产品类别、语言以及输入主版本号。之后会随机生成一个序列号。
 
-   **打开navicat，然后断网**
+   产品选择Premium，语言选择Simplified Chinese，版本输入12（当然，因为下载的是Navicat Premium12 简体中文版）
 
-6. 在注册界面填入序列号，然后激活。这时会提示要手动激活，ok就选这个
-   接下来会有请求码，复制然后贴入控制台，就可以得到注册码了。
+   然后会出现一个序列号：
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat-patch.png)
+   ```
+   Serial number:
+   NAVA-DHCN-P2OI-DV46
+   ```
+
+   接下来填写`用户名`和`组织名`，随便写。
+
+   **然后打开navicat，然后断网**
+
+6. 在注册界面填入序列号，然后激活。这时会提示要手动激活，ok就选这个。
+
+7. 一般来说在线激活肯定会失败，这时候Navicat会询问你是否`手动激活`，直接选吧。
+
+8. 在`手动激活`窗口你会得到一个请求码，复制它并把它粘贴到keygen里。最后别忘了连按至少两下回车结束输入。
+
+   ```
+   Your name: DoubleLabyrinth
+   Your organization: DoubleLabyrinth
+
+   Input request code (in Base64), input empty line to end:
+   q/cv0bkTrG1YDkS+fajFdi85bwNVBD/lc5jBYJPOSS5bfl4DdtnfXo+RRxdMjJtEcYQnvLPi2LF0
+   OB464brX9dqU29/O+A3qstSyhBq5//iezxfu2Maqca4y0rVtZgQSpEnZ0lBNlqKXv7CuTUYCS1pm
+   tEPgwJysQTMUZf7tu5MR0cQ+hY/AlyQ9iKrQAMhHklqZslaisi8VsnoIqH56vfTyyUwUQXrFNc41
+   qG5zZNsXu/NI79JOo7qTvcFHQT/k5cTadbKTxY+9c5eh+nF3JR7zEa2BDDfdQRLNvy4DTSyxdYXd
+   sAk/YPU+JdWI+8ELaa0SuAuNzr5fEkD6NDSG2A==
+
+   Request Info:
+   {"K":"NAVADHCNP2OIDV46", "DI":"Y2eJk9vrvfGudPG7Mbdn", "P":"WIN 8"}
+
+   Response Info:
+   {"K":"NAVADHCNP2OIDV46","DI":"Y2eJk9vrvfGudPG7Mbdn","N":"DoubleLabyrinth","O":"DoubleLabyrinth","T":1537630251}
+
+   License:
+   oyoMYr9cfVGXeT7F1dqBwHsB/vvWj6SUL6aR+Kzb0lm5IyEj1CgovuSq+qMzFfx+
+   oHMFaGKFg6viOY2hfJcrO2Vdq0hXZS/B/Ie3jBS2Ov37v8e3ufVajaH+wLkmEpLd
+   xppCVLkDQjIHYR2IPz5s/L/RuWqDpEY4TPmGFF6q+xQMnqQA3vXPyG+JYMARXLru
+   Y1gCDLN30v3DpyOeqKmFjUqiHK5h8s0NYiH2OpMyaCpi12JsF23miP89ldQp3+SJ
+   8moo0cNGy7sFp2gX9ol2zVoo7qxfYlLl03f7CALJ6im0sx4yBsmlzFDdvpQUbXk8
+   YZ5rT4LML2Fx6Wgnnklb5g==
+   ```
+
+9. 如果不出意外，你会得到一个看似用Base64编码的激活码。直接复制它，并把它粘贴到Navicat的`手动激活`窗口，最后点`激活`按钮。如果没什么意外的话应该能成功激活。
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
@@ -812,7 +845,9 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-producer.sh --broke
 docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 ```
 
+## Zookeeper UI
 
+***[https://github.com/DeemOpen/zkui](https://github.com/DeemOpen/zkui)***
 
 # 搭建ngrok配置
 

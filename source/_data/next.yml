@@ -329,7 +329,7 @@ disqus_proxy:
   enable: true
   username: ookamiantd
   server: disqus-proxy.yangbingdong.com
-  port: 5509
+#  port: 80
   defaultAvatar: /images/avatar/avatar-default.jpg
   adminAvatar: /images/avatar/avatar-admin.jpg
   js: /static/js/main.0d0338ae.js
