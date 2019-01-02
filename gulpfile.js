@@ -37,6 +37,4 @@ gulp.task('minify-js', function() {
         .pipe(gulp.dest(buildDir));
 });
 // 默认任务
-gulp.task('default', [
-    'minify-html','minify-css','minify-js'
-]);
+gulp.task('default', ['minify-html','minify-css','minify-js']);

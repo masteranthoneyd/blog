@@ -1344,6 +1344,116 @@ ${AnsiColor.BRIGHT_GREEN}
 ${AnsiStyle.NORMAL}
 ```
 
+# 发送邮件
+
+> 各个厂商的STMP服务以及端口请自行搜索。。。
+
+主要pom依赖：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+
+邮件模板：
+
+```html
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+您好,恭喜您中得【一等奖】,这是验证邮件,请点击下面的链接完成验证并领奖 -> <a href="#" th:href="@{ https://yangbingdong.com/{id}(id=${id}) }">领取奖品</a>
+</body>
+</html>
+```
+
+yml:
+
+```yaml
+spring:
+  application:
+    name: mail
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 587
+    username: 730493388@qq.com
+    password: 123123
+```
+
+发送邮件：
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("qq")
+public class SpringBootMailApplicationTests {
+
+	@Autowired
+	private JavaMailSender javaMailSender;
+
+	@Autowired
+	private TemplateEngine templateEngine;
+
+
+	@Test
+	public void contextLoads() {
+	}
+
+	@Test
+	public void testSendSimple() {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setFrom("730493388@qq.com");
+		message.setTo("masteranthoneyd@163.com");
+		message.setSubject("标题：测试标题");
+		message.setText("测试内容部份");
+		javaMailSender.send(message);
+	}
+
+
+	@Test
+	public void testSendTemplateByQQ() throws MessagingException {
+		Context context = new Context();
+		context.setVariable("id", "/archives");
+		String email = templateEngine.process("email", context);
+
+		MimeMessage message = javaMailSender.createMimeMessage();
+
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		helper.setFrom("730493388@qq.com");
+		helper.setTo("masteranthoneyd@163.com");
+		helper.setSubject("标题：测试标题");
+		helper.setText(email, true);
+		javaMailSender.send(message);
+	}
+
+	@Test
+	public void testSendTemplateBy163() throws MessagingException {
+		Context context = new Context();
+		context.setVariable("id", "/archives");
+		String email = templateEngine.process("email", context);
+		MimeMessage message = javaMailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		helper.setFrom("masteranthoneyd@163.com");
+		helper.setTo("730493388@qq.com");
+		helper.setSubject("标题：测试标题");
+		helper.setText(email, true);
+		javaMailSender.send(message);
+	}
+
+}
+```
+
 # 优雅停机
 
 可参考：***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***

@@ -156,6 +156,8 @@ im-config
 
 `im-config`中指定`fcitx`的配置即可。
 
+**搜狗输入法** 安装请看下面软件篇。
+
 # 科学上网篇
 
 ## 方式一：下载Lantern
@@ -310,13 +312,9 @@ hardcode-tray --conversion-tool Inkscape
 
 [**Nvidia GPU Temperature Indicator**](https://extensions.gnome.org/extension/541/nvidia-gpu-temperature-indicator/) 显卡温度指示器
 
-[**Dash To Dock**](https://extensions.gnome.org/extension/307/dash-to-dock/) 可定制的 
-
 **[User Themes](https://extensions.gnome.org/extension/19/user-themes/)** 可以使用shell-theme：
 
 ![](https://cdn.yangbingdong.com/img/individuation/user-themes.png)
-
-为什么单独的模块，迷…
 
 ## Oh-My-Zsh
 
@@ -417,7 +415,89 @@ sudo apt install fonts-wqy-microhei
 
 > Java开发者的环境搭建请看： ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
 
+## 搜狗输入法
+
+卸载ibus。
+
+```
+sudo apt-get remove ibus
+```
+
+清除ibus配置。
+
+```
+sudo apt-get purge ibus
+
+```
+
+卸载顶部面板任务栏上的键盘指示。
+
+```
+sudo  apt-get remove indicator-keyboard
+
+```
+
+安装fcitx输入法框架
+
+```
+sudo apt install fcitx-table-wbpy fcitx-config-gtk
+
+```
+
+切换为 Fcitx输入法
+
+```
+im-config -n fcitx
+
+```
+
+im-config 配置需要重启系统才能生效
+
+```
+sudo shutdown -r now
+
+```
+
+点击下载 Sogou For Linux -> <a id="download" href="http://pinyin.sogou.com/linux/"><i class="fa fa-download"></i><span> Download Now</span>
+</a>
+
+```
+wget http://cdn2.ime.sogou.com/dl/index/1524572264/sogoupinyin_2.2.0.0108_amd64.deb?st=ryCwKkvb-0zXvtBlhw5q4Q&e=1529739124&fn=sogoupinyin_2.2.0.0108_amd64.deb
+```
+
+安装搜狗输入法
+
+```
+sudo dpkg -i sogoupinyin_2.2.0.0108_amd64.deb
+
+```
+
+修复损坏缺少的包
+
+```
+ sudo apt-get install -f
+
+```
+
+打开 Fcitx 输入法配置
+
+```
+fcitx-config-gtk3
+
+```
+
+问题: 输入法皮肤透明
+
+```
+fcitx设置 >> 附加组件 >> 勾选高级 >> 取消经典界面
+
+Configure>>  Addon  >>Advanced>>Classic
+```
+
+再次重启。
+
 ## Wechat for Ubuntu
+
 下载地址：
 ***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径：`UbuntuTools -> wechat4Ubuntu`)
@@ -463,27 +543,8 @@ Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme7
 ![](https://cdn.yangbingdong.com/img/individuation/crossover.png)
 7、如果运行后出现乱码，把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
 
-## 搜狗输入法安装与崩溃处理
-### 安装
-点击下载 Sogou For Linux -> <a id="download" href="http://pinyin.sogou.com/linux/"><i class="fa fa-download"></i><span> Download Now</span>
-</a>
-然后`dpkg -i` 就可以安装了，中间如有冲突就`sudo apt -f install`进行修复。
-
-### 搜狗输入法不能输入中文解决（linux下常见软件崩溃问题解决方案） 
-先关闭`fcitx`：
-```bash
-killall fcitx
-killall sogou-qinpanel
-```
-然后**删除搜狗配置文件**，ubuntu下搜狗的配置文件在 ~/.config下的3个文件夹里：
-`SogouPY`、`SogouPY.users`、`sogou-qimpanel`
-删除这3个文件夹，然后重启搜狗：
-```bash
-fcitx
-```
-解决！
-
 ## 版本控制系统GUI-SmartGit
+
 ```
 sudo add-apt-repository ppa:eugenesan/ppa
 sudo apt update

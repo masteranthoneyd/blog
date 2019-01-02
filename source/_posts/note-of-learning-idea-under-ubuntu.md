@@ -436,6 +436,70 @@ Zookeeper UI，支持删除操作
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
 
+# Skills
+
+## 演出模式
+
+此模式将`IDEA`弄到最大，可以让你只关注一个类里面的代码，进行毫无干扰的`coding`。
+
+可以使用`Alt+V`快捷键，弹出`View`视图，然后选择`Enter Presentation Mode`
+
+若`Alt+V`没有设置快捷键，可在`Keymap`中设置：
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/keymap-view.png)
+
+退出：使用`ALT+V`弹出view视图，然后选择`Exit Presentation Mode` 即可。
+
+## Inject language 编辑JSON
+
+如果使用`IDEA`在编写`JSON`字符串的时候，然后要一个一个`\`去转义双引号的话，就实在太不应该了，又烦又容易出错。在`IDEA`可以使用`Inject language`帮我们自动转义双引号。 
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language.png)
+
+然后搜索`json`：
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json.png)
+
+选择完后。鼠标焦点自动会定位在双引号里面，这个时候你再次使用`alt+enter`就可以看到 :
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-new.png)
+
+选中`Edit JSON Fragment`并回车，就可以看到编辑`JSON`文件的视图了:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-result.png)
+
+## 使用快捷键移动分割线
+
+有时候想要拖拉项目视图的分割线：
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/project-view-hide.png)
+
+可以先`alt+1`把鼠标焦点定位到`project`视图里，然后直接使用`ctrl+shift+左右箭头`来移动分割线。
+
+再按`esc`返回代码。
+
+## 把鼠标定位到project视图里
+
+使用`alt+F1`，弹出`Select in`视图，然后选择`Project View`中的`Project`，回车，就可以立刻定位到类的位置了。
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/locate-project.png)
+
+使用`esc`或者`F4`跳回代码。
+
+## 自动生成not null判断语句
+
+变量后输入`.not`或者`.nn`：
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/edit-notnull.png)
+
+更多模板可查看设置中的`Postfix Completion`。
+
+## 生成 Try Catch
+
+使用`Ctrl + w`选中区域后按下`Ctrl + Shift + t`:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/try-catch.png)
+
 # VM Options
 
 可以通过ToolBox或IDEA选项里面设置

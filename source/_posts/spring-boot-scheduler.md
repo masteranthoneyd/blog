@@ -1,8 +1,19 @@
-# Scheduler
+---
+title: Spring与任务调度集成相关
+date: 2018-12-02 14:23:13
+categories: [Programming, Java, Spring Boot]
+tags: [Spring Boot, Java, Scheduler]
+---
 
 ![](https://cdn.yangbingdong.com/img/scheduler/scheduler-banner.jpg)
 
+# Preface
+
 > 本篇主要记录**任务调度**相关框架知识。
+>
+> 任务调度这个在日常开发中非常经典，比如每天固定时刻同步用户信息、或者是动态的活动开始与结束时间，亦或者每天早上8点发条短信鼓励一下自己今天努力填坑之类的。。。
+
+<!--more-->
 
 # Quartz
 
@@ -205,7 +216,7 @@ class AutowireCapableBeanJobFactory extends SpringBeanJobFactory {
 
 Spring Boot提供`SchedulerFactoryBeanCustomizer`定制`SchedulerFactoryBean`，比如换一个`JobFactory`（从Spring IoC容器中获取无状态`Job`）：
 
-```
+```java
 @Component
 public class QuartzScheduleFactoryBeanCustomizer implements SchedulerFactoryBeanCustomizer {
 
@@ -219,7 +230,7 @@ public class QuartzScheduleFactoryBeanCustomizer implements SchedulerFactoryBean
 }
 ```
 
-```
+```java
 @Component
 public class CustomizedActivitySchedulerFactory implements JobFactory, ApplicationContextAware {
 
@@ -241,101 +252,96 @@ public class CustomizedActivitySchedulerFactory implements JobFactory, Applicati
 ## Job的增删改
 
 ```java
-@Slf4j
+/**
+ * @author ybd
+ * @date 18-11-22
+ * @contact yangbingdong1994@gmail.com
+ */
 public class SpringQuartzJobTemplate implements ScheduleJobOperations, InitializingBean {
 
-	@Resource
+    private static final Logger log = LoggerFactory.getLogger(SpringQuartzJobTemplate.class);
+
+	@Autowired(required = false)
+    @Qualifier("customizedSchedulerFactoryBean")
 	private SchedulerFactoryBean schedulerFactoryBean;
 
 	private Scheduler scheduler;
 
+    @Override
+    public void addOrUpdateScheduleJob(BaseJobDetail baseJobDetail) {
+        try {
+            TriggerKey triggerKey = parseTriggerKey(baseJobDetail);
+            JobKey jobKey = parseJobKey(baseJobDetail);
+            boolean jobExists = scheduler.checkExists(jobKey);
+            boolean triggerExists = scheduler.checkExists(triggerKey);
+            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(baseJobDetail.getCron());
+            CronTrigger cronTrigger = TriggerBuilder.newTrigger()
+                                                    .withIdentity(triggerKey)
+                                                    .withSchedule(cronScheduleBuilder)
+                                                    .build();
+            if (!jobExists && !triggerExists) {
+                JobDetail jobDetail = buildJobDetail(baseJobDetail, jobKey);
+                scheduler.scheduleJob(jobDetail, cronTrigger);
+            } else if (jobExists && triggerExists) {
+                if (baseJobDetail.getJobDataMap() != null) {
+                    JobDetail jobDetail = buildJobDetail(baseJobDetail, jobKey);
+                    scheduler.addJob(jobDetail, true, true);
+                }
+                scheduler.rescheduleJob(triggerKey, cronTrigger);
+            } else {
+                throw new ScheduleJobException("Illegal state -> jobExists: " + jobExists + ", triggerExists: " + triggerExists);
+            }
+        } catch (Exception e) {
+            throw new ScheduleJobException(e);
+        }
+    }
+
+    private JobDetail buildJobDetail(BaseJobDetail baseJobDetail, JobKey jobKey) throws ClassNotFoundException {
+        Class<? extends Job> jobClass = Class.forName(baseJobDetail.getJobClass()).asSubclass(Job.class);
+        JobDetail jobDetail = JobBuilder.newJob(jobClass)
+                                        .withIdentity(jobKey)
+                                        .build();
+        if (baseJobDetail.getId() != null) {
+            jobDetail.getJobDataMap().put(JOB_DETAIL_ID_KEY, baseJobDetail.getId());
+        }
+        if (baseJobDetail.getJobDataMap() != null) {
+            jobDetail.getJobDataMap().putAll(baseJobDetail.getJobDataMap());
+        }
+        return jobDetail;
+    }
+
+    @Override
+    public void deleteScheduleJob(BaseJobDetail baseJobDetail) {
+        try {
+            TriggerKey triggerKey = parseTriggerKey(baseJobDetail);
+            if (scheduler.checkExists(triggerKey)) {
+                scheduler.pauseTrigger(triggerKey);
+                scheduler.unscheduleJob(triggerKey);
+                JobKey jobKey = parseJobKey(baseJobDetail);
+                if (scheduler.checkExists(jobKey)) {
+                    scheduler.deleteJob(parseJobKey(baseJobDetail));
+                }
+                log.info("Success [CREATE] quartz job: " + triggerKey.toString());
+            } else {
+                log.info("Fail to [DELETE] schedule job, job not exist: " + triggerKey);
+            }
+        } catch (SchedulerException e) {
+            throw new ScheduleJobException(e);
+        }
+    }
+
 	@Override
-	public void addScheduleJob(ScheduleJobInfo scheduleJobInfo) {
+	public void trigger(BaseJobDetail baseJobDetail) {
 		try {
-			JobKey jobKey = parseJobKey(scheduleJobInfo);
-			TriggerKey triggerKey = parseTriggerKey(scheduleJobInfo);
-			Class<? extends Job> jobClass = Class.forName(scheduleJobInfo.getJobClass()).asSubclass(Job.class);
-			JobDetail jobDetail = JobBuilder.newJob(jobClass)
-											.withIdentity(jobKey)
-											.build();
-			jobDetail.getJobDataMap().put(SCHEDULE_JOB_ID_KEY, scheduleJobInfo.getId());
-			CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJobInfo.getCron());
-			CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-													.withIdentity(triggerKey)
-													.forJob(jobKey)
-													.withSchedule(cronScheduleBuilder)
-													.build();
-			boolean jobExists = scheduler.checkExists(jobKey);
-			boolean triggerExists = scheduler.checkExists(triggerKey);
-			if (!jobExists && !triggerExists) {
-				scheduler.scheduleJob(jobDetail, cronTrigger);
-			} else if (jobExists && !triggerExists) {
-				scheduler.scheduleJob(cronTrigger);
-			} else {
-				log.info("Already exists trigger {} with existing {}", triggerKey, jobKey);
-			}
-			log.info("Success [CREATE] quartz job: " + jobKey);
+            JobKey jobKey = parseJobKey(baseJobDetail);
+            if (scheduler.checkExists(jobKey)) {
+                scheduler.triggerJob(jobKey);
+            } else {
+                JobDetail jobDetail = buildJobDetail(baseJobDetail, jobKey);
+                scheduler.addJob(jobDetail, false, true);
+                scheduler.triggerJob(jobKey);
+            }
 		} catch (Exception e) {
-			throw new ScheduleJobException(e);
-		}
-	}
-
-	@Override
-	public void deleteScheduleJob(ScheduleJobInfo scheduleJobInfo) {
-		try {
-			TriggerKey triggerKey = parseTriggerKey(scheduleJobInfo);
-			if (scheduler.checkExists(triggerKey)) {
-				scheduler.pauseTrigger(triggerKey);
-				scheduler.unscheduleJob(triggerKey);
-				JobKey jobKey = parseJobKey(scheduleJobInfo);
-				if (scheduler.checkExists(jobKey)) {
-					scheduler.deleteJob(parseJobKey(scheduleJobInfo));
-				}
-				log.info("Success create quartz job: " + triggerKey.toString());
-			} else {
-				log.info("Fail to [DELETE] schedule job, job not exist: " + triggerKey);
-			}
-		} catch (SchedulerException e) {
-			throw new ScheduleJobException(e);
-		}
-	}
-
-	@Override
-	public void updateScheduleJob(ScheduleJobInfo scheduleJobInfo) {
-		try {
-			CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJobInfo.getCron());
-			TriggerKey oldTriggerKey = parseTriggerKey(scheduleJobInfo);
-			CronTrigger newTrigger = TriggerBuilder.newTrigger()
-													.withIdentity(oldTriggerKey)
-													.withSchedule(cronScheduleBuilder)
-													.build();
-			scheduler.rescheduleJob(oldTriggerKey, newTrigger);
-			log.info("Success [UPDATE] quartz job: " + oldTriggerKey);
-		} catch (Exception e) {
-			throw new ScheduleJobException(e);
-		}
-	}
-
-	@Override
-	public void addOrUpdateScheduleJob(ScheduleJobInfo scheduleJobInfo) {
-		try {
-			TriggerKey triggerKey = parseTriggerKey(scheduleJobInfo);
-			JobKey jobKey = parseJobKey(scheduleJobInfo);
-			if (scheduler.checkExists(triggerKey) && scheduler.checkExists(jobKey)) {
-				updateScheduleJob(scheduleJobInfo);
-			} else {
-				addScheduleJob(scheduleJobInfo);
-			}
-		} catch (Exception e) {
-			throw new ScheduleJobException(e);
-		}
-	}
-
-	@Override
-	public void trigger(ScheduleJobInfo scheduleJobInfo) {
-		try {
-			scheduler.triggerJob(parseJobKey(scheduleJobInfo));
-		} catch (SchedulerException e) {
 			throw new ScheduleJobException(e);
 		}
 	}
@@ -345,81 +351,137 @@ public class SpringQuartzJobTemplate implements ScheduleJobOperations, Initializ
 		this.scheduler = schedulerFactoryBean.getScheduler();
 	}
 
-	private TriggerKey parseTriggerKey(ScheduleJobInfo scheduleJobInfo) {
-		return TriggerKey.triggerKey(scheduleJobInfo.getJobName(), DEFAULT_GROUP);
+	private TriggerKey parseTriggerKey(BaseJobDetail baseJobDetail) {
+        requireNameAndGroupNonNull(baseJobDetail);
+        return TriggerKey.triggerKey(baseJobDetail.getJobName(), baseJobDetail.getJobGroup());
 	}
 
-	private JobKey parseJobKey(ScheduleJobInfo scheduleJobInfo) {
-		return JobKey.jobKey(scheduleJobInfo.getJobName(), DEFAULT_GROUP);
-	}
+    private JobKey parseJobKey(BaseJobDetail baseJobDetail) {
+        requireNameAndGroupNonNull(baseJobDetail);
+        return JobKey.jobKey(baseJobDetail.getJobName(), baseJobDetail.getJobGroup());
+    }
+
+    private void requireNameAndGroupNonNull(BaseJobDetail baseJobDetail) {
+        requireNonNull(baseJobDetail.getJobName());
+        requireNonNull(baseJobDetail.getJobGroup());
+    }
 }
 ```
 
 信息类：
 
 ```java
-public class ScheduleJobInfo {
-	/**
-	 * 主键
-	 */
-	private Long id;
+@Data
+public class BaseJobDetail {
+    /**
+     * field comment: 主键
+     */
+    private Long id;
 
-	/**
-	 * cron表达式
-	 */
-	private String cron;
+    /**
+     * field comment: 任务组
+     */
+    private String jobGroup;
 
-	/**
-	 * cron表达式对应时间
-	 */
-	private Date cronTime;
+    /**
+     * field comment: 任务名
+     */
+    private String jobName;
 
-	/**
-	 * 对应的任务类
-	 */
-	private String jobClass;
+    /**
+     * field comment: 任务类
+     */
+    private String jobClass;
 
-	/**
-	 * 唯一的任务名字
-	 */
-	private String jobName;
+    /**
+     * field comment: cron表达式
+     */
+    private String cron;
 
-	/**
-	 * 是否启用
-	 */
-	private Boolean enable;
+    /**
+     * field comment: 冗余，cron表达式对应执行时间
+     */
+    private Date cronTime;
 
-	/**
-	 * 该任务已触发次数
-	 */
-	private Integer fireTimes;
+    /**
+     * field comment: 触发次数
+     */
+    private Integer fireTimes;
 
-	/**
-	 * 每次执行的消耗时长，JSON数组
-	 */
-	private String consume;
+    /**
+     * field comment: 最后一次触发时间
+     */
+    private Date lastFireTime;
 
-	/**
-	 * 上一次执行时间
-	 */
-	private Date lastExecuteTime;
+    /**
+     * field comment: 最后一次触发的任务耗时，单位：毫秒
+     */
+    private Long lastFireConsume;
 
-	/**
-	 * 状态 0: 待执行, 1: 已执行, 2: 已取消, 3: 执行异常
-	 */
-	private Byte status;
+    /**
+     * field comment: 状态，0:待执行 1:已执行 2:已取消 3:执行异常
+     */
+    private Byte status;
 
-	/**
-	 * 任务描述
-	 */
-	private String jobDesc;
+    /**
+     * field comment: 作业数据
+     */
+    private String jobData;
 
-	/**
-	 * 创建时间
-	 */
-	private Date createTime;
-	
-	// 省略Getter Setter
+    /**
+     * field comment: 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * field comment: 更新时间
+     */
+    private Date updateTime;
+
+    private transient Map<String, ?> jobDataMap;
+
+    public BaseJobDetail incrFireTimes() {
+        fireTimes++;
+        return this;
+    }
+
+    public BaseJobDetail withJobData(Object jobData) {
+        return setJobData(BaseJobData.of(jobData).toJsonString());
+    }
+
+    public static BaseJobDetail of(String jobGroup, String jobName, Class<? extends Job> jobClass, Date cronTime) {
+        return new BaseJobDetail().setCron(DateUtil.parseToCron(cronTime))
+                                  .setCronTime(cronTime)
+                                  .setJobGroup(jobGroup)
+                                  .setJobName(jobName)
+                                  .setJobClass(jobClass.getName());
+    }
+
+    @Data
+    public static class BaseJobData {
+        private Class dataClass;
+        private JSON jsonData;
+
+        public static BaseJobData resolve(String jsonData) {
+            return parseObject(jsonData, BaseJobData.class);
+        }
+
+        public static BaseJobData of(Object data) {
+            return new BaseJobData().setDataClass(data.getClass())
+                                    .setJsonData((JSON) toJSON(data));
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T parseData() {
+            return (T) parseObject(this.jsonData.toJSONString(), this.dataClass);
+        }
+
+        public String toJsonString() {
+            return toJSONString(this);
+        }
+    }
+}
+
 ```
 
 ## 其他问题
@@ -460,7 +522,7 @@ scheduler.rescheduleJob(oldTriggerKey, newTrigger);
 
 ### Xml方式
 
-```
+```xml
 <task:scheduler id="scheduler" pool-size="50"/>
 ```
 
@@ -468,7 +530,7 @@ scheduler.rescheduleJob(oldTriggerKey, newTrigger);
 
 ### Java配置方式
 
-```
+```java
 @Configuration
 @EnableScheduling
 public class SpringScheduleConfig implements SchedulingConfigurer {
@@ -497,13 +559,13 @@ public class SpringScheduleConfig implements SchedulingConfigurer {
 
 ### Xml方式
 
-```
+```xml
 <task:scheduled-tasks scheduler="myScheduler">
     <task:scheduled ref="doSomethingTask" method="doSomething" cron="0 * * * * *"/>
 </task:scheduled-tasks>
 ```
 
-```
+```java
 @Component
 public class DoSomethingTask {
     @Scheduled(cron="0 * * * * *")
@@ -517,7 +579,7 @@ public class DoSomethingTask {
 
 使用`@Scheduled`可以非常简单地就声明一个任务：
 
-```
+```java
 @Component
 public class DoSomethingTask {
     @Scheduled(cron="0 * * * * *")
@@ -572,8 +634,10 @@ Cron表达式由6~7项组成，中间用空格分开。从左到右依次是：�
 
 不记得也没关系，记住***[Cron Maker](http://www.cronmaker.com/)***也可以，它可以在线生成cron表达式。
 
-
-
 # 时间轮
 
 > ***[https://github.com/ifesdjeen/hashed-wheel-timer](https://github.com/ifesdjeen/hashed-wheel-timer)***
+
+# 分布式任务调度
+
+> ***[Elastic Job](http://elasticjob.io/)***

@@ -554,6 +554,126 @@ utf8mb4 = 4 byte = 1 character
 
 value是Object类型，在set的时候调用`JSONObject.toJSON(value)`转成Object再set进去...
 
+# 使用JTA处理分布式事务
+
+Atomikos是一个非常流行的开源事务管理器，并且可以嵌入到Spring Boot应用中。可以使用 `spring-boot-starter-jta-atomikos` Starter去获取正确的Atomikos库。Spring Boot会自动配置Atomikos，并将合适的 `depends-on` 应用到Spring Beans上，确保它们以正确的顺序启动和关闭。
+
+默认情况下，Atomikos事务日志将被记录在应用home目录（应用jar文件放置的目录）下的 `transaction-logs` 文件夹中。可以在 `application.properties` 文件中通过设置 `spring.jta.log-dir` 属性来定义该目录，以 `spring.jta.atomikos.properties` 开头的属性能用来定义Atomikos的 `UserTransactionServiceIml` 实现，具体参考[AtomikosProperties javadoc](http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/api/org/springframework/boot/jta/atomikos/AtomikosProperties.html)。
+
+> 注 为了确保多个事务管理器能够安全地和相应的资源管理器配合，每个Atomikos实例必须设置一个唯一的ID。默认情况下，该ID是Atomikos实例运行的机器上的IP地址。为了确保生产环境中该ID的唯一性，需要为应用的每个实例设置不同的 `spring.jta.transaction-manager-id` 属性值。
+
+依赖：
+
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jta-atomikos</artifactId>
+        </dependency>
+```
+
+application.yml
+
+```yaml
+spring:
+  application:
+    name: test-23
+  jpa:
+    show-sql: true
+  jta:
+    enabled: true
+    atomikos:
+      datasource:
+        jta-user:
+          xa-properties.url: jdbc:mysql://localhost:3306/jta-user
+          xa-properties.user: root
+          xa-properties.password: root
+          xa-data-source-class-name: com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
+          unique-resource-name: jta-user
+          max-pool-size: 25
+          min-pool-size: 3
+          max-lifetime: 20000
+          borrow-connection-timeout: 10000
+        jta-income: 
+          xa-properties.url: jdbc:mysql://localhost:3306/jta-income
+          xa-properties.user: root
+          xa-properties.password: root
+          xa-data-source-class-name: com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
+          unique-resource-name: jta-income
+          max-pool-size: 25
+          min-pool-size: 3
+          max-lifetime: 20000
+          borrow-connection-timeout: 10000
+```
+
+DataSourceJTAIncomeConfig.java:
+
+```java
+@Configuration
+@EnableConfigurationProperties
+@EnableAutoConfiguration
+@MapperScan(basePackages = "com.freud.test.springboot.mapper.income", sqlSessionTemplateRef = "jtaIncomeSqlSessionTemplate")
+public class DataSourceJTAIncomeConfig {
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.jta-income")
+    public DataSource dataSourceJTAIncome() {
+        return new AtomikosDataSourceBean();
+    }
+
+    @Bean
+    public SqlSessionFactory jtaIncomeSqlSessionFactory(@Qualifier("dataSourceJTAIncome") DataSource dataSource)
+            throws Exception {
+        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        bean.setDataSource(dataSource);
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*.xml"));
+        bean.setTypeAliasesPackage("com.freud.test.springboot.mapper.income");
+        return bean.getObject();
+    }
+
+    @Bean
+    public SqlSessionTemplate jtaIncomeSqlSessionTemplate(
+            @Qualifier("jtaIncomeSqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+}
+```
+
+DataSourceJTAUserConfig.java
+
+```java
+@Configuration
+@EnableConfigurationProperties
+@EnableAutoConfiguration
+@MapperScan(basePackages = "com.freud.test.springboot.mapper.user", sqlSessionTemplateRef = "jtaUserSqlSessionTemplate")
+public class DataSourceJTAUserConfig {
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.jta-user")
+    @Primary
+    public DataSource dataSourceJTAUser() {
+        return new AtomikosDataSourceBean();
+    }
+
+    @Bean
+    @Primary
+    public SqlSessionFactory jtaUserSqlSessionFactory(@Qualifier("dataSourceJTAUser") DataSource dataSource)
+            throws Exception {
+        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        bean.setDataSource(dataSource);
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*.xml"));
+        bean.setTypeAliasesPackage("com.freud.test.springboot.mapper.user");
+        return bean.getObject();
+    }
+
+    @Bean
+    @Primary
+    public SqlSessionTemplate jtaUserSqlSessionTemplate(
+            @Qualifier("jtaUserSqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+}
+```
+
 # Elasticsearch
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-elasticsearch/es-heart.svg)
@@ -596,7 +716,7 @@ docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/elasticse
 
 使用docker compose:
 
-```
+```yaml
 version: '3.4'
 services:
   elasticsearch-temp:
