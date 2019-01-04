@@ -9,7 +9,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 # Preface
 
-> 微服务架构下，微服务在带来良好的设计和架构理念的同时，也带来了运维上的额外复杂性，尤其是在服务部署和服务监控上。单体应用是集中式的，就一个单体跑在一起，部署和管理的时候非常简单，而微服务是一个网状分布的，有很多服务需要维护和管理，对它进行部署和维护的时候则比较复杂。集成Docker之后，我们可以很方便地部署以及编排服务，ELK的集中式日志管理可以让我们很方便地聚合Docker日志。
+> 微服务架构下, 微服务在带来良好的设计和架构理念的同时, 也带来了运维上的额外复杂性, 尤其是在服务部署和服务监控上. 单体应用是集中式的, 就一个单体跑在一起, 部署和管理的时候非常简单, 而微服务是一个网状分布的, 有很多服务需要维护和管理, 对它进行部署和维护的时候则比较复杂. 集成Docker之后, 我们可以很方便地部署以及编排服务, ELK的集中式日志管理可以让我们很方便地聚合Docker日志. 
 
 <!--more-->
 
@@ -17,7 +17,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 ## 使用Log4j2
 
-下面是 Log4j2  官方性能测试结果：
+下面是 Log4j2  官方性能测试结果: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/log4j2-performance.png)
 
@@ -56,33 +56,33 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 </dependency>
 ```
 
-**注意**：
+**注意**: 
 
-* 需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`，否则后面引入的`starter`模块带有的`logging`不会自动去除
+* 需要单独把`spring-boot-starter`里面的`logging`去除再引入`spring-boot-starter-web`, 否则后面引入的`starter`模块带有的`logging`不会自动去除
 * `Disruptor`需要**3.3.8**以及以上版本
 
 ### 开启全局异步以及Disruptor参数设置
 
-> 官方说明： ***[https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync](https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync)***
+> 官方说明: ***[https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync](https://logging.apache.org/log4j/2.x/manual/async.html#AllAsync)***
 
-添加`Disruptor`依赖后只需要添加启动参数：
+添加`Disruptor`依赖后只需要添加启动参数: 
 
 ```
 -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 ```
 
-也可以在程序启动时添加系统参数。
+也可以在程序启动时添加系统参数. 
 
-> 若想知道Disruptor是否生效，可以在`AsyncLogger#logMessage`中断点
+> 若想知道Disruptor是否生效, 可以在`AsyncLogger#logMessage`中断点
 
-加大队列参数：
+加大队列参数: 
 
 ```
 -DAsyncLogger.RingBufferSize=262144
 -DAsyncLoggerConfig.RingBufferSize=262144 
 ```
 
-设置队列满了时的处理策略：丢弃，否则默认blocking，异步就与同步无异了：
+设置队列满了时的处理策略: 丢弃, 否则默认blocking, 异步就与同步无异了: 
 
 ```
 -Dlog4j2.AsyncQueueFullPolicy=Discard
@@ -92,14 +92,14 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 ```
 logging:
-  config: classpath:log4j2.xml # 指定log4j2配置文件的路径，默认就是这个
+  config: classpath:log4j2.xml # 指定log4j2配置文件的路径, 默认就是这个
   pattern:
     console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
 ```
 
 ### log4j2.xml完整配置
 
-上面是简单的打印，生产环境需要采用以下xml的配置：
+上面是简单的打印, 生产环境需要采用以下xml的配置: 
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -153,19 +153,19 @@ logging:
 
 </configuration>
 ```
-- `bootstrap.servers`是kafka的地址，接入Docker network之后可以配置成`kafka:9092`
+- `bootstrap.servers`是kafka的地址, 接入Docker network之后可以配置成`kafka:9092`
 - `topic`要与Logstash中配置的一致
 - 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
-- Kafka地址通过`${spring:ybd.kafka.bootstrap}`读取配置文件获取，这个需要自己拓展Log4j，具体请看下面的获取Application配置
-- `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`，通过`MDC.put(key, value)`放进去，同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
-- `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时，日志触发Failover，写到文件中，不阻塞程序，进而保证了吞吐。`retryIntervalSeconds`的默认值是1分钟，是通过异常来切换的，所以可以适量加大间隔。
-- `KafkaAppender` `ignoreExceptions` 必须设置为`false`，否则无法触发Failover
-- `KafkaAppender` `max.block.ms`默认是1分钟，当Kafka宕机时，尝试写Kafka需要1分钟才能返回Exception，之后才会触发Failover，当请求量大时，log4j2 队列很快就会打满，之后写日志就Blocking，严重影响到主服务响应
+- Kafka地址通过`${spring:ybd.kafka.bootstrap}`读取配置文件获取, 这个需要自己拓展Log4j, 具体请看下面的获取Application配置
+- `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`, 通过`MDC.put(key, value)`放进去, 同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
+- `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时, 日志触发Failover, 写到文件中, 不阻塞程序, 进而保证了吞吐. `retryIntervalSeconds`的默认值是1分钟, 是通过异常来切换的, 所以可以适量加大间隔. 
+- `KafkaAppender` `ignoreExceptions` 必须设置为`false`, 否则无法触发Failover
+- `KafkaAppender` `max.block.ms`默认是1分钟, 当Kafka宕机时, 尝试写Kafka需要1分钟才能返回Exception, 之后才会触发Failover, 当请求量大时, log4j2 队列很快就会打满, 之后写日志就Blocking, 严重影响到主服务响应
 - 日志的格式采用`" | "`作为分割符方便后面Logstash进行切分字段
 
 ### 也可以使用log4j2.yml
 
-需要引入依赖以识别：
+需要引入依赖以识别: 
 
 ```
 <!-- 加上这个才能辨认到log4j2.yml文件 -->
@@ -196,7 +196,7 @@ Configuration:
       name: CONSOLE
       target: SYSTEM_OUT
       ThresholdFilter:
-        level: ${sys:log.level.console} # “sys:”表示：如果VM参数中没指定这个变量值，则使用本文件中定义的缺省全局变量值
+        level: ${sys:log.level.console} # “sys:”表示: 如果VM参数中没指定这个变量值, 则使用本文件中定义的缺省全局变量值
         onMatch: ACCEPT
         onMismatch: DENY
       PatternLayout:
@@ -215,15 +215,15 @@ Configuration:
         - ref: CONSOLE
 ```
 
-更多配置请参照：*[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
+更多配置请参照: *[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
 
 ## 日志配置文件中获取Application配置
 
 ### Logback
 
-方法1: 使用`logback-spring.xml`，因为`logback.xml`加载早于`application.properties`，所以如果你在`logback.xml`使用了变量时，而恰好这个变量是写在`application.properties`时，那么就会获取不到，只要改成`logback-spring.xml`就可以解决。
+方法1: 使用`logback-spring.xml`, 因为`logback.xml`加载早于`application.properties`, 所以如果你在`logback.xml`使用了变量时, 而恰好这个变量是写在`application.properties`时, 那么就会获取不到, 只要改成`logback-spring.xml`就可以解决. 
 
-方法2: 使用`<springProperty>`标签，例如：
+方法2: 使用`<springProperty>`标签, 例如: 
 
 ```
 <springProperty scope="context" name="LOG_HOME" source="logback.file"/>
@@ -231,7 +231,7 @@ Configuration:
 
 ### Log4j2
 
-只能写一个Lookup：
+只能写一个Lookup: 
 
 ```
 /**
@@ -343,17 +343,17 @@ MDC.put("IP", IpUtil.getIpAddr(request));
 - Docker
 - IDE（使用IDEA）
 - Maven环境
-- Docker私有仓库，可以使用Harbor(***[Ubuntu中安装Harbor](/2018/docker-visual-management-and-orchestrate-tools/#Harbor)***)
+- Docker私有仓库, 可以使用Harbor(***[Ubuntu中安装Harbor](/2018/docker-visual-management-and-orchestrate-tools/#Harbor)***)
 
-集成Docker需要的插件`docker-maven-plugin`：*[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
+集成Docker需要的插件`docker-maven-plugin`: *[https://github.com/spotify/docker-maven-plugin](https://github.com/spotify/docker-maven-plugin)*
 
 ## 安全认证配置
 
-> 当我们 push 镜像到 Docker 仓库中时，不管是共有还是私有，经常会需要安全认证，登录完成之后才可以进行操作。当然，我们可以通过命令行 `docker login -u user_name -p password docker_registry_host` 登录，但是对于自动化流程来说，就不是很方便了。使用 docker-maven-plugin 插件我们可以很容易实现安全认证。
+> 当我们 push 镜像到 Docker 仓库中时, 不管是共有还是私有, 经常会需要安全认证, 登录完成之后才可以进行操作. 当然, 我们可以通过命令行 `docker login -u user_name -p password docker_registry_host` 登录, 但是对于自动化流程来说, 就不是很方便了. 使用 docker-maven-plugin 插件我们可以很容易实现安全认证. 
 
 ### 普通配置
 
-`settings.xml`：
+`settings.xml`: 
 
 ```
 <server>
@@ -368,15 +368,15 @@ MDC.put("IP", IpUtil.getIpAddr(request));
 
 ### Maven 密码加密配置
 
-`settings.xml`配置私有库的访问：
+`settings.xml`配置私有库的访问: 
 
-首先使用你的私有仓库访问密码生成主密码：
+首先使用你的私有仓库访问密码生成主密码: 
 
 ```
 mvn --encrypt-master-password <password>
 ```
 
-其次在`settings.xml`文件的同级目录创建`settings-security.xml`文件，将主密码写入：
+其次在`settings.xml`文件的同级目录创建`settings-security.xml`文件, 将主密码写入: 
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -386,7 +386,7 @@ mvn --encrypt-master-password <password>
 
 ```
 
-最后使用你的私有仓库访问密码生成服务密码，将生成的密码写入到`settings.xml`的`<services>`中（可能会提示目录不存在，解决方法是创建一个`.m2`目录并把`settings-security.xml`复制进去）
+最后使用你的私有仓库访问密码生成服务密码, 将生成的密码写入到`settings.xml`的`<services>`中（可能会提示目录不存在, 解决方法是创建一个`.m2`目录并把`settings-security.xml`复制进去）
 
 ```
 mvn --encrypt-password <password>
@@ -405,7 +405,7 @@ mvn --encrypt-password <password>
 
 ## 构建基础镜像
 
-Dockerfile：
+Dockerfile: 
 
 ```
 FROM frolvlad/alpine-oraclejdk8:slim
@@ -422,19 +422,19 @@ ENV http_proxy=
 ENV https_proxy=
 ```
 
-构建：
+构建: 
 
 ```
 docker build --build-arg HTTP_PROXY=192.168.6.113:8118 -t yangbingdong/docker-oraclejdk8 .
 ```
 
-其中`HTTP_PROXY`是http代理，通过`--build-arg`参数传入，注意**不能**是`127.0.0.1`或`localhost`。
+其中`HTTP_PROXY`是http代理, 通过`--build-arg`参数传入, 注意**不能**是`127.0.0.1`或`localhost`. 
 
 ## 开始集成
 
 ### 编写Dockerfile
 
-在`src/main`下面新建`docker`文件夹，并创建`Dockerfile`：
+在`src/main`下面新建`docker`文件夹, 并创建`Dockerfile`: 
 
 ```
 FROM yangbingdong/docker-oraclejdk8:latest
@@ -445,20 +445,20 @@ RUN sh -c 'touch /app.jar'
 ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dspring.profiles.active=${ACTIVE:-docker} -jar /app.jar
 ```
 
-* 通过`@@`动态获取打包后的项目名（需要插件，下面会介绍）
+* 通过`@@`动态获取打包后的项目名（需要插件, 下面会介绍）
 * `Dspring.profiles.active=${ACTIVE:-docker}`可以通过docker启动命令`-e ACTIVE=docker`参数修改配置
 
 #### 注意PID
 
-如果需要Java程序监听到`sigterm`信号，那么Java程序的`PID`必须是1，可以使用`ENTRYPOINT exec java -jar ...`这种方式实现。 
+如果需要Java程序监听到`sigterm`信号, 那么Java程序的`PID`必须是1, 可以使用`ENTRYPOINT exec java -jar ...`这种方式实现. 
 
 ### pom文件添加构建Docker镜像的相关插件
 
-> 继承`spring-boot-starter-parent`，除了`docker-maven-plugin`，下面的3个插件都不用填写版本号，因为parent中已经定义版本号
+> 继承`spring-boot-starter-parent`, 除了`docker-maven-plugin`, 下面的3个插件都不用填写版本号, 因为parent中已经定义版本号
 
 #### spring-boot-maven-plugin
 
-这个不用多介绍了，打包Spring Boot Jar包的
+这个不用多介绍了, 打包Spring Boot Jar包的
 
 ```
     <plugin>
@@ -476,7 +476,7 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 
 #### maven-resources-plugin
 
-resources插件，使用`@变量@`形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中，这种方式是方便手动构建镜像）
+resources插件, 使用`@变量@`形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中, 这种方式是方便手动构建镜像）
 
 ```
     <plugin>
@@ -501,7 +501,7 @@ resources插件，使用`@变量@`形式获取Maven变量到Dockerfile中（同�
                     </resources>
                 </configuration>
             </execution>
-            <!-- 将Jar复制到target的docker目录中，因为真正的Dockerfile也是在里面，方便使用docker build命令构建Docker镜像 -->
+            <!-- 将Jar复制到target的docker目录中, 因为真正的Dockerfile也是在里面, 方便使用docker build命令构建Docker镜像 -->
             <execution>
                 <id>copy-jar</id>
                 <phase>package</phase>
@@ -526,7 +526,7 @@ resources插件，使用`@变量@`形式获取Maven变量到Dockerfile中（同�
 
 #### build-helper-maven-plugin
 
-这个是为了给镜像添加基于时间戳的版本号，maven也有自带的获取时间戳的变量`maven.build.timestamp.format` + `maven.build.timestamp`:
+这个是为了给镜像添加基于时间戳的版本号, maven也有自带的获取时间戳的变量`maven.build.timestamp.format` + `maven.build.timestamp`:
 
 ```
 <maven.build.timestamp.format>yyyy-MM-dd_HH-mm-ss<maven.build.timestamp.format>
@@ -535,9 +535,9 @@ resources插件，使用`@变量@`形式获取Maven变量到Dockerfile中（同�
 ${maven.build.timestamp}
 ```
 
-但是这个时区是`UTC`，接近于格林尼治标准时间，所以出来的时间会比但前的时间慢8个小时。
+但是这个时区是`UTC`, 接近于格林尼治标准时间, 所以出来的时间会比但前的时间慢8个小时. 
 
-如果要使用`GMT+8`，就需要`build-helper-maven-plugin`插件，当然也有其他的实现方式，这里不做展开。
+如果要使用`GMT+8`, 就需要`build-helper-maven-plugin`插件, 当然也有其他的实现方式, 这里不做展开. 
 
 ```
 <build>
@@ -564,9 +564,9 @@ ${maven.build.timestamp}
 </build>
 ```
 
-然后可以在pom中使用`${timestamp}`获取时间戳。
+然后可以在pom中使用`${timestamp}`获取时间戳. 
 
-当然，也可以使用**另外一种方式实现**，打包前`export`一个格式化日期的环境变量，`pom.xml`中获取这个变量：
+当然, 也可以使用**另外一种方式实现**, 打包前`export`一个格式化日期的环境变量, `pom.xml`中获取这个变量: 
 
 * `export DOCKER_IMAGE_TAGE_DATE=yyyy-MM-dd_HH-mm`
 * `mvn help:system`可查看所有环境变量
@@ -619,8 +619,8 @@ ${maven.build.timestamp}
                 <!--suppress UnresolvedMavenProperty -->
                 <imageTag>${timestamp}</imageTag>
             </imageTags>
-            <!-- 配置镜像名称，遵循Docker的命名规范： springio/image --><imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
-            <!-- Dockerfile位置，由于配置了编译时动态获取Maven变量，真正的Dockerfile位于位于编译后位置 -->
+            <!-- 配置镜像名称, 遵循Docker的命名规范: springio/image --><imageName>${docker.registry.url}/${docker.registry.name}/${project.artifactId}</imageName>
+            <!-- Dockerfile位置, 由于配置了编译时动态获取Maven变量, 真正的Dockerfile位于位于编译后位置 -->
             <dockerDirectory>${dockerfile.compiled.position}</dockerDirectory>
             <resources>
                 <resource>
@@ -629,7 +629,7 @@ ${maven.build.timestamp}
                     <include>${project.build.finalName}.jar</include>
                 </resource>
             </resources>
-            <!-- 被推送服务器的配置ID，与setting中的一直 -->
+            <!-- 被推送服务器的配置ID, 与setting中的一直 -->
             <serverId>docker-registry</serverId>
             <!--<registryUrl>${docker.registry.url}</registryUrl>-->
         </configuration>
@@ -652,37 +652,37 @@ ${maven.build.timestamp}
 </properties>
 ```
 
-**说明**：
+**说明**: 
 
 * 这里的`serverId`要与maven `setting.xml`里面的一样
 
 
 * Dockerfile构建文件在`src/main/docker`中
-* 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等），则使用`@@`占位符（如`@project.build.finalName@`）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`，非继承Spring Boot 的pom文件，则使用`${}`占位符
-* 如果不需要动态生成Dockerfile文件，则可以将Dockerfile资源拷贝部分放入`docker-maven-plugin`插件的`<resources>`配置里
-* **`spring-boot-maven-plugin`插件一定要在其他构建插件之上，否则打包文件会有问题。**
+* 如果Dockerfile文件需要maven构建参数（比如需要构建后的打包文件名等）, 则使用`@@`占位符（如`@project.build.finalName@`）原因是Sping Boot 的pom将resource插件的占位符由`${}`改为`@@`, 非继承Spring Boot 的pom文件, 则使用`${}`占位符
+* 如果不需要动态生成Dockerfile文件, 则可以将Dockerfile资源拷贝部分放入`docker-maven-plugin`插件的`<resources>`配置里
+* **`spring-boot-maven-plugin`插件一定要在其他构建插件之上, 否则打包文件会有问题. **
 
 
 
-`docker-maven-plugin` 插件还提供了很多很实用的配置，稍微列举几个参数吧。
+`docker-maven-plugin` 插件还提供了很多很实用的配置, 稍微列举几个参数吧. 
 
 | 参数                                      | 说明                                                         | 默认值 |
 | ----------------------------------------- | ------------------------------------------------------------ | ------ |
-| `<forceTags>true</forceTags>`             | build 时强制覆盖 tag，配合 imageTags 使用                    | false  |
-| `<noCache>true</noCache>`                 | build 时，指定 –no-cache 不使用缓存                          | false  |
-| `<pullOnBuild>true</pullOnBuild>`         | build 时，指定 –pull=true 每次都重新拉取基础镜像             | false  |
+| `<forceTags>true</forceTags>`             | build 时强制覆盖 tag, 配合 imageTags 使用                    | false  |
+| `<noCache>true</noCache>`                 | build 时, 指定 –no-cache 不使用缓存                          | false  |
+| `<pullOnBuild>true</pullOnBuild>`         | build 时, 指定 –pull=true 每次都重新拉取基础镜像             | false  |
 | `<pushImage>true</pushImage>`             | build 完成后 push 镜像                                       | false  |
-| `<pushImageTag>true</pushImageTag>`       | build 完成后，push 指定 tag 的镜像，配合 imageTags 使用      | false  |
-| `<retryPushCount>5</retryPushCount>`      | push 镜像失败，重试次数                                      | 5      |
-| `<retryPushTimeout>10</retryPushTimeout>` | push 镜像失败，重试时间                                      | 10s    |
-| `<rm>true</rm>`                           | build 时，指定 –rm=true 即 build 完成后删除中间容器          | false  |
-| `<useGitCommitId>true</useGitCommitId>`   | build 时，使用最近的 git commit id 前7位作为tag，例如：image:b50b604，前提是不配置 newName | false  |
+| `<pushImageTag>true</pushImageTag>`       | build 完成后, push 指定 tag 的镜像, 配合 imageTags 使用      | false  |
+| `<retryPushCount>5</retryPushCount>`      | push 镜像失败, 重试次数                                      | 5      |
+| `<retryPushTimeout>10</retryPushTimeout>` | push 镜像失败, 重试时间                                      | 10s    |
+| `<rm>true</rm>`                           | build 时, 指定 –rm=true 即 build 完成后删除中间容器          | false  |
+| `<useGitCommitId>true</useGitCommitId>`   | build 时, 使用最近的 git commit id 前7位作为tag, 例如: image:b50b604, 前提是不配置 newName | false  |
 
-更多参数可查看插件中的定义。
+更多参数可查看插件中的定义. 
 
 ### 命令构建
 
-如果`<skipDockerPush>false</skipDockerPush>`则install阶段将不提交Docker镜像，只有maven的`deploy`阶段才提交。
+如果`<skipDockerPush>false</skipDockerPush>`则install阶段将不提交Docker镜像, 只有maven的`deploy`阶段才提交. 
 
 ```
 mvn clean install
@@ -755,13 +755,13 @@ null: null
 [INFO] ------------------------------------------------------------------------
 ```
 
-可以看到本地以及私有仓库都多了一个镜像：
+可以看到本地以及私有仓库都多了一个镜像: 
 
 ![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/portainer.png)
 
 ![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/harbor.png)
 
-**此处有个疑问**，很明显看得出来这里上传了两个一样大小的包，不知道是不是同一个jar包，但id又不一样：
+**此处有个疑问**, 很明显看得出来这里上传了两个一样大小的包, 不知道是不是同一个jar包, 但id又不一样: 
 
 ![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/duplicate01.png)
 
@@ -781,7 +781,7 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 ## Docker Swarm环境下获取ClientIp
 
-在Docker Swarm环境中，服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip，搜索了一大圈，最终的解决方安是通过Nginx转发中添加参数，后端再获取。
+在Docker Swarm环境中, 服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip, 搜索了一大圈, 最终的解决方安是通过Nginx转发中添加参数, 后端再获取. 
 
 在`location`中添加
 
@@ -789,7 +789,7 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
 ```
 
-后端获取第一个Ip。
+后端获取第一个Ip. 
 
 ## Demo地址
 
@@ -799,11 +799,11 @@ proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/elk-arch1.png)
 
-传统的应用可以将日志存到日志中，但集成Docker之后，日志怎么处理？放到容器的某个目录然后挂在出来？这样也可以，但这样就相当于给容器与外界绑定了一个状态，弹性伸缩怎么办？个人还是觉得通过队列与ELK管理Docker日志比较合理，而且Log4j2**原生支持Kafka的Appender**。
+传统的应用可以将日志存到日志中, 但集成Docker之后, 日志怎么处理？放到容器的某个目录然后挂在出来？这样也可以, 但这样就相当于给容器与外界绑定了一个状态, 弹性伸缩怎么办？个人还是觉得通过队列与ELK管理Docker日志比较合理, 而且Log4j2**原生支持Kafka的Appender**. 
 
 ## 镜像准备
 
-Docker Hub中的ELK镜像并不是最新版本的，我们需要到官方的网站获取最新的镜像：***[https://www.docker.elastic.co](https://www.docker.elastic.co)***
+Docker Hub中的ELK镜像并不是最新版本的, 我们需要到官方的网站获取最新的镜像: ***[https://www.docker.elastic.co](https://www.docker.elastic.co)***
 
 ```
 docker pull zookeeper
@@ -857,7 +857,7 @@ networks:
       name: backend
 ```
 
-* `KAFKA_ADVERTISED_HOST_NAME`是内网IP，本地调试用，Docker环境下换成`kafka`（与别名`aliases的值保持一致`），其他Docker应用可通过`kafka:9092`这个域名访问到Kafka。
+* `KAFKA_ADVERTISED_HOST_NAME`是内网IP, 本地调试用, Docker环境下换成`kafka`（与别名`aliases的值保持一致`）, 其他Docker应用可通过`kafka:9092`这个域名访问到Kafka. 
 
 ## ELK配置以及启动
 
@@ -865,7 +865,7 @@ networks:
 
 #### 复制Jar包
 
-先启动一个Elasticsearch的容器，将Jar包copy出来：
+先启动一个Elasticsearch的容器, 将Jar包copy出来: 
 
 ```
 export CONTAINER_NAME=elk_elk-elasticsearch_1
@@ -875,7 +875,7 @@ docker cp ${CONTAINER_NAME}:/usr/share/elasticsearch/lib ./lib
 
 #### 反编译并修改源码
 
-找到下面两个类：
+找到下面两个类: 
 ```
 org.elasticsearch.license.LicenseVerifier.class org.elasticsearch.xpack.core.XPackBuild.class
 ```
@@ -883,7 +883,7 @@ org.elasticsearch.license.LicenseVerifier.class org.elasticsearch.xpack.core.XPa
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/luyten.png)
 
-将两个类复制IDEA（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**），修改为如下样子：
+将两个类复制IDEA（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）, 修改为如下样子: 
 
 ```
 package org.elasticsearch.license;
@@ -981,7 +981,7 @@ input {
     kafka {
         bootstrap_servers => ["kafka:9092"]
         auto_offset_reset => "latest"
-        consumer_threads => 3 # 3个消费线程，默认是1个
+        consumer_threads => 3 # 3个消费线程, 默认是1个
         topics => ["log-collect"]
     }
 }
@@ -1021,11 +1021,11 @@ filter {
     remove_field => [ "message" ]
   }
 
-  date {  # 将上面得到的日期信息，也就是日志打印的时间作为时间戳
+  date {  # 将上面得到的日期信息, 也就是日志打印的时间作为时间戳
     match => [ "timestamp", "yyyy-MM-dd HH:mm:ss.SSS" ]
     locale => "en"
     target => [ "@timestamp" ]
-    timezone => "Asia/Shanghai" # 这里如果不设置时区，在Kibana中展示的时候会多了8个小时
+    timezone => "Asia/Shanghai" # 这里如果不设置时区, 在Kibana中展示的时候会多了8个小时
   }
 
   geoip { # 分析ip
@@ -1079,7 +1079,7 @@ xpack.monitoring.ui.container.elasticsearch.enabled: true
 
 ### 申请License
 
-转到 ***[License申请地址](https://license.elastic.co/registration)*** ，下载之后然后修改license中的`type`、`max_nodes`、`expiry_date_in_millis`：
+转到 ***[License申请地址](https://license.elastic.co/registration)*** , 下载之后然后修改license中的`type`、`max_nodes`、`expiry_date_in_millis`: 
 
 ```
 {
@@ -1177,14 +1177,14 @@ networks:
 
 ```
 
-启动后需要手动请求更新License：
+启动后需要手动请求更新License: 
 
 ```
 docker-compose up -d
 docker exec ${CONTAINER_NAME} curl -XPUT 'http://0.0.0.0:9200/_xpack/license' -H "Content-Type: application/json" -d @license.json
 ```
 
-大概是下面这个样子：
+大概是下面这个样子: 
 
 ```
 # ybd @ ybd-PC in ~/data/git-repo/bitbucket/ms-base/docker-compose/elk on git:master x [20:52:51] 
@@ -1213,7 +1213,7 @@ $ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/lic
 
 ### 显示所有插件
 
-在Kibana首页最下面找到：
+在Kibana首页最下面找到: 
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-full-plugin-button.png)
 
@@ -1227,7 +1227,7 @@ $ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/lic
 
 ### 时区
 
-Kibana默认读取浏览器时区，可通过`dateFormat:tz`进行修改：
+Kibana默认读取浏览器时区, 可通过`dateFormat:tz`进行修改: 
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-timezone.png)
 
@@ -1313,9 +1313,9 @@ logging.level: warning
 logging.metrics.enabled: false
 ```
 
-这个配置文件从容器中`/usr/share/apm-server/apm-server.yml`复制出来稍微改了一下Elasticsearch的Url。
+这个配置文件从容器中`/usr/share/apm-server/apm-server.yml`复制出来稍微改了一下Elasticsearch的Url. 
 
-若开启了X-Pack，则需要在yml中配置帐号密码：
+若开启了X-Pack, 则需要在yml中配置帐号密码: 
 
 ```
 output.elasticsearch:
@@ -1338,7 +1338,7 @@ java -javaagent:/path/to/elastic-apm-agent-<version>.jar \
      -jar my-application.jar
 ```
 
-启动后在Kibana的APM模块中更新一下索引，效果图大概是这样的：
+启动后在Kibana的APM模块中更新一下索引, 效果图大概是这样的: 
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/apm.png)
 
@@ -1348,23 +1348,23 @@ Github: ***[https://github.com/AliyunContainerService/log-pilot](https://github.
 
 更多说明: ***[https://yq.aliyun.com/articles/69382](https://yq.aliyun.com/articles/69382)***
 
-这个是Ali开源的日志收集组件，通过中间件的方式部署，自动监听其他容器的日志，非常方便：
+这个是Ali开源的日志收集组件, 通过中间件的方式部署, 自动监听其他容器的日志, 非常方便: 
 
 ```
 docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v /etc/localtime:/etc/localtime -v /:/host -e PILOT_TYPE=fluentd -e FLUENTD_OUTPUT=elasticsearch -e ELASTICSEARCH_HOST=192.168.6.113 -e ELASTICSEARCH_PORT=9200 -e TZ=Asia/Chongqing --privileged registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot:latest
 ```
 
-需要手机日志的容器：
+需要手机日志的容器: 
 
 ```
 docker run --rm --label aliyun.logs.demo=stdout -p 8080:8080 192.168.0.202:8080/dev-images/demo:latest
 ```
 
-* 通过`--label aliyun.logs.demo=stdout`告诉`log-pilot`需要收集日志，索引为`demo`
+* 通过`--label aliyun.logs.demo=stdout`告诉`log-pilot`需要收集日志, 索引为`demo`
 
-然后打开Kibana就可以看到日志了。
+然后打开Kibana就可以看到日志了. 
 
-问题：
+问题: 
 
 * 日志稍微延迟
 * 日志顺序混乱

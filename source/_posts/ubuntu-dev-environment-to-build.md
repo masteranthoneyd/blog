@@ -8,7 +8,7 @@ tags: [Ubuntu,IDE,JDK,Tomcat]
 
 # 前言
 
-最近公司的电脑由于不明原因老是奔溃，重装过两次，在家里也比较喜欢折腾系统，为了不用每次都度娘谷歌，记录下来，一条龙走过。博主是搞爪哇开发的，那么以下搭建针对的是爪哇环境开发
+最近公司的电脑由于不明原因老是奔溃, 重装过两次, 在家里也比较喜欢折腾系统, 为了不用每次都度娘谷歌, 记录下来, 一条龙走过. 博主是搞爪哇开发的, 那么以下搭建针对的是爪哇环境开发
 
 <!--more-->
 # 安装JDK以及配置环境变量
@@ -59,7 +59,7 @@ sudo apt install oracle-java9-set-default
 
 ### 安装JDK
 
-安装之前当然是老规矩地下载`jdk`：*[Oracle JDK官方下载](http://www.oracle.com/technetwork/java/javase/downloads/index.html)*
+安装之前当然是老规矩地下载`jdk`: *[Oracle JDK官方下载](http://www.oracle.com/technetwork/java/javase/downloads/index.html)*
 
 ```
 # 把jdk的文件移动到 /usr/local/ 目录下
@@ -71,7 +71,7 @@ cd /usr/local/
 sudo ln -s jdk1.8.0_101 jdk
 ```
 
-***如需更换`jdk`，删除旧版本的软链接，重新创建软链接指向新版即可***
+***如需更换`jdk`, 删除旧版本的软链接, 重新创建软链接指向新版即可***
 
 ```
 sudo rm -rf jdk
@@ -80,33 +80,33 @@ sudo ln -s jdk* jdk
 
 ### 配置环境变量
 
-- 放到 `/usr/local` 里面的程序，建议使用系统变量。
+- 放到 `/usr/local` 里面的程序, 建议使用系统变量. 
 - 用户变量
     `~/.profile` 文件是用户的私有配置文件
-    `~/.bashrc`  是在bash里面使用的私有配置文件，优先级在 `.profile` 文件之后
+    `~/.bashrc`  是在bash里面使用的私有配置文件, 优先级在 `.profile` 文件之后
 - 系统变量
     `/etc/profile` 文件是系统的公用配置文件
-    `/etc/bash.bashrc` 是`bash`专用的配置文件，优先级在 `profile` 文件之后
-- 系统变量的配置，不建议修改前面说到的两个文件，而是建议在 ***`/etc/profile.d/`*** 目录下，创建一个 `.sh` 结尾 的文件。
+    `/etc/bash.bashrc` 是`bash`专用的配置文件, 优先级在 `profile` 文件之后
+- 系统变量的配置, 不建议修改前面说到的两个文件, 而是建议在 ***`/etc/profile.d/`*** 目录下, 创建一个 `.sh` 结尾 的文件. 
 
 ```
 sudo vi /etc/profile.d/jdk.sh
 ```
-***环境变量的配置内容如下：***
+***环境变量的配置内容如下: ***
 
-1. 设置一个名为`JAVA_HOME`的变量，并且使用`export`命令导出为环境变量, 如果不使用 `export` ，仅在当前`shell`里面有效
+1. 设置一个名为`JAVA_HOME`的变量, 并且使用`export`命令导出为环境变量, 如果不使用 `export` , 仅在当前`shell`里面有效
 ```
 export JAVA_HOME=/usr/local/jdk
 ```
-2. `PATH`不需要`export`，因为早在其他的地方，已经`export`过了！，`\$JAVA_HOME` 表示引用前面配置的 `JAVA_HOME` 变量，分隔符一定是冒号，**Windows**是分号,最后再引用原来的`PATH`的值
+2. `PATH`不需要`export`, 因为早在其他的地方, 已经`export`过了！, `\$JAVA_HOME` 表示引用前面配置的 `JAVA_HOME` 变量, 分隔符一定是冒号, **Windows**是分号,最后再引用原来的`PATH`的值
 ```
 PATH=$JAVA_HOME/bin:$PATH
 ```
-3. 配置以后，可以重新登录让配置生效，也可以使用`source`临时加载配置文件。使用`source`命令加载的配置，仅在当前`shell`有效，关闭以后失效。
+3. 配置以后, 可以重新登录让配置生效, 也可以使用`source`临时加载配置文件. 使用`source`命令加载的配置, 仅在当前`shell`有效, 关闭以后失效. 
 ```
 source /etc/profile.d/jdk.sh
 ```
-4. 查看`jdk`是否安装成功，一下两条命令成功则安装成功
+4. 查看`jdk`是否安装成功, 一下两条命令成功则安装成功
 ```
 java -version
 javac -version
@@ -121,9 +121,9 @@ javac -version
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
 
-2、解压到 `/usr/local` 目录，并创建软链接为 `scala` 
+2、解压到 `/usr/local` 目录, 并创建软链接为 `scala` 
 
-3、在 `/etc/profile.d` 目录下创建 `scala.sh` ，输入以下信息：
+3、在 `/etc/profile.d` 目录下创建 `scala.sh` , 输入以下信息: 
 
 ```
 export SCALA_HOME=/usr/local/scala
@@ -167,34 +167,34 @@ Name[en]=Eclipse Mars.2
 ```
 **通用设置**
 `window → preferences →`
-* 设置字体：general → appearance → color and font → basic → text font
-* 编辑器背景颜色：general →  editors → text editors → background color → `RGB:85,123,208`,`#C7EDCC`
-* 工作空间字符编码：general → workspace 
-* 作者签名：java → code style → code templates → types  签名快捷键：`alt + shift + j`
+* 设置字体: general → appearance → color and font → basic → text font
+* 编辑器背景颜色: general →  editors → text editors → background color → `RGB:85,123,208`,`#C7EDCC`
+* 工作空间字符编码: general → workspace 
+* 作者签名: java → code style → code templates → types  签名快捷键: `alt + shift + j`
 
 ## MyEclipse
-MyEclipse安装请看：***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-myeclipse-crack/)***
+MyEclipse安装请看: ***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-myeclipse-crack/)***
 
 ## IntelliJ IDEA
-之前听说过IDE[^1]，都是大公司用的，并没有用过
+之前听说过IDE[^1], 都是大公司用的, 并没有用过
 日后再研究补上
-官网：*[http://www.jetbrains.com/idea/](http://www.jetbrains.com/idea/)*
+官网: *[http://www.jetbrains.com/idea/](http://www.jetbrains.com/idea/)*
 
-新公司好多大牛，用的都是IDEA，于是乎“近墨者黑”，那么既然有机会跟大牛接触，我也开始真正意义上的学习IDEA了
+新公司好多大牛, 用的都是IDEA, 于是乎“近墨者黑”, 那么既然有机会跟大牛接触, 我也开始真正意义上的学习IDEA了
 
 ### 安装
-进过查阅，我选择官方的盒子下载：***[http://www.jetbrains.com/toolbox/app/?fromMenu](http://www.jetbrains.com/toolbox/app/?fromMenu)***
+进过查阅, 我选择官方的盒子下载: ***[http://www.jetbrains.com/toolbox/app/?fromMenu](http://www.jetbrains.com/toolbox/app/?fromMenu)***
 优点是可以自动更新
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/idea.png)
 
 ### 激活
 
-博主使用授权服务器，可以自己搭建，详情请看 ***[这里](/2017/note-of-learning-idea-under-ubuntu/#License)***
+博主使用授权服务器, 可以自己搭建, 详情请看 ***[这里](/2017/note-of-learning-idea-under-ubuntu/#License)***
 
 ### 部署Tomcat
 
 若是服务器版切换root用户解压到 `/opt/` 或者 `/usr/local/` 下
-直接运行tomcat目录下`bin/start.sh`即可开启，前提是配置好`JDK`
+直接运行tomcat目录下`bin/start.sh`即可开启, 前提是配置好`JDK`
 
 桌面版个人使用就解压到`/home/{user}`目录下就可以了
 
@@ -278,23 +278,23 @@ sudo bin/mysqld --initialize --user=mysql
 sudo bin/mysql_ssl_rsa_setup
 ```
 
-在初始化的时候，一定要仔细看屏幕，最后大概有一行:`[Note] A temporary password is generated for root@localhost: kklNBwkei1.t`
+在初始化的时候, 一定要仔细看屏幕, 最后大概有一行:`[Note] A temporary password is generated for root@localhost: kklNBwkei1.t`
 注意这是`root`的临时密码,记录下来以便后面修改密码！
 
-### 重新对一些主要的目录进行授权，确保安全性
+### 重新对一些主要的目录进行授权, 确保安全性
 
 ```
 sudo chown -R root .
 sudo chown -R mysql data mysql-files
 ```
 
-### 从默认的模板创建配置文件，需要在文件中增加 skip-grant-tables ，以便启动mysql以后修改root用户的密码
+### 从默认的模板创建配置文件, 需要在文件中增加 skip-grant-tables , 以便启动mysql以后修改root用户的密码
 
 ```
 sudo cp support-files/my-default.cnf ./my.cnf 
 ```
 
-### 测试启动，修改密码
+### 测试启动, 修改密码
 
 ```
 # 后台启动mysql
@@ -304,15 +304,15 @@ sudo bin/mysqld_safe --user=mysql &
 ```
 #### 方式一
 
-因为前面修改了`my.cnf`文件，增加了 `skip-grant-tables` 参数，所以不需要用户名即可登陆
-进去后立即修改`root`用户的密码，密码的字段是 `authentication_string`
+因为前面修改了`my.cnf`文件, 增加了 `skip-grant-tables` 参数, 所以不需要用户名即可登陆
+进去后立即修改`root`用户的密码, 密码的字段是 `authentication_string`
 ```
 update mysql.user set authentication_string=password('root') where user='root';
 ```
-修改密码后，再把`my.cnf`里面的 `skip-grant-tables` 去掉
+修改密码后, 再把`my.cnf`里面的 `skip-grant-tables` 去掉
 #### 方式二
 
-修改密码也可以使用安装到时候提示到**随机密码**进行登录，然后使用下面到命令修改密码。
+修改密码也可以使用安装到时候提示到**随机密码**进行登录, 然后使用下面到命令修改密码. 
 建议用下面的方式设置数据库的密码
 ```
 alter user user() identified by 'root';
@@ -338,9 +338,9 @@ sudo chmod 777 /etc/profile.d/mysql.sh
 sudo echo "PATH=/usr/local/mysql/bin:\$PATH" > /etc/profile.d/mysql.sh
 sudo chmod 644 /etc/profile.d/mysql.sh
 ```
-***<font color=red>到此，mysql的安装基本完成</font>***
+***<font color=red>到此, mysql的安装基本完成</font>***
 
-### 修复乱码以及忽略大小写，找到MySQL文件里的`my.cnf`在末尾添加
+### 修复乱码以及忽略大小写, 找到MySQL文件里的`my.cnf`在末尾添加
 
 ```
 lower_case_table_names=1
@@ -391,7 +391,7 @@ Query OK, 0 rows affected (0.01 sec)
 ### 如果登录mysql出现以下错误
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/mysql-problom.png)
-**则可能配置未加载或服务未启动，请重启系统，然后启动mysql服务**
+**则可能配置未加载或服务未启动, 请重启系统, 然后启动mysql服务**
 ```
 sudo service mysql start
 ```
@@ -403,7 +403,7 @@ sudo service mysql stop
 
 ### 开启远程链接
 
-链接mysql后：
+链接mysql后: 
 ```
 use mysql
 
@@ -432,13 +432,13 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
 
-安装：
+安装: 
 
 ```
 sudo apt install mycli
 ```
 
-使用：
+使用: 
 
 ```
 $ mycli --help
@@ -491,9 +491,9 @@ Options:
 
 #### 破解
 
-1. 到*[官网](https://www.navicat.com/download)*下载对应系统版本，这里选择linux版本，并解压
+1. 到*[官网](https://www.navicat.com/download)*下载对应系统版本, 这里选择linux版本, 并解压
 
-2. 到*[Github](https://github.com/DoubleLabyrinth/navicat-keygen/releases)*下载注册机，并解压
+2. 到*[Github](https://github.com/DoubleLabyrinth/navicat-keygen/releases)*下载注册机, 并解压
 
 3.  安装wine
 
@@ -503,40 +503,40 @@ Options:
    sudo apt-get install wine1.8
    ```
 
-4. 进入注册机解压目录，在此目录下打开命令窗口输入
+4. 进入注册机解压目录, 在此目录下打开命令窗口输入
 
    ```
    wine navicat-patcher.exe <Navicat installation path> ./RegPrivateKey.pem
    ```
 
-   `<Navicat installation path>`就是Navicat中存放`navicat.exe`的根目录。
+   `<Navicat installation path>`就是Navicat中存放`navicat.exe`的根目录. 
 
-5. 接着再用`navicat-keygen.exe`生成注册码，使用命令
+5. 接着再用`navicat-keygen.exe`生成注册码, 使用命令
 
    ```
    wine navicat-keygen.exe -text ./RegPrivateKey.pem
    ```
 
-   你会被要求选择Navicat产品类别、语言以及输入主版本号。之后会随机生成一个序列号。
+   你会被要求选择Navicat产品类别、语言以及输入主版本号. 之后会随机生成一个序列号. 
 
-   产品选择Premium，语言选择Simplified Chinese，版本输入12（当然，因为下载的是Navicat Premium12 简体中文版）
+   产品选择Premium, 语言选择Simplified Chinese, 版本输入12（当然, 因为下载的是Navicat Premium12 简体中文版）
 
-   然后会出现一个序列号：
+   然后会出现一个序列号: 
 
    ```
    Serial number:
    NAVA-DHCN-P2OI-DV46
    ```
 
-   接下来填写`用户名`和`组织名`，随便写。
+   接下来填写`用户名`和`组织名`, 随便写. 
 
-   **然后打开navicat，然后断网**
+   **然后打开navicat, 然后断网**
 
-6. 在注册界面填入序列号，然后激活。这时会提示要手动激活，ok就选这个。
+6. 在注册界面填入序列号, 然后激活. 这时会提示要手动激活, ok就选这个. 
 
-7. 一般来说在线激活肯定会失败，这时候Navicat会询问你是否`手动激活`，直接选吧。
+7. 一般来说在线激活肯定会失败, 这时候Navicat会询问你是否`手动激活`, 直接选吧. 
 
-8. 在`手动激活`窗口你会得到一个请求码，复制它并把它粘贴到keygen里。最后别忘了连按至少两下回车结束输入。
+8. 在`手动激活`窗口你会得到一个请求码, 复制它并把它粘贴到keygen里. 最后别忘了连按至少两下回车结束输入. 
 
    ```
    Your name: DoubleLabyrinth
@@ -564,7 +564,7 @@ Options:
    YZ5rT4LML2Fx6Wgnnklb5g==
    ```
 
-9. 如果不出意外，你会得到一个看似用Base64编码的激活码。直接复制它，并把它粘贴到Navicat的`手动激活`窗口，最后点`激活`按钮。如果没什么意外的话应该能成功激活。
+9. 如果不出意外, 你会得到一个看似用Base64编码的激活码. 直接复制它, 并把它粘贴到Navicat的`手动激活`窗口, 最后点`激活`按钮. 如果没什么意外的话应该能成功激活. 
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
@@ -590,7 +590,7 @@ Type=Application
 Terminal=0
 ```
 
-> 参考：***[https://www.52pojie.cn/thread-705020-1-1.html]( https://www.52pojie.cn/thread-705020-1-1.html)***
+> 参考: ***[https://www.52pojie.cn/thread-705020-1-1.html]( https://www.52pojie.cn/thread-705020-1-1.html)***
 
 #### 后台运行
 
@@ -608,35 +608,35 @@ nohup /home/ybd/data/application/navicat/navicat120_premium_en_x64/start_navicat
 官网下载或者***[点击镜像获取](http://mirror.bit.edu.cn/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz)***
 
 ## 配置
-1、下载解压到自己的指定的目录后，将命令放到`/bin`下：
+1、下载解压到自己的指定的目录后, 将命令放到`/bin`下: 
 ```
 sudo ln -s /自定义目录/apache-maven-3.3.9/bin/mvn /bin/mvn
 ```
 
 2、添加环境变量
-老规矩，在`/etc/profile.d`下创建一个`maven.sh`的文件：
+老规矩, 在`/etc/profile.d`下创建一个`maven.sh`的文件: 
 ```
 sudo touch /etc/profile.d/maven.sh
 sudo vi /etc/profile.d/maven.sh
 ```
 
-输入以下内容：
+输入以下内容: 
 ```
 export M2_HOME=/自定义目录/apache-maven-3.3.9
 export PATH=${M2_HOME}/bin:$PATH
 ```
 
-然后`source`一下：
+然后`source`一下: 
 ```
 source /etc/profile.d/maven.sh
 ```
 
-查看是否配置成功：
+查看是否配置成功: 
 ```
 mvn -v
 ```
 
-输入内容如下：
+输入内容如下: 
 ```
 Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-11T00:41:47+08:00)
 Maven home: /home/ybd/Data/application/maven/apache-maven-3.3.9
@@ -663,7 +663,7 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 ```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
 
-#下面命令针对ubuntu16.04版本，在其他ubuntu版本系统请查看MongoDB官网
+#下面命令针对ubuntu16.04版本, 在其他ubuntu版本系统请查看MongoDB官网
 echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
 
 sudo apt-get update
@@ -671,7 +671,7 @@ sudo apt-get update
 sudo apt-get install -y mongodb-org
 ```
 
-安装完成后查看版本：
+安装完成后查看版本: 
 ```
 mongo -version
 ```
@@ -688,7 +688,7 @@ sudo service mongod restart
 ```
 sudo cat /var/log/mongodb/mongod.log
 ```
-在 `mongod.log` 日志中若出现如下信息，说明启动成功:
+在 `mongod.log` 日志中若出现如下信息, 说明启动成功:
 ```
 [initandlisten] waiting for connections on port 27017
 ```
@@ -705,40 +705,40 @@ sudo rm -r /var/lib/mongodb
 ```
 ## MongoDB 使用
 shell命令模式 
-输入`mongo`进入shell命令模式，默认连接的数据库是test数据库，命令如下：
+输入`mongo`进入shell命令模式, 默认连接的数据库是test数据库, 命令如下: 
 ```
 ➜  ~ mongo
 ```
-常用操作命令：
+常用操作命令: 
 
-`show dbs`：显示数据库列表 
-`show collections`：显示当前数据库中的集合（类似关系数据库中的表table） 
-`show users`：显示所有用户 
-`use yourDB`：切换当前数据库至yourDB 
-`db.help()` ：显示数据库操作命令 
-`db.yourCollection.help()` ：显示集合操作命令，yourCollection是集合名
+`show dbs`: 显示数据库列表 
+`show collections`: 显示当前数据库中的集合（类似关系数据库中的表table） 
+`show users`: 显示所有用户 
+`use yourDB`: 切换当前数据库至yourDB 
+`db.help()` : 显示数据库操作命令 
+`db.yourCollection.help()` : 显示集合操作命令, yourCollection是集合名
 
-官方文档：***[https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/](https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/)***
+官方文档: ***[https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/](https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/)***
 
 ## GUI客户端
 ***[Robomongo](https://www.mongodb.com/download-center#community)***
 
 # RabbitMQ
 
-选择Docker安装。。。不折腾了。。
+选择Docker安装. . . 不折腾了. . 
 
 ```
 docker pull rabbitmq:3-management
 docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 --restart=always rabbitmq:3-management
 ```
 
-(注意版本，是`management`)
+(注意版本, 是`management`)
 
-浏览器打开`localhost:15673`，默认帐号密码都是`guest`
+浏览器打开`localhost:15673`, 默认帐号密码都是`guest`
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
 
-集群：[https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
+集群: [https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
 
 # Kafka&Zookeeper集群
 
@@ -824,12 +824,12 @@ services:
       - "3888"
 ```
 
-启动：
+启动: 
 ```
 docker-compose up -d
 ```
 
-测试：
+测试: 
 
 ```
 #创建主题
@@ -852,25 +852,25 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --boots
 # 搭建ngrok配置
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/ngrok_p1.jpg)
->ngrok 是一个反向代理，通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道。ngrok 可捕获和分析所有通道上的流量，便于后期分析和重放。可以被使用来进行微信借口的本地调试。在ngrok被墙之后，我们需要通过ngrok开源的源码自行搭建ngrok服务。
+>ngrok 是一个反向代理, 通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道. ngrok 可捕获和分析所有通道上的流量, 便于后期分析和重放. 可以被使用来进行微信借口的本地调试. 在ngrok被墙之后, 我们需要通过ngrok开源的源码自行搭建ngrok服务. 
 
-参考地址：***[Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***
-搞了一上午，服务运行起来了，客户端也运行起来了，浏览器就是访问不到！！
-不知道是不是因为个人电脑没有域名所以才访问不到，日后再深究。
-无奈，还好互联网开源精神无处不在，某大神搭建的ngrok：
+参考地址: ***[Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***
+搞了一上午, 服务运行起来了, 客户端也运行起来了, 浏览器就是访问不到！！
+不知道是不是因为个人电脑没有域名所以才访问不到, 日后再深究. 
+无奈, 还好互联网开源精神无处不在, 某大神搭建的ngrok: 
 ***[http://www.qydev.com/](http://www.qydev.com/)***
-客户端和教程都在里面哦。
+客户端和教程都在里面哦. 
 
-**Update:**Ngrok已搭建成功～ ，记录于***[self-hosted-build-ngrok-server](/2017/self-hosted-build-ngrok-server/)***
+**Update:**Ngrok已搭建成功～ , 记录于***[self-hosted-build-ngrok-server](/2017/self-hosted-build-ngrok-server/)***
 
 
-<p id="div-border-left-purple">**其他tunnel的代理服务器**：
+<p id="div-border-left-purple">**其他tunnel的代理服务器**: 
 ***[natapp.cn](http://natapp.cn)***
 ***[www.ngrok.cc](http://www.ngrok.cc)***
 </p>
 
 
-[^1]: IDEA 全称IntelliJ IDEA，是java语言开发的集成环境，IntelliJ在业界被公认为最好的java开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主
+[^1]: IDEA 全称IntelliJ IDEA, 是java语言开发的集成环境, IntelliJ在业界被公认为最好的java开发工具之一, 尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的. IDEA是JetBrains公司的产品, 这家公司总部位于捷克共和国的首都布拉格, 开发人员以严谨著称的东欧程序员为主
 
 
 

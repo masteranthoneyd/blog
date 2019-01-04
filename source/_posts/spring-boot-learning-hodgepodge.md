@@ -9,19 +9,19 @@ tags: [Java, Spring, Spring Boot]
 
 # Preface
 
-> Spring Boot作为当下最流行的微服务项目构建基础，有的时候我们根本不需要额外的配置就能够干很多的事情，这得益于它的一个核心理念：“习惯优于配置”。。。
+> Spring Boot作为当下最流行的微服务项目构建基础, 有的时候我们根本不需要额外的配置就能够干很多的事情, 这得益于它的一个核心理念: “习惯优于配置”. . . 
 >
 > 说白的就是大部分的配置都已经按照~~最佳实践~~的编程规范配置好了
 >
-> 本文基于 Spring Boot 2的学习杂记，还是与1.X版本还是有一定区别的
+> 本文基于 Spring Boot 2的学习杂记, 还是与1.X版本还是有一定区别的
 
 <!--more-->
 
 # 构建依赖版本管理工程
 
-学习Demo：***[https://github.com/masteranthoneyd/spring-boot-learning](https://github.com/masteranthoneyd/spring-boot-learning)***
+学习Demo: ***[https://github.com/masteranthoneyd/spring-boot-learning](https://github.com/masteranthoneyd/spring-boot-learning)***
 
-> 为什么要分开为两个工程？因为考虑到common工程也需要版本控制，但parent工程中依赖了common工程，所以common工程不能依赖parent工程（循环依赖），故例外抽离出一个dependencies的工程，专门用作依赖版本管理，而parent工程用作其他子工程的公共依赖。
+> 为什么要分开为两个工程？因为考虑到common工程也需要版本控制, 但parent工程中依赖了common工程, 所以common工程不能依赖parent工程（循环依赖）, 故例外抽离出一个dependencies的工程, 专门用作依赖版本管理, 而parent工程用作其他子工程的公共依赖. 
 
 ## 依赖版本管理工程
 
@@ -35,21 +35,21 @@ tags: [Java, Spring, Spring Boot]
 
 *[https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml](https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml)*
 
-说明：
+说明: 
 
-* `<packaging>` 为 `pom` 表示此会被打包成 pom 文件被其他子项目依赖。
-* 由于 Spring Boot 以及集成了 `maven-surefire-plugin` 插件，跳过测试只需要在 properties中添加 `<maven.test.skip>true</maven.test.skip>`即可，等同 `mvn package -Dmaven.test.skip=true`，也可使用 `<skipTests>true</skipTests>`，两者的区别在于 `<maven.test.skip>` 标签连 `.class` 文件都不会生成，而 `<skipTests>` 会编译生成 `.class` 文件
+* `<packaging>` 为 `pom` 表示此会被打包成 pom 文件被其他子项目依赖. 
+* 由于 Spring Boot 以及集成了 `maven-surefire-plugin` 插件, 跳过测试只需要在 properties中添加 `<maven.test.skip>true</maven.test.skip>`即可, 等同 `mvn package -Dmaven.test.skip=true`, 也可使用 `<skipTests>true</skipTests>`, 两者的区别在于 `<maven.test.skip>` 标签连 `.class` 文件都不会生成, 而 `<skipTests>` 会编译生成 `.class` 文件
 
 
-* 子项目会继承父项目的 `properties`，若子项目重新定义属性，则会覆盖父项目的属性。
-* `<dependencyManagement>` 管理依赖版本，不使用 `<parent>` 来依赖 Spring Boot，可以使用上面方式，添加 `<type>` 为 `pom` 以及 `<scope>` 为 `import`。
-* `<pluginManagement>` 的功能类似于 `<dependencyManagement>`，在父项目中设置好插件属性，在子项目中直接依赖就可以，不需要每个子项目都配置一遍，当然了，子项目也可以覆盖插件属性。
+* 子项目会继承父项目的 `properties`, 若子项目重新定义属性, 则会覆盖父项目的属性. 
+* `<dependencyManagement>` 管理依赖版本, 不使用 `<parent>` 来依赖 Spring Boot, 可以使用上面方式, 添加 `<type>` 为 `pom` 以及 `<scope>` 为 `import`. 
+* `<pluginManagement>` 的功能类似于 `<dependencyManagement>`, 在父项目中设置好插件属性, 在子项目中直接依赖就可以, 不需要每个子项目都配置一遍, 当然了, 子项目也可以覆盖插件属性. 
 
 # 打包
 
 ## 打包成可执行的Jar
 
-默认情况下Spring Boot打包出来的jar包是不可执行的，需要这样配置：
+默认情况下Spring Boot打包出来的jar包是不可执行的, 需要这样配置: 
 
 ```xml
     <plugins>
@@ -68,13 +68,13 @@ tags: [Java, Spring, Spring Boot]
     </plugins>
 ```
 
-打包之后会发现有**两个**jar，一个是本身的代码，一个是集成了Spring Boot的可运行jar：
+打包之后会发现有**两个**jar, 一个是本身的代码, 一个是集成了Spring Boot的可运行jar: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/repackage.png)
 
 ## 打包依赖了Spring Boot的工具库
 
-只需要在打包插件`spring-boot-maven-plugin`中这样配置：
+只需要在打包插件`spring-boot-maven-plugin`中这样配置: 
 
 ```xml
 <build>
@@ -119,15 +119,15 @@ tags: [Java, Spring, Spring Boot]
 </build>
 ```
 
-然后指定该pom文件构建：
+然后指定该pom文件构建: 
 
 ```
 mvn -f pom_own.xml package
 ```
 
-# 配置文件：Properties 和 YAML
+# 配置文件: Properties 和 YAML
 
-## 配置文件的生效顺序，会对值进行覆盖
+## 配置文件的生效顺序, 会对值进行覆盖
 
 1. `@TestPropertySource` 注解
 
@@ -135,8 +135,8 @@ mvn -f pom_own.xml package
 3. Java系统属性（`System.getProperties()`）
 4. 操作系统环境变量
 5. 只有在`random.*`里包含的属性会产生一个`RandomValuePropertySource`
-6. 在打包的jar外的应用程序配置文件（`application.properties`，包含YAML和profile变量）
-7. 在打包的jar内的应用程序配置文件（`application.properties`，包含YAML和profile变量）
+6. 在打包的jar外的应用程序配置文件（`application.properties`, 包含YAML和profile变量）
+7. 在打包的jar内的应用程序配置文件（`application.properties`, 包含YAML和profile变量）
 8. 在`@Configuration`类上的`@PropertySource`注解
 9. 默认属性（使用`SpringApplication.setDefaultProperties`指定）
 
@@ -149,13 +149,13 @@ roncoo.bignumber=${random.long}
 roncoo.number.less.than.ten=${random.int(10)}
 roncoo.number.in.range=${random.int[1024,65536]}
 
-读取使用注解：@Value(value = "${roncoo.secret}")
+读取使用注解: @Value(value = "${roncoo.secret}")
 ```
 
 ## 应用简单配置
 
 ```properties
-#端口配置：
+#端口配置: 
 server.port=8090
 #应用名
 spring.application.name=test-demo
@@ -180,7 +180,7 @@ spring:
 ### 多环境配置的好处
 
 > - 不同环境配置可以配置不同的参数
-> - 便于部署，提高效率，减少出错
+> - 便于部署, 提高效率, 减少出错
 
 ### Properties多环境配置
 
@@ -210,9 +210,9 @@ spring:
 
 ### 两种配置方式的比较
 
-- Properties配置多环境，需要添加多个配置文件，YAML只需要一个配件文件
-- 书写格式的差异，yaml相对比较简洁，优雅
-- YAML的缺点：不能通过`@PropertySource`注解加载。如果需要使用`@PropertySource`注解的方式加载值，那就要使用properties文件。
+- Properties配置多环境, 需要添加多个配置文件, YAML只需要一个配件文件
+- 书写格式的差异, yaml相对比较简洁, 优雅
+- YAML的缺点: 不能通过`@PropertySource`注解加载. 如果需要使用`@PropertySource`注解的方式加载值, 那就要使用properties文件. 
 
 ### 启动时指定环境
 
@@ -222,7 +222,7 @@ java -Dspring.profiles.active=dev -jar myapp.jar
 
 # 热部署
 
-`pom.xml`添加依赖：
+`pom.xml`添加依赖: 
 
 ```xml
     <dependencies>
@@ -230,7 +230,7 @@ java -Dspring.profiles.active=dev -jar myapp.jar
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <!-- optional=true,依赖不会传递，该项目依赖devtools；之后依赖该项目的项目如果想要使用devtools，需要重新引入 -->
+            <!-- optional=true,依赖不会传递, 该项目依赖devtools；之后依赖该项目的项目如果想要使用devtools, 需要重新引入 -->
             <optional>true</optional>
         </dependency>
     </dependencies>
@@ -247,7 +247,7 @@ java -Dspring.profiles.active=dev -jar myapp.jar
     </build>
 ```
 
-`application.yml`配置文件中添加：
+`application.yml`配置文件中添加: 
 
 ```yaml
 spring:
@@ -259,7 +259,7 @@ spring:
       exclude: WEB-INF/**
 ```
 
-关于DevTools的键值如下：
+关于DevTools的键值如下: 
 ```properties
 # DEVTOOLS (DevToolsProperties)
 spring.devtools.livereload.enabled=true # Enable a livereload.com compatible server.
@@ -283,7 +283,7 @@ spring.devtools.remote.secret= # A shared secret required to establish a connect
 spring.devtools.remote.secret-header-name=X-AUTH-TOKEN # HTTP header used to transfer the shared secret.
 ```
 
-当我们修改了java类后，IDEA默认是不自动编译的，而`spring-boot-devtools`又是监测`classpath`下的文件发生变化才会重启应用，所以需要设置IDEA的自动编译：
+当我们修改了java类后, IDEA默认是不自动编译的, 而`spring-boot-devtools`又是监测`classpath`下的文件发生变化才会重启应用, 所以需要设置IDEA的自动编译: 
 
 （1）**File-Settings-Compiler-Build Project automatically**
 
@@ -293,16 +293,16 @@ spring.devtools.remote.secret-header-name=X-AUTH-TOKEN # HTTP header used to tra
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools02.png)
 
-OK了，重启一下项目，然后改一下类里面的内容，IDEA就会自动去make了。
+OK了, 重启一下项目, 然后改一下类里面的内容, IDEA就会自动去make了. 
 
-> **热部署可能会牺牲一定的系统性能，因为是动态的编译**
+> **热部署可能会牺牲一定的系统性能, 因为是动态的编译**
 
 # 使用为Undertow作为Web容器
 
-> Spring Boot内嵌容器支持Tomcat、Jetty、Undertow。
-> 根据 [Tomcat vs. Jetty vs. Undertow: Comparison of Spring Boot Embedded Servlet Containers](https://link.jianshu.com/?t=https://examples.javacodegeeks.com/enterprise-java/spring/tomcat-vs-jetty-vs-undertow-comparison-of-spring-boot-embedded-servlet-containers/) 这篇文章统计，Undertow的综合性能更好。
+> Spring Boot内嵌容器支持Tomcat、Jetty、Undertow. 
+> 根据 [Tomcat vs. Jetty vs. Undertow: Comparison of Spring Boot Embedded Servlet Containers](https://link.jianshu.com/?t=https://examples.javacodegeeks.com/enterprise-java/spring/tomcat-vs-jetty-vs-undertow-comparison-of-spring-boot-embedded-servlet-containers/) 这篇文章统计, Undertow的综合性能更好. 
 >
-> 在Spring Boot 2中，已经把netty作为webflux的默认容器
+> 在Spring Boot 2中, 已经把netty作为webflux的默认容器
 
 ## 与Tomcat性能对比
 
@@ -325,7 +325,7 @@ Undertow:
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
-        <!-- 移除默认web容器，使用undertow -->
+        <!-- 移除默认web容器, 使用undertow -->
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
@@ -333,12 +333,12 @@ Undertow:
     </exclusions>
 </dependency>
 
-如果是webflux，默认的容器的netty
+如果是webflux, 默认的容器的netty
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
     <exclusions>
-        <!-- 移除默认web容器，使用undertow -->
+        <!-- 移除默认web容器, 使用undertow -->
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-reactor-netty</artifactId>
@@ -390,7 +390,7 @@ server.undertow.accesslog.suffix=log
 server.undertow.max-http-post-size=0 
 # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
 server.undertow.io-threads=4
-# 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载，默认数量为 CPU核心*8
+# 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载, 默认数量为 CPU核心*8
 server.undertow.worker-threads=20
 # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
 # 每块buffer的空间大小,越小的空间被利用越充分
@@ -403,7 +403,7 @@ server.undertow.direct-buffers=true
 
 # 查看依赖树
 
-如果引入了某些jar包带有`logback`依赖，log4j2会失效，需要通过IDEA或Maven查找排除依赖：
+如果引入了某些jar包带有`logback`依赖, log4j2会失效, 需要通过IDEA或Maven查找排除依赖: 
 
 ```
 mvn dependency:tree
@@ -421,9 +421,9 @@ public class SpringAsyncConfig {
 }
 ```
 
-配置完这个就已经具备异步方法功能了，只需要在方法上面添加`@Async`即可
+配置完这个就已经具备异步方法功能了, 只需要在方法上面添加`@Async`即可
 
-如果被`@Async`注解的方法所在类是基于接口实现的，想要直接注入实现类，需要添加：`@EnableAsync(proxyTargetClass = true)` 以使用CGLIB代理
+如果被`@Async`注解的方法所在类是基于接口实现的, 想要直接注入实现类, 需要添加: `@EnableAsync(proxyTargetClass = true)` 以使用CGLIB代理
 
 ## 编写异步方法
 
@@ -437,7 +437,7 @@ public void asyncMethodWithVoidReturnType() throws InterruptedException {
 
 ## 配置线程池
 
-在不配置线程池的情况下，Spring**默认使用**`SimpleAsyncTaskExecutor`，每一次的执行任务都会使用新的线程，性能不太好，所以我们可以自定义线程池
+在不配置线程池的情况下, Spring**默认使用**`SimpleAsyncTaskExecutor`, 每一次的执行任务都会使用新的线程, 性能不太好, 所以我们可以自定义线程池
 
 ### 直接声明线程池
 
@@ -461,20 +461,20 @@ public class SpringAsyncConfig {
 
 ```
 
-通过使用`ThreadPoolTaskExecutor`创建了一个线程池，同时设置了以下这些参数：
+通过使用`ThreadPoolTaskExecutor`创建了一个线程池, 同时设置了以下这些参数: 
 
-- 核心线程数10：线程池创建时候初始化的线程数
-- 最大线程数20：线程池最大的线程数，只有在缓冲队列满了之后才会申请超过核心线程数的线程
-- 缓冲队列500：用来缓冲执行任务的队列
-- 允许线程的空闲时间60秒：当超过了核心线程出之外的线程在空闲时间到达之后会被销毁
-- 线程池名的前缀：设置好了之后可以方便我们定位处理任务所在的线程池
-- 线程池对拒绝任务的处理策略：这里采用了`CallerRunsPolicy`策略，当线程池没有处理能力的时候，该策略会直接在 execute 方法的调用线程中运行被拒绝的任务；如果执行程序已关闭，则会丢弃该任务
+- 核心线程数10: 线程池创建时候初始化的线程数
+- 最大线程数20: 线程池最大的线程数, 只有在缓冲队列满了之后才会申请超过核心线程数的线程
+- 缓冲队列500: 用来缓冲执行任务的队列
+- 允许线程的空闲时间60秒: 当超过了核心线程出之外的线程在空闲时间到达之后会被销毁
+- 线程池名的前缀: 设置好了之后可以方便我们定位处理任务所在的线程池
+- 线程池对拒绝任务的处理策略: 这里采用了`CallerRunsPolicy`策略, 当线程池没有处理能力的时候, 该策略会直接在 execute 方法的调用线程中运行被拒绝的任务；如果执行程序已关闭, 则会丢弃该任务
 
 ### 实现AsyncConfigurer
 
-> 通过这种方式，可以**对异常进行处理**
+> 通过这种方式, 可以**对异常进行处理**
 
-`AsyncConfigurer`接口有两个方法：
+`AsyncConfigurer`接口有两个方法: 
 
 - `getAsyncExecutor()`: 提供线程池
 - `getAsyncUncaughtExceptionHandler()`: 异步任务异常处理
@@ -511,7 +511,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 
 ### 优雅关闭线程池
 
-有时候，存在关闭程序但还有异步任务在执行的情况，这时候，我们需要优雅地关闭线程池，只需要两个参数：
+有时候, 存在关闭程序但还有异步任务在执行的情况, 这时候, 我们需要优雅地关闭线程池, 只需要两个参数: 
 
 ```java
 executor.setWaitForTasksToCompleteOnShutdown(true);
@@ -520,7 +520,7 @@ executor.setAwaitTerminationSeconds(60);
 
 ## Async使用指定线程池
 
-如果同时实现了`AsyncConfigurer`以及配置线程池，那么`@Async`默认使用`AsyncConfigurer.getAsyncExecutor`的线程池。
+如果同时实现了`AsyncConfigurer`以及配置线程池, 那么`@Async`默认使用`AsyncConfigurer.getAsyncExecutor`的线程池. 
 
 如果需要指定线程池可以这样
 
@@ -532,7 +532,7 @@ public void someMethod(){...}
 
 ## 获取异步执行结果
 
-Service：
+Service: 
 
 ```java
 @Async("threadPoolTaskExecutor")
@@ -544,7 +544,7 @@ public Future<String> asyncMethodWithVoidReturnType() throws InterruptedExceptio
 
 ```
 
-Controller：
+Controller: 
 
 ```java
 @GetMapping("/hello")
@@ -559,7 +559,7 @@ public Mono<String> syaHello() throws InterruptedException, ExecutionException {
 }
 ```
 
-执行结果：
+执行结果: 
 
 ```
 wait...
@@ -574,17 +574,17 @@ Execute method asynchronously. asyncExecutor-1
 
 ## @PostConstruct 或 InitializingBean
 
-通过`@PostConstruct`或实现`InitializingBean`实现初始化`bean`的时候干一些事情，两者区别在于`InitializingBean`是在属性设置完之后执行的，所以执行顺序是在`@PostConstruct`之前
+通过`@PostConstruct`或实现`InitializingBean`实现初始化`bean`的时候干一些事情, 两者区别在于`InitializingBean`是在属性设置完之后执行的, 所以执行顺序是在`@PostConstruct`之前
 
-> 由于此接口的方法`afterPropertiesSet`是在对象的所有属性被初始化后才会调用。当Spring的配置文件中设置类初始默认为”延迟初始”（`default-lazy-init="true"`，此值默认为`false`）时，
+> 由于此接口的方法`afterPropertiesSet`是在对象的所有属性被初始化后才会调用. 当Spring的配置文件中设置类初始默认为”延迟初始”（`default-lazy-init="true"`, 此值默认为`false`）时, 
 >
-> 类对象如果不被使用，则不会实例化该类对象。所以 `InitializingBean`子类不能用于在容器启动时进行初始化的工作，则应使用Spring提供的`ApplicationListener`接口来进行程序的初始化工作。
+> 类对象如果不被使用, 则不会实例化该类对象. 所以 `InitializingBean`子类不能用于在容器启动时进行初始化的工作, 则应使用Spring提供的`ApplicationListener`接口来进行程序的初始化工作. 
 >
-> 另外，如果需要`InitializingBean`子类对象在Spring容器启动时就初始化并则容器调用`afterPropertiesSet`方法则需要在类上增加`org.springframework.context.annotation.Lazy`注解并设置为false即可（也可通过spring配置bean时添加`lazy-init="false"`)。
+> 另外, 如果需要`InitializingBean`子类对象在Spring容器启动时就初始化并则容器调用`afterPropertiesSet`方法则需要在类上增加`org.springframework.context.annotation.Lazy`注解并设置为false即可（也可通过spring配置bean时添加`lazy-init="false"`). 
 
 ## 监听ContextRefreshedEvent
 
-通过监听`ContextRefreshedEvent`事件：
+通过监听`ContextRefreshedEvent`事件: 
 
 ```java
 public class ApplicationContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
@@ -602,7 +602,7 @@ public void processContextRefreshedEvent(ContextRefreshedEvent event) throws Int
 
 ```
 
-Spring的事件处理是单线程的，所以如果一个事件被触发，除非所有的接收者得到消息，否则这些进程被阻止，流程将不会继续。因此，如果要使用事件处理，在设计应用程序时应小心。
+Spring的事件处理是单线程的, 所以如果一个事件被触发, 除非所有的接收者得到消息, 否则这些进程被阻止, 流程将不会继续. 因此, 如果要使用事件处理, 在设计应用程序时应小心. 
 
 ### Spring内置事件
 
@@ -610,15 +610,15 @@ Spring的事件处理是单线程的，所以如果一个事件被触发，除�
 
 | Spring 内置事件           | 描述                                                         |
 | ------------------------- | ------------------------------------------------------------ |
-| **ContextRefreshedEvent** | `ApplicationContext`被初始化或刷新时，该事件被发布。这也可以在`ConfigurableApplicationContext`接口中使用`refresh()`方法来发生。 |
-| **ContextStartedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`start()`方法启动`ApplicationContext`时，该事件被触发。你可以查询你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。 |
-| **ContextStoppedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`stop()`方法停止`ApplicationContext`时，该事件被触发。你可以在接受到这个事件后做必要的清理的工作。 |
-| **ContextClosedEvent**    | 当使用`ConfigurableApplicationContext`接口中的`close()`方法关闭`ApplicationContext`时，该事件被触发。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。 |
-| **RequestHandledEvent**   | 这是一个`web-specific`事件，告诉所有`bean` HTTP请求已经被服务。 |
+| **ContextRefreshedEvent** | `ApplicationContext`被初始化或刷新时, 该事件被发布. 这也可以在`ConfigurableApplicationContext`接口中使用`refresh()`方法来发生. |
+| **ContextStartedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`start()`方法启动`ApplicationContext`时, 该事件被触发. 你可以查询你的数据库, 或者你可以在接受到这个事件后重启任何停止的应用程序. |
+| **ContextStoppedEvent**   | 当使用`ConfigurableApplicationContext`接口中的`stop()`方法停止`ApplicationContext`时, 该事件被触发. 你可以在接受到这个事件后做必要的清理的工作. |
+| **ContextClosedEvent**    | 当使用`ConfigurableApplicationContext`接口中的`close()`方法关闭`ApplicationContext`时, 该事件被触发. 一个已关闭的上下文到达生命周期末端；它不能被刷新或重启. |
+| **RequestHandledEvent**   | 这是一个`web-specific`事件, 告诉所有`bean` HTTP请求已经被服务. |
 
 ### Spring Boot 2.0新增事件
 
-在Spring Boot 2.0中对事件模型做了一些增强，主要就是增加了`ApplicationStartedEvent`事件，所以在2.0版本中所有的事件按执行的先后顺序如下：
+在Spring Boot 2.0中对事件模型做了一些增强, 主要就是增加了`ApplicationStartedEvent`事件, 所以在2.0版本中所有的事件按执行的先后顺序如下: 
 
 - `ApplicationStartingEvent`
 - `ApplicationEnvironmentPreparedEvent`
@@ -654,33 +654,33 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 `ApplicationRunner`比`CommandLineRunner`先执行
 
-**总结**：以上三种方式的顺序跟其序号一样
+**总结**: 以上三种方式的顺序跟其序号一样
 
 ## onApplicationEvent执行两次问题
 
-`applicationontext`和使用MVC之后的`webApplicationontext`会两次调用上面的方法，如何区分这个两种容器呢？
+`applicationontext`和使用MVC之后的`webApplicationontext`会两次调用上面的方法, 如何区分这个两种容器呢？
 
-但是这个时候，会存在一个问题，在web 项目中（spring mvc），系统会存在两个容器，一个是`root application context` ,另一个就是我们自己的 `projectName-servlet context`（作为root application context的子容器）。
+但是这个时候, 会存在一个问题, 在web 项目中（spring mvc）, 系统会存在两个容器, 一个是`root application context` ,另一个就是我们自己的 `projectName-servlet context`（作为root application context的子容器）. 
 
-这种情况下，就会造成`onApplicationEvent`方法被执行两次。为了避免上面提到的问题，我们可以只在`root application context`初始化完成后调用逻辑代码，其他的容器的初始化完成，则不做任何处理，修改后代码 
+这种情况下, 就会造成`onApplicationEvent`方法被执行两次. 为了避免上面提到的问题, 我们可以只在`root application context`初始化完成后调用逻辑代码, 其他的容器的初始化完成, 则不做任何处理, 修改后代码 
 
 ```java
       @Override  
       public void onApplicationEvent(ContextRefreshedEvent event) {  
-        if(event.getApplicationContext().getParent() == null){//root application context 没有parent，他就是老大.  
-             //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。  
+        if(event.getApplicationContext().getParent() == null){//root application context 没有parent, 他就是老大.  
+             //需要执行的逻辑代码, 当spring容器初始化完成后就会执行该方法.  
         }  
       }  
 
 ```
 
-> 后续发现加上以上判断还是能执行两次，不加的话三次，最终研究结果使用以下判断更加准确：`event.getApplicationContext().getDisplayName().equals("Root WebApplicationContext")`
+> 后续发现加上以上判断还是能执行两次, 不加的话三次, 最终研究结果使用以下判断更加准确: `event.getApplicationContext().getDisplayName().equals("Root WebApplicationContext")`
 
 # Spring应用停止前执行程序的几种方式
 
 1. 监听`ContextClosedEvent`
 
-2. 实现`DisposableBean`或使用`@PostConstruct`，执行顺序：`@PostConstruct` > `DisposableBean`
+2. 实现`DisposableBean`或使用`@PostConstruct`, 执行顺序: `@PostConstruct` > `DisposableBean`
 
 3. 使用ShutdownHook:
 
@@ -714,15 +714,15 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 ## 元注解
 
-Spring4.0的许多注解都可以用作meta annotation（元注解）。元注解是一种使用在别的注解上的注解。这意味着我们可以使用Spring的注解组合成一个我们自己的注解。
+Spring4.0的许多注解都可以用作meta annotation（元注解）. 元注解是一种使用在别的注解上的注解. 这意味着我们可以使用Spring的注解组合成一个我们自己的注解. 
 
-类似于：`@Documented`, `@Component`, `@RequestMapping`, `@Controller`, `@ResponseBody`等等
+类似于: `@Documented`, `@Component`, `@RequestMapping`, `@Controller`, `@ResponseBody`等等
 
-对于元注解，是Spring框架中定义的部分，都有特定的含义。我们并不能修改，但是对于组合注解，我们完全可以基于自己的定义进行实现。
+对于元注解, 是Spring框架中定义的部分, 都有特定的含义. 我们并不能修改, 但是对于组合注解, 我们完全可以基于自己的定义进行实现. 
 
 ## 组合注解
 
-自定义注解或组合注解是从其他的Spring元注解创建的，我们先看一下`@SpringBootApplication`这个神奇的注解（去除注释）：
+自定义注解或组合注解是从其他的Spring元注解创建的, 我们先看一下`@SpringBootApplication`这个神奇的注解（去除注释）: 
 
 ```java
 @Target(ElementType.TYPE)
@@ -751,7 +751,7 @@ public @interface SpringBootApplication {
 }
 ```
 
-发现这个注解中有含有大量其他注解，并使用了`@AliasFor`这个注解传递注解属性值。
+发现这个注解中有含有大量其他注解, 并使用了`@AliasFor`这个注解传递注解属性值. 
 
 ## 自定义组合注解
 
@@ -768,7 +768,7 @@ public @interface Rest {
 }
 ```
 
-使用：
+使用: 
 
 ```
 @Rest("/ex")
@@ -779,24 +779,24 @@ public class ExampleController {
 
 # Spring AOP
 
-> AOP为**Aspect Oriented Programming**的缩写，意为：面向切面编程，通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术。AOP是Spring框架中的一个重要内容，它通过对既有程序定义一个切入点，然后在其前后切入不同的执行内容，比如常见的有：打开数据库连接/关闭数据库连接、打开事务/关闭事务、记录日志等。基于AOP不会破坏原来程序逻辑，因此它可以很好的对业务逻辑的各个部分进行**隔离**，从而使得业务逻辑各部分之间的**耦合度降低**，提高程序的可重用性，同时提高了开发的效率。
+> AOP为**Aspect Oriented Programming**的缩写, 意为: 面向切面编程, 通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术. AOP是Spring框架中的一个重要内容, 它通过对既有程序定义一个切入点, 然后在其前后切入不同的执行内容, 比如常见的有: 打开数据库连接/关闭数据库连接、打开事务/关闭事务、记录日志等. 基于AOP不会破坏原来程序逻辑, 因此它可以很好的对业务逻辑的各个部分进行**隔离**, 从而使得业务逻辑各部分之间的**耦合度降低**, 提高程序的可重用性, 同时提高了开发的效率. 
 
 ## 注解说明
 
-实现AOP的切面主要有以下几个要素：
+实现AOP的切面主要有以下几个要素: 
 
 - 使用`@Aspect`注解将一个java类定义为切面类
-- 使用`@Pointcut`定义一个切入点，可以是一个规则表达式，比如下例中某个package下的所有函数，也可以是一个注解等。
+- 使用`@Pointcut`定义一个切入点, 可以是一个规则表达式, 比如下例中某个package下的所有函数, 也可以是一个注解等. 
 - 根据需要在切入点不同位置的切入内容
   - 使用`@Before`在切入点开始处切入内容
   - 使用`@After`在切入点结尾处切入内容
   - 使用`@AfterReturning`在切入点return内容之后切入内容（可以用来对处理返回值做一些加工处理）
-  - 使用`@Around`在切入点前后切入内容，并自己控制何时执行切入点自身的内容
+  - 使用`@Around`在切入点前后切入内容, 并自己控制何时执行切入点自身的内容
   - 使用`@AfterThrowing`用来处理当切入内容部分抛出异常之后的处理逻辑
 
 ## 引入依赖
 
-与其他模块一样，使用需要引入pom依赖：
+与其他模块一样, 使用需要引入pom依赖: 
 
 ```xml
 <dependency>
@@ -805,15 +805,15 @@ public class ExampleController {
 </dependency>
 ```
 
-**引入依赖程序将自动启用AOP**，只要引入了AOP依赖后，默认已经增加了`@EnableAspectJAutoProxy`，并且默认启用**Cglib**代理：
+**引入依赖程序将自动启用AOP**, 只要引入了AOP依赖后, 默认已经增加了`@EnableAspectJAutoProxy`, 并且默认启用**Cglib**代理: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-cglib-default.png)
 
 ## AOP顺序
 
-由于通过AOP实现，程序得到了很好的解耦，但是也会带来一些问题，比如：我们可能会对Web层做多个切面，校验用户，校验头信息等等，这个时候经常会碰到切面的处理**顺序问题**。
+由于通过AOP实现, 程序得到了很好的解耦, 但是也会带来一些问题, 比如: 我们可能会对Web层做多个切面, 校验用户, 校验头信息等等, 这个时候经常会碰到切面的处理**顺序问题**. 
 
-所以，我们需要定义每个切面的优先级，我们需要`@Order(i)`注解来标识切面的优先级。**i的值越小，优先级越高**。
+所以, 我们需要定义每个切面的优先级, 我们需要`@Order(i)`注解来标识切面的优先级. **i的值越小, 优先级越高**. 
 
 ## AOP记录Web访问日志用例
 
@@ -844,7 +844,7 @@ public void annotation() {}
 public void logHttp() {}
 ```
 
-然后这样使用：
+然后这样使用: 
 
 ```java
 @Before("path() && @annotation(reqLog)")
@@ -853,7 +853,7 @@ public void before(JoinPoint joinPoint) {
 }
 ```
 
-如果要很方便地获取`@ReqLog`的`value`，我们可以将其**绑定**为参数：
+如果要很方便地获取`@ReqLog`的`value`, 我们可以将其**绑定**为参数: 
 
 ```java
 @Pointcut("execution(public * com.yangbingdong.docker.controller..*.*(..))")
@@ -865,9 +865,9 @@ public void doBefore(JoinPoint joinPoint, ReqLog reqLog) {
 }
 ```
 
-Pointcut匹配表达式详解可以参考：***[https://blog.csdn.net/elim168/article/details/78150438](https://blog.csdn.net/elim168/article/details/78150438)***
+Pointcut匹配表达式详解可以参考: ***[https://blog.csdn.net/elim168/article/details/78150438](https://blog.csdn.net/elim168/article/details/78150438)***
 
-如果是使用`@Around`，则方法参数应该使用`ProceedingJoinPoint，`因为`ProceedingJoinPoint.proceed()`可获取方法返回值，且必须返回`Object`：
+如果是使用`@Around`, 则方法参数应该使用`ProceedingJoinPoint, `因为`ProceedingJoinPoint.proceed()`可获取方法返回值, 且必须返回`Object`: 
 
 ```
 @Around("logHttp()")
@@ -878,20 +878,20 @@ public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
 
 # 函数式方式动态注册 Bean
 
-> Spring 5 支持在应用程序上下文中以函数式方式注册 bean。简单地说，您可以通过在 **`GenericApplicationContext`** 类中定义的一个新 **`registerBean()`** 方法重载来完成。
+> Spring 5 支持在应用程序上下文中以函数式方式注册 bean. 简单地说, 您可以通过在 **`GenericApplicationContext`** 类中定义的一个新 **`registerBean()`** 方法重载来完成. 
 
-看一下有哪些方法重载：
+看一下有哪些方法重载: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-reg-bean.png)
 
-注入`GenericWebApplicationContext`：
+注入`GenericWebApplicationContext`: 
 
 ```java
 @Autowired
 private GenericWebApplicationContext context;
 ```
 
-注册并设置bean：
+注册并设置bean: 
 
 ```java
 String beanName = lowercaseInitial(handler.getClass().getSimpleName()) + "-" + j;
@@ -903,13 +903,13 @@ AbstractShardingHandler<AopLogEvent> shardingBean = (AbstractShardingHandler<Aop
 
 # 自动配置的原理与自定义starter
 
-在自定义starter之前，先看一下Spring Boot的一些原理
+在自定义starter之前, 先看一下Spring Boot的一些原理
 
 ## Spring Boot实现自动配置的原理
 
 ### 入口注解类@EnableAutoConfiguration
 
-`@SpringBootApplication`注解中包含了自动配置的入口注解：
+`@SpringBootApplication`注解中包含了自动配置的入口注解: 
 
 ```java
 @Target(ElementType.TYPE)
@@ -939,14 +939,14 @@ public @interface EnableAutoConfiguration {
 }
 ```
 
-这个注解的Javadoc内容还是不少，所有就不贴在文章里面了，概括一下：
+这个注解的Javadoc内容还是不少, 所有就不贴在文章里面了, 概括一下: 
 
 1. 自动配置基于应用的类路径以及你定义了什么Beans
-2. 如果使用了`@SpringBootApplication`注解，那么自动就启用了自动配置
+2. 如果使用了`@SpringBootApplication`注解, 那么自动就启用了自动配置
 3. 可以通过设置注解的`excludeName`属性或者通过`spring.autoconfigure.exclude`配置项来指定不需要自动配置的项目
 4. 自动配置的发生时机在用户定义的Beans被注册之后
-5. 如果没有和`@SpringBootApplication`一同使用，最好将`@EnableAutoConfiguration`注解放在root package的类上，这样就能够搜索到所有子packages中的类了
-6. 自动配置类就是普通的Spring `@Configuration`类，通过`SpringFactoriesLoader`机制完成加载，实现上通常使用`@Conditional`(比如`@ConditionalOnClass`或者`@ConditionalOnMissingBean`)
+5. 如果没有和`@SpringBootApplication`一同使用, 最好将`@EnableAutoConfiguration`注解放在root package的类上, 这样就能够搜索到所有子packages中的类了
+6. 自动配置类就是普通的Spring `@Configuration`类, 通过`SpringFactoriesLoader`机制完成加载, 实现上通常使用`@Conditional`(比如`@ConditionalOnClass`或者`@ConditionalOnMissingBean`)
 
 ### @AutoConfigurationPackage
 
@@ -961,7 +961,7 @@ public @interface AutoConfigurationPackage {
 }
 ```
 
-这个注解的职责就是**引入**了另外一个配置类：`AutoConfigurationPackages.Registrar`。
+这个注解的职责就是**引入**了另外一个配置类: `AutoConfigurationPackages.Registrar`. 
 
 ```java
 /**
@@ -984,31 +984,31 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 }
 ```
 
-这个注解实现的功能已经比较底层了，调试看看上面的register方法什么会被调用：
+这个注解实现的功能已经比较底层了, 调试看看上面的register方法什么会被调用: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code.png)
 
-调用参数中的`packageNames`数组中仅包含一个值：`com.example.demo`，也就是项目的root package名。
+调用参数中的`packageNames`数组中仅包含一个值: `com.example.demo`, 也就是项目的root package名. 
 
-从调用栈来看的话，调用`register`方法的时间在容器刷新期间：
+从调用栈来看的话, 调用`register`方法的时间在容器刷新期间: 
 
 `refresh` -> `invokeBeanFactoryPostProcessors` -> `invokeBeanDefinitionRegistryPostProcessors` -> `postProcessBeanDefinitionRegistry` -> `processConfigBeanDefinitions`(开始处理配置Bean的定义) -> `loadBeanDefinitions` -> `loadBeanDefinitionsForConfigurationClass`(读取配置Class中的Bean定义) -> `loadBeanDefinitionsFromRegistrars`(这里开始准备进入上面的register方法) -> `registerBeanDefinitions`(即上述方法)
 
-这个过程已经比较复杂了，目前暂且不深入研究了。它的功能简单说就是将应用的root package给注册到Spring容器中，供后续使用。
+这个过程已经比较复杂了, 目前暂且不深入研究了. 它的功能简单说就是将应用的root package给注册到Spring容器中, 供后续使用. 
 
-相比而言，下面要讨论的几个类型才是实现自动配置的关键。
+相比而言, 下面要讨论的几个类型才是实现自动配置的关键. 
 
 ### @Import(EnableAutoConfigurationImportSelector.class)
 
-`@EnableAutoConfiguration`注解的另外一个作用就是引入了`EnableAutoConfigurationImportSelector`：
+`@EnableAutoConfiguration`注解的另外一个作用就是引入了`EnableAutoConfigurationImportSelector`: 
 
-它的类图如下所示：
+它的类图如下所示: 
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code02.png)
 
-可以发现它除了实现几个Aware类接口外，最关键的就是实现了`DeferredImportSelector`(继承自`ImportSelector`)接口。
+可以发现它除了实现几个Aware类接口外, 最关键的就是实现了`DeferredImportSelector`(继承自`ImportSelector`)接口. 
 
-所以我们先来看看`ImportSelector`以及`DeferredImportSelector`接口的定义：
+所以我们先来看看`ImportSelector`以及`DeferredImportSelector`接口的定义: 
 
 ```java
 public interface ImportSelector {
@@ -1021,11 +1021,11 @@ public interface ImportSelector {
 }
 ```
 
-这个接口的Javadoc比较长，还是捡重点说明一下：
+这个接口的Javadoc比较长, 还是捡重点说明一下: 
 
-1. 主要功能通过`selectImports`方法实现，用于筛选需要引入的类名
-2. 实现了`ImportSelector`的类也可以实现一系列Aware接口，这些Aware接口中的相应方法会在`selectImports`方法之前被调用(这一点通过上面的类图也可以佐证，`EnableAutoConfigurationImportSelector`确实实现了四个Aware类型的接口)
-3. `ImportSelector`的实现和通常的`@Import`在处理方式上是一致的，然而还是可以在所有`@Configuration`类都被处理后再进行引入筛选(具体看下面即将介绍的`DeferredImportSelector`)
+1. 主要功能通过`selectImports`方法实现, 用于筛选需要引入的类名
+2. 实现了`ImportSelector`的类也可以实现一系列Aware接口, 这些Aware接口中的相应方法会在`selectImports`方法之前被调用(这一点通过上面的类图也可以佐证, `EnableAutoConfigurationImportSelector`确实实现了四个Aware类型的接口)
+3. `ImportSelector`的实现和通常的`@Import`在处理方式上是一致的, 然而还是可以在所有`@Configuration`类都被处理后再进行引入筛选(具体看下面即将介绍的`DeferredImportSelector`)
 
 ```java
 public interface DeferredImportSelector extends ImportSelector {
@@ -1033,12 +1033,12 @@ public interface DeferredImportSelector extends ImportSelector {
 }
 ```
 
-这个接口是一个**标记接口**，它本身没有定义任何方法。那么这个接口的含义是什么呢：
+这个接口是一个**标记接口**, 它本身没有定义任何方法. 那么这个接口的含义是什么呢: 
 
-1. 它是`ImportSelector`接口的一个变体，在所有的`@Configuration`被处理之后才会执行。在需要筛选的引入类型具备`@Conditional`注解的时候非常有用
-2. 实现类同样也可以实现`Ordered`接口，来定义多个`DeferredImportSelector`的优先级别(同样地，`EnableAutoConfigurationImportSelector`也实现了`Ordered`接口)
+1. 它是`ImportSelector`接口的一个变体, 在所有的`@Configuration`被处理之后才会执行. 在需要筛选的引入类型具备`@Conditional`注解的时候非常有用
+2. 实现类同样也可以实现`Ordered`接口, 来定义多个`DeferredImportSelector`的优先级别(同样地, `EnableAutoConfigurationImportSelector`也实现了`Ordered`接口)
 
-明确了这两个接口的意义，下面来看看是如何实现的：
+明确了这两个接口的意义, 下面来看看是如何实现的: 
 
 ```java
 @Override
@@ -1074,7 +1074,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 }
 ```
 
-很明显，核心就在于上面的**步骤3**：
+很明显, 核心就在于上面的**步骤3**: 
 
 ```java
 protected List<String> getCandidateConfigurations(AnnotationMetadata metadata,
@@ -1088,10 +1088,10 @@ protected List<String> getCandidateConfigurations(AnnotationMetadata metadata,
 }
 ```
 
-它将实现委托给了`SpringFactoriesLoader`的`loadFactoryNames`方法：
+它将实现委托给了`SpringFactoriesLoader`的`loadFactoryNames`方法: 
 
 ```java
-// 传入的factoryClass：org.springframework.boot.autoconfigure.EnableAutoConfiguration
+// 传入的factoryClass: org.springframework.boot.autoconfigure.EnableAutoConfiguration
 public static List<String> loadFactoryNames(Class<?> factoryClass, ClassLoader classLoader) {
     String factoryClassName = factoryClass.getName();
     try {
@@ -1116,11 +1116,11 @@ public static List<String> loadFactoryNames(Class<?> factoryClass, ClassLoader c
 public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
 ```
 
-这段代码的意图很明确，在第一篇文章讨论Spring Boot启动过程的时候就已经接触到了。它会从类路径中拿到所有名为**`META-INF/spring.factories`**的配置文件，然后按照`factoryClass`的名称取到对应的值。那么我们就来找一个**`META-INF/spring.factories`**配置文件看看。
+这段代码的意图很明确, 在第一篇文章讨论Spring Boot启动过程的时候就已经接触到了. 它会从类路径中拿到所有名为**`META-INF/spring.factories`**的配置文件, 然后按照`factoryClass`的名称取到对应的值. 那么我们就来找一个**`META-INF/spring.factories`**配置文件看看. 
 
 #### META-INF/spring.factories
 
-比如`spring-boot-autoconfigure`包：
+比如`spring-boot-autoconfigure`包: 
 
 ```properties
 # Auto Configure
@@ -1135,12 +1135,12 @@ org.springframework.boot.autoconfigure.cloud.CloudAutoConfiguration,\
 # ...
 ```
 
-列举了非常多的自动配置候选项，挑一个AOP相关的`AopAutoConfiguration`看看究竟：
+列举了非常多的自动配置候选项, 挑一个AOP相关的`AopAutoConfiguration`看看究竟: 
 
 ```java
-// 如果设置了spring.aop.auto=false，那么AOP不会被配置
+// 如果设置了spring.aop.auto=false, 那么AOP不会被配置
 // 需要检测到@EnableAspectJAutoProxy注解存在才会生效
-// 默认使用JdkDynamicAutoProxyConfiguration，如果设置了spring.aop.proxy-target-class=true，那么使用CglibAutoProxyConfiguration
+// 默认使用JdkDynamicAutoProxyConfiguration, 如果设置了spring.aop.proxy-target-class=true, 那么使用CglibAutoProxyConfiguration
 @Configuration
 @ConditionalOnClass({ EnableAspectJAutoProxy.class, Aspect.class, Advice.class })
 @ConditionalOnProperty(prefix = "spring.aop", name = "auto", havingValue = "true", matchIfMissing = true)
@@ -1163,15 +1163,15 @@ public class AopAutoConfiguration {
 }
 ```
 
-这个自动配置类的作用是判断是否存在配置项：
+这个自动配置类的作用是判断是否存在配置项: 
 
 ```
 spring.aop.proxy-target-class=true
 ```
 
-如果存在并且值为`true`的话使用基于**CGLIB**字节码操作的动态代理方案，否则使用JDK自带的动态代理机制。
+如果存在并且值为`true`的话使用基于**CGLIB**字节码操作的动态代理方案, 否则使用JDK自带的动态代理机制. 
 
-下面列举所有由Spring Boot提供的条件注解：
+下面列举所有由Spring Boot提供的条件注解: 
 
 - `@ConditionalOnBean`
 - `@ConditionalOnClass`
@@ -1187,15 +1187,15 @@ spring.aop.proxy-target-class=true
 - `@ConditionalOnSingleCandidate`
 - `@ConditionalOnWebApplication`
 
-一般的模式，就是一个条件注解对应一个继承自`SpringBootCondition`的具体实现类。
+一般的模式, 就是一个条件注解对应一个继承自`SpringBootCondition`的具体实现类. 
 
 ## 自定义starter
 
-看完上面描述之后，应该不难发现，自定义starter的关键就是**`META-INF/spring.factories`**了，Spring Boot会在启动时加载这个文件中声明的第三方类。
+看完上面描述之后, 应该不难发现, 自定义starter的关键就是**`META-INF/spring.factories`**了, Spring Boot会在启动时加载这个文件中声明的第三方类. 
 
 ### 自定义properties
 
-为了给可配置的bean属性生成元数据，我们需要引入如下jar包：
+为了给可配置的bean属性生成元数据, 我们需要引入如下jar包: 
 
 ```xml
 <!-- 将被@ConfigurationProperties注解的类的属性注入到元数据 -->
@@ -1216,7 +1216,7 @@ ybd.datasource.password=xxx
 ybd.datasource.dbcp2.validation-query=select 'x'
 ```
 
-> 生成的元数据位于jar文件中的`META-INF/spring-configurationmetadata. json`。元数据本身并不会修改被`@ConfigurationProperties`修饰的类属性，在我的理解里元数据仅仅只是表示配置类的默认值以及java doc，供调用者便利的了解默认配置有哪些以及默认配置的含义，在idea里面如果有元数据则可以提供良好的代码提示功能以方便了解默认的配置。
+> 生成的元数据位于jar文件中的`META-INF/spring-configurationmetadata. json`. 元数据本身并不会修改被`@ConfigurationProperties`修饰的类属性, 在我的理解里元数据仅仅只是表示配置类的默认值以及java doc, 供调用者便利的了解默认配置有哪些以及默认配置的含义, 在idea里面如果有元数据则可以提供良好的代码提示功能以方便了解默认的配置. 
 
 ### properties接收类
 
@@ -1307,26 +1307,26 @@ public class DataSourceConfiguration {
 
 * `@Import`引入其他配置类
 * `@ConditionalOnClass`在指定类存在时该配置类生效
-* `@EnableConfigurationProperties`启用配置接受类，通过Spring字段注入或构造器注入properties配置Bean
+* `@EnableConfigurationProperties`启用配置接受类, 通过Spring字段注入或构造器注入properties配置Bean
 
 ### 使Spring Boot可以自动加载配置类
 
-在`/resource`目录创建**`META-INF/spring.factories`**：
+在`/resource`目录创建**`META-INF/spring.factories`**: 
 
 ```
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.yangbingdong.configuration.WebMvcMessageConvertConfiguration
 ```
 
-然后打包成Jar，第三方Spring Boot系统通过引入这个Jar包，会自动加载该类。
+然后打包成Jar, 第三方Spring Boot系统通过引入这个Jar包, 会自动加载该类. 
 
-如果有需要，可以配合`@AutoConfigureAfter`，`@ConditionalOnBean`，`@ConditionalOnProperty`等注解控制配置是否需要加载以及加载顺序。
+如果有需要, 可以配合`@AutoConfigureAfter`, `@ConditionalOnBean`, `@ConditionalOnProperty`等注解控制配置是否需要加载以及加载顺序. 
 
-需要更灵活的配置可以实现`Condition`或`SpringBootCondition`通过`@Conditional(XXXCondition.class)`实现类加载判断。
+需要更灵活的配置可以实现`Condition`或`SpringBootCondition`通过`@Conditional(XXXCondition.class)`实现类加载判断. 
 
 # 自定义Banner
 
-新建一个`banner.txt`到`resources`目录下：
+新建一个`banner.txt`到`resources`目录下: 
 
 ```
 ${AnsiColor.BRIGHT_GREEN}
@@ -1356,9 +1356,9 @@ ${AnsiStyle.NORMAL}
 
 # 发送邮件
 
-> 各个厂商的STMP服务以及端口请自行搜索。。。
+> 各个厂商的STMP服务以及端口请自行搜索. . . 
 
-主要pom依赖：
+主要pom依赖: 
 
 ```xml
 <dependency>
@@ -1372,7 +1372,7 @@ ${AnsiStyle.NORMAL}
 </dependency>
 ```
 
-邮件模板：
+邮件模板: 
 
 ```html
 <!DOCTYPE html>
@@ -1401,7 +1401,7 @@ spring:
     password: 123123
 ```
 
-发送邮件：
+发送邮件: 
 
 ```java
 @RunWith(SpringRunner.class)
@@ -1425,7 +1425,7 @@ public class SpringBootMailApplicationTests {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom("730493388@qq.com");
 		message.setTo("masteranthoneyd@163.com");
-		message.setSubject("标题：测试标题");
+		message.setSubject("标题: 测试标题");
 		message.setText("测试内容部份");
 		javaMailSender.send(message);
 	}
@@ -1442,7 +1442,7 @@ public class SpringBootMailApplicationTests {
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		helper.setFrom("730493388@qq.com");
 		helper.setTo("masteranthoneyd@163.com");
-		helper.setSubject("标题：测试标题");
+		helper.setSubject("标题: 测试标题");
 		helper.setText(email, true);
 		javaMailSender.send(message);
 	}
@@ -1456,7 +1456,7 @@ public class SpringBootMailApplicationTests {
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		helper.setFrom("masteranthoneyd@163.com");
 		helper.setTo("730493388@qq.com");
-		helper.setSubject("标题：测试标题");
+		helper.setSubject("标题: 测试标题");
 		helper.setText(email, true);
 		javaMailSender.send(message);
 	}
@@ -1466,7 +1466,7 @@ public class SpringBootMailApplicationTests {
 
 # 优雅停机
 
-可参考：***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
+可参考: ***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
 
 ```java
 package com.yangbingdong.docker.config.shutdown;

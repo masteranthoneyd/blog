@@ -9,9 +9,9 @@ tags: [Docker, Swarm]
 
 # Preface
 
-> 在学习了Docker的基本操作之后，接下来就是Docker的管理部分了，这包括Docker的可视化管理以及集群管理。
+> 在学习了Docker的基本操作之后, 接下来就是Docker的管理部分了, 这包括Docker的可视化管理以及集群管理. 
 >
-> 此篇主要记录Docker私有库的搭建，Docker编排工具的介绍以及使用，可视化管理工具的介绍以及搭建...
+> 此篇主要记录Docker私有库的搭建, Docker编排工具的介绍以及使用, 可视化管理工具的介绍以及搭建...
 
 <!--more-->
 
@@ -21,16 +21,16 @@ tags: [Docker, Swarm]
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-arch.png)
 
-Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，通过添加一些企业必需的功能特性，例如安全、标识和管理等，扩展了开源Docker Distribution。作为一个企业级私有Registry服务器，Harbor提供了更好的性能和安全。提升用户使用Registry构建和运行环境传输镜像的效率。Harbor支持安装在多个Registry节点的镜像资源复制，镜像全部保存在私有Registry中， 确保数据和知识产权在公司内部网络中管控。另外，Harbor也提供了高级的安全特性，诸如用户管理，访问控制和活动审计等。
+Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器, 通过添加一些企业必需的功能特性, 例如安全、标识和管理等, 扩展了开源Docker Distribution. 作为一个企业级私有Registry服务器, Harbor提供了更好的性能和安全. 提升用户使用Registry构建和运行环境传输镜像的效率. Harbor支持安装在多个Registry节点的镜像资源复制, 镜像全部保存在私有Registry中, 确保数据和知识产权在公司内部网络中管控. 另外, Harbor也提供了高级的安全特性, 诸如用户管理, 访问控制和活动审计等. 
 
-- **基于角色的访问控制** - 用户与Docker镜像仓库通过“项目”进行组织管理，一个用户可以对多个镜像仓库在同一命名空间（project）里有不同的权限。
-- **镜像复制** - 镜像可以在多个Registry实例中复制（同步）。尤其适合于负载均衡，高可用，混合云和多云的场景。
-- **图形化用户界面** - 用户可以通过浏览器来浏览，检索当前Docker镜像仓库，管理项目和命名空间。
-- **AD/LDAP 支持** - Harbor可以集成企业内部已有的AD/LDAP，用于鉴权认证管理。
-- **审计管理** - 所有针对镜像仓库的操作都可以被记录追溯，用于审计管理。
-- **国际化** - 已拥有英文、中文、德文、日文和俄文的本地化版本。更多的语言将会添加进来。
-- **RESTful API** - RESTful API 提供给管理员对于Harbor更多的操控, 使得与其它管理软件集成变得更容易。
-- **部署简单** - 提供在线和离线两种安装工具， 也可以安装到vSphere平台(OVA方式)虚拟设备。
+- **基于角色的访问控制** - 用户与Docker镜像仓库通过“项目”进行组织管理, 一个用户可以对多个镜像仓库在同一命名空间（project）里有不同的权限. 
+- **镜像复制** - 镜像可以在多个Registry实例中复制（同步）. 尤其适合于负载均衡, 高可用, 混合云和多云的场景. 
+- **图形化用户界面** - 用户可以通过浏览器来浏览, 检索当前Docker镜像仓库, 管理项目和命名空间. 
+- **AD/LDAP 支持** - Harbor可以集成企业内部已有的AD/LDAP, 用于鉴权认证管理. 
+- **审计管理** - 所有针对镜像仓库的操作都可以被记录追溯, 用于审计管理. 
+- **国际化** - 已拥有英文、中文、德文、日文和俄文的本地化版本. 更多的语言将会添加进来. 
+- **RESTful API** - RESTful API 提供给管理员对于Harbor更多的操控, 使得与其它管理软件集成变得更容易. 
+- **部署简单** - 提供在线和离线两种安装工具, 也可以安装到vSphere平台(OVA方式)虚拟设备. 
 
 - 集成clair进行镜像安全漏洞扫描
 
@@ -48,11 +48,11 @@ e.`harbor-ui`:harbor的web页面服务
 
 f.`nginx`:负责流量转发和安全验证
 
-g.`registry`:官方的Docker registry，负责保存镜像
+g.`registry`:官方的Docker registry, 负责保存镜像
 
 ### Condition
 
-前置条件：
+前置条件: 
 
 1.需要`Python2.7`或以上
 
@@ -62,23 +62,23 @@ g.`registry`:官方的Docker registry，负责保存镜像
 
 ### Download
 
-[***Release页面***](https://github.com/vmware/harbor/releases)下载离线安装包（或在线也可以，不过安装的时候很慢）
+[***Release页面***](https://github.com/vmware/harbor/releases)下载离线安装包（或在线也可以, 不过安装的时候很慢）
 
 ### Config
 
-解压缩之后，目录下会生成`harbor.conf`文件，该文件就是Harbor的配置文件。
+解压缩之后, 目录下会生成`harbor.conf`文件, 该文件就是Harbor的配置文件. 
 
 ```
-# 1. hostname设置访问地址，可以使用ip、域名，不可以设置为127.0.0.1或localhost
-# 2. 默认情况下，harbor使用的端口是80，若使用自定义的端口，除了要改docker-compose.yml文件中的配置外，
-# 这里的hostname也要加上自定义的端口，在docker login、push时会报错
+# 1. hostname设置访问地址, 可以使用ip、域名, 不可以设置为127.0.0.1或localhost
+# 2. 默认情况下, harbor使用的端口是80, 若使用自定义的端口, 除了要改docker-compose.yml文件中的配置外, 
+# 这里的hostname也要加上自定义的端口, 在docker login、push时会报错
 # hostname = ${IP_ADDR}:${PORT}
 hostname = 192.168.1.102:8888
 
-# 访问协议，默认是http，也可以设置https，如果设置https，则nginx ssl需要设置on
+# 访问协议, 默认是http, 也可以设置https, 如果设置https, 则nginx ssl需要设置on
 ui_url_protocol = http
 
-# mysql数据库root用户默认密码root123，实际使用时修改下
+# mysql数据库root用户默认密码root123, 实际使用时修改下
 db_password = root123
 
 #Maximum number of job workers in job service  
@@ -87,40 +87,40 @@ max_job_workers = 3
 #The path of secretkey storage
 secretkey_path = /data
 
-# 启动Harbor后，管理员UI登录的密码，默认是Harbor12345
-# 若修改了此处的admin登录密码。则登录后台时使用修改后的密码
+# 启动Harbor后, 管理员UI登录的密码, 默认是Harbor12345
+# 若修改了此处的admin登录密码. 则登录后台时使用修改后的密码
 harbor_admin_password = Harbor12345
 
-# 认证方式，这里支持多种认证方式，如LADP、本次存储、数据库认证。默认是db_auth，mysql数据库认证
+# 认证方式, 这里支持多种认证方式, 如LADP、本次存储、数据库认证. 默认是db_auth, mysql数据库认证
 auth_mode = db_auth
 
 # 是否开启自注册
 self_registration = on
 
-# Token有效时间，默认30分钟
+# Token有效时间, 默认30分钟
 token_expiration = 30
 
-# 用户创建项目权限控制，默认是everyone（所有人），也可以设置为adminonly（只能管理员）
+# 用户创建项目权限控制, 默认是everyone（所有人）, 也可以设置为adminonly（只能管理员）
 project_creation_restriction = everyone
 ```
 
-harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.yml`也需要修改`proxy`的端口
+harbor默认监听80端口, 我们修改为8888端口, 同时`docker-compose.yml`也需要修改`proxy`的端口
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/proxy-port.png)
 
-还可以修改仓库的存储位置：
+还可以修改仓库的存储位置: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry-data.png)
 
 ### Install
 
-运行安装脚本：
+运行安装脚本: 
 
 ```
 ./install.sh
 ```
 
-集成clair漏洞扫描：
+集成clair漏洞扫描: 
 
 ```
 ./install.sh --with-clair
@@ -136,9 +136,9 @@ harbor默认监听80端口，我们修改为8888端口，同时`docker-compose.y
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
 
-**帐号密码默认是** `admin/Harbor12345`，可在配置文件`harbor.conf`中修改
+**帐号密码默认是** `admin/Harbor12345`, 可在配置文件`harbor.conf`中修改
 
-**修改配置文件之后**需要重新生成一些内置配置：
+**修改配置文件之后**需要重新生成一些内置配置: 
 
 ```
 ./prepare
@@ -151,9 +151,9 @@ docker-compose up -d
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/refuse.png)
 
-这是因为 Docker 默认**不允许非 `HTTPS` 方式推送镜像**。我们可以通过 Docker 配置来**取消这个限制**，或者配置能够通过 `HTTPS` 访问的私有仓库。
+这是因为 Docker 默认**不允许非 `HTTPS` 方式推送镜像**. 我们可以通过 Docker 配置来**取消这个限制**, 或者配置能够通过 `HTTPS` 访问的私有仓库. 
 
-如果是`systemd` 的系统例如`Ubuntu16.04+`、`Debian 8+`、`centos 7`，可以在`/etc/docker/daemon.json` 中写入如下内容：
+如果是`systemd` 的系统例如`Ubuntu16.04+`、`Debian 8+`、`centos 7`, 可以在`/etc/docker/daemon.json` 中写入如下内容: 
 
 ```
 {
@@ -162,7 +162,7 @@ docker-compose up -d
 }
 ```
 
-然后重新加载Docker：
+然后重新加载Docker: 
 
 ```
 sudo systemctl reload docker
@@ -179,11 +179,11 @@ docker push 192.168.1.102/library/ubuntu:latest
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-push.png)
 
-**注意**：使用`docker stack deploy`时，如果是私有镜像，需要终端登录后加上`--with-registry-auth`选项。
+**注意**: 使用`docker stack deploy`时, 如果是私有镜像, 需要终端登录后加上`--with-registry-auth`选项. 
 
 ### 删除Harbor
 
-**删除harbor，但保留数据**
+**删除harbor, 但保留数据**
 
 ```
 docker-compose down -v
@@ -198,25 +198,25 @@ rm -r /data/registry
 
 **删除镜像**
 
-UI界面操作删除镜像，只是删除元数据，并未删除真实数据，还需要调用registry的garbage-collect进行清理
+UI界面操作删除镜像, 只是删除元数据, 并未删除真实数据, 还需要调用registry的garbage-collect进行清理
 
 ```
 docker-compose stop
 
-docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.2-photon garbage-collect --dry-run /etc/registry/config.yml #只是打印过程，并不删除
+docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.2-photon garbage-collect --dry-run /etc/registry/config.yml #只是打印过程, 并不删除
 
 docker run -it --name gc --rm --volumes-from registry vmware/registry:2.6.2-photon garbage-collect  /etc/registry/config.yml
 
 docker-compose start
 ```
 
-注意：配置文件`config.yml`挂载在`/etc/registry/`下.
+注意: 配置文件`config.yml`挂载在`/etc/registry/`下.
 
 ### 踩坑
 
 #### python版本
 
-在Ubuntu18.04中的python是3+版本的，需要装回2.7版本，不然会有不明异常。。。：
+在Ubuntu18.04中的python是3+版本的, 需要装回2.7版本, 不然会有不明异常. . . : 
 
 ```
 sudo apt install python2.7 python-minimal -y
@@ -224,17 +224,17 @@ sudo apt install python2.7 python-minimal -y
 
 #### Fail to generate key file
 
-这个貌似是openssl的问题，解决方案是将`prepare`中的`empty_subj = "/C=/ST=/L=/O=/CN=/"`改为`empty_subj = "/"`
+这个貌似是openssl的问题, 解决方案是将`prepare`中的`empty_subj = "/C=/ST=/L=/O=/CN=/"`改为`empty_subj = "/"`
 
 ## Registry Mirror
 
 **registry mirror原理**
 
-Docker Hub的镜像数据分为两部分：index数据和registry数据。前者保存了镜像的一些元数据信息，数据量很小；后者保存了镜像的实际数据，数据量比较大。平时我们使用docker pull命令拉取一个镜像时的过程是：先去index获取镜像的一些元数据，然后再去registry获取镜像数据。
+Docker Hub的镜像数据分为两部分: index数据和registry数据. 前者保存了镜像的一些元数据信息, 数据量很小；后者保存了镜像的实际数据, 数据量比较大. 平时我们使用docker pull命令拉取一个镜像时的过程是: 先去index获取镜像的一些元数据, 然后再去registry获取镜像数据. 
 
-所谓registry mirror就是搭建一个registry，然后将docker hub的registry数据缓存到自己本地的registry。整个过程是：当我们使用docker pull去拉镜像的时候，会先从我们本地的registry mirror去获取镜像数据，如果不存在，registry mirror会先从docker hub的registry拉取数据进行缓存，再传给我们。而且整个过程是流式的，registry mirror并不会等全部缓存完再给我们传，而且边缓存边给客户端传。
+所谓registry mirror就是搭建一个registry, 然后将docker hub的registry数据缓存到自己本地的registry. 整个过程是: 当我们使用docker pull去拉镜像的时候, 会先从我们本地的registry mirror去获取镜像数据, 如果不存在, registry mirror会先从docker hub的registry拉取数据进行缓存, 再传给我们. 而且整个过程是流式的, registry mirror并不会等全部缓存完再给我们传, 而且边缓存边给客户端传. 
 
-对于缓存，我们都知道一致性非常重要。registry mirror与docker官方保持一致的方法是：registry mirror只是缓存了docker hub的registry数据，并不缓存index数据。所以我们pull镜像的时候会先连docker hub的index获取镜像的元数据，如果我们registry mirror里面有该镜像的缓存，且数据与从index处获取到的元数据一致，则从registry mirror拉取；如果我们的registry mirror有该镜像的缓存，但数据与index处获取的元数据不一致，或者根本就没有该镜像的缓存，则先从docker hub的registry缓存或者更新数据。
+对于缓存, 我们都知道一致性非常重要. registry mirror与docker官方保持一致的方法是: registry mirror只是缓存了docker hub的registry数据, 并不缓存index数据. 所以我们pull镜像的时候会先连docker hub的index获取镜像的元数据, 如果我们registry mirror里面有该镜像的缓存, 且数据与从index处获取到的元数据一致, 则从registry mirror拉取；如果我们的registry mirror有该镜像的缓存, 但数据与index处获取的元数据不一致, 或者根本就没有该镜像的缓存, 则先从docker hub的registry缓存或者更新数据. 
 
 1、拉取镜像
 
@@ -248,7 +248,7 @@ docker pull registry:latest
 docker run -it --rm --entrypoint cat registry:latest  /etc/docker/registry/config.yml > config.yml
 ```
 
-内容可能如下：
+内容可能如下: 
 
 ```
 version: 0.1
@@ -271,7 +271,7 @@ health:
     threshold: 3
 ```
 
-我们在最后面加上如下配置：
+我们在最后面加上如下配置: 
 
 ```
 proxy:
@@ -280,9 +280,9 @@ proxy:
   password: [password]
 ```
 
-`username`和`password`是可选的，如果配置了的话，那registry mirror除了可以缓存所有的公共镜像外，也可以访问这个用户所有的私有镜像。
+`username`和`password`是可选的, 如果配置了的话, 那registry mirror除了可以缓存所有的公共镜像外, 也可以访问这个用户所有的私有镜像. 
 
-启动registry容器：
+启动registry容器: 
 
 Bash
 
@@ -290,7 +290,7 @@ Bash
 docker run  --restart=always -p 5000:5000 --name v2-mirror -v /data:/var/lib/registry -v  $PWD/config.yml:/etc/registry/config.yml registry:latest /etc/registry/config.yml
 ```
 
-当然我们也可以使用docker-compose启动：
+当然我们也可以使用docker-compose启动: 
 
 ```
 version: '3'
@@ -308,7 +308,7 @@ services:
       ["serve", "/etc/registry/config.yml"]
 ```
 
-curl验证一下服务是否启动OK：
+curl验证一下服务是否启动OK: 
 
 ```
 # ybd @ ybd-PC in ~ [17:30:14] 
@@ -327,35 +327,35 @@ Content-Type: text/plain; charset=utf-8
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-compose-logo.png)
 
-> 官方文档：[***https://docs.docker.com/compose/***](https://docs.docker.com/compose/)
+> 官方文档: [***https://docs.docker.com/compose/***](https://docs.docker.com/compose/)
 >
-> release：[***https://github.com/docker/compose/releases***](https://github.com/docker/compose/releases)
+> release: [***https://github.com/docker/compose/releases***](https://github.com/docker/compose/releases)
 
-Compose是定义和运行多容器Docker应用程序的工具，使用Compose，您可以使用YAML文件来配置应用程序的服务，然后，使用单个命令创建并启动配置中的所有服务。
+Compose是定义和运行多容器Docker应用程序的工具, 使用Compose, 您可以使用YAML文件来配置应用程序的服务, 然后, 使用单个命令创建并启动配置中的所有服务. 
 
-Dockerfile 可以让用户管理一个单独的应用容器。使用Docker Compose，不再需要使用shell脚本来启动容器。在配置文件中，所有的容器通过services来定义，然后使用`docker-compose`脚本来启动，停止和重启应用，和应用中的服务以及所有依赖服务的容器
+Dockerfile 可以让用户管理一个单独的应用容器. 使用Docker Compose, 不再需要使用shell脚本来启动容器. 在配置文件中, 所有的容器通过services来定义, 然后使用`docker-compose`脚本来启动, 停止和重启应用, 和应用中的服务以及所有依赖服务的容器
 
 ### Install
 
-最新安装请看官方文档：***[https://docs.docker.com/compose/install/#install-compose](https://docs.docker.com/compose/install/#install-compose)***
+最新安装请看官方文档: ***[https://docs.docker.com/compose/install/#install-compose](https://docs.docker.com/compose/install/#install-compose)***
 
 ```
 sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 ```
 
-变为可执行命令：
+变为可执行命令: 
 
 ```
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-检查安装成功：
+检查安装成功: 
 
 ```
 docker-compose --version
 ```
 
-卸载：
+卸载: 
 
 ```
 sudo rm /usr/local/bin/docker-compose
@@ -363,7 +363,7 @@ sudo rm /usr/local/bin/docker-compose
 
 ### Command
 
-基本命令：
+基本命令: 
 
 `-p` 指定项目名称
 
@@ -397,11 +397,11 @@ sudo rm /usr/local/bin/docker-compose
 
 `docker-compose stop` 停止已经存在的服务容器
 
-`docker-compose up` 自动构建、创建服务、启动服务，关联一系列，运行在前台，ctrl c 就都停止运行。如果容器已经存在，将会尝试停止容器，重新创建。如果不希望重新创建，可以 `--no-recreate` 就只启动处于停止状态的容器，如果只想重新部署某个服务，可以使用
+`docker-compose up` 自动构建、创建服务、启动服务, 关联一系列, 运行在前台, ctrl c 就都停止运行. 如果容器已经存在, 将会尝试停止容器, 重新创建. 如果不希望重新创建, 可以 `--no-recreate` 就只启动处于停止状态的容器, 如果只想重新部署某个服务, 可以使用
 
-`docker-compose up --no-deps -d` ，不影响其所依赖的服务
+`docker-compose up --no-deps -d` , 不影响其所依赖的服务
 
-`docker-compose up -d` 后台启动运行，生产环境必备
+`docker-compose up -d` 后台启动运行, 生产环境必备
 
 `docker-compose down` 停止并删除容器
 
@@ -412,21 +412,21 @@ mkdir -p ~/.zsh/completion
 curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/zsh/_docker-compose > ~/.zsh/completion/_docker-compose
 ```
 
-在`.zshrc`添加：
+在`.zshrc`添加: 
 
-**注意**：(如果是`oh-my-zsh`，在`$ZSH/oh-my-zsh.sh`中添加)
+**注意**: (如果是`oh-my-zsh`, 在`$ZSH/oh-my-zsh.sh`中添加)
 
 ```
 fpath=(~/.zsh/completion $fpath)
 ```
 
-执行：
+执行: 
 
 ```
 autoload -Uz compinit && compinit -i
 ```
 
-重载：
+重载: 
 
 ```
 exec $SHELL -l
@@ -434,9 +434,9 @@ exec $SHELL -l
 
 ### Compose 文件指令
 
-> 最新参看文档： ***[https://docs.docker.com/compose/compose-file/](https://docs.docker.com/compose/compose-file/)***
+> 最新参看文档: ***[https://docs.docker.com/compose/compose-file/](https://docs.docker.com/compose/compose-file/)***
 
-默认的模板文件名称为 `docker-compose.yml`，格式为 YAML 格式。
+默认的模板文件名称为 `docker-compose.yml`, 格式为 YAML 格式. 
 
 ```
 version: "3"
@@ -449,13 +449,13 @@ services:
       - "/data"
 ```
 
-注意每个服务都必须通过 `image` 指令指定镜像或 `build` 指令（需要 Dockerfile）等来自动构建生成镜像。
+注意每个服务都必须通过 `image` 指令指定镜像或 `build` 指令（需要 Dockerfile）等来自动构建生成镜像. 
 
-如果使用 `build` 指令，在 `Dockerfile` 中设置的选项(例如：`CMD`, `EXPOSE`, `VOLUME`, `ENV` 等) 将会自动被获取，无需在 `docker-compose.yml` 中再次设置。下面分别介绍各个指令的用法。
+如果使用 `build` 指令, 在 `Dockerfile` 中设置的选项(例如: `CMD`, `EXPOSE`, `VOLUME`, `ENV` 等) 将会自动被获取, 无需在 `docker-compose.yml` 中再次设置. 下面分别介绍各个指令的用法. 
 
 #### `build`
 
-指定 `Dockerfile` 所在文件夹的路径（可以是绝对路径，或者相对 docker-compose.yml 文件的路径）。 `Compose` 将会利用它自动构建这个镜像，然后使用这个镜像。
+指定 `Dockerfile` 所在文件夹的路径（可以是绝对路径, 或者相对 docker-compose.yml 文件的路径）. `Compose` 将会利用它自动构建这个镜像, 然后使用这个镜像. 
 
 ```
 version: '3'
@@ -466,11 +466,11 @@ services:
 
 ```
 
-你也可以使用 `context` 指令指定 `Dockerfile` 所在文件夹的路径。
+你也可以使用 `context` 指令指定 `Dockerfile` 所在文件夹的路径. 
 
-使用 `dockerfile` 指令指定 `Dockerfile` 文件名。
+使用 `dockerfile` 指令指定 `Dockerfile` 文件名. 
 
-使用 `arg` 指令指定构建镜像时的变量。
+使用 `arg` 指令指定构建镜像时的变量. 
 
 ```
 version: '3'
@@ -497,9 +497,9 @@ build:
 
 #### `cap_add, cap_drop`
 
-指定容器的内核能力（capacity）分配。
+指定容器的内核能力（capacity）分配. 
 
-例如，让容器拥有所有能力可以指定为：
+例如, 让容器拥有所有能力可以指定为: 
 
 ```
 cap_add:
@@ -507,7 +507,7 @@ cap_add:
 
 ```
 
-去掉 NET_ADMIN 能力可以指定为：
+去掉 NET_ADMIN 能力可以指定为: 
 
 ```
 cap_drop:
@@ -517,7 +517,7 @@ cap_drop:
 
 #### `command`
 
-覆盖容器启动后默认执行的命令。
+覆盖容器启动后默认执行的命令. 
 
 ```
 command: echo "hello world"
@@ -525,13 +525,13 @@ command: echo "hello world"
 
 #### `configs`
 
-仅用于 `Swarm mode`，详细内容请查看下面Swarm模式介绍
+仅用于 `Swarm mode`, 详细内容请查看下面Swarm模式介绍
 
 #### `cgroup_parent`
 
-指定父 `cgroup` 组，意味着将继承该组的资源限制。
+指定父 `cgroup` 组, 意味着将继承该组的资源限制. 
 
-例如，创建了一个 cgroup 组名称为 `cgroups_1`。
+例如, 创建了一个 cgroup 组名称为 `cgroups_1`. 
 
 ```
 cgroup_parent: cgroups_1
@@ -540,20 +540,20 @@ cgroup_parent: cgroups_1
 
 #### `container_name`
 
-指定容器名称。默认将会使用 `项目名称_服务名称_序号` 这样的格式。
+指定容器名称. 默认将会使用 `项目名称_服务名称_序号` 这样的格式. 
 
 ```
 container_name: docker-web-container
 
 ```
 
-> 注意: 指定容器名称后，该服务将**无法进行扩展**（**scale**），因为 Docker 不允许多个容器具有相同的名称。
+> 注意: 指定容器名称后, 该服务将**无法进行扩展**（**scale**）, 因为 Docker 不允许多个容器具有相同的名称. 
 
 #### `deploy`
 
-仅用于 `Swarm mode`，这是 V3 才能使用的语法，通过`docker-compose up`方式启动会忽略这部分。
+仅用于 `Swarm mode`, 这是 V3 才能使用的语法, 通过`docker-compose up`方式启动会忽略这部分. 
 
-语法规则：
+语法规则: 
 
 ```
 deploy:
@@ -567,27 +567,27 @@ deploy:
 
 ##### `mode`
 
-首先 deploy 提供了一个模式选项，它的值有 `global` 和 `replicated` 两个，默认是 `replicated` 模式。
+首先 deploy 提供了一个模式选项, 它的值有 `global` 和 `replicated` 两个, 默认是 `replicated` 模式. 
 
-这两个模式的区别是：
+这两个模式的区别是: 
 
-- `global`：每个集群每个服务实例启动一个容器，就像以前启动 Service 时一样。
-- `replicated`：用户可以指定集群中实例的副本数量。
+- `global`: 每个集群每个服务实例启动一个容器, 就像以前启动 Service 时一样. 
+- `replicated`: 用户可以指定集群中实例的副本数量. 
 
-以前这个功能是无法在 Compose 中直接实现的，以前需要用户先使用 `docker-compose bundle` 命令将 docker-compose.yml 转换为 .dab 文件，然后才能拿到集群部署，而且很多功能用不了。
+以前这个功能是无法在 Compose 中直接实现的, 以前需要用户先使用 `docker-compose bundle` 命令将 docker-compose.yml 转换为 .dab 文件, 然后才能拿到集群部署, 而且很多功能用不了. 
 
-但是随着这次更新把 stack 加进来了，deploy 也就水到渠成加进了 Compose 功能中。
+但是随着这次更新把 stack 加进来了, deploy 也就水到渠成加进了 Compose 功能中. 
 
 ##### `replicas`
 
-上面说到可以指定副本数量，其中 replicas 就是用于指定副本数量的选项。
+上面说到可以指定副本数量, 其中 replicas 就是用于指定副本数量的选项. 
 
 ```
 deploy:
   replicas: 6
 ```
 
-部署服务栈：
+部署服务栈: 
 
 ```
 docker stack deploy --compose-file docker-compose.yml
@@ -595,7 +595,7 @@ docker stack deploy --compose-file docker-compose.yml
 
 ##### `placement`
 
-这是 Docker 1.12 版本时就引入的概念，允许用户限制服务容器，下面是官方的说明：
+这是 Docker 1.12 版本时就引入的概念, 允许用户限制服务容器, 下面是官方的说明: 
 
 | node attribute  | matches                  | example                                  |
 | --------------- | ------------------------ | ---------------------------------------- |
@@ -621,19 +621,19 @@ services:
 
 ##### `update_config`
 
-早在上一个版本中，Swarm 就提供了一个升级回滚的功能。当服务升级出现故障时，超过重试次数则停止升级的功能，这也很方便，避免让错误的应用替代现有正常服务。
+早在上一个版本中, Swarm 就提供了一个升级回滚的功能. 当服务升级出现故障时, 超过重试次数则停止升级的功能, 这也很方便, 避免让错误的应用替代现有正常服务. 
 
-这个选项用于告诉 Compose 使用怎样的方式升级，以及升级失败后怎样回滚原来的服务。
+这个选项用于告诉 Compose 使用怎样的方式升级, 以及升级失败后怎样回滚原来的服务. 
 
-- `parallelism`: 服务中多个容器同时更新。
-- `delay`: 设置每组容器更新之间的延迟时间。
-- `failure_action`: 设置更新失败时的动作，可选值有 continue 与 pause (默认是：pause)。
-- `monitor`: 每次任务更新失败后监视故障的持续时间 (ns|us|ms|s|m|h) (默认：0s)。
-- `max_failure_ratio`: 更新期间容忍的故障率。
+- `parallelism`: 服务中多个容器同时更新. 
+- `delay`: 设置每组容器更新之间的延迟时间. 
+- `failure_action`: 设置更新失败时的动作, 可选值有 continue 与 pause (默认是: pause). 
+- `monitor`: 每次任务更新失败后监视故障的持续时间 (ns|us|ms|s|m|h) (默认: 0s). 
+- `max_failure_ratio`: 更新期间容忍的故障率. 
 
 ##### `resources`
 
-看例子：
+看例子: 
 
 ```
 resources:
@@ -645,20 +645,20 @@ resources:
     memory: 20M
 ```
 
-知道干啥用了吧，这是一个新的语法选项，替代了之前的类似 `cpu_shares`, `cpu_quota`, `cpuset`, `mem_limit`, `memswap_limit` 这种选项。统一起来好看点。
+知道干啥用了吧, 这是一个新的语法选项, 替代了之前的类似 `cpu_shares`, `cpu_quota`, `cpuset`, `mem_limit`, `memswap_limit` 这种选项. 统一起来好看点. 
 
 ##### `restart_policy`
 
-设置如何重启容器，毕竟有时候容器会意外退出。
+设置如何重启容器, 毕竟有时候容器会意外退出. 
 
-- `condition`：设置重启策略的条件，可选值有 none, on-failure 和 any (默认：any)。
-- `delay`：在重新启动尝试之间等待多长时间，指定为持续时间（默认值：0）。
-- `max_attempts`：设置最大的重启尝试次数，默认是永不放弃，哈哈，感受到一股运维的绝望。
-- `window`：在决定重新启动是否成功之前要等待多长时间，默认是立刻判断，有些容器启动时间比较长，指定一个“窗口期”非常重要。
+- `condition`: 设置重启策略的条件, 可选值有 none, on-failure 和 any (默认: any). 
+- `delay`: 在重新启动尝试之间等待多长时间, 指定为持续时间（默认值: 0）. 
+- `max_attempts`: 设置最大的重启尝试次数, 默认是永不放弃, 哈哈, 感受到一股运维的绝望. 
+- `window`: 在决定重新启动是否成功之前要等待多长时间, 默认是立刻判断, 有些容器启动时间比较长, 指定一个“窗口期”非常重要. 
 
 #### `devices`
 
-指定设备映射关系。
+指定设备映射关系. 
 
 ```
 devices:
@@ -667,7 +667,7 @@ devices:
 
 #### `depends_on`
 
-解决容器的依赖、**启动先后的问题**。以下例子中会先启动 `redis` `db` 再启动 `web`
+解决容器的依赖、**启动先后的问题**. 以下例子中会先启动 `redis` `db` 再启动 `web`
 
 ```
 version: '3'
@@ -687,11 +687,11 @@ services:
 
 ```
 
-> 注意：`web` 服务不会等待 `redis` `db` 「完全启动」之后才启动。
+> 注意: `web` 服务不会等待 `redis` `db` 「完全启动」之后才启动. 
 
 #### `dns`
 
-自定义 `DNS` 服务器。可以是一个值，也可以是一个列表。
+自定义 `DNS` 服务器. 可以是一个值, 也可以是一个列表. 
 
 ```
 dns: 8.8.8.8
@@ -704,7 +704,7 @@ dns:
 
 #### `dns_search`
 
-配置 `DNS` 搜索域。可以是一个值，也可以是一个列表。
+配置 `DNS` 搜索域. 可以是一个值, 也可以是一个列表. 
 
 ```
 dns_search: example.com
@@ -717,7 +717,7 @@ dns_search:
 
 #### `tmpfs`
 
-挂载一个 tmpfs 文件系统到容器。
+挂载一个 tmpfs 文件系统到容器. 
 
 ```
 tmpfs: /run
@@ -729,11 +729,11 @@ tmpfs:
 
 #### `env_file`
 
-从文件中获取环境变量，可以为单独的文件路径或列表，默认读当前目录`.env`。
+从文件中获取环境变量, 可以为单独的文件路径或列表, 默认读当前目录`.env`. 
 
-如果通过 `docker-compose -f FILE` 方式来指定 Compose 模板文件，则 `env_file` 中变量的路径会**基于模板文件路径**。
+如果通过 `docker-compose -f FILE` 方式来指定 Compose 模板文件, 则 `env_file` 中变量的路径会**基于模板文件路径**. 
 
-如果有变量名称与 `environment` 指令冲突，则按照惯例，**以后者为准**。
+如果有变量名称与 `environment` 指令冲突, 则按照惯例, **以后者为准**. 
 
 ```
 env_file: .env
@@ -744,7 +744,7 @@ env_file:
   - /opt/secrets.env
 ```
 
-环境变量文件中每一行必须符合格式，支持 `#` 开头的注释行。
+环境变量文件中每一行必须符合格式, 支持 `#` 开头的注释行. 
 
 ```
 # common.env: Set development environment
@@ -753,9 +753,9 @@ PROG_ENV=development
 
 #### `environment`
 
-设置环境变量。你可以使用数组或字典两种格式。
+设置环境变量. 你可以使用数组或字典两种格式. 
 
-**只给定名称的变量会自动获取运行 Compose 主机上对应变量的值**，**可以用来防止泄露不必要的数据**。
+**只给定名称的变量会自动获取运行 Compose 主机上对应变量的值**, **可以用来防止泄露不必要的数据**. 
 
 ```
 environment:
@@ -767,7 +767,7 @@ environment:
   - SESSION_SECRET
 ```
 
-如果变量名称或者值中用到 `true|false，yes|no` 等表达 [布尔](http://yaml.org/type/bool.html) 含义的词汇，**最好放到引号里**，避免 YAML 自动解析某些内容为对应的布尔语义。这些特定词汇，包括
+如果变量名称或者值中用到 `true|false, yes|no` 等表达 [布尔](http://yaml.org/type/bool.html) 含义的词汇, **最好放到引号里**, 避免 YAML 自动解析某些内容为对应的布尔语义. 这些特定词汇, 包括
 
 ```
 y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF
@@ -776,7 +776,7 @@ y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|O
 
 #### `expose`
 
-暴露端口，但不映射到宿主机，只被连接的服务访问。
+暴露端口, 但不映射到宿主机, 只被连接的服务访问. 
 
 仅可以指定内部端口为参数
 
@@ -789,9 +789,9 @@ expose:
 
 #### `external_links`
 
-> 注意：不建议使用该指令。
+> 注意: 不建议使用该指令. 
 
-链接到 `docker-compose.yml` 外部的容器，甚至并非 `Compose` 管理的外部容器。
+链接到 `docker-compose.yml` 外部的容器, 甚至并非 `Compose` 管理的外部容器. 
 
 ```
 external_links:
@@ -803,7 +803,7 @@ external_links:
 
 #### `extra_hosts`
 
-类似 Docker 中的 `--add-host` 参数，指定额外的 host 名称映射信息。
+类似 Docker 中的 `--add-host` 参数, 指定额外的 host 名称映射信息. 
 
 ```
 extra_hosts:
@@ -811,7 +811,7 @@ extra_hosts:
  - "dockerhub:52.1.157.61"
 ```
 
-会在启动后的服务容器中 `/etc/hosts` 文件中添加如下两条条目。
+会在启动后的服务容器中 `/etc/hosts` 文件中添加如下两条条目. 
 
 ```
 8.8.8.8 googledns
@@ -820,7 +820,7 @@ extra_hosts:
 
 #### `healthcheck`
 
-通过命令检查容器是否健康运行。
+通过命令检查容器是否健康运行. 
 
 ```
 healthcheck:
@@ -832,7 +832,7 @@ healthcheck:
 
 #### `image`
 
-指定为镜像名称或镜像 ID。如果镜像在本地不存在，`Compose` 将会尝试拉去这个镜像。
+指定为镜像名称或镜像 ID. 如果镜像在本地不存在, `Compose` 将会尝试拉去这个镜像. 
 
 ```
 image: ubuntu
@@ -843,7 +843,7 @@ image: a4bc65fd
 
 #### `labels`
 
-为容器添加 Docker 元数据（metadata）信息。例如可以为容器添加辅助说明信息。
+为容器添加 Docker 元数据（metadata）信息. 例如可以为容器添加辅助说明信息. 
 
 ```
 labels:
@@ -854,11 +854,11 @@ labels:
 
 #### `links`
 
-> 注意：不推荐使用该指令。
+> 注意: 不推荐使用该指令. 
 
 #### `logging`
 
-配置日志选项。
+配置日志选项. 
 
 ```
 logging:
@@ -867,7 +867,7 @@ logging:
     syslog-address: "tcp://192.168.0.42:123"
 ```
 
-目前支持三种日志驱动类型。
+目前支持三种日志驱动类型. 
 
 ```
 driver: "json-file"
@@ -876,7 +876,7 @@ driver: "none"
 
 ```
 
-`options` 配置日志驱动的相关参数。
+`options` 配置日志驱动的相关参数. 
 
 ```
 options:
@@ -884,11 +884,11 @@ options:
   max-file: "10"
 ```
 
-更多详情：[https://docs.docker.com/engine/admin/logging/overview/](https://docs.docker.com/engine/admin/logging/overview/)
+更多详情: [https://docs.docker.com/engine/admin/logging/overview/](https://docs.docker.com/engine/admin/logging/overview/)
 
 #### `network_mode`
 
-设置网络模式。使用和 `docker run` 的 `--network` 参数一样的值。
+设置网络模式. 使用和 `docker run` 的 `--network` 参数一样的值. 
 
 ```
 network_mode: "bridge"
@@ -900,7 +900,7 @@ network_mode: "container:[container name/id]"
 
 #### `networks`
 
-配置容器连接的网络。
+配置容器连接的网络. 
 
 ```
 version: "3"
@@ -916,11 +916,11 @@ networks:
   other-network:
 ```
 
-Docker 网络类型，有 `bridge` `overlay`，默认为`bridge`。其中 `overlay` 网络类型用于 `Swarm mode`
+Docker 网络类型, 有 `bridge` `overlay`, 默认为`bridge`. 其中 `overlay` 网络类型用于 `Swarm mode`
 
 #### `pid`
 
-跟主机系统共享进程命名空间。打开该选项的容器之间，以及容器和宿主机系统之间可以通过进程 ID 来相互访问和操作。
+跟主机系统共享进程命名空间. 打开该选项的容器之间, 以及容器和宿主机系统之间可以通过进程 ID 来相互访问和操作. 
 
 ```
 pid: "host"
@@ -928,9 +928,9 @@ pid: "host"
 
 #### `ports`
 
-暴露端口信息。
+暴露端口信息. 
 
-使用宿主端口：容器端口 `(HOST:CONTAINER)` 格式，或者仅仅指定容器的端口（宿主将会随机选择端口）都可以。
+使用宿主端口: 容器端口 `(HOST:CONTAINER)` 格式, 或者仅仅指定容器的端口（宿主将会随机选择端口）都可以. 
 
 ```
 ports:
@@ -940,11 +940,11 @@ ports:
  - "127.0.0.1:8001:8001"
 ```
 
-*注意：当使用 HOST:CONTAINER 格式来映射端口时，如果你使用的容器端口小于 60 并且没放到引号里，可能会得到错误结果，因为 YAML 会自动解析 xx:yy 这种数字格式为 60 进制。为避免出现这种问题，建议数字串都采用引号包括起来的字符串格式。*
+*注意: 当使用 HOST:CONTAINER 格式来映射端口时, 如果你使用的容器端口小于 60 并且没放到引号里, 可能会得到错误结果, 因为 YAML 会自动解析 xx:yy 这种数字格式为 60 进制. 为避免出现这种问题, 建议数字串都采用引号包括起来的字符串格式. *
 
 #### `secrets`
 
-存储敏感数据，例如 `mysql` 服务密码。
+存储敏感数据, 例如 `mysql` 服务密码. 
 
 ```
 version: "3"
@@ -967,7 +967,7 @@ secrets:
 
 #### `security_opt`
 
-指定容器模板标签（label）机制的默认属性（用户、角色、类型、级别等）。例如配置标签的用户名和角色名。
+指定容器模板标签（label）机制的默认属性（用户、角色、类型、级别等）. 例如配置标签的用户名和角色名. 
 
 ```
 security_opt:
@@ -977,7 +977,7 @@ security_opt:
 
 #### `stop_signal`
 
-设置另一个信号来停止容器。在默认情况下使用的是 SIGTERM 停止容器。
+设置另一个信号来停止容器. 在默认情况下使用的是 SIGTERM 停止容器. 
 
 ```
 stop_signal: SIGUSR1
@@ -985,7 +985,7 @@ stop_signal: SIGUSR1
 
 #### `sysctls`
 
-配置容器内核参数。
+配置容器内核参数. 
 
 ```
 sysctls:
@@ -999,9 +999,9 @@ sysctls:
 
 #### `ulimits`
 
-指定容器的 ulimits 限制值。
+指定容器的 ulimits 限制值. 
 
-例如，指定最大进程数为 65535，指定文件句柄数为 20000（软限制，应用可以随时修改，不能超过硬限制） 和 40000（系统硬限制，只能 root 用户提高）。
+例如, 指定最大进程数为 65535, 指定文件句柄数为 20000（软限制, 应用可以随时修改, 不能超过硬限制） 和 40000（系统硬限制, 只能 root 用户提高）. 
 
 ```
   ulimits:
@@ -1013,9 +1013,9 @@ sysctls:
 
 #### `volumes`
 
-数据卷所挂载路径设置。可以设置宿主机路径 （`HOST:CONTAINER`） 或加上访问模式 （`HOST:CONTAINER:ro`）。
+数据卷所挂载路径设置. 可以设置宿主机路径 （`HOST:CONTAINER`） 或加上访问模式 （`HOST:CONTAINER:ro`）. 
 
-该指令中路径支持相对路径。
+该指令中路径支持相对路径. 
 
 ```
 volumes:
@@ -1026,27 +1026,27 @@ volumes:
 
 #### 其它指令
 
-此外，还有包括 `domainname, entrypoint, hostname, ipc, mac_address, privileged, read_only, shm_size, restart, stdin_open, tty, user, working_dir` 等指令，基本跟 `docker run` 中对应参数的功能一致。
+此外, 还有包括 `domainname, entrypoint, hostname, ipc, mac_address, privileged, read_only, shm_size, restart, stdin_open, tty, user, working_dir` 等指令, 基本跟 `docker run` 中对应参数的功能一致. 
 
-指定服务容器启动后执行的入口文件。
+指定服务容器启动后执行的入口文件. 
 
 ```
 entrypoint: /code/entrypoint.sh
 ```
 
-指定容器中运行应用的用户名。
+指定容器中运行应用的用户名. 
 
 ```
 user: nginx
 ```
 
-指定容器中工作目录。
+指定容器中工作目录. 
 
 ```
 working_dir: /code
 ```
 
-指定容器中搜索域名、主机名、mac 地址等。
+指定容器中搜索域名、主机名、mac 地址等. 
 
 ```
 domainname: your_website.com
@@ -1054,31 +1054,31 @@ hostname: test
 mac_address: 08-00-27-00-0C-0A
 ```
 
-允许容器中运行一些特权命令。
+允许容器中运行一些特权命令. 
 
 ```
 privileged: true
 ```
 
-指定容器退出后的重启策略为始终重启。该命令对保持服务始终运行十分有效，在生产环境中推荐配置为 `always` 或者 `unless-stopped`。
+指定容器退出后的重启策略为始终重启. 该命令对保持服务始终运行十分有效, 在生产环境中推荐配置为 `always` 或者 `unless-stopped`. 
 
 ```
 restart: always
 ```
 
-以只读模式挂载容器的 root 文件系统，意味着不能对容器内容进行修改。
+以只读模式挂载容器的 root 文件系统, 意味着不能对容器内容进行修改. 
 
 ```
 read_only: true
 ```
 
-打开标准输入，可以接受外部输入。
+打开标准输入, 可以接受外部输入. 
 
 ```
 stdin_open: true
 ```
 
-模拟一个伪终端。
+模拟一个伪终端. 
 
 ```
 tty: true
@@ -1086,9 +1086,9 @@ tty: true
 
 #### 读取变量
 
-Compose 模板文件支持动态读取主机的系统环境变量和当前目录下的 `.env` 文件中的变量。
+Compose 模板文件支持动态读取主机的系统环境变量和当前目录下的 `.env` 文件中的变量. 
 
-例如，下面的 Compose 文件将从运行它的环境中读取变量 `${MONGO_VERSION}` 的值，并写入执行的指令中。
+例如, 下面的 Compose 文件将从运行它的环境中读取变量 `${MONGO_VERSION}` 的值, 并写入执行的指令中. 
 
 ```
 version: "3"
@@ -1099,20 +1099,20 @@ db:
 
 ```
 
-如果执行 `MONGO_VERSION=3.2 docker-compose up` 则会启动一个 `mongo:3.2` 镜像的容器；如果执行 `MONGO_VERSION=2.8 docker-compose up` 则会启动一个 `mongo:2.8` 镜像的容器。
+如果执行 `MONGO_VERSION=3.2 docker-compose up` 则会启动一个 `mongo:3.2` 镜像的容器；如果执行 `MONGO_VERSION=2.8 docker-compose up` 则会启动一个 `mongo:2.8` 镜像的容器. 
 
-若当前目录存在 `.env` 文件，执行 `docker-compose` 命令时将从该文件中读取变量。
+若当前目录存在 `.env` 文件, 执行 `docker-compose` 命令时将从该文件中读取变量. 
 
-在当前目录新建 `.env` 文件并写入以下内容。
+在当前目录新建 `.env` 文件并写入以下内容. 
 
 ```
 # 支持 # 号注释
 MONGO_VERSION=3.6
 ```
 
-执行 `docker-compose up` 则会启动一个 `mongo:3.6` 镜像的容器。
+执行 `docker-compose up` 则会启动一个 `mongo:3.6` 镜像的容器. 
 
-**官方例子**：
+**官方例子**: 
 
 ```
 version: "3"
@@ -1210,15 +1210,15 @@ volumes:
 
 ### 理解多compose文件组合
 
-默认，`compose`会读取两个文件，一个`docker-compose.yml`和一个可选的`docker-compose.override.yml`文件。通常，`docker-compose.yml`文件包含你的基本配置，而`docker-compose.override.yml`，顾名思义，就是包含的现有服务配置的覆盖内容，或完全新的配置。
+默认, `compose`会读取两个文件, 一个`docker-compose.yml`和一个可选的`docker-compose.override.yml`文件. 通常, `docker-compose.yml`文件包含你的基本配置, 而`docker-compose.override.yml`, 顾名思义, 就是包含的现有服务配置的覆盖内容, 或完全新的配置. 
 
-如果一个服务在这两个文件中都有定义，那么`compose`将使用[添加和覆盖配置](https://docs.docker.com/compose/extends/#adding-and-overriding-configuration)中所描述的规则来合并服务
+如果一个服务在这两个文件中都有定义, 那么`compose`将使用[添加和覆盖配置](https://docs.docker.com/compose/extends/#adding-and-overriding-configuration)中所描述的规则来合并服务
 
-要使用多个`override`文件或不同名称的`override`文件，可以使用`-f`选项来指定文件列表。`compose`**根据在命令行指定的顺序来合并它们**。
+要使用多个`override`文件或不同名称的`override`文件, 可以使用`-f`选项来指定文件列表. `compose`**根据在命令行指定的顺序来合并它们**. 
 
-当使用多个配置文件时，必须确保文件中所有的路径都是**相对于**`base compose`文件的(`-f` 指定的第一个`compose`文件)。这样要求是因为`override`文件不需要一个有效的`compose`文件。`override`文件可以只包含配置中的一小片段。跟踪一个服务的片段是相对于那个路径的，这是很困难的事，所以一定要保持路径容易理解，所以路径必须定义为相对于base文件的路径。
+当使用多个配置文件时, 必须确保文件中所有的路径都是**相对于**`base compose`文件的(`-f` 指定的第一个`compose`文件). 这样要求是因为`override`文件不需要一个有效的`compose`文件. `override`文件可以只包含配置中的一小片段. 跟踪一个服务的片段是相对于那个路径的, 这是很困难的事, 所以一定要保持路径容易理解, 所以路径必须定义为相对于base文件的路径. 
 
-**例如**，定义两个配置文件：
+**例如**, 定义两个配置文件: 
 
 **docker-compose.yml**
 
@@ -1250,7 +1250,7 @@ cache:
     TTL: '500'
 ```
 
-要使用这个生产compose文件部署，运行如下命令：
+要使用这个生产compose文件部署, 运行如下命令: 
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
@@ -1262,11 +1262,11 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-logo.png)
 
-> Docker Machine 是供给和管理 docker 化主机的工具。有自己的命令行客户端 `docker-machine`。提供多种环境的 docker 主机，可以用 Docker Machine 在一个或者多个虚拟系统（本地或者远程）上安装 Docker Engine。
+> Docker Machine 是供给和管理 docker 化主机的工具. 有自己的命令行客户端 `docker-machine`. 提供多种环境的 docker 主机, 可以用 Docker Machine 在一个或者多个虚拟系统（本地或者远程）上安装 Docker Engine. 
 
 ### Install
 
-最新安装请看官方文档：***[https://docs.docker.com/machine/install-machine/](https://docs.docker.com/machine/install-machine/)***
+最新安装请看官方文档: ***[https://docs.docker.com/machine/install-machine/](https://docs.docker.com/machine/install-machine/)***
 
 ```
 base=https://github.com/docker/machine/releases/download/v0.14.0 && \
@@ -1276,7 +1276,7 @@ sudo install /tmp/docker-machine /usr/local/bin/docker-machine
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-version.png)
 
-**uninstall**：
+**uninstall**: 
 
 ```
 sudo rm $(which docker-machine)
@@ -1289,15 +1289,15 @@ mkdir -p ~/.zsh/completion
 curl -L https://raw.githubusercontent.com/docker/machine/master/contrib/completion/zsh/_docker-machine > ~/.zsh/completion/_docker-machine
 ```
 
-在`~/.zshrc`添加：
+在`~/.zshrc`添加: 
 
-**注意**：(如果是`oh-my-zsh`，在`$ZSH/oh-my-zsh.sh`中添加)
+**注意**: (如果是`oh-my-zsh`, 在`$ZSH/oh-my-zsh.sh`中添加)
 
 ```
 fpath=(~/.zsh/completion $fpath)
 ```
 
-执行：
+执行: 
 
 ```
 autoload -Uz compinit && \
@@ -1307,15 +1307,15 @@ exec $SHELL -l
 
 ### Usage
 
-确保已经安装了`virtualbox`：
+确保已经安装了`virtualbox`: 
 
 ```
 sudo apt install virtualbox
 ```
 
-创建本地实例：
+创建本地实例: 
 
-使用 `virtualbox` 类型的驱动，创建一台 Docker 主机，命名为 test。
+使用 `virtualbox` 类型的驱动, 创建一台 Docker 主机, 命名为 test. 
 
 ```
 docker-machine create -d virtualbox test
@@ -1323,7 +1323,7 @@ docker-machine create -d virtualbox test
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-create.png)
 
-你也可以在创建时加上如下参数，来配置主机或者主机上的 Docker。
+你也可以在创建时加上如下参数, 来配置主机或者主机上的 Docker. 
 
 `--engine-opt dns=114.114.114.114` 配置 Docker 的默认 DNS
 
@@ -1335,7 +1335,7 @@ docker-machine create -d virtualbox test
 
 `--virtualbox-cpu-count 2` 配置主机 CPU
 
-更多参数请使用 `docker-machine create --driver virtualbox --help` 命令查看。
+更多参数请使用 `docker-machine create --driver virtualbox --help` 命令查看. 
 
 ```
 $ docker-machine create --driver virtualbox --help
@@ -1377,7 +1377,7 @@ Options:
    --virtualbox-no-share                                                                                Disable the mount of your home directory
 ```
 
-创建好主机之后，查看主机
+创建好主机之后, 查看主机
 
 ```
 docker-machine ls
@@ -1386,29 +1386,29 @@ NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DO
 test      -        virtualbox   Running   tcp://192.168.99.187:2376           v17.10.0-ce
 ```
 
-创建主机成功后，可以通过 `env` 命令来让后续操作对象都是目标主机。
+创建主机成功后, 可以通过 `env` 命令来让后续操作对象都是目标主机. 
 
 ```
 docker-machine env test
 ```
 
-后续根据提示在命令行输入命令之后就可以操作 test 主机。
+后续根据提示在命令行输入命令之后就可以操作 test 主机. 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-env.png)
 
-通过以下命令恢复当前环境：
+通过以下命令恢复当前环境: 
 
 ```
 docker-machine env -u
 ```
 
-也可以通过 `SSH` 登录到主机。
+也可以通过 `SSH` 登录到主机. 
 
 ```
 docker-machine ssh test
 ```
 
-连接到主机之后你就可以在其上使用 Docker 了。
+连接到主机之后你就可以在其上使用 Docker 了. 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-machine-ssh.png)
 
@@ -1437,27 +1437,27 @@ docker-machine ssh test
 - `version` 输出 docker-machine 版本信息
 - `help` 输出帮助信息
 
-每个命令，又带有不同的参数，可以通过
+每个命令, 又带有不同的参数, 可以通过
 
 ```
 $ docker-machine COMMAND --help
 ```
 
-来查看具体的用法。
+来查看具体的用法. 
 
-**注意：**docker-machine 安装的 Docker 在 `/etc/systemd/system` 目录下多出了一个 Docker 相关的目录：`docker.service.d`。这个目录中只有一个文件 `10-machine.conf`，这个配置文件至关重要，因为它会覆盖 Docker 默认安装时的配置文件，从而以 Docker Machine 指定的方式启动 Docker daemon。至此我们有了一个可以被远程访问的 Docker daemon。
+**注意: **docker-machine 安装的 Docker 在 `/etc/systemd/system` 目录下多出了一个 Docker 相关的目录: `docker.service.d`. 这个目录中只有一个文件 `10-machine.conf`, 这个配置文件至关重要, 因为它会覆盖 Docker 默认安装时的配置文件, 从而以 Docker Machine 指定的方式启动 Docker daemon. 至此我们有了一个可以被远程访问的 Docker daemon. 
 
 ### 使用KVM引擎启动
 
 ***[https://github.com/dhiltgen/docker-machine-kvm](https://github.com/dhiltgen/docker-machine-kvm)***
 
-首先确保安装了KVM：
+首先确保安装了KVM: 
 
 ```
 sudo apt install libvirt-bin qemu-kvm
 ```
 
-到 ***[Release](https://github.com/dhiltgen/docker-machine-kvm/releases)*** 页面下载相关驱动。
+到 ***[Release](https://github.com/dhiltgen/docker-machine-kvm/releases)*** 页面下载相关驱动. 
 
 Ubuntu 16.04:
 
@@ -1465,7 +1465,7 @@ Ubuntu 16.04:
 sudo curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.10.0/docker-machine-driver-kvm-ubuntu16.04 > /usr/local/bin/docker-machine-driver-kvm && sudo chmod +x /usr/local/bin/docker-machine-driver-kvm
 ```
 
-最后启动：
+最后启动: 
 
 ```
 docker-machine create -d kvm --engine-registry-mirror=https://vioqnt8w.mirror.aliyuncs.com  --engine-insecure-registry=192.168.122.213 test01
@@ -1473,98 +1473,98 @@ docker-machine create -d kvm --engine-registry-mirror=https://vioqnt8w.mirror.al
 
 ## Swarm Mode
 
->  Docker 1.12 [Swarm mode](https://docs.docker.com/engine/swarm/) 已经内嵌入 Docker 引擎，成为了 docker 子命令 `docker swarm`。请注意与旧的 `Docker Swarm` 区分开来。
+>  Docker 1.12 [Swarm mode](https://docs.docker.com/engine/swarm/) 已经内嵌入 Docker 引擎, 成为了 docker 子命令 `docker swarm`. 请注意与旧的 `Docker Swarm` 区分开来. 
 >
->  `Swarm mode` 内置 kv 存储功能，提供了众多的新特性，比如：具有容错能力的去中心化设计、内置服务发现、负载均衡、路由网格、动态伸缩、滚动更新、安全传输等。使得 Docker 原生的 `Swarm` 集群具备与 Mesos、Kubernetes 竞争的实力。
+>  `Swarm mode` 内置 kv 存储功能, 提供了众多的新特性, 比如: 具有容错能力的去中心化设计、内置服务发现、负载均衡、路由网格、动态伸缩、滚动更新、安全传输等. 使得 Docker 原生的 `Swarm` 集群具备与 Mesos、Kubernetes 竞争的实力. 
 
 ### 功能特点
 
 #### 与Docker Engine集成的集群管理
 
-使用Docker Engine CLI创建一组Docker引擎，您可以在其中部署应用程序服务。您不需要其他编排软件来创建或管理群集。
+使用Docker Engine CLI创建一组Docker引擎, 您可以在其中部署应用程序服务. 您不需要其他编排软件来创建或管理群集. 
 
 #### 节点分散式设计
 
-Docker Engine不是在部署时处理节点角色之间的差异，而是在运行时处理角色变化。您可以使用Docker Engine部署两种类型的节点，管理节点和工作节点。这意味着您可以从单个服务器构建整个群集。
+Docker Engine不是在部署时处理节点角色之间的差异, 而是在运行时处理角色变化. 您可以使用Docker Engine部署两种类型的节点, 管理节点和工作节点. 这意味着您可以从单个服务器构建整个群集. 
 
 #### 声明性服务模型
 
-Docker Engine使用声明性方法来定义应用程序堆栈中各种服务的所需状态。例如，您可以描述由具有消息队列服务和数据库后端的Web前端服务组成的应用程序。
+Docker Engine使用声明性方法来定义应用程序堆栈中各种服务的所需状态. 例如, 您可以描述由具有消息队列服务和数据库后端的Web前端服务组成的应用程序. 
 
 ####  可扩容与缩放容器
 
-对于每个服务，您可以声明要运行的任务数。当您向上或向下缩放时，swarm管理器通过添加或删除任务来自动适应，以保持所需的任务数量来保证集群的可靠状态。
+对于每个服务, 您可以声明要运行的任务数. 当您向上或向下缩放时, swarm管理器通过添加或删除任务来自动适应, 以保持所需的任务数量来保证集群的可靠状态. 
 
 #### 容器容错状态协调
 
-群集管理器节点不断监视群集状态，并协调您表示的期望状态的实际状态之间的任何差异。例如，如果设置一个服务以运行容器的10个副本，并且托管其中两个副本的工作程序计算机崩溃，则管理器将创建两个新副本以替换崩溃的副本。 swarm管理器将新副本分配给正在运行和可用的worker节点上。
+群集管理器节点不断监视群集状态, 并协调您表示的期望状态的实际状态之间的任何差异. 例如, 如果设置一个服务以运行容器的10个副本, 并且托管其中两个副本的工作程序计算机崩溃, 则管理器将创建两个新副本以替换崩溃的副本. swarm管理器将新副本分配给正在运行和可用的worker节点上. 
 
 #### 多主机网络
 
-您可以为服务指定覆盖网络。当swarm管理器初始化或更新应用程序时，它会自动为覆盖网络上的容器分配地址。
+您可以为服务指定覆盖网络. 当swarm管理器初始化或更新应用程序时, 它会自动为覆盖网络上的容器分配地址. 
 
 #### 服务发现
 
-Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称，并负载平衡运行的容器。您可以通过嵌入在swarm中的DNS服务器查询在群中运行的每个容器。
+Swarm管理器节点为swarm中的每个服务分配唯一的DNS名称, 并负载平衡运行的容器. 您可以通过嵌入在swarm中的DNS服务器查询在群中运行的每个容器. 
 
 #### 负载平衡
 
-您可以将服务的端口公开给外部负载平衡器。在内部，swarm允许您指定如何在节点之间分发服务容器。
+您可以将服务的端口公开给外部负载平衡器. 在内部, swarm允许您指定如何在节点之间分发服务容器. 
 
 #### 缺省安全
 
-群中的每个节点强制执行TLS相互验证和加密，以保护其自身与所有其他节点之间的通信。您可以选择使用自签名根证书或来自自定义根CA的证书。
+群中的每个节点强制执行TLS相互验证和加密, 以保护其自身与所有其他节点之间的通信. 您可以选择使用自签名根证书或来自自定义根CA的证书. 
 
 #### 滚动更新
 
-在已经运行期间，您可以增量地应用服务更新到节点。 swarm管理器允许您控制将服务部署到不同节点集之间的延迟。如果出现任何问题，您可以将任务回滚到服务的先前版本。
+在已经运行期间, 您可以增量地应用服务更新到节点. swarm管理器允许您控制将服务部署到不同节点集之间的延迟. 如果出现任何问题, 您可以将任务回滚到服务的先前版本. 
 
 ### 概念
 
 #### 节点
 
-运行 Docker 的主机可以主动初始化一个 `Swarm` 集群或者加入一个已存在的 `Swarm` 集群，这样这个运行 Docker 的主机就成为一个 `Swarm` 集群的节点 (`node`) 。
+运行 Docker 的主机可以主动初始化一个 `Swarm` 集群或者加入一个已存在的 `Swarm` 集群, 这样这个运行 Docker 的主机就成为一个 `Swarm` 集群的节点 (`node`) . 
 
-节点分为管理 (`manager`) 节点和工作 (`worker`) 节点。
+节点分为管理 (`manager`) 节点和工作 (`worker`) 节点. 
 
-管理节点用于 `Swarm` 集群的管理，`docker swarm` 命令基本只能在管理节点执行（节点退出集群命令 `docker swarm leave` 可以在工作节点执行）。一个 `Swarm` 集群可以有多个管理节点，但只有一个管理节点可以成为 `leader`，`leader` 通过 `raft` 协议实现。
+管理节点用于 `Swarm` 集群的管理, `docker swarm` 命令基本只能在管理节点执行（节点退出集群命令 `docker swarm leave` 可以在工作节点执行）. 一个 `Swarm` 集群可以有多个管理节点, 但只有一个管理节点可以成为 `leader`, `leader` 通过 `raft` 协议实现. 
 
-工作节点是任务执行节点，管理节点将服务 (`service`) 下发至工作节点执行。管理节点默认也作为工作节点。你也可以通过配置让服务只运行在管理节点。
+工作节点是任务执行节点, 管理节点将服务 (`service`) 下发至工作节点执行. 管理节点默认也作为工作节点. 你也可以通过配置让服务只运行在管理节点. 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/swarm-diagram.png)
 
 #### 服务和任务
 
-任务 （`Task`）是 `Swarm` 中的最小的调度单位，目前来说就是一个单一的容器。
+任务 （`Task`）是 `Swarm` 中的最小的调度单位, 目前来说就是一个单一的容器. 
 
-服务 （`Services`） 是指一组任务的集合，服务定义了任务的属性。服务有两种模式：
+服务 （`Services`） 是指一组任务的集合, 服务定义了任务的属性. 服务有两种模式: 
 
-- `replicated services` 按照一定规则在各个工作节点上运行指定个数的任务。
+- `replicated services` 按照一定规则在各个工作节点上运行指定个数的任务. 
 - `global services` 每个工作节点上运行一个任务
 
-两种模式通过 `docker service create` 的 `--mode` 参数指定。
+两种模式通过 `docker service create` 的 `--mode` 参数指定. 
 
-**下图解释服务、任务、容器：**
+**下图解释服务、任务、容器: **
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/services-diagram.png)
 
-**服务的任务及调试说明：**
+**服务的任务及调试说明: **
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-task.png)
 
-**服务部署的复制模式和全局模式说明：**
+**服务部署的复制模式和全局模式说明: **
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-swarm-net.png)
 
 ### 创建集群
 
-在创建集群前，如果开启了防火墙，请确认三台主机的防火墙能让swarm需求的端口开放，需要打开主机之间的端口，以下端口必须可用。在某些系统上，这些端口默认为打开。
-**2377**：TCP端口2377用于集群管理通信
-**7946**：TCP和UDP端口7946用于节点之间的通信
-**4789**：TCP和UDP端口4789用于覆盖网络流量
-如果您计划使用加密（–opt加密）创建覆盖网络，则还需要确保协议50（ESP）已打开。
+在创建集群前, 如果开启了防火墙, 请确认三台主机的防火墙能让swarm需求的端口开放, 需要打开主机之间的端口, 以下端口必须可用. 在某些系统上, 这些端口默认为打开. 
+**2377**: TCP端口2377用于集群管理通信
+**7946**: TCP和UDP端口7946用于节点之间的通信
+**4789**: TCP和UDP端口4789用于覆盖网络流量
+如果您计划使用加密（–opt加密）创建覆盖网络, 则还需要确保协议50（ESP）已打开. 
 
-docker swarm命令：
+docker swarm命令: 
 
 ```
 docker swarm init --advertise-addr 172.18.60.133
@@ -1617,25 +1617,25 @@ docker node ls
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/docker-node-ls.png)
 
-说明：
-**AVAILABILITY列**：
-显示调度程序是否可以将任务分配给节点：
+说明: 
+**AVAILABILITY列**: 
+显示调度程序是否可以将任务分配给节点: 
 
-- `Active` 意味着调度程序可以将任务分配给节点。
-- `Pause` 意味着调度程序不会将新任务分配给节点，但现有任务仍在运行。
-- `Drain` 意味着调度程序不会向节点分配新任务。调度程序关闭所有现有任务并在可用节点上调度它们。
+- `Active` 意味着调度程序可以将任务分配给节点. 
+- `Pause` 意味着调度程序不会将新任务分配给节点, 但现有任务仍在运行. 
+- `Drain` 意味着调度程序不会向节点分配新任务. 调度程序关闭所有现有任务并在可用节点上调度它们. 
 
 **MANAGER STATUS列**
 显示节点是属于manager或者worker
 
-- **没有值** 表示不参与群管理的工作节点。
-- `Leader` 意味着该节点是使得群的所有群管理和编排决策的主要管理器节点。
-- `Reachable` 意味着节点是管理者节点正在参与Raft共识。如果领导节点不可用，则该节点有资格被选为新领导者。
-- `Unavailable` 意味着节点是不能与其他管理器通信的管理器。如果管理器节点不可用，您应该将新的管理器节点加入群集，或者将工作器节点升级为管理器。
+- **没有值** 表示不参与群管理的工作节点. 
+- `Leader` 意味着该节点是使得群的所有群管理和编排决策的主要管理器节点. 
+- `Reachable` 意味着节点是管理者节点正在参与Raft共识. 如果领导节点不可用, 则该节点有资格被选为新领导者. 
+- `Unavailable` 意味着节点是不能与其他管理器通信的管理器. 如果管理器节点不可用, 您应该将新的管理器节点加入群集, 或者将工作器节点升级为管理器. 
 
 #### 查看节点的详细信息
 
-您可以在管理器节点上运行`docker node inspect`来查看单个节点的详细信息。 输出默认为JSON格式，但您可以传递`–pretty`标志以以可读的yml格式打印结果
+您可以在管理器节点上运行`docker node inspect`来查看单个节点的详细信息. 输出默认为JSON格式, 但您可以传递`–pretty`标志以以可读的yml格式打印结果
 
 ```
 # ybd @ ybd-PC in ~ [9:37:23] 
@@ -1689,9 +1689,9 @@ Options:
       --role string           Role of the node ("worker"|"manager")
 #### 升级或降级节点
 
-您可以将工作程序节点提升为manager角色。这在管理器节点不可用或者您希望使管理器脱机以进行维护时很有用。 类似地，您可以将管理器节点降级为worker角色。
-无论您升级或降级节点，您应该始终在群中维护**奇数个**管理器节点。
-要升级一个节点或一组节点，请从管理器节点运行：
+您可以将工作程序节点提升为manager角色. 这在管理器节点不可用或者您希望使管理器脱机以进行维护时很有用. 类似地, 您可以将管理器节点降级为worker角色. 
+无论您升级或降级节点, 您应该始终在群中维护**奇数个**管理器节点. 
+要升级一个节点或一组节点, 请从管理器节点运行: 
 
 ```
 docker node promote [NODE]
@@ -1700,13 +1700,13 @@ docker node domote [NODE]
 
 #### 退出docker swarm集群
 
-work节点：
+work节点: 
 
 ```
 docker swarm leave
 ```
 
-manager节点：
+manager节点: 
 
 ```
 docker swarm leave -f
@@ -1754,11 +1754,11 @@ docker service ls
 查看服务的容器状态
 docker service ps nginx
  
-查看服务的详细信息。
+查看服务的详细信息. 
 docker service inspect nginx
 ```
 
-**实现零宕机部署也非常简单。**这样也可以方便地实现持续部署:
+**实现零宕机部署也非常简单. **这样也可以方便地实现持续部署:
 
 ```
 构建新镜像
@@ -1771,7 +1771,7 @@ docker push hub.docker.com/image
 docker service update --image hub.docker.com/image service
 ```
 
-**更新服务要慎重**。 你的容器同时运行在多个主机上。更新服务时，只需要更新Docker镜像。合理的测试和部署流程是保证成功的关键。**Swarm非常容易入门**。分布式系统通常是非常复杂的。与其他容器集群系统(Mesos, Kubernetes)相比，Swarm的学习曲线**最低**。
+**更新服务要慎重**. 你的容器同时运行在多个主机上. 更新服务时, 只需要更新Docker镜像. 合理的测试和部署流程是保证成功的关键. **Swarm非常容易入门**. 分布式系统通常是非常复杂的. 与其他容器集群系统(Mesos, Kubernetes)相比, Swarm的学习曲线**最低**. 
 
 # Docker Visual Management
 
@@ -1779,11 +1779,11 @@ docker service update --image hub.docker.com/image service
 
 [***官方网站***](http://rancher.com/)
 
-如果是对集群管理并且管理员只限制Docker命令权限的话，建议用这个工具，商店用起来都比较方便，
+如果是对集群管理并且管理员只限制Docker命令权限的话, 建议用这个工具, 商店用起来都比较方便, 
 
-**优点**：界面中文化，操作简单易懂,功能强大,容灾机制。
+**优点**: 界面中文化, 操作简单易懂,功能强大,容灾机制. 
 
-**缺点**: 不能团队分配权限，容器操作权限太大没法满足需求，部署时相应的Docker 服务也很多，需要逐一去了解容器作用。
+**缺点**: 不能团队分配权限, 容器操作权限太大没法满足需求, 部署时相应的Docker 服务也很多, 需要逐一去了解容器作用. 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/rancher.png)
 
@@ -1791,30 +1791,30 @@ docker service update --image hub.docker.com/image service
 
 [***官方网站***](https://shipyard-project.com/)
 
-Shipyard是在Docker Swarm的基础上，管理Docker资源，包括容器，镜像，注册表等。
+Shipyard是在Docker Swarm的基础上, 管理Docker资源, 包括容器, 镜像, 注册表等. 
 
-**优点**：
+**优点**: 
 
-1. 支持镜像管理、容器管理。
+1. 支持镜像管理、容器管理. 
 2. 支持控制台命令
 3. 容器资源消耗监控
-4. 支持集群swarm，可以随意增加节点
-5. 支持控制用户管理权限，可以设置某个容器对某个用户只读、管理权限。
+4. 支持集群swarm, 可以随意增加节点
+5. 支持控制用户管理权限, 可以设置某个容器对某个用户只读、管理权限. 
 6. 有汉化版
 
-**缺点** ：
+**缺点** : 
 
-1. 启动容器较多，占用每个节点的一部分资源
+1. 启动容器较多, 占用每个节点的一部分资源
 
-部署：
+部署: 
 
 ```
 curl -sSL https://shipyard-project.com/deploy | bash -s
 ```
 
-注意：这将在端口2375上暴露Docker Engine。如果此节点可以在安全网络之外访问，建议使用TLS。
+注意: 这将在端口2375上暴露Docker Engine. 如果此节点可以在安全网络之外访问, 建议使用TLS. 
 
-支持集群，所以可以添加节点：
+支持集群, 所以可以添加节点: 
 
 ```
 curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.0.0.10:4001 bash -s
@@ -1822,19 +1822,19 @@ curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-download.png)
 
-它会下载并启动7个镜像：
+它会下载并启动7个镜像: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-need-containers.png)
 
-界面：
+界面: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-containers.png)
 
-容器信息：
+容器信息: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/shipyard-container-info.png)
 
-初体验来说，感觉跟下面的Portainer功能差不多，但是Registry总是添加失败
+初体验来说, 感觉跟下面的Portainer功能差不多, 但是Registry总是添加失败
 
 ## Portainer
 
@@ -1842,23 +1842,23 @@ curl -sSL https://shipyard-project.com/deploy | ACTION=node DISCOVERY=etcd://10.
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/portainer-demo.gif)
 
-`Portainer`是`Docker`的图形化管理工具，提供状态显示面板、应用模板快速部署、容器镜像网络数据卷的基本操作（包括上传下载镜像，创建容器等操作）、事件日志显示、容器控制台操作、`Swarm`集群和服务等集中管理和操作、登录用户管理和控制等功能。功能十分全面，基本能满足中小型单位对容器管理的全部需求。
+`Portainer`是`Docker`的图形化管理工具, 提供状态显示面板、应用模板快速部署、容器镜像网络数据卷的基本操作（包括上传下载镜像, 创建容器等操作）、事件日志显示、容器控制台操作、`Swarm`集群和服务等集中管理和操作、登录用户管理和控制等功能. 功能十分全面, 基本能满足中小型单位对容器管理的全部需求. 
 
 **优点**
 
 1. 支持容器管理、镜像管理
-2. 轻量级，消耗资源少
-3. 基于docker api，安全性高，可指定docker api端口，支持TLS证书认证。
+2. 轻量级, 消耗资源少
+3. 基于docker api, 安全性高, 可指定docker api端口, 支持TLS证书认证. 
 4. 支持权限分配
 5. 支持集群
 
 **缺点**
 
-1. 功能不够强大。
-2. 容器创建后，无法通过后台增加端口。
+1. 功能不够强大. 
+2. 容器创建后, 无法通过后台增加端口. 
 3. 没有容灾机制
 
-单机启动：
+单机启动: 
 
 ```
 docker run -d -p 9000:9000 \
@@ -1868,7 +1868,7 @@ docker run -d -p 9000:9000 \
 portainer/portainer
 ```
 
-swarm模式启动：
+swarm模式启动: 
 
 ```
 docker service create \
@@ -1881,27 +1881,27 @@ portainer/portainer \
 -H unix:///var/run/docker.sock
 ```
 
-容器管理：
+容器管理: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-containers.png)
 
-镜像管理：
+镜像管理: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-images.png)
 
-镜像仓库：
+镜像仓库: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry.png)
 
-Endpoints：
+Endpoints: 
 
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/end-point.png)
 
-**注意**：添加Endpoints先要暴露节点的2375端口。
+**注意**: 添加Endpoints先要暴露节点的2375端口. 
 
 # Finally
 
-> 参考：
+> 参考: 
 >
 > ***[Docker — 从入门到实践](https://yeasy.gitbooks.io/docker_practice/content/)***
 >
@@ -1909,4 +1909,4 @@ Endpoints：
 >
 > ***[使用Docker Harbor搭建私有镜像服务器和Mirror服务器](https://www.jianshu.com/p/8d4fcff97a35)***
 >
-> ***[远程连接docker daemon，Docker Remote API](https://deepzz.com/post/dockerd-and-docker-remote-api.html)***
+> ***[远程连接docker daemon, Docker Remote API](https://deepzz.com/post/dockerd-and-docker-remote-api.html)***
