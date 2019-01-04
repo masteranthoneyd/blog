@@ -784,35 +784,9 @@ Mem:           989M        121M         87M        7.0M        781M        662M
 Swap:          255M         14M        241M
 ```
 
-# printf进制转换
+# letsencrypt 自动脚本
 
-> 二进制:binanry number
->
-> 八进制:otcal number
->
-> 十进制:decimal number
->
-> 十六进制: hexadecimal number
->
-> 一般使用jstack查找线程时候用到
-
-十进制转16进制:
-
-```
-printf "%x\n" 666
-```
-
-输出的是`29a`，一般16进制前面会加个`0x`表示，所以可以这样：
-
-```
-printf "0x%x\n" 666
-```
-
-16进制转十进制:
-
-```
-printf "%d\n" 0x29a
-```
+***[https://github.com/Neilpang/acme.sh](https://github.com/Neilpang/acme.sh)***
 
 #  Extend
 
@@ -897,6 +871,36 @@ echo "test test " > /var/test_boot_up.log
 
 ![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
 
-出现类似情况，可以找到`/etc/apt/sources.list.d`目录，删除对应的`.list`文件即可
+出现类似情况，可以找到`/etc/apt/sources.list.d`目录，删除对应的`.list`文件即可.
+
+## printf进制转换
+
+> 二进制:binanry number
+>
+> 八进制:otcal number
+>
+> 十进制:decimal number
+>
+> 十六进制: hexadecimal number
+>
+> 一般使用jstack查找线程时候用到
+
+十进制转16进制:
+
+```
+printf "%x\n" 666
+```
+
+输出的是`29a`，一般16进制前面会加个`0x`表示，所以可以这样：
+
+```
+printf "0x%x\n" 666
+```
+
+16进制转十进制:
+
+```
+printf "%d\n" 0x29a
+```
 
 

@@ -146,9 +146,13 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/auto-compile.png)
 
-## 设置统一编译jdk版本（关闭module JDK）
+## 设置统一编译JDK版本（关闭module JDK）
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
+
+## Maven 自动下载源码
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
 
 # Keyboard shortcuts
 

@@ -165,6 +165,16 @@ spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone=Asia/Chongqing
 ```
 
+## 导入其他配置
+
+```yaml
+spring:
+  profiles:
+    include: docker-log4j2
+```
+
+此时在项目或其他JAR包中应该存在`application-docker-log4j2.yml`.
+
 ## 配置文件-多环境配置
 
 ### 多环境配置的好处
@@ -204,7 +214,7 @@ spring:
 - 书写格式的差异，yaml相对比较简洁，优雅
 - YAML的缺点：不能通过`@PropertySource`注解加载。如果需要使用`@PropertySource`注解的方式加载值，那就要使用properties文件。
 
-### 如何使用
+### 启动时指定环境
 
 ```shell
 java -Dspring.profiles.active=dev -jar myapp.jar
