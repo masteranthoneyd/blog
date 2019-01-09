@@ -19,6 +19,8 @@ tags: [Java, Spring Boot, Spring]
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-process.jpg)
 
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-convert-processing.png)
+
 1、  用户发送请求至前端控制器`DispatcherServlet`. 
 
 2、  `DispatcherServlet`收到请求调用`HandlerMapping`处理器映射器. 
@@ -41,7 +43,9 @@ tags: [Java, Spring Boot, Spring]
 
 11、 `DispatcherServlet`响应用户. 
 
-## Spring MVC集成fastjson
+## Spring MVC集成FastJson
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/web-mvc-configurer.png)
 
 > ***[https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson](https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson)***
 
@@ -49,17 +53,17 @@ tags: [Java, Spring Boot, Spring]
 <dependency>
     <groupId>com.alibaba</groupId>
     <artifactId>fastjson</artifactId>
-    <version>1.2.46</version>
+    <version>1.2.54</version>
 </dependency>
 ```
 
-两种方式: 
-
-### 方式一、实现`WebMvcConfigurer`
-
-```
+```java
 @Configuration
 public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
+
+	@Autowired
+	StringHttpMessageConverter stringHttpMessageConverter;
+
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
@@ -70,43 +74,23 @@ public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
 		serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
 
 		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		fastJsonConfig.setCharset(Charset.forName("UTF-8"));
+		fastJsonConfig.setCharset(StandardCharsets.UTF_8);
 		fastJsonConfig.setSerializeConfig(serializeConfig);
-		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
-		fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		fastConverter.setFastJsonConfig(fastJsonConfig);
-
-		converters.add(fastConverter);
-	}
-}
-```
-
-### 方式二、通过`@Bean`方式
-
-```
-@Configuration
-public class WebMvcMessageConvertConfig {
-	@Bean
-	public HttpMessageConverters fastJsonHttpMessageConverter() {
-		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
-
-		SerializeConfig serializeConfig = SerializeConfig.globalInstance;
-		serializeConfig.put(BigInteger.class, ToStringSerializer.instance);
-		serializeConfig.put(Long.class, ToStringSerializer.instance);
-		serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
-
-		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		fastJsonConfig.setCharset(Charset.forName(Constant.CHARSET));
-		fastJsonConfig.setSerializeConfig(serializeConfig);
-		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+//		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
 		fastJsonConfig.setDateFormat(Constant.DATE_FORMAT);
 
 		fastConverter.setFastJsonConfig(fastJsonConfig);
-		return new HttpMessageConverters((HttpMessageConverter<?>) fastConverter);
+		fastConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON_UTF8));
+		converters.add(0, stringHttpMessageConverter);
+		converters.add(1, fastConverter);
 	}
 }
 ```
+
+**注意**:
+
+* SpringBoot 2.0.1版本中加载`WebMvcConfigurer`的顺序发生了变动，故需使用`converters.add(0, converter);`指定`FastJsonHttpMessageConverter`在converters内的顺序，否则在SpringBoot 2.0.1及之后的版本中将优先使用Jackson处理。详情：***[WebMvcConfigurer is overridden by WebMvcAutoConfiguration #12389](https://github.com/spring-projects/spring-boot/issues/12389)***
+* 在`FastJsonHttpMessageConverter`之前插入一个`StringHttpMessageConverter`是为了在Controller层返回String类型不会再次被FastJson序列化.
 
 ### WebFlux
 
@@ -114,7 +98,7 @@ public class WebMvcMessageConvertConfig {
 
 ## Spring Boot JSON （Date类型入参、格式化, 以及如何处理null）
 
-```
+```yaml
 spring:
   jackson:
     default-property-inclusion: non_null # 忽略 json 中值为null的属性
@@ -161,7 +145,7 @@ Spring boot 在spring默认基础上, 自动配置添加了以下特性
 
 ## 开启GZIP算法压缩响应流
 
-```
+```yaml
 server:
   compression:
     enabled: true # 启用压缩
@@ -179,7 +163,7 @@ server:
 
 ### 方式二: 通过@ControllerAdvice
 
-```
+```java
 @Slf4j
 @ControllerAdvice
 //@RestControllerAdvice
@@ -209,7 +193,7 @@ public class ErrorExceptionHandler {
 
 或者继承`ResponseEntityExceptionHandler`更灵活地控制状态码、`Header`等信息: 
 
-```
+```java
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -233,25 +217,23 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 ```
 spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/static/
-
 ```
 
 ## 自定义消息转化器
 
-```
+```java
 	@Bean
     public StringHttpMessageConverter stringHttpMessageConverter() {
         StringHttpMessageConverter converter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         return converter;
     }
-
 ```
 
 ## 自定义SpringMVC的拦截器
 
 有些时候我们需要自己配置SpringMVC而不是采用默认, 比如增加一个拦截器
 
-```
+```java
 public class MyInterceptor implements HandlerInterceptor {
 
     @Override
@@ -275,10 +257,9 @@ public class MyInterceptor implements HandlerInterceptor {
     }
 
 }
-
 ```
 
-```
+```java
 @Configuration
 public class InterceptorConfigurerAdapter extends WebMvcConfigurer {
     /**
@@ -293,7 +274,6 @@ public class InterceptorConfigurerAdapter extends WebMvcConfigurer {
         super.addInterceptors(registry);
     }
 }
-
 ```
 
 或者可以使用继承`HandlerInterceptorAdapter`的方式, 这种方式可以**按需覆盖父类方法**. 
@@ -304,7 +284,7 @@ public class InterceptorConfigurerAdapter extends WebMvcConfigurer {
 
 > 直接通过`@WebServlet`、`@WebFilter`、`@WebListener` 注解自动注册
 
-```
+```java
 @WebFilter(filterName = "customFilter", urlPatterns = "/*")
 public class CustomFilter implements Filter {
     ...
@@ -319,8 +299,6 @@ public class CustomListener implements ServletContextListener {
 public class CustomServlet extends HttpServlet {
     ...
 }
-
-
 ```
 
 然后需要在`**Application.java` 加上`@ServletComponentScan`注解, 否则不会生效. 
@@ -329,7 +307,7 @@ public class CustomServlet extends HttpServlet {
 
 ### 通过编码注册
 
-```
+```java
 @Configuration
 public class WebConfig {
 
@@ -368,8 +346,6 @@ public class WebConfig {
         return registrationBean;
     }
 }
-
-
 ```
 
 ## Spring Interceptor与Servlet Filter的区别
@@ -393,7 +369,7 @@ public class WebConfig {
 
 先看一下`ResponseBodyAdvice`
 
-```
+```java
 public interface ResponseBodyAdvice<T> {
 
 	/**
@@ -428,35 +404,31 @@ public interface ResponseBodyAdvice<T> {
 
 `beforeBodyWrite`可以对返回的body进行包装或加密: 
 
-```
+```java
+/**
+ * @author ybd
+ * @date 18-5-15
+ * @contact yangbingdong1994@gmail.com
+ */
 @RestControllerAdvice(annotations = Rest.class)
 public class GlobalControllerAdvisor implements ResponseBodyAdvice {
 	private static final String VOID = "void";
-	private static final String RESOURCE_NOT_FOUND = "Resource not found!";
-	private static final String SUCCESS = "SUCCESS";
-	
+
+	/**
+	 * String 类型不支持
+	 */
 	@Override
 	public boolean supports(MethodParameter returnType, Class converterType) {
-		return Boolean.TRUE;
+		return !(returnType.getGenericParameterType() instanceof Class) || !((Class<?>) returnType.getGenericParameterType()).isAssignableFrom(String.class);
 	}
 
 	@Override
 	public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-		Object result;
-		if (isVoidMethod(returnType)) {
-			result = genSuccessResult(null, SUCCESS);
-		} else if (body instanceof Result) {
-			result = body;
-		} else if (nonNull(body)) {
-			result = genSuccessResult(body);
-		} else {
-			result = genBadReqResult(NOT_FOUND, RESOURCE_NOT_FOUND);
-		}
-		return result;
+		return isVoidMethod(returnType) ? Response.ok() : Response.ok(body);
 	}
 
 	private boolean isVoidMethod(MethodParameter returnType) {
-		return VOID.equals(returnType.getMethod().getReturnType().getName());
+		return VOID.equals(returnType.getGenericParameterType().getTypeName());
 	}
 }
 ```
@@ -499,7 +471,7 @@ public class GlobalControllerAdvisor implements ResponseBodyAdvice {
 
 实体: 
 
-```
+```java
 @Data
 public class Foo {
 	@NotBlank
@@ -515,13 +487,11 @@ public class Foo {
 	@Email(message = "邮箱格式错误")
 	private String email;
 }
-
-
 ```
 
 `Controller`:
 
-```
+```java
 @RestController
 @Slf4j
 public class FooController {
@@ -538,15 +508,13 @@ public class FooController {
       return "success";
    }
 }
-
-
 ```
 
 ## 快速失效
 
 一般情况下, Validator并不会应为第一个校验失败为停止, 而是一直校验完所有参数. 我们可以通过设置快速失效: 
 
-```
+```java
 @Configuration
 public class ValidatorConfiguration {
 	@Bean
@@ -559,8 +527,6 @@ public class ValidatorConfiguration {
 		return validatorFactory.getValidator();
 	}
 }
-
-
 ```
 
 这样在遇到第一个校验失败的时候就会停止对之后的参数校验. 
@@ -571,7 +537,7 @@ public class ValidatorConfiguration {
 
 添加分组: 
 
-```
+```java
 Class Foo{
 	@Min(value = 18,groups = {Adult.class})
 	private Integer age;
@@ -580,13 +546,11 @@ Class Foo{
 	
 	public interface Minor{}
 }
-
-
 ```
 
 `Controller`: 
 
-```
+```java
 @RequestMapping("/drink")
 public String drink(@Validated({Foo.Adult.class}) Foo foo, BindingResult bindingResult) {
     if(bindingResult.hasErrors()){
@@ -597,8 +561,6 @@ public String drink(@Validated({Foo.Adult.class}) Foo foo, BindingResult binding
     }
     return "success";
 }
-
-
 ```
 
 ## 自定义校验
@@ -608,7 +570,7 @@ public String drink(@Validated({Foo.Adult.class}) Foo foo, BindingResult binding
 1 自定义校验注解
 我们尝试添加一个“字符串不能包含空格”的限制. 
 
-```
+```java
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
 @Documented
@@ -633,8 +595,6 @@ public @interface CannotHaveBlank {
     }
 
 }
-
-
 ```
 
 我们不需要关注太多东西, 使用spring validation的原则便是便捷我们的开发, 例如payload, List , groups, 都可以忽略. 
@@ -643,7 +603,7 @@ public @interface CannotHaveBlank {
 
 2 编写真正的校验者类
 
-```
+```java
 public class CannotHaveBlankValidator implements <1> ConstraintValidator<CannotHaveBlank, String> {
 
 	@Override
@@ -667,19 +627,15 @@ public class CannotHaveBlankValidator implements <1> ConstraintValidator<CannotH
         return true;
     }
 }
-
-
 ```
 
 `<1>` 所有的验证者都需要实现`ConstraintValidator`接口, 它的接口也很形象, 包含一个初始化事件方法, 和一个判断是否合法的方法
 
-```
+```java
 public interface ConstraintValidator<A extends Annotation, T> {
 	void initialize(A constraintAnnotation);
 		boolean isValid(T value, ConstraintValidatorContext context);
 }
-
-
 ```
 
 `<2> ` `ConstraintValidatorContext` 这个上下文包含了认证中所有的信息, 我们可以利用这个上下文实现获取默认错误提示信息, 禁用错误提示信息, 改写错误提示信息等操作. 
@@ -694,7 +650,7 @@ public interface ConstraintValidator<A extends Annotation, T> {
 
 **Hibernate Validation**: 
 
-```
+```java
 Foo foo = new Foo();
 foo.setAge(22);
 foo.setEmail("000");
@@ -704,8 +660,6 @@ Set<ConstraintViolation<Foo>> set = validator.validate(foo);
 for (ConstraintViolation<Foo> constraintViolation : set) {
     System.out.println(constraintViolation.getMessage());
 }
-
-
 ```
 
 由于依赖了Hibernate Validation框架, 我们需要调用Hibernate相关的工厂方法来获取validator实例, 从而校验. 
@@ -720,7 +674,7 @@ for (ConstraintViolation<Foo> constraintViolation : set) {
 
 上面这段话主要描述了spring对validation全面支持JSR-303、JSR-349的标准, 并且封装了`LocalValidatorFactoryBean`作为validator的实现. 值得一提的是, 这个类的责任其实是非常重大的, 他兼容了spring的validation体系和hibernate的validation体系, 也可以被开发者直接调用, 代替上述的从工厂方法中获取的hibernate validator. 由于我们使用了springboot, 会触发web模块的自动配置, `LocalValidatorFactoryBean`已经成为了Validator的默认实现, 使用时只需要自动注入即可. 
 
-```
+```java
 @Autowired
 Validator globalValidator; <1>
 
@@ -737,8 +691,6 @@ public String validate() {
 
     return "success";
 }
-
-
 ```
 
 `<1>` 真正使用过`Validator`接口的读者会发现有两个接口, 一个是位于`javax.validation`包下, 另一个位于`org.springframework.validation`包下, **注意我们这里使用的是前者**`javax.validation`, 后者是spring自己内置的校验接口, `LocalValidatorFactoryBean`同时实现了这两个接口. 
@@ -747,7 +699,7 @@ public String validate() {
 
 ## 基于方法校验
 
-```
+```java
 @RestController
 @Validated <1>
 public class BarController {
@@ -770,8 +722,6 @@ public class BarController {
     }
 
 }
-
-
 ```
 
 `<1>` 为类添加@Validated注解
@@ -784,29 +734,52 @@ public class BarController {
 
 ## 统一处理验证异常
 
-```
-@ControllerAdvice
-@Component
+| 异常类型                                  | 描述                             |
+| ----------------------------------------- | -------------------------------- |
+| `ConstraintViolationException`            | 违反约束，javax扩展定义          |
+| `BindException`                           | 绑定失败，如表单对象参数违反约束 |
+| `MethodArgumentNotValidException`         | 参数无效，如JSON请求参数违反约束 |
+| `MissingServletRequestParameterException` | 参数缺失                         |
+| `TypeMismatchException`                   | 参数类型不匹配                   |
+
+```java
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handle(ValidationException exception) {
-        if(exception instanceof ConstraintViolationException){
-            ConstraintViolationException exs = (ConstraintViolationException) exception;
+	@ExceptionHandler(value = {
+			MethodArgumentNotValidException.class,
+			BindException.class,
+			ConstraintViolationException.class})
+	@ResponseStatus(HttpStatus.OK)
+	public Response<Void> handleValidException(Exception ex) {
+		String validateFailReason;
+		if (ex instanceof MethodArgumentNotValidException) {
+			validateFailReason = ((MethodArgumentNotValidException) ex).getBindingResult()
+																	   .getFieldError()
+																	   .getDefaultMessage();
+		} else if (ex instanceof BindException) {
+			validateFailReason = ((BindException) ex).getFieldError().getDefaultMessage();
+		} else if (ex instanceof ConstraintViolationException) {
+			validateFailReason = ((ConstraintViolationException) ex).getConstraintViolations().stream()
+																	.findAny()
+																	.map(ConstraintViolation::getMessage)
+																	.orElse("Unknown error message");
+		} else {
+			validateFailReason = "Unknown error message";
+		}
+		return Response.error(validateFailReason);
+	}
 
-            Set<ConstraintViolation<?>> violations = exs.getConstraintViolations();
-            for (ConstraintViolation<?> item : violations) {
-　　　　　　　　　　/**打印验证不通过的信息*/
-                System.out.println(item.getMessage());
-            }
-        }
-        return "bad request, " ;
-    }
+	@ExceptionHandler(value = {Exception.class})
+	public Response<Void> handle(Exception exception) {
+		return Response.error(exception.getMessage());
+	}
 }
-
 ```
 
 > 参考: 
-> *[https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/](https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/)*
+> ***[https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/](https://www.cnkirito.moe/2017/08/16/%E4%BD%BF%E7%94%A8spring%20validation%E5%AE%8C%E6%88%90%E6%95%B0%E6%8D%AE%E5%90%8E%E7%AB%AF%E6%A0%A1%E9%AA%8C/)***
+>
+> 相关代码:
+>
+> ***[https://github.com/masteranthoneyd/spring-boot-learning](https://github.com/masteranthoneyd/spring-boot-learning)***

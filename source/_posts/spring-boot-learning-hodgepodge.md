@@ -527,7 +527,6 @@ executor.setAwaitTerminationSeconds(60);
 ```java
 @Async("threadPoolTaskExecutor")
 public void someMethod(){...}
-
 ```
 
 ## 获取异步执行结果
@@ -541,7 +540,6 @@ public Future<String> asyncMethodWithVoidReturnType() throws InterruptedExceptio
 	Thread.sleep(2000L);
 	return AsyncResult.forValue("Execute method asynchronously. " + Thread.currentThread().getName());
 }
-
 ```
 
 Controller: 
