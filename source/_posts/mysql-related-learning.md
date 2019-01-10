@@ -23,7 +23,7 @@ tags: [MySQL]
 
 直接贴出`docker-compose.yml`:
 
-```
+```yaml
 version: '3.5'
 
 services:
@@ -37,6 +37,7 @@ services:
       - ../conf:/etc/mysql/conf.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
+      - TZ=Asia/Shanghai
     restart: always
     networks:
       - backend
@@ -59,6 +60,8 @@ collation-server = utf8mb4_unicode_ci
 
 ## 遇到问题
 
+### 配置文件权限
+
 虽然启动成功, 但发现MySQL实例是关闭的, 在启动日志中发现这一条信息
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-warning.png)
@@ -68,6 +71,24 @@ collation-server = utf8mb4_unicode_ci
 结论: **配置文件权限过大, 会影响实例不能启动, 或者不能关闭, 需要修改为 644**
 
 问题得以解决~！
+
+### Docker时区
+
+通过Docker启动的MySql, 默认读取的是Docker中的时区UTC, 只要在docker compose文件中指定时区就行了:
+
+```diff
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
++     - TZ=Asia/Shanghai
+```
+
+或者在MySql配置文件中加入:
+
+```
+[mysqld]
+...
+default-time-zone='+8:00'
+```
 
 
 
@@ -498,6 +519,46 @@ InnoDB适合:
 5、对于自增长的字段, InnoDB中必须包含只有该字段的索引, 但是在MyISAM表中可以和其他字段一起建立联合索引. 
 
 6、清空整个表时, InnoDB是一行一行的删除, 效率非常慢. MyISAM则会重建表. 
+
+# 通过SQL查看表信息
+
+## 查看创建表
+
+```sql
+SHOW CREATE TABLE test_table;
+```
+
+## 查看表信息
+
+```sql
+SHOW TABLE STATUS WHERE NAME IN('test_table', 'person');
+```
+
+更详细信息:
+
+```sql
+SELECT * FROM information_schema.tables WHERE table_schema='test_db' AND table_name='test_table';
+```
+
+## 查看字段信息
+
+```sql
+SHOW FULL FIELDS FROM `test_table`;
+```
+
+更详细信息:
+
+```sql
+SELECT * FROM information_schema.COLUMNS WHERE table_schema='test_db' AND table_name='test_table';
+```
+
+## 查看表索引
+
+```sql
+SHOW INDEX FROM test_table;
+-- 或者
+SHOW KEYS from test_table;
+```
 
 # Finally
 
