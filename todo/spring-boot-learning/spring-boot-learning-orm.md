@@ -449,33 +449,110 @@ spring:
     driver-class-name: net.sf.log4jdbc.DriverSpy
 ```
 
-## 常用注解
+## 基础CRUD操作
 
-`@Entity(name = "t_user")`
+集成 `JpaRepository<T, ID>` , T为实体, ID为实体id:
 
-`@Table(indexes = {...}`
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+	Page<User> findByName(String name, Pageable pageable);
+}
+```
 
-`@Id`
+Controller:
 
-`@GeneratedValue`
+```java
+@Autowired
+private UserRepository userRepository;
 
-`@Column(length = 100, nullable = false)`
+@GetMapping
+public Iterable<User> getAllUsers() {
+	return userRepository.findAll();
+}
 
-`@Enumerated(EnumType.STRING)`
+@PostMapping
+public void addNewUser(@Valid @RequestBody User user) {
+	userRepository.save(user);
+}
 
-`@Temporal(TemporalType.TIMESTAMP)`
+/**
+ * 验证排序和分页查询方法，Pageable的默认实现类：PageRequest
+ * @return
+ */
+@GetMapping(path = "/page")
+@ResponseBody
+public Page<User> getAllUserByPage() {
+	return userRepository.findAll(PageRequest.of(0, 2, Sort.by(new Sort.Order(Sort.Direction.ASC,"name"))));
+}
+/**
+ * 排序查询方法，使用Sort对象
+ * @return
+ */
+@GetMapping(path = "/sort")
+@ResponseBody
+public Iterable<User> getAllUsersWithSort() {
+	return userRepository.findAll(Sort.by(new Sort.Order(Sort.Direction.ASC,"name")));
+}
+```
 
-`@PrePersist`
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/simple-jpa-repository-method.png)
 
-`@PreUpdate`
+`JpaRepository` 的默认实现类是 `SimpleJpaRepository`, 可以看到提供了大部分通用的方法.
 
-`@PreRemove`
+## 定义查询方法
 
-`@CreationTimestamp`
+### 方法的查询策略设置
 
-`@UpdateTimestamp`
+通过下面的命令来配置方法的查询策略(在`JpaRepositoriesAutoConfigureRegistrar`中已经自动配置, 实际Spring Boot项目中我们只需要引入JPA依赖即可, 不需要手动显示配置)：
 
-## 生成JPQL语句方法名称中支持的关键字
+```java
+@EnableJpaRepositories(queryLookupStrategy= QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND)
+```
+
+`QueryLookupStrategy.Key` 的值一共就三个：
+
+- `Create`：直接根据方法名进行创建，规则是根据方法名称的构造进行尝试，一般的方法是从方法名中删除给定的一组已知前缀，并解析该方法的其余部分。如果方法名不符合规则，启动的时候会报异常。
+- `USE_DECLARED_QUERY`：声明方式创建，即本书说的注解的方式。启动的时候会尝试找到一个声明的查询，如果没有找到将抛出一个异常，查询可以由某处注释或其他方法声明。
+- `CREATE_IF_NOT_FOUND`：这个是默认的，以上两种方式的结合版。先用声明方式进行查找，如果没有找到与方法相匹配的查询，那用 Create 的方法名创建规则创建一个查询。
+
+### 查询方法的创建
+
+Spring Data 中有一套自己的方法命名查询规范, 一般是前缀 find…By、read…By、query…By、count…By 和 get…By等, `org.springframework.data.repository.query.parser.PartTree`:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/part-tree-class.png)
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/subject-class.png)
+
+Ex:
+
+```java
+interface PersonRepository extends Repository<User, Long> {
+   // and的查询关系
+   List<User> findByEmailAddressAndLastname(EmailAddress emailAddress, String lastname);
+   // 包含distinct去重，or的sql语法
+   List<User> findDistinctPeopleByLastnameOrFirstname(String lastname, String firstname);
+   List<User> findPeopleDistinctByLastnameOrFirstname(String lastname, String firstname);
+   // 根据lastname字段查询忽略大小写
+   List<User> findByLastnameIgnoreCase(String lastname);
+   // 根据lastname和firstname查询equal并且忽略大小写
+   List<User> findByLastnameAndFirstnameAllIgnoreCase(String lastname, String firstname); 
+  // 对查询结果根据lastname排序
+   List<User> findByLastnameOrderByFirstnameAsc(String lastname);
+   List<User> findByLastnameOrderByFirstnameDesc(String lastname);
+}
+```
+
+使用的时候要配合不同的返回结果进行使用:
+
+```java
+interface UserRepository extends CrudRepository<User, Long> {
+     long countByLastname(String lastname);//查询总数
+     long deleteByLastname(String lastname);//根据一个字段进行删除操作
+     List<User> removeByLastname(String lastname);
+}
+```
+
+关键字列表:
 
 | Keyword             | Sample                                                       | JPQL snippet                                                 |
 | ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -504,8 +581,267 @@ spring:
 | `False`             | `findByActiveFalse()`                                        | `… where x.active = false`                                   |
 | `IgnoreCase`        | `findByFirstnameIgnoreCase`                                  | `… where UPPER(x.firstame) = UPPER(?1)`                      |
 
+最全支持关键字可查看: `org.springframework.data.repository.query.parser.Type`
 
-![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-query.png)
+### 查询结果的处理
+
+#### 参数选择（Sort/Pageable）分页和排序
+
+```java
+Page<User> findByLastname(String lastname, Pageable pageable);
+Slice<User> findByLastname(String lastname, Pageable pageable);
+List<User> findByLastname(String lastname, Sort sort);
+List<User> findByLastname(String lastname, Pageable pageable);		
+```
+
+#### 限制查询结果
+
+在查询方法上加限制查询结果的关键字 First 和 Top:
+
+```java
+User findFirstByOrderByLastnameAsc();
+User findTopByOrderByAgeDesc();
+Page<User> queryFirst10ByLastname(String lastname, Pageable pageable);
+Slice<User> findTop3ByLastname(String lastname, Pageable pageable);
+List<User> findFirst10ByLastname(String lastname, Sort sort);
+List<User> findTop10ByLastname(String lastname, Pageable pageable);
+```
+
+#### 查询结果的不同形式（List/Stream/Page/Future）
+
+```java
+@Query("select u from User u")
+Stream<User> findAllByCustomQueryAndStream();
+Stream<User> readAllByFirstnameNotNull();
+@Query("select u from User u")
+Stream<User> streamAllPaged(Pageable pageable);
+```
+
+关闭流:
+
+```java
+Stream<User> stream;
+try {
+   stream = repository.findAllByCustomQueryAndStream()
+   stream.forEach(…);
+} catch (Exception e) {
+   e.printStackTrace();
+} finally {
+   if (stream!=null){
+      stream.close();
+   }
+}
+```
+
+异步结果:
+
+```java
+@Async
+Future<User> findByFirstname(String firstname); 
+@Async
+CompletableFuture<User> findOneByFirstname(String firstname); 
+@Async
+ListenableFuture<User> findOneByLastname(String lastname);
+```
+支持的返回结果:
+
+| 返回值类型        | 描述                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| void              | 不返回结果，一般是更新操作                                   |
+| Primitives        | Java 的基本类型，一般常见的是统计操作（如 long、boolean 等）Wrapper types Java 的包装类 |
+| T                 | 最多只返回一个实体，没有查询结果时返回 null。如果超过了一个结果会抛出 IncorrectResultSizeDataAccessException 的异常。 |
+| Iterator          | 一个迭代器                                                   |
+| Collection        | A 集合                                                       |
+| List              | List 及其任何子类                                            |
+| Optional          | 返回 Java 8 或 Guava 中的 Optional 类。查询方法的返回结果最多只能有一个，如果超过了一个结果会抛出 IncorrectResultSizeDataAccessException 的异常 |
+| Option            | Scala 或者 javaslang 选项类型                                |
+| Stream            | Java 8 Stream                                                |
+| Future            | Future，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能。一般配合多线程使用。关系数据库，实际工作很少有用到 |
+| CompletableFuture | 返回 Java8 中新引入的 CompletableFuture 类，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能 |
+| ListenableFuture  | 返回 org.springframework.util.concurrent.ListenableFuture 类，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能 |
+| Slice             | 返回指定大小的数据和是否还有可用数据的信息。需要方法带有 Pageable 类型的参数 |
+| Page              | 在 Slice 的基础上附加返回分页总数等信息。需要方法带有 Pageable 类型的参数 |
+| GeoResult         | 返回结果会附带诸如到相关地点距离等信息                       |
+| GeoResults        | 返回 GeoResult 的列表，并附带到相关地点平均距离等信息        |
+| GeoPage           | 分页返回 GeoResult，并附带到相关地点平均距离等信息           |
+
+#### Projections 对查询结果的扩展
+
+Spring JPA 对 Projections 的扩展的支持，从字面意思上理解就是映射，指的是和 DB 的查询结果的字段映射关系。一般情况下，我们是返回的字段和 DB 的查询结果的字段是一一对应的，但有的时候，需要返回一些指定的字段，**不需要全部返回**，或者返回一些**复合型的字段**，还得自己写逻辑。Spring Data 正是考虑到了这一点，允许对专用返回类型进行建模，以便更有选择地将部分视图对象。
+
+假设 Person 是一个正常的实体，和数据表 Person 一一对应，我们正常的写法如下：
+
+```java
+@Entity
+class Person {
+   @Id
+   UUID id;
+   String firstname, lastname;
+   Address address;
+   @Entity
+   static class Address {
+      String zipCode, city, street;
+   }
+}
+interface PersonRepository extends Repository<Person, UUID> {
+   Collection<Person> findByLastname(String lastname);
+}
+```
+
+（1）但是我们想仅仅返回其中的 name 相关的字段，应该怎么做呢？如果基于 projections 的思路，其实是比较容易的。只需要声明一个接口，包含我们要返回的属性的方法即可。如下：
+
+```java
+interface NamesOnly {
+  String getFirstname();
+  String getLastname();
+}
+```
+
+Repository 里面的写法如下，直接用这个对象接收结果即可，如下：
+
+```java
+interface PersonRepository extends Repository<Person, UUID> {
+  Collection<NamesOnly> findByLastname(String lastname);
+}
+```
+
+Ctroller 里面直接调用这个对象可以看看结果。
+
+原理是，底层会有动态代理机制为这个接口生产一个实现实体类，在运行时。
+
+（2）查询关联的子对象，一样的道理，如下：
+
+```java
+interface PersonSummary {
+  String getFirstname();
+  String getLastname();
+  AddressSummary getAddress();
+  interface AddressSummary {
+    String getCity();
+  }
+}
+```
+
+（3）`@Value` 和 SPEL 也支持：
+
+```java
+interface NamesOnly {
+  @Value("#{target.firstname + ' ' + target.lastname}")
+  String getFullName();
+  …
+}
+```
+
+PersonRepository 里面保持不变，这样会返回一个 firstname 和 lastname 相加的只有 fullName 的结果集合。
+
+（4）对 Spel 表达式的支持远不止这些：
+
+```java
+@Component
+class MyBean {
+  String getFullName(Person person) {
+    …//自定义的运算
+  }
+}
+interface NamesOnly {
+  @Value("#{@myBean.getFullName(target)}")
+  String getFullName();
+  …
+}
+```
+
+（5）还可以通过 Spel 表达式取到方法里面的参数的值。
+
+```java
+interface NamesOnly {
+  @Value("#{args[0] + ' ' + target.firstname + '!'}")
+  String getSalutation(String prefix);
+}
+```
+
+（6）这时候有人会在想，只能用 interface 吗？dto 支持吗？也是可以的，也可以定义自己的 Dto 实体类，需要哪些字段我们直接在 Dto 类当中暴漏出来 get/set 属性即可，如下：
+
+```java
+class NamesOnlyDto {
+  private final String firstname, lastname;
+//注意构造方法
+  NamesOnlyDto(String firstname, String lastname) {
+    this.firstname = firstname;
+    this.lastname = lastname;
+  }
+  String getFirstname() {
+    return this.firstname;
+  }
+  String getLastname() {
+    return this.lastname;
+  }
+}
+```
+
+（7）支持动态 Projections，想通过泛化，根据不同的业务情况，返回不通的字段集合。
+
+```java
+PersonRepository做一定的变化，如下：
+interface PersonRepository extends Repository<Person, UUID> {
+  Collection<T> findByLastname(String lastname, Class<T> type);
+}
+```
+
+我们的掉用方，就可以通过 class 类型动态指定返回不同字段的结果集合了，如下：
+
+```java
+void someMethod(PersonRepository people) {
+//我想包含全字段，就直接用原始entity（Person.class）接收即可
+  Collection<Person> aggregates = people.findByLastname("Matthews", Person.class);
+//如果我想仅仅返回名称，我只需要指定Dto即可。
+  Collection<NamesOnlyDto> aggregates = people.findByLastname("Matthews", NamesOnlyDto.class);
+}
+```
+
+#### 实现机制
+
+通过 QueryExecutorMethodInterceptor 这个类的源代码，我们发现，该类实现了 MethodInterceptor 接口，也就是说它是一个方法调用的拦截器， 当一个 Repository 上的查询方法，譬如说 findByEmailAndLastname 方法被调用，Advice 拦截器会在方法真正的实现调用前，先执行这个 MethodInterceptor 的 invoke 方法。这样我们就有机会在真正方法实现执行前执行其他的代码了。
+
+然而对于 QueryExecutorMethodInterceptor 来说，最重要的代码并不在 invoke 方法中，而是在它的构造器 QueryExecutorMethodInterceptor(RepositoryInformationr、Object customImplementation、Object target) 中。
+
+最重要的一段代码是这段：
+
+```java
+for (Method method : queryMethods) { 
+     // 使用lookupStrategy，针对Repository接口上的方法查询Query
+     RepositoryQuery query = lookupStrategy.resolveQuery(method, repositoryInformation, factory, namedQueries); invokeListeners(query);
+     queries.put(method, query);
+}
+```
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-defining-query-method-processing.png)
+
+## 常用注解
+
+`@Entity(name = "t_user")`
+
+`@Table(indexes = {...}`
+
+`@Id`
+
+`@GeneratedValue`
+
+`@Column(length = 100, nullable = false)`
+
+`@Enumerated(EnumType.STRING)`
+
+`@Temporal(TemporalType.TIMESTAMP)`
+
+`@PrePersist`
+
+`@PreUpdate`
+
+`@PreRemove`
+
+`@CreationTimestamp`
+
+`@UpdateTimestamp`
+
 
 ## 使用Tips
 

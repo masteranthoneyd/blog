@@ -1426,6 +1426,74 @@ public static Map<String, List<Integer>> getElementPositions(List<String> list) 
 }
 ```
 
+## 使用Lambda代替字符串
+
+定义接口:
+
+```java
+@FunctionalInterface
+public interface Fn<T> extends Serializable {
+    Object apply(T source);
+}
+```
+
+编写Entity:
+
+```java
+@Data
+public class Foo {
+    private Integer bar;
+}
+```
+
+获取`Fn`的信息的工具类:
+
+```java
+import java.beans.Introspector;
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.Method;
+
+public class Reflections {
+    private Reflections() {
+    }
+
+    public static String fnToFieldName(Fn fn) {
+        try {
+            Method method = fn.getClass().getDeclaredMethod("writeReplace");
+            method.setAccessible(Boolean.TRUE);
+            SerializedLambda serializedLambda = (SerializedLambda) method.invoke(fn);
+            String getter = serializedLambda.getImplMethodName();
+            String fieldName = Introspector.decapitalize(getter.replace("get", ""));
+            return fieldName;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+运行:
+
+```java
+public class FnConverter<T> {
+    public String convertFnToString(Fn<T> fn){
+        return Reflections.fnToFieldName(fn);
+    }
+
+    public static void main(String[] args) {
+        FnConverter<Foo> fnConverter = new FnConverter<>();
+        String fieldName = fnConverter.convertFnToString(Foo::getBar);
+        System.out.println("方法名："+fieldName);
+    }
+}
+```
+
+结果:
+
+```
+方法名：bar
+```
+
 # Summary
 
 关于java8的介绍与使用网上有太多太多了, 如***[java8最佳技巧](https://zhuanlan.zhihu.com/p/27424997)***等等...

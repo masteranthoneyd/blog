@@ -11,7 +11,7 @@ tags: [Ubuntu,IDE,JDK,Tomcat]
 最近公司的电脑由于不明原因老是奔溃, 重装过两次, 在家里也比较喜欢折腾系统, 为了不用每次都度娘谷歌, 记录下来, 一条龙走过. 博主是搞爪哇开发的, 那么以下搭建针对的是爪哇环境开发
 
 <!--more-->
-# 安装JDK以及配置环境变量
+# JDK以及配置环境变量
 
 ## 通过Apt安装
 
@@ -113,7 +113,7 @@ javac -version
 ```
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/javaVersion.png)
 
-# 安装Scala环境
+# Scala环境
 
 更上面安装JDK类似
 
@@ -138,7 +138,7 @@ scala -version
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
 
-#  安装IDE
+#  IDE
 
 ## Eclipse
 
@@ -198,7 +198,7 @@ MyEclipse安装请看: ***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-
 
 桌面版个人使用就解压到`/home/{user}`目录下就可以了
 
-# 安装MySQL以及GUI工具
+# MySQL以及GUI工具
 
 ## 基于Docker安装
 
@@ -597,12 +597,12 @@ Terminal=0
 ```
 nohup /home/ybd/data/application/navicat/navicat120_premium_en_x64/start_navicat > /dev/null 2>&1 &
 ```
-# 安装Redis
+# Redis
 
 ***[请看这里](/2018/redis-relate-note.html)***
 
 
-# 安装Maven
+# Maven
 
 ## 下载
 官网下载或者***[点击镜像获取](http://mirror.bit.edu.cn/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz)***
@@ -739,6 +739,15 @@ docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 --restart=always rabbi
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
 
 集群: [https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
+
+# Pip
+
+```
+sudo apt install python3-pip
+
+// for Python 2
+sudo apt install python-pip
+```
 
 # Kafka&Zookeeper集群
 
