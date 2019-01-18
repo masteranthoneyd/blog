@@ -593,26 +593,11 @@ spring:
 
 # Spring Data JPA
 
-## Spring Data JPA 的主要类及结构图
-
-七个大 Repository 接口：
-
-- `Repository`(org.springframework.data.repository); 
-- `CrudRepository`(org.springframework.data.repository); 
-- `PagingAndSortingRepository`(org.springframework.data.repository); 
-- `JpaRepository`(org.springframework.data.jpa.repository); 
-- `QueryByExampleExecutor`(org.springframework.data.repository.query); 
-- `JpaSpecificationExecutor`(org.springframework.data.jpa.repository); 
-- `QueryDslPredicateExecutor`(org.springframework.data.querydsl).
-
-两大 Repository 实现类：
-
-- `SimpleJpaRepository`(org.springframework.data.jpa.repository.support);
-- `QueryDslJpaRepository`(org.springframework.data.jpa.repository.support).
+## 结构图
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-struct.png)
 
-## JPA配置
+## 配置
 
 ```yaml
 spring:
@@ -744,7 +729,7 @@ interface UserRepository extends CrudRepository<User, Long> {
 }
 ```
 
-关键字列表:
+#### 方法命名查询关键字列表
 
 | Keyword             | Sample                                                       | JPQL snippet                                                 |
 | ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -837,164 +822,31 @@ ListenableFuture<User> findOneByLastname(String lastname);
 ```
 支持的返回结果:
 
-| 返回值类型        | 描述                                                         |
-| ----------------- | ------------------------------------------------------------ |
-| void              | 不返回结果，一般是更新操作                                   |
-| Primitives        | Java 的基本类型，一般常见的是统计操作（如 long、boolean 等）Wrapper types Java 的包装类 |
-| T                 | 最多只返回一个实体，没有查询结果时返回 null。如果超过了一个结果会抛出 IncorrectResultSizeDataAccessException 的异常。 |
-| Iterator          | 一个迭代器                                                   |
-| Collection        | A 集合                                                       |
-| List              | List 及其任何子类                                            |
-| Optional          | 返回 Java 8 或 Guava 中的 Optional 类。查询方法的返回结果最多只能有一个，如果超过了一个结果会抛出 IncorrectResultSizeDataAccessException 的异常 |
-| Option            | Scala 或者 javaslang 选项类型                                |
-| Stream            | Java 8 Stream                                                |
-| Future            | Future，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能。一般配合多线程使用。关系数据库，实际工作很少有用到 |
-| CompletableFuture | 返回 Java8 中新引入的 CompletableFuture 类，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能 |
-| ListenableFuture  | 返回 org.springframework.util.concurrent.ListenableFuture 类，查询方法需要带有 @Async 注解，并开启 Spring 异步执行方法的功能 |
-| Slice             | 返回指定大小的数据和是否还有可用数据的信息。需要方法带有 Pageable 类型的参数 |
-| Page              | 在 Slice 的基础上附加返回分页总数等信息。需要方法带有 Pageable 类型的参数 |
-| GeoResult         | 返回结果会附带诸如到相关地点距离等信息                       |
-| GeoResults        | 返回 GeoResult 的列表，并附带到相关地点平均距离等信息        |
-| GeoPage           | 分页返回 GeoResult，并附带到相关地点平均距离等信息           |
-
-#### Projections 对查询结果的扩展
-
-Spring JPA 对 Projections 的扩展的支持，从字面意思上理解就是映射，指的是和 DB 的查询结果的字段映射关系。一般情况下，我们是返回的字段和 DB 的查询结果的字段是一一对应的，但有的时候，需要返回一些指定的字段，**不需要全部返回**，或者返回一些**复合型的字段**，还得自己写逻辑。Spring Data 正是考虑到了这一点，允许对专用返回类型进行建模，以便更有选择地将部分视图对象。
-
-假设 Person 是一个正常的实体，和数据表 Person 一一对应，我们正常的写法如下：
-
-```java
-@Entity
-class Person {
-   @Id
-   UUID id;
-   String firstname, lastname;
-   Address address;
-   @Entity
-   static class Address {
-      String zipCode, city, street;
-   }
-}
-interface PersonRepository extends Repository<Person, UUID> {
-   Collection<Person> findByLastname(String lastname);
-}
-```
-
-（1）但是我们想仅仅返回其中的 name 相关的字段，应该怎么做呢？如果基于 projections 的思路，其实是比较容易的。只需要声明一个接口，包含我们要返回的属性的方法即可。如下：
-
-```java
-interface NamesOnly {
-  String getFirstname();
-  String getLastname();
-}
-```
-
-Repository 里面的写法如下，直接用这个对象接收结果即可，如下：
-
-```java
-interface PersonRepository extends Repository<Person, UUID> {
-  Collection<NamesOnly> findByLastname(String lastname);
-}
-```
-
-Ctroller 里面直接调用这个对象可以看看结果。
-
-原理是，底层会有动态代理机制为这个接口生产一个实现实体类，在运行时。
-
-（2）查询关联的子对象，一样的道理，如下：
-
-```java
-interface PersonSummary {
-  String getFirstname();
-  String getLastname();
-  AddressSummary getAddress();
-  interface AddressSummary {
-    String getCity();
-  }
-}
-```
-
-（3）`@Value` 和 SPEL 也支持：
-
-```java
-interface NamesOnly {
-  @Value("#{target.firstname + ' ' + target.lastname}")
-  String getFullName();
-  …
-}
-```
-
-PersonRepository 里面保持不变，这样会返回一个 firstname 和 lastname 相加的只有 fullName 的结果集合。
-
-（4）对 Spel 表达式的支持远不止这些：
-
-```java
-@Component
-class MyBean {
-  String getFullName(Person person) {
-    …//自定义的运算
-  }
-}
-interface NamesOnly {
-  @Value("#{@myBean.getFullName(target)}")
-  String getFullName();
-  …
-}
-```
-
-（5）还可以通过 Spel 表达式取到方法里面的参数的值。
-
-```java
-interface NamesOnly {
-  @Value("#{args[0] + ' ' + target.firstname + '!'}")
-  String getSalutation(String prefix);
-}
-```
-
-（6）这时候有人会在想，只能用 interface 吗？dto 支持吗？也是可以的，也可以定义自己的 Dto 实体类，需要哪些字段我们直接在 Dto 类当中暴漏出来 get/set 属性即可，如下：
-
-```java
-class NamesOnlyDto {
-  private final String firstname, lastname;
-//注意构造方法
-  NamesOnlyDto(String firstname, String lastname) {
-    this.firstname = firstname;
-    this.lastname = lastname;
-  }
-  String getFirstname() {
-    return this.firstname;
-  }
-  String getLastname() {
-    return this.lastname;
-  }
-}
-```
-
-（7）支持动态 Projections，想通过泛化，根据不同的业务情况，返回不通的字段集合。
-
-```java
-PersonRepository做一定的变化，如下：
-interface PersonRepository extends Repository<Person, UUID> {
-  Collection<T> findByLastname(String lastname, Class<T> type);
-}
-```
-
-我们的掉用方，就可以通过 class 类型动态指定返回不同字段的结果集合了，如下：
-
-```java
-void someMethod(PersonRepository people) {
-//我想包含全字段，就直接用原始entity（Person.class）接收即可
-  Collection<Person> aggregates = people.findByLastname("Matthews", Person.class);
-//如果我想仅仅返回名称，我只需要指定Dto即可。
-  Collection<NamesOnlyDto> aggregates = people.findByLastname("Matthews", NamesOnlyDto.class);
-}
-```
+| 返回值类型          | 描述                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| `void`              | 不返回结果，一般是更新操作                                   |
+| `Primitives`        | Java 的基本类型，一般常见的是统计操作（如 `long`、`boolean` 等）Wrapper types Java 的包装类 |
+| `T`                 | 最多只返回一个实体，没有查询结果时返回 null。如果超过了一个结果会抛出 `IncorrectResultSizeDataAccessException` 的异常。 |
+| `Iterator`          | 一个迭代器                                                   |
+| `Collection`        | 集合                                                         |
+| `List`              | `List` 及其任何子类                                          |
+| `Optional`          | 返回 Java 8 或 Guava 中的 `Optional` 类。查询方法的返回结果最多只能有一个，如果超过了一个结果会抛出 `IncorrectResultSizeDataAccessException` 的异常 |
+| `Option`            | Scala 或者 javaslang 选项类型                                |
+| `Stream`            | Java 8 Stream                                                |
+| `Future`            | Future，查询方法需要带有 `@Async` 注解，并**开启 Spring 异步执行方法的功能**。一般配合多线程使用。关系数据库，实际工作很少有用到. |
+| `CompletableFuture` | 返回 Java8 中新引入的 `CompletableFuture` 类，查询方法需要带有 `@Async` 注解，并开启 Spring 异步执行方法的功能 |
+| `ListenableFuture`  | 返回 `org.springframework.util.concurrent.ListenableFuture` 类，查询方法需要带有 `@Async` 注解，并开启 Spring 异步执行方法的功能 |
+| `Slice`             | 返回指定大小的数据和是否还有可用数据的信息。需要方法带有 `Pageable` 类型的参数 |
+| `Page`              | 在 `Slice` 的基础上附加返回分页总数等信息。需要方法带有 `Pageable` 类型的参数 |
+| `GeoResult`         | 返回结果会附带诸如到相关地点距离等信息                       |
+| `GeoResults`        | 返回 `GeoResult` 的列表，并附带到相关地点平均距离等信息      |
+| `GeoPage`           | 分页返回 `GeoResult`，并附带到相关地点平均距离等信息         |
 
 #### 实现机制
 
-通过 QueryExecutorMethodInterceptor 这个类的源代码，我们发现，该类实现了 MethodInterceptor 接口，也就是说它是一个方法调用的拦截器， 当一个 Repository 上的查询方法，譬如说 findByEmailAndLastname 方法被调用，Advice 拦截器会在方法真正的实现调用前，先执行这个 MethodInterceptor 的 invoke 方法。这样我们就有机会在真正方法实现执行前执行其他的代码了。
+通过 `QueryExecutorMethodInterceptor` 这个类的源代码，我们发现，该类实现了 MethodInterceptor 接口，也就是说它是一个方法调用的拦截器， 当一个 Repository 上的查询方法，譬如说 findByEmailAndLastname 方法被调用，Advice 拦截器会在方法真正的实现调用前，先执行这个 MethodInterceptor 的 invoke 方法。这样我们就有机会在真正方法实现执行前执行其他的代码了。
 
-然而对于 QueryExecutorMethodInterceptor 来说，最重要的代码并不在 invoke 方法中，而是在它的构造器 QueryExecutorMethodInterceptor(RepositoryInformationr、Object customImplementation、Object target) 中。
+然而对于 `QueryExecutorMethodInterceptor` 来说，最重要的代码并不在 invoke 方法中，而是在它的构造器 `QueryExecutorMethodInterceptor(RepositoryInformationr、Object customImplementation、Object target)` 中。
 
 最重要的一段代码是这段：
 
@@ -1007,6 +859,247 @@ for (Method method : queryMethods) {
 ```
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-defining-query-method-processing.png)
+
+## 注解查询
+
+### @Query
+
+```java
+public @interface Query {
+   /**
+    * 指定JPQL的查询语句。（nativeQuery=true的时候，是原生的Sql语句）
+    */
+   String value() default "";
+   /**
+    * 指定count的JPQL语句，如果不指定将根据query自动生成。
+    * （如果当nativeQuery=true的时候，指的是原生的Sql语句）
+    */
+   String countQuery() default "";
+   /**
+    * 根据哪个字段来count，一般默认即可。
+    */
+   String countProjection() default "";
+   /**
+    * 默认是false，表示value里面是不是原生的sql语句
+    */
+   boolean nativeQuery() default false;
+   /**
+    * 可以指定一个query的名字，必须唯一的。
+    * 如果不指定，默认的生成规则是：
+    * {$domainClass}.${queryMethodName}
+    */
+   String name() default "";
+   /*
+    * 可以指定一个count的query的名字，必须唯一的。
+    * 如果不指定，默认的生成规则是：
+    * {$domainClass}.${queryMethodName}.count
+    */
+   String countName() default "";
+}
+```
+
+#### 用法
+
+```java
+public interface UserRepository extends JpaRepository<User, Long>{
+  @Query("select u from User u where u.emailAddress = ?1")
+  User findByEmailAddress(String emailAddress);
+    
+  @Query("select u from User u where u.firstname like %?1")
+  List<User> findByFirstnameEndsWith(String firstname);
+}	
+```
+
+原生SQL:
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
+  User findByEmailAddress(String emailAddress);
+    
+  @Query(value = "select * from user_info where first_name=?1 order by ?2",nativeQuery = true)
+}
+```
+
+**注意:** `nativeQuery` 不支持直接 `Sort` 的参数查询, 需要类似上面一样使用原生的`order by`。
+
+#### 排序
+
+`@Query` 的 JPQL 情况下，想实现排序，方法上面直接用 `PageRequest` 或者直接用 `Sort` 参数都可以做到。
+
+在排序实例中实际使用的属性需要与**实体模型里面的字段相匹配**，这意味着它们需要解析为查询中使用的属性或别名。这是一个`state_field_path_expression JPQL`定义，并且 Sort 的对象支持一些特定的函数。
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query("select u from User u where u.lastname like ?1%")
+  List<User> findByAndSort(String lastname, Sort sort);
+  @Query("select u.id, LENGTH(u.firstname) as fn_len from User u where u.lastname like ?1%")
+  List<Object[]> findByAsArrayAndSort(String lastname, Sort sort);
+}
+//调用方的写法，如下：
+repo.findByAndSort("lannister", new Sort("firstname"));               
+repo.findByAndSort("stark", new Sort("LENGTH(firstname)"));          
+repo.findByAndSort("targaryen", JpaSort.unsafe("LENGTH(firstname)"));
+repo.findByAsArrayAndSort("bolton", new Sort("fn_len"));  
+```
+
+#### 分页
+
+直接用 Page 对象接受接口，参数直接用 `Pageable` 的实现类即可。
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query(value = "select u from User u where u.lastname = ?1")
+  Page<User> findByLastname(String lastname, Pageable pageable);
+}
+//调用者的写法
+repository.findByFirstName("jackzhang",new PageRequest(1,10));
+```
+
+对原生 SQL 的分页支持，案例如下，但是支持的不是特别友好，以 MySQL 为例。
+
+```java
+ public interface UserRepository extends JpaRepository<UserInfoEntity, Integer>, JpaSpecificationExecutor<UserInfoEntity> {
+   @Query(value = "select * from user_info where first_name=?1 /* #pageable# */",
+         countQuery = "select count(*) from user_info where first_name=?1",
+         nativeQuery = true)
+   Page<UserInfoEntity> findByFirstName(String firstName, Pageable pageable);
+}
+//调用者的写法
+return userRepository.findByFirstName("jackzhang",new PageRequest(1,10, Sort.Direction.DESC,"last_name"));
+//打印出来的sql
+select  *   from  user_info  where  first_name=? /* #pageable# */  order by  last_name desc limit ?, ?
+```
+
+### @Param
+
+默认情况下，参数是**通过顺序**绑定在查询语句上的，这使得查询方法**对参数位置的重构**容易出错。为了解决这个问题，可以使用 `@Param` 注解指定方法参数的具体名称，通过绑定的参数名字做查询条件，这样不需要关心参数的顺序，推荐这种做法，比较利于代码重构。
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query("select u from User u where u.firstname = :firstname or u.lastname = :lastname")
+  User findByLastnameOrFirstname(@Param("lastname") String lastname,
+                                 @Param("firstname") String firstname);
+}
+```
+
+根据参数进行查询，top 10 前面说的 query method 关键字照样有用，如下：
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query("select u from User u where u.firstname = :firstname or u.lastname = :lastname")
+  User findTop10ByLastnameOrFirstname(@Param("lastname") String lastname,
+                                 @Param("firstname") String firstname);
+}
+```
+
+> 提醒：大家通过 @Query 定义自己的查询方法时，建议也用 Spring Data JPA 的 name query 的命名方法，这样下来风格就比较统一了。
+
+### Spel 表达式的支持
+
+在 Spring Data JPA 1.4 以后，支持在 `@Query` 中使用 SpEL 表达式（简介）来接收变量。
+
+SpEL 支持的变量
+
+| 变量名       | 使用方式                         | 描述                                              |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| `entityName` | `select x from #{#entityName} x` | 根据指定的 Repository 自动插入相关的 `entityName` |
+
+> 有两种方式能被解析出来：
+>
+> - 如果定了 `@Entity` 注解，直接用其属性名。
+> - 如果没定义，直接用实体的类的名称。
+
+在以下的例子中，我们在查询语句中插入表达式：
+
+```java
+@Entity("User")
+public class User {
+   @Id
+   @GeneratedValue
+   Long id;
+   String lastname;
+}
+//Repository写法
+public interface UserRepository extends JpaRepository<User, Long> {
+   @Query("select u from #{#entityName} u where u.lastname = ?1")
+   List<User> findByLastname(String lastname);
+}
+```
+
+这个 SPEL 的支持，比较适合自定义的 Repository，如果想写一个通用的 Repository 接口，那么可以用这个表达式来处理：
+
+```java
+@MappedSuperclass
+public abstract class AbstractMappedType {
+   …
+   String attribute;
+}
+@Entity
+public class ConcreteType extends AbstractMappedType { …
+}
+@NoRepositoryBean
+public interface MappedTypeRepository<T extends AbstractMappedType> extends Repository<T, Long> {
+   @Query("select t from #{#entityName} t where t.attribute = ?1")
+   List<T> findAllByAttribute(String attribute);
+}
+public interface ConcreteRepository extends MappedTypeRepository<ConcreteType> { …
+}
+```
+
+`MappedTypeRepository` 作为一个公用的父类，自己的 Repository 可以继承它，当调用 `ConcreteRepository` 执行 `findAllByAttribute` 方法的时候执行结果如下：
+
+```sql
+select t from ConcreteType t where t.attribute = ?1
+```
+
+### @Modifying 修改查询
+
+可以通过在 `@Modifying` 注解实现只需要参数绑定的 update 查询的执行，我们来看个例子根据 lastName 更新 firstname 并且返回更新条数如下：
+
+```java
+@Modifying
+@Query("update User u set u.firstname = ?1 where u.lastname = ?2")
+int setFixedFirstnameFor(String firstname, String lastname);
+```
+
+简单的针对某些特定属性的更新，也可以直接用基类里面提供的通用 save 来做更新（即继承 `CrudRepository` 接口）。
+
+**还有第三种方法就是自定义 Repository 使用 EntityManager 来进行更新操作。**
+
+对删除操作的支持如下：
+
+```java
+interface UserRepository extends Repository<User, Long> {
+  void deleteByRoleId(long roleId);
+  @Modifying
+  @Query("delete from User u where user.role.id = ?1")
+  void deleteInBulkByRoleId(long roleId);
+}
+```
+
+所以现在我们一共有四种方式来做更新操作：
+
+- 通过方法表达式；
+- 还有一种就是 `@Modifying` 注解；
+- `@Query` 注解也可以做到；
+- 继承 `CrudRepository` 接口。
+
+### @Query 的优缺点与实践
+
+| 分类     | 描述                                                         |
+| -------- | ------------------------------------------------------------ |
+| 优点     | （1）可以灵活快速的使用 JPQL 和 SQL                          |
+|          | （2）对返回的结果和字段记性自定义                            |
+|          | （3）支持连表查询和对象关联查询，可以组合出来复杂的 SQL 或者 JPQL |
+|          | （4）可以很好的表达你的查询思路                              |
+|          | （5）灵活性非常强，快捷方便                                  |
+| 缺点     | （1）不支持动态查询条件，参数个数如果是不固定的不支持        |
+|          | （2）有些读者会将返回结果用 Map 或者 Object[] 数组接收结果，会导致调用此方法的开发人员不知道返回结果里面到底有些什么数据 |
+| 最佳实践 | （1）当出现很复杂的 SQL 或者 JPQL 的时候建议用视图           |
+|          | （2）返回结果一定要用对象接收，最好每个对象里面的字段和你返回的结果一一对应 |
+|          | （3）动态的 Query Param 会在后面的章节中讲到                 |
+|          | （4）能用 JPQL 的就不要用 SQL                                |
 
 ## 常用注解
 
@@ -1086,7 +1179,7 @@ public class ReqReceiveDataConverter implements AttributeConverter<List<ReqRecei
 * `ReqReceiveDataConverter`需要实现`AttributeConverter<X,Y>`，`X`为实体的字段类型，`Y`对应需要持久化到DB的类型
 * `@Converter(autoApply = true)`注解作用，如果有多个实体需要用到此属性转换器，不需要每个实体都的字段加上`@Convert`注解，自动对全部实体生效
 
-## 发布领域事件
+### 发布领域事件
 
 一般基于DDD的设计，在实体状态改变时(保存或更新实体)，为了保证其他边缘服务与之状态的统一，我们需要通过发布实体保存或更新事件，其他服务监听后做出相应的处理，大概像这样：
 

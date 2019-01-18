@@ -1352,6 +1352,10 @@ ${AnsiColor.BRIGHT_GREEN}
 ${AnsiStyle.NORMAL}
 ```
 
+# 自定义favico
+
+将自己的`favicon.ico`放到`src/main/resources`即可.
+
 # 发送邮件
 
 > 各个厂商的STMP服务以及端口请自行搜索. . . 
