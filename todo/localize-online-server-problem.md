@@ -1,4 +1,55 @@
+# 转载-如何应对在线故障
+
+> 原创出处 ***[http://www.rowkey.me/blog/2018/11/22/online-debug/](http://www.rowkey.me/blog/2018/11/22/online-debug/)***
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug01.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug02.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug03.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug04.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug05.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug06.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug07.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug08.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug09.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug10.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug11.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug12.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug13.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug14.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug15.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug16.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug17.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug18.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug19.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug20.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug21.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug22.jpeg)
+
+![](https://cdn.yangbingdong.com/img/online-debug/online-debug23.jpeg)
+
 ## CPU100%问题快速定位
+
 ### 步骤一、找到最耗CPU的进程
 1、执行top -c ，显示进程运行信息列表
 2、键入P (大写p)，进程按照CPU使用率排序
