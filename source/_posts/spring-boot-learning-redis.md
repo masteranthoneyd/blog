@@ -1,5 +1,5 @@
 ---
-title: Redis杂记
+title: Redis 拾遗
 date: 2018-10-06 16:15:04
 categories: [Programming, Java, Spring Boot]
 tags: [Redis, Spring Boot]
@@ -414,6 +414,14 @@ slowlog get [n] // n 表示返回的日志记录条数
   会丢失部分慢查询命令, 为了防止这种情况发生, 可以定期执行 slow get 命令将慢查询日志持久化到其他存储中（例如 MySQL）, 然后可以制作可视化界面进行查询. 
 
 # rdb文件分析
+
+## redis-rdb-tools
+
+> ***[https://github.com/sripathikrishnan/redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)***
+
+## rdr
+
+> ***[https://github.com/xueqiu/rdr](https://github.com/xueqiu/rdr)***
 
 首先查看Redis的dump目录设置:
 

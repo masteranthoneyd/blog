@@ -1,6 +1,4 @@
-# Spring Boot 拾遗
-
-# Servlet加载
+# Spring Boot 之 Servlet 加载
 
 ## Spring时代
 
