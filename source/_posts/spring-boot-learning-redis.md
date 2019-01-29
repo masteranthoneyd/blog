@@ -1,5 +1,5 @@
 ---
-title: Redis 拾遗
+title: Redis拾遗与Spring Boot整合
 date: 2018-10-06 16:15:04
 categories: [Programming, Java, Spring Boot]
 tags: [Redis, Spring Boot]
@@ -438,6 +438,45 @@ CONFIG GET dir
 效果图: 
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/rdr.png)
+
+# Spring Boot整合
+
+## 核心依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-pool2</artifactId>
+</dependency>
+```
+
+* 使用连接池需要用到`commons-pool2`
+
+## 配置
+
+```yaml
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    lettuce:
+      pool:
+        #最大连接数
+        max-active: 128
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 5s
+        #最大空闲
+        max-idle: 16
+        #最小空闲
+        min-idle: 0
+    #连接超时时间
+    timeout: 10s
+```
 
 # 客户端序列化选择
 
