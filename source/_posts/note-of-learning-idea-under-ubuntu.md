@@ -363,6 +363,10 @@ Zookeeper UI, 支持删除操作
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
 
+## K8s工具：Kubernetes
+
+参考 https://plugins.jetbrains.com/plugin/10485-kubernetes 支持编辑 Kubernetes 资源文件，如下： 可以比较方便的查看yaml中的各项 placeholder 的默认值，且可以方便的链接到value位置。
+
 ## GsonFormat
 
 复制一段JSON格式字符串
@@ -373,7 +377,15 @@ Zookeeper UI, 支持删除操作
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format03.png)
 
-## Mybatis 插件
+## POJO to JSON
+
+为了测试需要，我们需要将简单 Java 领域对象转成 JSON 字符串方便用 postman 或者 curl 模拟数据。详细使用文档，参考：https://plugins.jetbrains.com/plugin/9686-pojo-to-json
+
+## Grep Console
+
+参考：https://plugins.jetbrains.com/plugin/7125-grep-console
+
+## Free Mybatis Plugin
 
 可以直接从Mapper文件跳转到xml: 
 
@@ -427,6 +439,10 @@ Zookeeper UI, 支持删除操作
 这是一个设置背景图的插件
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/background-image-plus.png)
+
+## Translation
+
+最骚的操作是什么？帆哥在群里分享了一套「半中文编程」：说到了变量命名，先用中文写好，然后用 Translation 插件的 translate and replace 一键替换为英文，这样效率高而且准确。详细使用文档，参考：https://plugins.jetbrains.com/plugin/8579-translation
 
 ## Enso
 

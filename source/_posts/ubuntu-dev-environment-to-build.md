@@ -39,6 +39,8 @@ sudo apt install openjdk-11-jdk
 
 ### OracleJDK
 
+**注意: 这个安装可能有点慢, 建议使用代理.**
+
 ```
 sudo add-apt-repository ppa:webupd8team/java && sudo apt update
 ```
