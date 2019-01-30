@@ -189,8 +189,19 @@ libxml2-utils
 
 ### 主题安装
 
-推荐一个网站 ***[Gnome Look](https://www.gnome-look.org/)***, 这里面有大量的主题, 并且都是以压缩包形式的, 应用程序和shell的主题都是放在`/usr/share/themes`目录下面, 图标的主题都是放在 
-`/usr/share/icons`目录下, 并且注意一下解压后shell的主题文件夹的二级目录应该是`/gnome-shell`, 然后分别放到对应的目录, 就能在**gnome-tweak**工具里面识别了
+推荐一个网站 ***[Gnome Look](https://www.gnome-look.org/)***, 这里面有大量的主题, 并且都是以压缩包形式的.
+
+- 主题存放目录：`/usr/share/themes` 或 `~/.themes`
+- 图标存放目录：`/usr/share/icons` 或 `~/.icons`
+- 字体存放目录：`/usr/share/fonts` 或 `~/.fonts`
+
+其中 `/usr/share` 目录需要 root 权限才能修改，可以对文件管理提权后打开：
+
+```text
+sudo nautilus
+```
+
+ 并且注意一下解压后shell的主题文件夹的二级目录应该是`/gnome-shell`, 然后分别放到对应的目录, 就能在**gnome-tweak**工具里面识别了
 
 #### Flatabulous
 
@@ -221,7 +232,19 @@ sudo apt install ultra-flat-icons
 sudo apt install arc-theme
 ```
 
-选择主题
+#### Sierra-gtk-theme
+
+> ***[https://github.com/vinceliuice/Sierra-gtk-theme](https://github.com/vinceliuice/Sierra-gtk-theme)***
+
+这是一款类苹果的主题...
+
+```
+sudo add-apt-repository ppa:dyatlov-igor/sierra-theme
+sudo apt update
+sudo apt install sierra-gtk-theme
+```
+
+#### 选择主题
 
 安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可. 
 
@@ -266,6 +289,14 @@ sudo apt install papirus-icon-theme
 
 或者下载最新的 [**deb 安装包**](https://launchpad.net/~papirus/+archive/ubuntu/papirus/+packages?field.name_filter=papirus-icon-theme)
 **[项目地址](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme)**
+
+### 光标
+
+#### oxy-blue
+
+***[https://www.opendesktop.org/p/1274872/](https://www.opendesktop.org/p/1274872/)***
+
+下载后解压到 `/usr/share/themes` 目录下
 
 ### GNOME Shell Extensions
 
@@ -388,9 +419,10 @@ cd fonts
 
 ## 安装字体
 
-`Ubuntu`自带的字体不太好看, 所以采用**文泉译微米黑字体**替代, 效果会比较好, 毕竟是国产字体！
+`Ubuntu`自带的字体不太好看, 所以采用**文泉译微米黑/正黑**替代, 效果会比较好, 毕竟是国产字体！
+
 ```
-sudo apt install fonts-wqy-microhei
+sudo apt install fonts-wqy-microhei fonts-wqy-zenhei
 ```
 
 然后通过`gnome-tweak-tool`来替换字体
@@ -401,7 +433,7 @@ sudo apt install fonts-wqy-microhei
 
 前往 ***[https://www.gnome-look.org/browse/cat/109/](https://www.gnome-look.org/browse/cat/109/)*** 选择一款合适自己的主题安装
 
-博主推荐 ***[Grub-theme-vimix](https://www.gnome-look.org/p/1009236/)*** 或 ***[Blur grub](https://www.gnome-look.org/p/1220920/)*** 
+博主推荐 ***[Grub-theme-vimix](https://www.gnome-look.org/p/1009236/)***  ***[Blur grub](https://www.gnome-look.org/p/1220920/)*** 或者 [***fallout-grub-theme***](https://github.com/shvchk/fallout-grub-theme)
 
 ![](https://cdn.yangbingdong.com/img/gnome/stylish.png)
 
