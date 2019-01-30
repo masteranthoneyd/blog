@@ -512,12 +512,12 @@ Zookeeper UI, 支持删除操作
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
 
-优化参数: 
+优化参数(32G内存): 
 
 ```
 -server
 -Xms2048m
--Xmx2048m
+-Xmx4096m
 -Xmn1024m
 -XX:MetaspaceSize=256m
 -XX:MaxMetaspaceSize=2048m
