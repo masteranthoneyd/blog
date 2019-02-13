@@ -161,21 +161,6 @@ sudo chmod -R 777 /usr/bin/lantern
 
 # 主题美化篇
 
-## 使用Tweaks对gnome进行美化
-
-### 依赖安装
-
-```
-sudo apt install -y \
-gnome-tweak-tool \
-gnome-shell-extensions \
-chrome-gnome-shell \
-gtk2-engines-pixbuf \
-libxml2-utils
-```
-
-### 主题安装
-
 推荐一个网站 ***[Gnome Look](https://www.gnome-look.org/)***, 这里面有大量的主题, 并且都是以压缩包形式的.
 
 - 主题存放目录：`/usr/share/themes` 或 `~/.themes`
@@ -189,6 +174,21 @@ sudo nautilus
 ```
 
  并且注意一下解压后shell的主题文件夹的二级目录应该是`/gnome-shell`, 然后分别放到对应的目录, 就能在**gnome-tweak**工具里面识别了
+
+## GNOME美化
+
+### 依赖安装
+
+```
+sudo apt install -y \
+gnome-tweak-tool \
+gnome-shell-extensions \
+chrome-gnome-shell \
+gtk2-engines-pixbuf \
+libxml2-utils
+```
+
+### 主题
 
 #### Flatabulous
 
@@ -241,7 +241,7 @@ sudo apt install sierra-gtk-theme
 
 [**项目地址**](https://github.com/snwh/paper-icon-theme) , 其他热门主题 [**Numix**](https://github.com/snwh/paper-gtk-theme) 、 [**Paper**](https://github.com/numixproject/numix-gtk-theme)
 
-### 图标安装
+### 图标
 
 #### Numix
 
@@ -285,7 +285,9 @@ sudo apt install papirus-icon-theme
 
 下载后解压到 `/usr/share/themes` 目录下
 
-### GNOME Shell Extensions
+## GNOME Extensions
+
+> Ubuntu 18.04 抛弃了 Unity 桌面转而使用 Gnome ，所以 Gnome 桌面下的一些 Shell 扩展在 Ubuntu 18.04 中就可以使用了。
 
 先上图...
 
@@ -293,21 +295,31 @@ sudo apt install papirus-icon-theme
 
 ![](https://cdn.yangbingdong.com/img/gnome/desktop2.png)
 
+### Chrome Gnome Shell
+
+首先安装 Chrome Gnome Shell ：
+
+```
+sudo apt install chrome-gnome-shell
+```
+
+然后安装浏览器插件（**谷歌浏览器**）：[Chrome 网上应用商店](https://chrome.google.com/webstore/detail/gnome-shell-integration/gphhapmejobijbbhgpjhcjognlahblep)
+
+浏览器插件安装完成后点击 *插件图标* 就能进入：**[Shell 扩展商店](https://extensions.gnome.org/)**
+
+### Dash To Dock
+
 **[Dash To Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)**: 虽然Ubuntu18已经有了一个Dock, 但定制性不强. 这个Dock插件提供了很多选项定制, 个人比较喜欢的一个选项就是隔离工作区. 
 
 ![](https://cdn.yangbingdong.com/img/gnome/dock02.png)
 
 ![](https://cdn.yangbingdong.com/img/gnome/dock01.png)
 
+### Weather
+
 [**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
 
-[**System Monitor**](https://extensions.gnome.org/extension/1064/system-monitor/) 系统监视器
-
-这个先要安装依赖: 
-
-```
-sudo apt install gir1.2-gtop-2.0 libgtop2-dev
-```
+### Topicons Plus
 
 [**Topicons Plus**](https://extensions.gnome.org/extension/1031/topicons/) 任务图标栏
 
@@ -322,17 +334,56 @@ sudo apt update
 sudo apt install sni-qt sni-qt:i386 hardcode-tray inkscape
 ```
 
-1. 转换图标
+2. 转换图标
 
 ```
 hardcode-tray --conversion-tool Inkscape
 ```
 
+### Nvidia GPU Temperature Indicator
+
 [**Nvidia GPU Temperature Indicator**](https://extensions.gnome.org/extension/541/nvidia-gpu-temperature-indicator/) 显卡温度指示器
+
+### User Themes
 
 **[User Themes](https://extensions.gnome.org/extension/19/user-themes/)** 可以使用shell-theme: 
 
 ![](https://cdn.yangbingdong.com/img/individuation/user-themes.png)
+
+### Other
+
+**以下是其他的Gnome 扩展推荐** :
+
+| 扩展                                                         | 简要功能描述                         |
+| ------------------------------------------------------------ | ------------------------------------ |
+| [Appfolders Management extension](https://extensions.gnome.org/extension/1217/appfolders-manager/) | 添加文件夹                           |
+| [Applications Menu](https://extensions.gnome.org/extension/6/applications-menu/) | 在顶部添加一个应用程序入口           |
+| [Autohide Battery](https://extensions.gnome.org/extension/595/autohide-battery/) | 自动隐藏电源（充电状态下已满）       |
+| [Caffeine](https://extensions.gnome.org/extension/517/caffeine/) | 取消自动锁屏（应用前台允许下）       |
+| [Clipboard Indicator](https://extensions.gnome.org/extension/779/clipboard-indicator/) | 剪切板管理工具                       |
+| [Coverflow Alt-Tab](https://extensions.gnome.org/extension/97/coverflow-alt-tab/) | Alt Tab 切换应用（更酷炫的界面）     |
+| [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/) | Dock （大名鼎鼎）                    |
+| [Dash to Panel](https://extensions.gnome.org/extension/1160/dash-to-panel/) | 对顶栏的操作处理（诸如自动隐藏等）   |
+| [EasyScreenCast](https://extensions.gnome.org/extension/690/easyscreencast/) | 录屏工具（录制质量优秀）             |
+| [Extension update notifier](https://extensions.gnome.org/extension/1166/extension-update-notifier/) | 自动推送所有扩展的更新信息           |
+| [Hide Top Bar](https://extensions.gnome.org/extension/545/hide-top-bar/) | 全屏时自动隐藏顶栏                   |
+| [HiKitty](https://extensions.gnome.org/extension/1391/hikitty/) | 一个有趣的扩展（放松必备）           |
+| [Internet speed meter](https://extensions.gnome.org/extension/1461/internet-speed-meter/) | 顶栏显示当前网络速度                 |
+| [Keys Indicator](https://extensions.gnome.org/extension/1105/keys-indicator/) | 顶栏显示 shift,alt,ctrl,num,cap 状态 |
+| [Lock Keys](https://extensions.gnome.org/extension/36/lock-keys/) | 顶栏显示 Numlock 和 Capslock 的状态  |
+| [Never close calendar event](https://extensions.gnome.org/extension/1439/never-close-calendar-event/) | 从不清除日历事件                     |
+| [No Topleft Hot Corner](https://extensions.gnome.org/extension/118/no-topleft-hot-corner/) | 清楚左上角的活动热区                 |
+| [OpenWeather](https://extensions.gnome.org/extension/750/openweather/) | 顶栏显示天气情况（支持中文）         |
+| [Places Status Indicator](https://extensions.gnome.org/extension/8/places-status-indicator/) | 提供快捷目录入口（同文件管理器）     |
+| [Popup dict Switcher](https://extensions.gnome.org/extension/1349/popup-dict-switcher/) | 一键开关划词翻译                     |
+| [Removable Drive Menu](https://extensions.gnome.org/extension/7/removable-drive-menu/) | 移除可移动设备                       |
+| [Screenshot Tool](https://extensions.gnome.org/extension/1112/screenshot-tool/) | 截图工具（挺方便）                   |
+| [Sound Input & Output Device Chooser](https://extensions.gnome.org/extension/906/sound-output-device-chooser/) | 更方便的调整声音、亮度               |
+| [System-monitor](https://extensions.gnome.org/extension/120/system-monitor/) | 在状态栏中显示系统信息（很多类型）   |
+| [TaskBar](https://extensions.gnome.org/extension/584/taskbar/) | 类似于 Windows 任务栏的显示效果      |
+| [Time ++](https://extensions.gnome.org/extension/1238/time/) | 番茄钟（闹钟、秒表、计时器）         |
+
+> 若出现安装失败，请检查 **是否满足相关依赖** 。
 
 ## Oh-My-Zsh
 
@@ -350,6 +401,7 @@ sudo apt-get install zsh
 接下来我们需要下载 `oh-my-zsh` 项目来帮我们配置 `zsh`, 采用`wget`安装(需要先安装`git`)
 ```
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+chsh -s /usr/bin/zsh
 ```
 
 ### 语法高亮
@@ -414,7 +466,7 @@ sudo apt install fonts-wqy-microhei fonts-wqy-zenhei
 
 然后通过`gnome-tweak-tool`来替换字体
 
-## GRUB 2 美化
+## GRUB 2 主题
 
 > 由于安装了多系统, 恰好Ubuntu的GRUB2提供了切换系统的选择, 但是界面不咋样
 
@@ -425,6 +477,77 @@ sudo apt install fonts-wqy-microhei fonts-wqy-zenhei
 ![](https://cdn.yangbingdong.com/img/gnome/stylish.png)
 
 根据提示下载源码执行安装脚本即可. 
+
+
+
+但某些主题只提供主题包并没有安装脚本, 则我们需要**手动安装**:
+
+首先下载主题包，多为压缩包，解压出文件。使用 `sudo nautilus` 打开文件管理器。
+
+定位到目录：`/boot/grub`，在该目录下 **新建文件夹** ：`themes`，把解压出的文件拷贝到文件夹中。
+
+- **方案一：手写配置文件**
+
+接着（终端下）使用 gedit 修改 *grub* 文件：
+
+```
+sudo gedit /etc/default/grub
+```
+
+在该文件末尾添加：
+
+```
+# GRUB_THEME="/boot/grub/themes/主题包文件夹名称/theme.txt"
+GRUB_THEME="/boot/grub/themes/fallout-grub-theme-master/theme.txt"
+```
+
+- **方案二：利用软件 Grub Customizer**
+
+添加 PPA ：
+
+```
+sudo add-apt-repository ppa:danielrichter2007/grub-customizer
+```
+
+安装软件：
+
+```
+sudo apt install grub-customizer
+```
+
+- **最后** 更新配置文件：
+
+```
+sudo update-grub
+```
+
+> 谈到 grub 就不得不谈到 `/boot/grub/grub.cfg` ，这个文件才是事实上的配置文件，所谓更新就是重新生成 *grub.cfg* 。
+
+## GDM 登录背景图
+
+更换登录界面的背景图需要修改文件 `ubuntu.css`，它位于 `/usr/share/gnome-shell/theme` 。
+
+```
+sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
+```
+
+在文件中找到关键字 `lockDialogGroup`，如下行：
+
+```
+#lockDialogGroup {
+   background: #2c001e url(resource:///org/gnome/shell/theme/noise-texture.png);
+   background-repeat: repeat; }
+```
+
+修改图片路径即可，样例如下：
+
+```
+#lockDialogGroup {
+background: #2c001e url(file://home/inkss/APP/ink_img/img.jpg);
+   background-repeat: no-repeat; 
+   background-size: cover;
+   background-position: center; }
+```
 
 ## 壁纸推荐
 
@@ -561,11 +684,6 @@ sudo add-apt-repository ppa:eugenesan/ppa
 sudo apt update
 sudo apt install smartgithg
 ```
-卸载: 
-```
-sudo apt remove smartgithg
-```
-
 ## Typora(Markdown编辑器)
 *[官方](https://typora.io/#linux)*安装方法如下: 
 ```
@@ -708,21 +826,6 @@ sudo perl securecrt_linux_crack.pl /usr/bin/SecureCRT
 
 然后按照提示手动输入License即可
 
-## wiznote(为知笔记)
-
-一款`linux`下强大的笔记软件
-
-```
-sudo add-apt-repository ppa:wiznote-team 
-sudo apt update 
-sudo apt install wiznote
-```
-
-## Vim
-系统并没有集成`vim`, 可以执行以下代码安装: 
-```
-sudo apt install vim
-```
 ## WPS
 去*[wps官网](http://linux.wps.cn/)* 下载wps for Linux. 
 先不要执行dpkg -i 去执行安装. 这个地方有个问题, 就是ubuntu 16 版本不支持32位的支持库, 所以需要安装一下支持库. 
@@ -1020,36 +1123,15 @@ sudo apt install filezilla
 sudo apt install filezilla-locales
 ```
 
-## rar安装与使用
-
-### 安装
+## 备份工具 Timeshift
 ```
-sudo apt install rar
-```
-### 使用
-解压到当前目录: 
-```
-unrar e update.rar
+sudo apt install timeshift
 ```
 
-解压到指定目录: 
-```
-unrar x update.rar update/
-```
-
-压缩: 
-```
-rar a pg_healthcheck.rar1 pg_healthcheck/
-```
-
-## 备份工具
-```
-sudo add-apt-repository ppa:nemh/systemback
-sudo apt update
-sudo apt install systemback
-```
+![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
 
 ## 键盘输入声音特效（Tickys）
+
 ***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
 下载`tickys`之后执行:
 ```
@@ -1085,14 +1167,6 @@ sudo apt install screenfetch
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/screenfetch.png)
-
-## 点击图标最小化
-
-试了之后发现这种交互也不太好, 如果开了多个窗口, 全部都一起最小化了...
-
-```
-gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
-```
 
 ## exfat驱动
 ```
@@ -1147,7 +1221,20 @@ cmatrix -b
 
 够骚气. . . 
 
+# 附录
+
+## 软件图标（.desktop）文件位置
+
+- `/usr/share/applications` # 大部分启动图标都在此
+- `~/.local/share/applications` # 一部分本地图标
+- `/var/lib/snapd/desktop/applications` # snap 类软件在此
+
 # Finally
+
+> 参考: 
+>
+> * ***[https://inkss.cn/2018/09/12/ubuntu-1804-installation-record/](https://inkss.cn/2018/09/12/ubuntu-1804-installation-record/)***
+> * ***[https://www.jianshu.com/p/23b0d3015db8](https://www.jianshu.com/p/23b0d3015db8)***
 
 使用Ubuntu的这一路过来真的是跌跌撞撞, 一路摸爬滚打不断谷歌百度解决各种奇怪的系统问题, 磨合了也有好长一段日子, 重装系统的次数也数不过来了, 有一段时间甚至觉得重装系统已是日常, 有时候一装就是到凌晨2点. . . 给我最大的收获并不是觉得自己用Ubuntu用得多牛X, 而是锻炼了自己的耐性, 小强般的韧性. 曾经一度想放弃Ubuntu, 但一路都在边缘徘徊, 还是坚持了下来. . . 
 
