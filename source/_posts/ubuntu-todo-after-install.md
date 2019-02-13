@@ -145,19 +145,6 @@ sudo visudo
 
 这样所有sudo组内的用户使用sudo时就不需要密码了. 
 
-## 中文输入法
-
-如果觉得用不惯Ubuntu自带的`ibus`, 可以选择装回`fcitx`: 
-
-```
-sudo apt install fcitx fcitx-googlepinyin im-config
-im-config
-```
-
-`im-config`中指定`fcitx`的配置即可. 
-
-**搜狗输入法** 安装请看下面软件篇. 
-
 # 科学上网篇
 
 ## 方式一: 下载Lantern
@@ -459,35 +446,30 @@ sudo apt-get remove ibus
 
 ```
 sudo apt-get purge ibus
-
 ```
 
 卸载顶部面板任务栏上的键盘指示. 
 
 ```
 sudo  apt-get remove indicator-keyboard
-
 ```
 
 安装fcitx输入法框架
 
 ```
 sudo apt install fcitx-table-wbpy fcitx-config-gtk
-
 ```
 
 切换为 Fcitx输入法
 
 ```
 im-config -n fcitx
-
 ```
 
 im-config 配置需要重启系统才能生效
 
 ```
 sudo shutdown -r now
-
 ```
 
 点击下载 Sogou For Linux -> <a id="download" href="http://pinyin.sogou.com/linux/"><i class="fa fa-download"></i><span> Download Now</span>
@@ -501,21 +483,18 @@ wget http://cdn2.ime.sogou.com/dl/index/1524572264/sogoupinyin_2.2.0.0108_amd64.
 
 ```
 sudo dpkg -i sogoupinyin_2.2.0.0108_amd64.deb
-
 ```
 
 修复损坏缺少的包
 
 ```
- sudo apt-get install -f
-
+sudo apt-get install -f
 ```
 
 打开 Fcitx 输入法配置
 
 ```
 fcitx-config-gtk3
-
 ```
 
 问题: 输入法皮肤透明
