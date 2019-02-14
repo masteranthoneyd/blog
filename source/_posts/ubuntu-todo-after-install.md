@@ -103,7 +103,7 @@ sudo dd if=ubuntu-16.04-desktop-amd64.iso of=/dev/sdc bs=1M
 
 ## 换源
 
-更换最佳源服务器, 打开 **软件和更新**（这里我选择阿里的, 或者点击右边的 选择最佳服务器）: 
+更换最佳源服务器, 打开 **软件和更新**（这里可以选择阿里的, 或者点击右边的 选择最佳服务器）: 
 
 ![](https://cdn.yangbingdong.com/img/individuation/source-server.png)
 
@@ -190,6 +190,18 @@ libxml2-utils
 
 ### 主题
 
+#### Sierra-gtk-theme
+
+> ***[https://github.com/vinceliuice/Sierra-gtk-theme](https://github.com/vinceliuice/Sierra-gtk-theme)***
+
+这是一款类苹果的主题...
+
+```
+sudo add-apt-repository ppa:dyatlov-igor/sierra-theme
+sudo apt update
+sudo apt install sierra-gtk-theme
+```
+
 #### Flatabulous
 
 `Flatabulous`主题是一款`Ubuntu`下扁平化主题.
@@ -219,39 +231,26 @@ sudo apt install ultra-flat-icons
 sudo apt install arc-theme
 ```
 
-#### Sierra-gtk-theme
-
-> ***[https://github.com/vinceliuice/Sierra-gtk-theme](https://github.com/vinceliuice/Sierra-gtk-theme)***
-
-这是一款类苹果的主题...
-
-```
-sudo add-apt-repository ppa:dyatlov-igor/sierra-theme
-sudo apt update
-sudo apt install sierra-gtk-theme
-```
-
-#### 选择主题
-
-安装完成后打开自带的 `GNOME Tweak Tool` 工具选择对应的 `Arc` 主题即可. 
-
-![](https://cdn.yangbingdong.com/img/gnome/gnome-tweak-tool.png)
-
-**注意** :对于高分屏, 可能使用 `Arc-Theme` 显示 GNOME Shell 的字体过小, 可通过修改 `/usr/share/themes/[对应 Arc 主题]/gnome-shell/gnome-shell.css` 修改 **stage** 的 `font-size` . 
-
-[**项目地址**](https://github.com/snwh/paper-icon-theme) , 其他热门主题 [**Numix**](https://github.com/snwh/paper-gtk-theme) 、 [**Paper**](https://github.com/numixproject/numix-gtk-theme)
-
 ### 图标
 
-#### Numix
+#### Suru Plus
+
+> ***[https://www.opendesktop.org/p/1210408/](https://www.opendesktop.org/p/1210408/)***
 
 ```
-sudo add-apt-repository ppa:numix/ppa
-sudo apt update
-sudo apt install numix-icon-theme
+wget -qO- https://raw.githubusercontent.com/gusbemacbe/suru-plus/master/install.sh | sh
 ```
 
-**[项目地址](https://github.com/numixproject/numix-icon-theme)**
+更换文件夹颜色(***[https://github.com/gusbemacbe/suru-plus-folders/blob/master/languages/en.md](https://github.com/gusbemacbe/suru-plus-folders/blob/master/languages/en.md)***):
+
+```
+# 安装
+wget -qO- https://git.io/fhQdI | sh
+# 查看颜色
+suru-plus-folders -l --theme Suru++
+# 更换
+suru-plus-folders -C brown --theme Suru++
+```
 
 #### Paper
 
@@ -266,20 +265,19 @@ sudo apt install paper-cursor-theme
 
 **[项目地址](https://github.com/snwh/paper-icon-theme)**
 
-#### Papirus
-
-```
-sudo add-apt-repository ppa:papirus/papirus
-sudo apt update
-sudo apt install papirus-icon-theme
-```
-
-或者下载最新的 [**deb 安装包**](https://launchpad.net/~papirus/+archive/ubuntu/papirus/+packages?field.name_filter=papirus-icon-theme)
-**[项目地址](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme)**
-
 ### 光标
 
-#### oxy-blue
+#### Capitaine Cursors
+
+> ***[https://www.gnome-look.org/p/1148692/](https://www.gnome-look.org/p/1148692/)***
+
+```
+sudo add-apt-repository ppa:dyatlov-igor/la-capitaine
+sudo apt update
+sudo apt install la-capitaine-cursor-theme
+```
+
+#### Oxy Blue
 
 ***[https://www.opendesktop.org/p/1274872/](https://www.opendesktop.org/p/1274872/)***
 
@@ -456,7 +454,7 @@ cd fonts
 ./install.sh
 ```
 
-## 安装字体
+## 字体
 
 `Ubuntu`自带的字体不太好看, 所以采用**文泉译微米黑/正黑**替代, 效果会比较好, 毕竟是国产字体！
 
@@ -551,11 +549,24 @@ background: #2c001e url(file://home/inkss/APP/ink_img/img.jpg);
 
 ## 壁纸推荐
 
-推荐一个不错的壁纸下载网站: ***[https://pixabay.com](https://pixabay.com)***
+推荐几个不错的壁纸下载网站: 
+
+* ***[https://pixabay.com](https://pixabay.com)***
+* ***[https://wallpapershome.com](https://wallpapershome.com)***
 
 # 软件篇
 
 > Java开发者的环境搭建请看: ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
+
+## Gdebi
+
+有时候安装deb包不满足依赖还需要手动执行`sudo apt install -f`, 我们可以使用`gdebi`解决这个问题:
+
+```
+sudo apt install gdebi
+```
+
+之后使用`sudo gdebi xxx.deb`安装即可
 
 ## 搜狗输入法
 
@@ -1181,7 +1192,6 @@ sudo gedit /etc/default/grub
 将`GRUB_TIMEOUT=10`中的`10`改为你想要修改的等待时间, 比如`3`, 网上很多的教程都是到这一步, 其实是不行的, 估计都是乱转一气. 到这里还有最重要的一步, 就是使用`#`号将`GRUB_HIDDEN_TIMEOUT=0`标注,然后再次回到终端, 输入下面的命令刷新`/boot/grub/grub.cfg`文件: 
 ```
 sudo update-grub2
-
 ```
 
 ## 启动项管理
