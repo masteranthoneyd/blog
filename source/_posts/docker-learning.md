@@ -1550,7 +1550,7 @@ portainer/portainer:{PORTAINER_VERSION:-latest} \
 -H unix:///var/run/docker.sock
 ```
 
-## [*Visualizer*](https://hub.docker.com/r/dockersamples/visualizer/)
+## *[Visualizer](https://hub.docker.com/r/dockersamples/visualizer/)*
 
 ```
 docker service create \
@@ -1671,7 +1671,7 @@ docker run -idt --name ngrok-server \
 
 > 详情: [***Docker搭建Ngrok***](http://yangbingdong.com/2017/self-hosted-build-ngrok-server/#Docker搭建Ngrok)
 
-## [*Zookeeper*](https://hub.docker.com/_/zookeeper/)集群
+## *[Zookeeper](https://hub.docker.com/_/zookeeper/)*集群
 
 docker-compose.yml:
 
@@ -1754,7 +1754,7 @@ networks:
       name: zoo-net
 ```
 
-## [*Kafka*](https://hub.docker.com/r/wurstmeister/kafka/tags/)集群
+## *[Kafka](https://hub.docker.com/r/wurstmeister/kafka/tags/)*集群
 
 docker-compose.yml
 
@@ -1876,7 +1876,7 @@ networks:
       name: zoo-net
 ```
 
-## [*Logrotate*](https://hub.docker.com/r/blacklabelops/logrotate/)
+## *[Logrotate](https://hub.docker.com/r/blacklabelops/logrotate/)*
 
 功能: 日志清理
 
