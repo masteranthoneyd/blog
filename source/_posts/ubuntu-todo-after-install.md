@@ -1,12 +1,12 @@
 ---
-title: Ubuntu主题美化、个性化设置与常用软件
+title: Ubuntu主题美化与常用软件记录
 date: 2017-01-12 23:04:36
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
 ![](https://cdn.yangbingdong.com/img/gnome/activities-overview.jpg)
 # 前言
->  ***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本回归GNOME环境, 果断升级...
+>  时间已经来到了9102年, 当初的***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本已经回归GNOME环境, 各种主题优化教程也层出不穷了, 说明Ubuntu的使用人群也渐渐增加...
 >
 
 <!--more-->
@@ -313,10 +313,6 @@ sudo apt install chrome-gnome-shell
 
 ![](https://cdn.yangbingdong.com/img/gnome/dock01.png)
 
-### Weather
-
-[**Weather**](https://extensions.gnome.org/extension/613/weather/) 天气插件
-
 ### Topicons Plus
 
 [**Topicons Plus**](https://extensions.gnome.org/extension/1031/topicons/) 任务图标栏
@@ -365,7 +361,6 @@ hardcode-tray --conversion-tool Inkscape
 | [EasyScreenCast](https://extensions.gnome.org/extension/690/easyscreencast/) | 录屏工具（录制质量优秀）             |
 | [Extension update notifier](https://extensions.gnome.org/extension/1166/extension-update-notifier/) | 自动推送所有扩展的更新信息           |
 | [Hide Top Bar](https://extensions.gnome.org/extension/545/hide-top-bar/) | 全屏时自动隐藏顶栏                   |
-| [HiKitty](https://extensions.gnome.org/extension/1391/hikitty/) | 一个有趣的扩展（放松必备）           |
 | [Internet speed meter](https://extensions.gnome.org/extension/1461/internet-speed-meter/) | 顶栏显示当前网络速度                 |
 | [Keys Indicator](https://extensions.gnome.org/extension/1105/keys-indicator/) | 顶栏显示 shift,alt,ctrl,num,cap 状态 |
 | [Lock Keys](https://extensions.gnome.org/extension/36/lock-keys/) | 顶栏显示 Numlock 和 Capslock 的状态  |
@@ -377,7 +372,7 @@ hardcode-tray --conversion-tool Inkscape
 | [Removable Drive Menu](https://extensions.gnome.org/extension/7/removable-drive-menu/) | 移除可移动设备                       |
 | [Screenshot Tool](https://extensions.gnome.org/extension/1112/screenshot-tool/) | 截图工具（挺方便）                   |
 | [Sound Input & Output Device Chooser](https://extensions.gnome.org/extension/906/sound-output-device-chooser/) | 更方便的调整声音、亮度               |
-| [System-monitor](https://extensions.gnome.org/extension/120/system-monitor/) | 在状态栏中显示系统信息（很多类型）   |
+| [System-monitor](https://extensions.gnome.org/extension/120/system-monitor/) / [System-monitor](https://extensions.gnome.org/extension/1064/system-monitor/) | 在状态栏中显示系统信息（很多类型）   |
 | [TaskBar](https://extensions.gnome.org/extension/584/taskbar/) | 类似于 Windows 任务栏的显示效果      |
 | [Time ++](https://extensions.gnome.org/extension/1238/time/) | 番茄钟（闹钟、秒表、计时器）         |
 
