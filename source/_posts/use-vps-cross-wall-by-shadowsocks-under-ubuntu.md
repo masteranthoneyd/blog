@@ -82,19 +82,6 @@ Linode只能使用**信用卡支付**, 官方会随机手工抽查, 被抽查到
 # ShadowSocks服务端安装
 > 安装方式各种各样. . . 推荐Docker安装
 
-## 基于Docker安装
-
-详细教程不在本篇范围内, 请看***[Docker入门笔记](/2017/docker-learning)***
-以下是最简单快捷高效的安装方式: 
-
-```
-curl -fsSL get.docker.com -o get-docker.sh
-sh get-docker.sh
-```
-
-就是这么粗暴的两条命令=.=
-这里可能会有个小问题, 如果VPS使用的`IPv6`可能会导致`apt update`失败, 解决办法是把上面下载的`get-docker.sh`里面所有的`apt-get update`改为`apt-get Acquire::ForceIPv4=true update`. 
-
 ### 拉取镜像
 
 `Showdowsocks`镜像: ***[https://hub.docker.com/r/mritd/shadowsocks/](https://hub.docker.com/r/mritd/shadowsocks/)***
@@ -205,65 +192,6 @@ Enjoy it!
 **Shadowsocks-libev** 版: 
 `/etc/shadowsocks-libev/config.json`
 
-## 手动安装
-
-### 安装
-
-```shell
-apt-get update
-apt-get install python-pip
-pip install shadowsocks
-```
-
-### 修改配置文件
-
-```shell
-vi /etc/shadowsocks.json
-```
-添加以下内容: 
-```json
-{
-    "server":"my_server_ip",
-    "server_port":8388,
-    "local_address": "127.0.0.1",
-    "local_port":1080,
-    "password":"mypassword",
-    "timeout":300,
-    "method":"aes-256-cfb",
-    "fast_open": false
-}
-```
-| name        | info                                     |
-| ----------- | ---------------------------------------- |
-| server      | 服务器 IP (IPv4/IPv6), 注意这也将是服务端监听的 IP 地址    |
-| server_port | 服务器端口                                    |
-| local_port  | 本地端端口                                    |
-| password    | 用来加密的密码                                  |
-| timeout     | 超时时间（秒）                                  |
-| method      | 加密方法, 可选择 “bf-cfb”, “aes-256-cfb”, “des-cfb”, “rc4″, 等等. 默认是一种不安全的加密, 推荐用 “aes-256-cfb” |
-
-只需要把 `my_server_ip`换成你VPS的IP, 并且把 `mypassword` 换成你自己的密码, 注意: 这个密码不是你登录VPS的密码, 是你一会从ShadowSocks客户端登录的时候用的密码.
-`server_port`默认8388也行, 你修改也行, 这个端口是ShadowSocks客户端登录时用的端口号, 如果你修改了, 最好改成1024至65536之间的一个数字, 并且自己一定要记住. 其它的都默认就好. 
-
-### 启动服务
-
-下面就可以开始启动ShadowSocks服务端了. ShadowSocks服务端自身就已经支持后台运行了, 所以, 通过下面的命令启动之后, 只要你的VPS不关机不重启, ShadowSocks服务端就会一直在后台运行. 
-```shell
-ssserver -c /etc/shadowsocks.json -d start
-```
-![](https://cdn.yangbingdong.com/img/vps/shadowsocks-startup.png)
-看到`started`没有, 这就表示你的ShadowSocks服务端就已经启动了. 此时就可以关掉你的终端, 然后打开你的ShadowSocks客户端进行连接了. 
-
-最后一步, 将ShadowSocks加入开机启动. 很简单, 只需在/etc/rc.local加一句话就成. 通过如下命令打开rc.local文件
-```shell
-vi /etc/rc.local
-```
-在`exit 0`的上一行添加以下内容: 
-```shell
-/usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start
-```
-粘贴完成后, 和上面编辑配置文件一样, 选按键盘左上角的“ESC”键, 然后输入”:wq”, 保存退出. 这样, 开机就会自动启动ShadowSocks了. 不信, 你可以试一下. 
-
 # ShadowSocks客户端安装
 ## 安装与启动
 
@@ -348,53 +276,6 @@ sudo apt-get install shadowsocks-qt5
 ```
 由于是图形界面, 配置和windows基本没啥差别就不赘述了. 经过上面的配置, 你只是启动了sslocal 但是要上网你还需要配置下浏览器到指定到代理端口比如1080才可以正式上网. 
 
-## 开机后台自动运行ss客户端
-**如果你选择了第二种可以不管这个**
-如果你上面可以代理上网了可以进行这一步, 之前让你不要关掉终端, 因为关掉终端的时候代理就随着关闭了, 之后你每次开机或者关掉终端之后, 下次你再想用代理就要重新在终端输入这样的命令 `sslocal  -c /home/ybd/shadowsocks.json` , 挺麻烦是不？
-
-我们现在可以在你的Ubuntu上安装一个叫做`supervisor`的程序来管理你的`sslocal`启动. 
-```shell
-sudo apt-get install supervisor
-```
-安装好后我们直接在`/etc/supervisor/conf.d/`下新建个文件比如`ss.conf`然后加入下面内容: 
-```shell
-[program:shadowsocks]
-command=sslocal -c /home/ybd/shadowsocks.json
-autostart=true
-autorestart=true
-user=root
-log_stderr=true
-logfile=/var/log/shadowsocks.log
-```
-`command = `这里json文件的路径根据你的文件路径来填写. 确认无误后记得保存. `sslocal` 和`ssserver`这两个命令是被存在 `/usr/bin/`下面的, 我们要拷贝一份命令文件到`/bin`
-```shell
-sudo cp /usr/bin/sslocal /bin 
-sudo cp /usr/bin/ssserver /bin 
-```
-现在关掉你之前运行`sslocal`命令的终端, 再打开终端输入`sudo service supervisor restart` 然后去打开浏览器看看可不可以继续代理上网. 你也可以用`ps -ef|grep sslocal`命令查看`sslocal`是否在运行. 
-
-这个时候我们需要在`/etc`下编辑一个叫`rc.local`的文件 , 让`supervisor`开机启动. 
-```shell
-sudo gedit /etc/rc.local
-```
-在这个配置文件的`exit 0`**前面**一行加上 `service supervisor start` 保存. 看你是否配置成功你可以在现在关机重启之后直接打开浏览器看是否代理成功. 
-
-还有一种方法就是: 
-```bash
-sudo systemctl enable supervisor
-```
-然后重启即可
-
-# 番外篇: 服务端一键安装
-## 搬瓦工一键安装
-搬瓦工早就知道广大使用者的~~阴谋~~意图, 所以特意提供了**一键无脑安装Shadowsocks**. 
-注意: **目前只支持CentOS**. 
-进入KiwiVM后, 在左边的选项栏的最下面: 
-![](https://cdn.yangbingdong.com/img/vps/one-key-install-shadowsocks.png)
-点击Install之后会出现如下界面代表安装成功: 
-![](https://cdn.yangbingdong.com/img/vps/one-key-install-shadowsocks01.png)
-点GO Back可看到相关信息了
-
 # 使用ShadowSocks代理实现科学上网
 
 **毕竟Shadowsocks是sock5代理, 不能接受http协议, 所以我们需要把sock5转化成http流量. **
@@ -468,6 +349,11 @@ sudo pip uninstall genpac
 点击“应用到整个系统”, 接下来可以愉悦的跨过墙了～
 
 ## Proxychains 代理
+
+> ***[https://github.com/rofl0r/proxychains-ng](https://github.com/rofl0r/proxychains-ng)***
+>
+> 这个是最新版的proxychains, 下面通过apt安装的是3.1版本的.
+
 安装proxychains: 
 ```shell
 sudo apt install proxychains
@@ -522,31 +408,6 @@ wget http://www.google.com
 ```
 export http_proxy="127.0.0.1:8118"
 export https_proxy="127.0.0.1:8118"
-```
-
-# ShadowSocks优化
-
-> 更多详情请见: ***[https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize](https://github.com/iMeiji/shadowsocks_install/wiki/shadowsocks-optimize)***
-
-## 开启TCP Fast Open
-**这个需要服务器和客户端都是Linux 3.7+的内核**
-在服务端和客户端的`/etc/sysctl.conf`都加上: 
-```
-# turn on TCP Fast Open on both client and server side
-net.ipv4.tcp_fastopen = 3
-```
-然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`
-
-## 使用特殊端口
-GFW会通过某些手段来减轻数据过滤的负荷, 例如特殊的端口如ssh, ssh默认端口给ss用了那么久必须修改我们登录服务器的端口. 
-修改SSH配置文件: 
-```shell
-vi /etc/ssh/sshd_config
-```
-找到`#port 22`, 将前面的`#`去掉, 然后修改端口 `port 2333`（自己设定）. 
-然后重启SSH: 
-```shell
-service ssh restart
 ```
 
 # 多用户管理
@@ -657,9 +518,21 @@ rm -f /sbin/sysctl
 ln -s /bin/true /sbin/sysctl
 ```
 
-## Kcptun
+## 使用特殊端口
 
-***[Kcptun 服务端一键安装脚本](https://blog.kuoruan.com/110.html)***
+GFW会通过某些手段来减轻数据过滤的负荷, 例如特殊的端口如ssh, ssh默认端口给ss用了那么久必须修改我们登录服务器的端口. 
+修改SSH配置文件: 
+
+```shell
+vi /etc/ssh/sshd_config
+```
+
+找到`#port 22`, 将前面的`#`去掉, 然后修改端口 `port 2333`（自己设定）. 
+然后重启SSH: 
+
+```shell
+service ssh restart
+```
 
 # VPS Security
 
@@ -1044,6 +917,8 @@ speedtest-cli --server=6611
 SSR GUI客户端: ***[erguotou520/electron-ssr](https://github.com/erguotou520/electron-ssr)***
 
 更多精彩内容请查看: ***[https://teddysun.com](https://teddysun.com)***
+
+v2ray: ***[https://github.com/v2ray/v2ray-core](https://github.com/v2ray/v2ray-core)***
 
 
 [^1]: 防火长城（英语: Great Firewall( of China), 常用简称: GFW, 中文也称中国国家防火墙, 中国大陆民众俗称防火墙等）, 是对中华人民共和国政府在其互联网边界审查系统（包括相关行政审查系统）的统称. 此系统起步于1998年, 其英文名称得自于2002年5月17日Charles R. Smith所写的一篇关于中国网络审查的文章《The Great Firewall of China》, 取與Great Wall（长城）相谐的效果, 简写为Great Firewall, 缩写GFW. 隨着使用的拓广, 中文「墙」和英文「GFW」有时也被用作动词, 网友所說的「被墙」即指被防火长城所屏蔽, 「翻墙」也被引申为浏览国外网站、香港等特区网站的行为. 

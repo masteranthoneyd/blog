@@ -197,8 +197,7 @@ libxml2-utils
 这是一款类苹果的主题...
 
 ```
-sudo add-apt-repository ppa:dyatlov-igor/sierra-theme
-sudo apt update
+sudo add-apt-repository -y ppa:dyatlov-igor/sierra-theme
 sudo apt install sierra-gtk-theme
 ```
 
@@ -252,11 +251,20 @@ suru-plus-folders -l --theme Suru++
 suru-plus-folders -C brown --theme Suru++
 ```
 
+#### Papirus
+
+```
+sudo add-apt-repository -y ppa:papirus/papirus
+sudo apt install papirus-icon-theme
+```
+
+或者下载最新的 [**deb 安装包**](https://launchpad.net/~papirus/+archive/ubuntu/papirus/+packages?field.name_filter=papirus-icon-theme)
+***[项目地址](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme)***
+
 #### Paper
 
 ```
-sudo add-apt-repository ppa:snwh/pulp
-sudo apt update
+sudo add-apt-repository -y ppa:snwh/pulp
 sudo apt install paper-icon-theme
 # 同时也可以安装 GTK 和 Cursor 主题
 sudo apt install paper-gtk-theme
@@ -272,8 +280,7 @@ sudo apt install paper-cursor-theme
 > ***[https://www.gnome-look.org/p/1148692/](https://www.gnome-look.org/p/1148692/)***
 
 ```
-sudo add-apt-repository ppa:dyatlov-igor/la-capitaine
-sudo apt update
+sudo add-apt-repository -y ppa:dyatlov-igor/la-capitaine
 sudo apt install la-capitaine-cursor-theme
 ```
 
@@ -1034,44 +1041,10 @@ services:
 
 ![](https://cdn.yangbingdong.com/img/individuation/h5ai.jpg)
 
-#### 使用nextcloud作为文件管理器
+### 其他GUI
 
-`docker-compose.yml` :
-
-```
-version: '3.4'
-
-services:
-  nextcloud:
-    image: wonderfall/nextcloud
-    volumes:
-      - /home/ybd/data/docker/aria2/nextcloud:/data
-      - /home/ybd/data/docker/aria2/data:/user-files
-    restart: always
-  aria2:
-    image: wahyd4/aria2-ui:nextcloud
-    ports:
-      - "8000:80"
-      - "6800:6800"
-    volumes:
-      - /home/ybd/data/docker/aria2/config/aria2.conf:/root/conf/aria2.conf
-      - /home/ybd/data/docker/aria2/config/aria2.session:/root/conf/aria2.session
-      - /home/ybd/data/docker/aria2/data:/data
-    environment:
-      - DOMAIN=:80
-      # - SSL=true
-      # - RPC_SECRET=Hello
-      # - ARIA2_USER=admin
-      # - ARIA2_PWD=password
-      # - ENABLE_AUTH=true
-    links:
-      - nextcloud:file-manager
-    restart: always
-```
-
-使用nettcloud作为文件管理还需要手动配置一下: 
-
-*[https://github.com/wahyd4/aria2-ariang-x-docker-compose/tree/master/nextcloud#nextcloud-%E9%85%8D%E7%BD%AE-external-storage](https://github.com/wahyd4/aria2-ariang-x-docker-compose/tree/master/nextcloud#nextcloud-%E9%85%8D%E7%BD%AE-external-storage)*
+1. ***[Uget](https://ugetdm.com/)***
+2. chrome 扩展 ***[YAAW for Chrome](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)***
 
 ### 百度网盘直接下载助手
 
@@ -1103,9 +1076,10 @@ services:
 ```
 sudo apt install stardict
 ```
-***安装词库: ***
+**安装词库: **
 进入*[http://download.huzheng.org/](http://download.huzheng.org/)*
 选择所需词库并下载, `a`为下载的词库名, 然后重启`stardict`
+
 ```
 tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
@@ -1154,21 +1128,17 @@ sudo apt install hardinfo -y
 
 # 其他设置篇
 
-## screenfetch
-
-```
-sudo apt install screenfetch
-```
-
-![](https://cdn.yangbingdong.com/img/individuation/screenfetch.png)
-
 ## exfat驱动
 ```
 sudo apt install exfat-fuse exfat-utils
 ```
 
-## 设置grub2引导等待时间
+## Grub2
+
+### 设置引导等待时间
+
 `Ubuntu`系统的`Grub2`菜单的相关信息在读取`/boot/grub/grub.cfg`文件, 不过`Ubuntu`官方不建议直接修改这个文件, 想要修改`Grub2`的等待时间还可以修改`/etc/deafalt/grub`来实现. 具体的修改方法如下: 
+
 ```
 sudo gedit /etc/default/grub
 ```
@@ -1177,7 +1147,21 @@ sudo gedit /etc/default/grub
 sudo update-grub2
 ```
 
+### Grub Customizer
+
+```
+sudo add-apt-repository -y ppa:danielrichter2007/grub-customizer
+sudo apt install grub-customizer
+```
+
+**最后** 更新配置文件
+
+```
+sudo update-grub
+```
+
 ## 启动项管理
+
 ```
 gnome-session-properties
 ```
@@ -1204,7 +1188,26 @@ sudo ntpdate time.windows.com
 sudo hwclock --localtime --systohc
 ```
 
-## 终端高逼格屏保
+## 提高逼格
+
+### screenfetch
+
+```
+sudo apt install screenfetch
+```
+
+![](https://cdn.yangbingdong.com/img/individuation/screenfetch.png)
+
+### edex-ui
+
+> ***[https://github.com/GitSquared/edex-ui](https://github.com/GitSquared/edex-ui)***
+
+在Release页面中下载AppImage运行即可:
+
+![](https://cdn.yangbingdong.com/img/individuation/eDEX-UI.png)
+
+### 终端高逼格屏保
+
 ```
 sudo apt install cmatrix
 cmatrix -b
