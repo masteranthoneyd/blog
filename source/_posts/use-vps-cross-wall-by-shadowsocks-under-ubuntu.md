@@ -357,6 +357,8 @@ sudo pip uninstall genpac
 安装proxychains: 
 ```shell
 sudo apt install proxychains
+
+# 最新版为 sudo apt install proxychains4, 配置文件在/etc/proxychains4.conf, 命令为proxychains4
 ```
 配置proxychains: 
 编辑`/etc/proxychains.conf`, 最下面有一行`socks4 127.0.0.1 9050`, 把这一行注释掉, 添加一行`socks5 127.0.0.1 1080`

@@ -594,6 +594,20 @@ sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
 
 > Java开发者的环境搭建请看: ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
 
+## Apt Fast
+
+> ***[https://github.com/ilikenwf/apt-fast](https://github.com/ilikenwf/apt-fast)***
+>
+> apt-fast 是一个为 `apt-get` 和 `aptitude` 做的 **shell 脚本封装**，通过对每个包进行并发下载的方式可以大大减少 APT 的下载时间。apt-fast 使用 **aria2c** 下载管理器来减少 APT 下载时间。就像传统的 apt-get 包管理器一样，apt-fast 支持几乎所有的 apt-get 功能，如， `install` , `remove` , `update` , `upgrade` , `dist-upgrade` 等等，并且更重要的是它也支持 proxy。
+
+```
+sudo add-apt-repository ppa:apt-fast/stable
+sudo apt-get update
+sudo apt-get -y install apt-fast
+```
+
+之后就可以用 `apt-fast`  代替 `apt` 或 `apt-get` 命令了.
+
 ## Gdebi
 
 有时候安装deb包不满足依赖还需要手动执行`sudo apt install -f`, 我们可以使用`gdebi`解决这个问题:
@@ -966,11 +980,26 @@ sudo apt update
 sudo apt install bleachbit 
 ```
 
-
 ## 多协议下载器 Aria2
+
+> aria2: ***[https://github.com/aria2/aria2](https://github.com/aria2/aria2)***
+
 一般在Linux环境中下载东西都是比较不友好的, 不支持多种协议, 方式单一, 但这款Aria2就是为了解决多协议问题而诞生的, 配合UI界面可以很方便地~~随心所欲~~地下载. 
 
-### 搭建 Aria2 以及 AriaNg Web UI
+### 安装
+
+```
+sudo apt install aria2
+```
+
+配置文件可参考: ***[https://github.com/fsaimon/aria2.conf](https://github.com/fsaimon/aria2.conf)***
+
+### GUI
+
+1. ***[Uget](https://ugetdm.com/)***
+2. chrome 扩展 ***[YAAW for Chrome](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)***
+
+### Docker 搭建 Aria2 以及 AriaNg Web UI
 
 ![](https://cdn.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
 
@@ -1087,16 +1116,7 @@ services:
 
 ![](https://cdn.yangbingdong.com/img/individuation/h5ai.jpg)
 
-### 其他GUI
-
-1. ***[Uget](https://ugetdm.com/)***
-2. chrome 扩展 ***[YAAW for Chrome](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)***
-
-### 百度网盘直接下载助手
-
-1、安装 *[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN)* Chrome插件, 这个主要是管理脚本的, 下面安装百度云盘脚本需要用到
-
-2、进入 *[百度网盘直接下载助手(显示直接下载入口)](https://greasyfork.org/zh-CN/scripts/36549-%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%8A%A9%E6%89%8B-%E6%98%BE%E7%A4%BA%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%85%A5%E5%8F%A3)* , 点击`安装`或者`install`,完了直接刷新界面, 进入到自己的百度云盘选择所需的下载文件即可. 
+## 百度网盘相关
 
 ### BaiduExporter
 
@@ -1107,7 +1127,6 @@ services:
 > * Chrome : Click Settings -> Extensions, drag BaiduExporter.crx file to the page, install it, or check Developer mode -> Load unpacked extension, navigate to the chrome/release folder.
 > * Firefox : Open about:debugging in Firefox, click "Load Temporary Add-on" and navigate to the chrome/release folder, select manifest.json, click OK.
 
-
 1、到 *[Github](https://github.com/acgotaku/BaiduExporter)* 下载与源码
 
 2、打开Chrome -> 扩展程序 -> 勾选开发者模式 -> 加载已解压的扩展程序 , 然后会弹出文件框, 找到刚才下载的源码, 找到chrome -> release, 添加成功！
@@ -1116,6 +1135,16 @@ services:
 
 ![](https://cdn.yangbingdong.com/img/individuation/baiduexporter1.jpg)
 ![](https://cdn.yangbingdong.com/img/individuation/baiduexporter2.jpg)
+
+### BaiduPCS-Go
+
+这里还有一个很有意思的通过终端与百度盘交互的项目: ***[https://github.com/iikira/BaiduPCS-Go](https://github.com/iikira/BaiduPCS-Go)***
+
+### 百度网盘直接下载助手
+
+1、安装 *[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN)* Chrome插件, 这个主要是管理脚本的, 下面安装百度云盘脚本需要用到
+
+2、进入 *[百度网盘直接下载助手(显示直接下载入口)](https://greasyfork.org/zh-CN/scripts/36549-%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%8A%A9%E6%89%8B-%E6%98%BE%E7%A4%BA%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%85%A5%E5%8F%A3)* , 点击`安装`或者`install`,完了直接刷新界面, 进入到自己的百度云盘选择所需的下载文件即可. 
 
 ## Stardict火星译王
 
@@ -1171,6 +1200,10 @@ sudo apt install hardinfo -y
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/System%20Information_002.png)
+
+## deepin-wine-ubuntu
+
+这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
 
 # 其他设置篇
 
