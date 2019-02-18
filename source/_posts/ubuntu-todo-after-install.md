@@ -945,7 +945,10 @@ sudo sh setup.sh
 
 **`XMindCrack.jar`**与**序列号**如果有需要可以私聊博主. 
 
-## Shutter
+## 截图
+
+### Shutter
+
 `Ubuntu`下很强大的一款截图软件
 ```
 sudo apt install shutter
@@ -971,6 +974,16 @@ sudo apt install shutter
 依次使用`dpkg`命令安装, 报错使用`sudo apt-get -f install`修复
 
 最后重启Shutter进程就好了
+
+### Deepin Screenshot
+
+这个是Deepin开发的截图工具, 目前已经可以在软件商店中找到:
+
+```
+sudo apt install deepin-screenshot
+```
+
+然后跟上面的Shutter一样设置快捷键就可以了, 命令是`deepin-screenshot`
 
 ## 系统清理软件 BleachBit
 
