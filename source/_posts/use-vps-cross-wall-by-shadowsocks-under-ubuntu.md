@@ -384,7 +384,7 @@ sudo apt install privoxy
 
 安装好后进行配置, Privoxy的配置文件在`/etc/privoxy/config`, 这个配置文件中注释很多. 
 
-找到`4.1. listen-address`这一节, 确认监听的端口号. 
+找到`4.1. listen-address`这一节, 确认监听的端口号, 如果有内网地址可以监听 `0.0.0.0:8118`. 
 
 ![](https://cdn.yangbingdong.com/img/vps/privoxy-config01.png)
 

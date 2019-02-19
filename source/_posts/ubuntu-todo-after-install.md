@@ -1038,7 +1038,7 @@ all-proxy=http://192.168.6.113:8118
 enable-rpc=true
 #允许所有来源, web界面跨域权限需要
 rpc-allow-origin-all=true
-#允许外部访问, false的话只监听本地端口
+#允许外部访问，false的话只监听本地端口
 rpc-listen-all=true
 #RPC端口, 仅当默认端口被占用时修改
 #rpc-listen-port=6800
@@ -1049,7 +1049,7 @@ continue=true
 #同服务器连接数
 max-connection-per-server=5
 #最小文件分片大小, 下载线程数上限取决于能分出多少片, 对于小文件重要
-min-split-size=10M
+min-split-size=2M
 #单文件最大线程数, 路由建议值: 5
 split=10
 #下载速度限制
@@ -1062,7 +1062,7 @@ max-overall-upload-limit=0
 max-upload-limit=0
 #断开速度过慢的连接
 #lowest-speed-limit=0
-#验证用, 需要1.16.1之后的release版本
+#验证用，需要1.16.1之后的release版本
 #referer=*
 #文件保存路径, 默认为当前启动位置
 # dir=/user-files/superuser/
@@ -1070,7 +1070,7 @@ dir=/data
 #文件缓存, 使用内置的文件缓存, 如果你不相信Linux内核文件缓存和磁盘内置缓存时使用, 需要1.16及以上版本
 #disk-cache=0
 #另一种Linux文件缓存方式, 使用前确保您使用的内核支持此选项, 需要1.15及以上版本(?)
-#enable-mmap=true
+enable-mmap=true
 #文件预分配, 能有效降低文件碎片, 提高磁盘性能. 缺点是预分配时间较长
 #所需时间 none < falloc ? trunc « prealloc, falloc和trunc需要文件系统和内核支持
 file-allocation=prealloc
@@ -1079,6 +1079,7 @@ file-allocation=prealloc
 log=/var/log/aria2.log
 #You can set either debug, info, notice, warn or error.
 log-level=error
+
 
 ## 进度保存相关 ##
 # 从会话文件中读取下载任务
@@ -1089,8 +1090,7 @@ save-session=/root/conf/aria2.session
 save-session-interval=10
 
 # BT trackers from https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt
-# echo `wget -qO- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt|awk NF|sed ":a;N;s/\n/,/g;ta"`
-bt-tracker=udp://tracker.coppersurfer.tk:6969/announce,udp://tracker.leechers-paradise.org:6969/announce,udp://9.rarbg.to:2710/announce,udp://p4p.arenabg.com:1337/announce,http://p4p.arenabg.com:1337/announce,udp://tracker.internetwarriors.net:1337/announce,http://tracker.internetwarriors.net:1337/announce,udp://tracker.skyts.net:6969/announce,udp://tracker.safe.moe:6969/announce,udp://tracker.piratepublic.com:1337/announce,udp://tracker.opentrackr.org:1337/announce,http://tracker.opentrackr.org:1337/announce,udp://wambo.club:1337/announce,udp://trackerxyz.tk:1337/announce,udp://tracker4.itzmx.com:2710/announce,udp://tracker2.christianbro.pw:6969/announce,udp://tracker1.wasabii.com.tw:6969/announce,udp://tracker.zer0day.to:1337/announce,udp://public.popcorn-tracker.org:6969/announce,udp://peerfect.org:6969/announce,udp://tracker.mg64.net:6969/announce,udp://mgtracker.org:6969/announce,http://tracker.mg64.net:6881/announce,http://mgtracker.org:6969/announce,http://t.nyaatracker.com:80/announce,http://retracker.telecom.by:80/announce,ws://tracker.btsync.cf:2710/announce,udp://zephir.monocul.us:6969/announce,udp://z.crazyhd.com:2710/announce,udp://tracker.xku.tv:6969/announce,udp://tracker.vanitycore.co:6969/announce,udp://tracker.tvunderground.org.ru:3218/announce,udp://tracker.torrent.eu.org:451/announce,udp://tracker.tiny-vps.com:6969/announce,udp://tracker.swateam.org.uk:2710/announce,udp://tracker.halfchub.club:6969/announce,udp://tracker.grepler.com:6969/announce,udp://tracker.files.fm:6969/announce,udp://tracker.dutchtracking.com:6969/announce,udp://tracker.dler.org:6969/announce,udp://tracker.desu.sh:6969/announce,udp://tracker.cypherpunks.ru:6969/announce,udp://tracker.cyberia.is:6969/announce,udp://tracker.christianbro.pw:6969/announce,udp://tracker.bluefrog.pw:2710/announce,udp://tracker.acg.gg:2710/announce,udp://thetracker.org:80/announce,udp://sd-95.allfon.net:2710/announce,udp://santost12.xyz:6969/announce,udp://sandrotracker.biz:1337/announce,udp://retracker.nts.su:2710/announce,udp://retracker.lanta-net.ru:2710/announce,udp://retracker.coltel.ru:2710/announce,udp://oscar.reyesleon.xyz:6969/announce,udp://open.stealth.si:80/announce,udp://ipv4.tracker.harry.lu:80/announce,udp://inferno.demonoid.pw:3418/announce,udp://allesanddro.de:1337/announce,http://tracker2.itzmx.com:6961/announce,http://tracker.vanitycore.co:6969/announce,http://tracker.torrentyorg.pl:80/announce,http://tracker.city9x.com:2710/announce,http://torrentsmd.me:8080/announce,http://sandrotracker.biz:1337/announce,http://retracker.mgts.by:80/announce,http://open.acgtracker.com:1096/announce,http://omg.wtftrackr.pw:1337/announce,wss://tracker.openwebtorrent.com:443/announce,wss://tracker.fastcast.nz:443/announce,wss://tracker.btorrent.xyz:443/announce,udp://tracker.uw0.xyz:6969/announce,udp://tracker.kamigami.org:2710/announce,udp://tracker.justseed.it:1337/announce,udp://tc.animereactor.ru:8082/announce,udp://packages.crunchbangplusplus.org:6969/announce,udp://explodie.org:6969/announce,udp://bt.xxx-tracker.com:2710/announce,udp://bt.aoeex.com:8000/announce,udp://104.238.198.186:8000/announce,https://open.acgnxtracker.com:443/announce,http://tracker.tfile.me:80/announce,http://share.camoe.cn:8080/announce,http://retracker.omsk.ru:2710/announce,http://open.acgnxtracker.com:80/announce,http://explodie.org:6969/announce,http://agusiq-torrents.pl:6969/announce,http://104.238.198.186:8000/announce
+bt-tracker=udp://tracker.leechers-paradise.org:6969/announce, udp://tracker.internetwarriors.net:1337/announce, udp://tracker.opentrackr.org:1337/announce, udp://9.rarbg.to:2710/announce, udp://tracker.coppersurfer.tk:6969/announce, udp://exodus.desync.com:6969/announce, udp://explodie.org:6969/announce, http://tracker3.itzmx.com:6961/announce, udp://tracker1.itzmx.com:8080/announce, udp://tracker.tiny-vps.com:6969/announce, udp://thetracker.org:80/announce, udp://open.demonii.si:1337/announce, udp://denis.stalker.upeer.me:6969/announce, udp://bt.xxx-tracker.com:2710/announce, http://tracker4.itzmx.com:2710/announce, udp://tracker2.itzmx.com:6961/announce, udp://tracker.torrent.eu.org:451/announce, udp://tracker.port443.xyz:6969/announce, udp://tracker.cyberia.is:6969/announce, udp://open.stealth.si:80/announce
 ```
 
 #### 使用h5ai作为文件管理器
@@ -1128,6 +1128,9 @@ services:
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/h5ai.jpg)
+
+1. 查看文件h5ai： *[http://localhost:8000](http://localhost:8000/)*
+2. AriaNg： *[http://localhost:8000/aria2/](http://localhost:8000/aria2/)* 注意地址后面一定要带`/` 
 
 ## 百度网盘相关
 
