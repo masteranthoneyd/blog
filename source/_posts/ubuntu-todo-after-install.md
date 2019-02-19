@@ -1057,7 +1057,7 @@ all-proxy=http://192.168.6.113:8118
 enable-rpc=true
 #允许所有来源, web界面跨域权限需要
 rpc-allow-origin-all=true
-#允许外部访问, false的话只监听本地端口
+#允许外部访问，false的话只监听本地端口
 rpc-listen-all=true
 #RPC端口, 仅当默认端口被占用时修改
 #rpc-listen-port=6800
@@ -1068,7 +1068,7 @@ continue=true
 #同服务器连接数
 max-connection-per-server=5
 #最小文件分片大小, 下载线程数上限取决于能分出多少片, 对于小文件重要
-min-split-size=10M
+min-split-size=2M
 #单文件最大线程数, 路由建议值: 5
 split=10
 #下载速度限制
@@ -1081,7 +1081,7 @@ max-overall-upload-limit=0
 max-upload-limit=0
 #断开速度过慢的连接
 #lowest-speed-limit=0
-#验证用, 需要1.16.1之后的release版本
+#验证用，需要1.16.1之后的release版本
 #referer=*
 #文件保存路径, 默认为当前启动位置
 # dir=/user-files/superuser/
@@ -1089,7 +1089,7 @@ dir=/data
 #文件缓存, 使用内置的文件缓存, 如果你不相信Linux内核文件缓存和磁盘内置缓存时使用, 需要1.16及以上版本
 #disk-cache=0
 #另一种Linux文件缓存方式, 使用前确保您使用的内核支持此选项, 需要1.15及以上版本(?)
-#enable-mmap=true
+enable-mmap=true
 #文件预分配, 能有效降低文件碎片, 提高磁盘性能. 缺点是预分配时间较长
 #所需时间 none < falloc ? trunc « prealloc, falloc和trunc需要文件系统和内核支持
 file-allocation=prealloc
@@ -1099,6 +1099,7 @@ log=/var/log/aria2.log
 #You can set either debug, info, notice, warn or error.
 log-level=error
 
+
 ## 进度保存相关 ##
 # 从会话文件中读取下载任务
 input-file=/root/conf/aria2.session
@@ -1106,6 +1107,9 @@ input-file=/root/conf/aria2.session
 save-session=/root/conf/aria2.session
 # 定时保存会话, 0为退出时才保存, 需1.16.1以上版本, 默认:0
 save-session-interval=10
+
+# BT trackers from https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt
+bt-tracker=udp://tracker.leechers-paradise.org:6969/announce, udp://tracker.internetwarriors.net:1337/announce, udp://tracker.opentrackr.org:1337/announce, udp://9.rarbg.to:2710/announce, udp://tracker.coppersurfer.tk:6969/announce, udp://exodus.desync.com:6969/announce, udp://explodie.org:6969/announce, http://tracker3.itzmx.com:6961/announce, udp://tracker1.itzmx.com:8080/announce, udp://tracker.tiny-vps.com:6969/announce, udp://thetracker.org:80/announce, udp://open.demonii.si:1337/announce, udp://denis.stalker.upeer.me:6969/announce, udp://bt.xxx-tracker.com:2710/announce, http://tracker4.itzmx.com:2710/announce, udp://tracker2.itzmx.com:6961/announce, udp://tracker.torrent.eu.org:451/announce, udp://tracker.port443.xyz:6969/announce, udp://tracker.cyberia.is:6969/announce, udp://open.stealth.si:80/announce
 ```
 
 #### 使用h5ai作为文件管理器
@@ -1143,6 +1147,9 @@ services:
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/h5ai.jpg)
+
+1. 查看文件h5ai： *[http://localhost:8000](http://localhost:8000/)*
+2. AriaNg： *[http://localhost:8000/aria2/](http://localhost:8000/aria2/)* 注意地址后面一定要带`/` 
 
 ## 百度网盘相关
 
