@@ -601,9 +601,8 @@ sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
 > apt-fast 是一个为 `apt-get` 和 `aptitude` 做的 **shell 脚本封装**，通过对每个包进行并发下载的方式可以大大减少 APT 的下载时间。apt-fast 使用 **aria2c** 下载管理器来减少 APT 下载时间。就像传统的 apt-get 包管理器一样，apt-fast 支持几乎所有的 apt-get 功能，如， `install` , `remove` , `update` , `upgrade` , `dist-upgrade` 等等，并且更重要的是它也支持 proxy。
 
 ```
-sudo add-apt-repository ppa:apt-fast/stable
-sudo apt-get update
-sudo apt-get -y install apt-fast
+sudo add-apt-repository -y ppa:apt-fast/stable && \
+sudo apt -y install apt-fast
 ```
 
 之后就可以用 `apt-fast`  代替 `apt` 或 `apt-get` 命令了.
@@ -702,13 +701,15 @@ Configure>>  Addon  >>Advanced>>Classic
 
 另外, Github中还有一个Linux版的Wechat: ***[https://github.com/eNkru/electron-wechat](https://github.com/eNkru/electron-wechat)***
 
-## Wine-QQ与Wine-TIM的Appimage版本
+## QQ
+
+### Wine-QQ Appimage版本
 
 Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme765cs/Wine-QQ-TIM)***
 
 下载玩对应的Appimage后, 右键属性, 在权限中允许执行, 然后可以直接打开了
 
-## QQ轻聊版
+### QQ轻聊版
 
 > 这种方式比较麻烦, 可以直接才上面的Appimage
 
@@ -721,13 +722,13 @@ Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme7
 - `crossover16crack.tar.gz`
 - `apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
 
-### crossover安装与破解
+#### crossover安装与破解
 这个轻聊版是Deepin的作品, 要在Ubuntu上使用, 就要安装**crossover**, 很不幸这玩意是收费的, 很幸运的是这玩意是可以破解的. 
 1、安装的工具包下载下来解压后会有三个文件, 首先先安装`crossover_16.0.0-1.deb`, 缺少依赖就执行一下`sudo apt -f install`, 安装完后**先不要打开**crossover. 
 2、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
 3、把破解文件 (`crossover16crack`->`winewrapper.exe.so`) 替换路径: `/opt/cxoffice/lib/wine`下的`winewrapper.exe.so`文件. 提示已有文件, 点“替换”破解完成. 
 
-### Deepin QQ轻聊版
+#### Deepin QQ轻聊版
 1、用归档管理器打开`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
 2、点开 `data.tar.xz` 找到 `./opt/cxoffice/support`
 3、把 `apps.com.qq.im.light` 这个文件夹提取出来
@@ -738,7 +739,9 @@ Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme7
 ![](https://cdn.yangbingdong.com/img/individuation/crossover.png)
 7、如果运行后出现乱码, 把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
 
-## 版本控制系统GUI-SmartGit
+## GUI-SmartGit
+
+git的一个GUI:
 
 ```
 sudo add-apt-repository ppa:eugenesan/ppa
@@ -746,14 +749,11 @@ sudo apt update
 sudo apt install smartgithg
 ```
 ## Typora(Markdown编辑器)
-*[官方](https://typora.io/#linux)*安装方法如下: 
+*[官方](https://typora.io/#linux)* 安装方法如下: 
+
 ```
-# optional, but recommended
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
-# add Typora's repository
-sudo add-apt-repository 'deb http://typora.io linux/'
-sudo apt update
-# install typora
+wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
+sudo add-apt-repository -y 'deb https://typora.io/linux ./'
 sudo apt install typora
 ```
 
@@ -777,6 +777,7 @@ sudo apt install peek
 然后`dpkg`安装就好了, 如果还有依赖直接`apt install -f`修复一下就好. 
 安装好之后修改`LicenseManagerDomain.js`
 查找: 
+
 ```
 dpkg -S staruml | grep LicenseManagerDomain.js
 ```
@@ -850,7 +851,7 @@ Dash里打开virt-manager:
 
 
 
-## SecureCRT Crack
+## SecureCRT
 
 ### Install
 
@@ -925,7 +926,7 @@ sudo apt install google-chrome-stable
 
 ### Setup
 
-一款思维导图软件, 再*[XMind官网](http://www.xmindchina.net/xiazai.html)*下载压缩包.
+一款思维导图软件, 前往 *[XMind官网](http://www.xmindchina.net/xiazai.html)* 下载压缩包.
 
 解压后先执行一下解压包根目录下的`setup.sh`: 
 
@@ -950,11 +951,12 @@ sudo sh setup.sh
 ### Shutter
 
 `Ubuntu`下很强大的一款截图软件
+
 ```
 sudo apt install shutter
 ```
 
-***设置快捷键: *** 
+**设置快捷键: **
 打开系统设置 -> `键盘` -> `快捷键` -> `自定义快捷键` -> `点击" + " `
 名字随便起, 命令: `shutter -s`
 点击确定, 再点禁用, 键盘按下`ctrl+alt+a`, 完成设置
@@ -996,23 +998,40 @@ sudo apt install bleachbit
 ## 多协议下载器 Aria2
 
 > aria2: ***[https://github.com/aria2/aria2](https://github.com/aria2/aria2)***
+>
+> 部分使用说明: ***[https://aria2c.com/usage.html](https://aria2c.com/usage.html)***
 
 一般在Linux环境中下载东西都是比较不友好的, 不支持多种协议, 方式单一, 但这款Aria2就是为了解决多协议问题而诞生的, 配合UI界面可以很方便地~~随心所欲~~地下载. 
 
-### 安装
+### 直接安装
 
 ```
 sudo apt install aria2
 ```
 
+添加配置文件:
+
+```
+sudo mkdir /etc/aria2
+sudo touch /etc/aria2/aria2.session
+sudo chmod 777 /etc/aria2/aria2.session
+sudo gedit /etc/aria2/aria2.conf
+```
+
 配置文件可参考: ***[https://github.com/fsaimon/aria2.conf](https://github.com/fsaimon/aria2.conf)***
+
+后台运行:
+
+```
+sudo aria2c --conf-path=/etc/aria2/aria2.conf -D
+```
 
 ### GUI
 
 1. ***[Uget](https://ugetdm.com/)***
 2. chrome 扩展 ***[YAAW for Chrome](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)***
 
-### Docker 搭建 Aria2 以及 AriaNg Web UI
+### 通过 Docker 搭建 Aria2 以及 AriaNg Web UI
 
 ![](https://cdn.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
 
@@ -1087,10 +1106,6 @@ input-file=/root/conf/aria2.session
 save-session=/root/conf/aria2.session
 # 定时保存会话, 0为退出时才保存, 需1.16.1以上版本, 默认:0
 save-session-interval=10
-
-# BT trackers from https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt
-# echo `wget -qO- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt|awk NF|sed ":a;N;s/\n/,/g;ta"`
-bt-tracker=udp://tracker.coppersurfer.tk:6969/announce,udp://tracker.leechers-paradise.org:6969/announce,udp://9.rarbg.to:2710/announce,udp://p4p.arenabg.com:1337/announce,http://p4p.arenabg.com:1337/announce,udp://tracker.internetwarriors.net:1337/announce,http://tracker.internetwarriors.net:1337/announce,udp://tracker.skyts.net:6969/announce,udp://tracker.safe.moe:6969/announce,udp://tracker.piratepublic.com:1337/announce,udp://tracker.opentrackr.org:1337/announce,http://tracker.opentrackr.org:1337/announce,udp://wambo.club:1337/announce,udp://trackerxyz.tk:1337/announce,udp://tracker4.itzmx.com:2710/announce,udp://tracker2.christianbro.pw:6969/announce,udp://tracker1.wasabii.com.tw:6969/announce,udp://tracker.zer0day.to:1337/announce,udp://public.popcorn-tracker.org:6969/announce,udp://peerfect.org:6969/announce,udp://tracker.mg64.net:6969/announce,udp://mgtracker.org:6969/announce,http://tracker.mg64.net:6881/announce,http://mgtracker.org:6969/announce,http://t.nyaatracker.com:80/announce,http://retracker.telecom.by:80/announce,ws://tracker.btsync.cf:2710/announce,udp://zephir.monocul.us:6969/announce,udp://z.crazyhd.com:2710/announce,udp://tracker.xku.tv:6969/announce,udp://tracker.vanitycore.co:6969/announce,udp://tracker.tvunderground.org.ru:3218/announce,udp://tracker.torrent.eu.org:451/announce,udp://tracker.tiny-vps.com:6969/announce,udp://tracker.swateam.org.uk:2710/announce,udp://tracker.halfchub.club:6969/announce,udp://tracker.grepler.com:6969/announce,udp://tracker.files.fm:6969/announce,udp://tracker.dutchtracking.com:6969/announce,udp://tracker.dler.org:6969/announce,udp://tracker.desu.sh:6969/announce,udp://tracker.cypherpunks.ru:6969/announce,udp://tracker.cyberia.is:6969/announce,udp://tracker.christianbro.pw:6969/announce,udp://tracker.bluefrog.pw:2710/announce,udp://tracker.acg.gg:2710/announce,udp://thetracker.org:80/announce,udp://sd-95.allfon.net:2710/announce,udp://santost12.xyz:6969/announce,udp://sandrotracker.biz:1337/announce,udp://retracker.nts.su:2710/announce,udp://retracker.lanta-net.ru:2710/announce,udp://retracker.coltel.ru:2710/announce,udp://oscar.reyesleon.xyz:6969/announce,udp://open.stealth.si:80/announce,udp://ipv4.tracker.harry.lu:80/announce,udp://inferno.demonoid.pw:3418/announce,udp://allesanddro.de:1337/announce,http://tracker2.itzmx.com:6961/announce,http://tracker.vanitycore.co:6969/announce,http://tracker.torrentyorg.pl:80/announce,http://tracker.city9x.com:2710/announce,http://torrentsmd.me:8080/announce,http://sandrotracker.biz:1337/announce,http://retracker.mgts.by:80/announce,http://open.acgtracker.com:1096/announce,http://omg.wtftrackr.pw:1337/announce,wss://tracker.openwebtorrent.com:443/announce,wss://tracker.fastcast.nz:443/announce,wss://tracker.btorrent.xyz:443/announce,udp://tracker.uw0.xyz:6969/announce,udp://tracker.kamigami.org:2710/announce,udp://tracker.justseed.it:1337/announce,udp://tc.animereactor.ru:8082/announce,udp://packages.crunchbangplusplus.org:6969/announce,udp://explodie.org:6969/announce,udp://bt.xxx-tracker.com:2710/announce,udp://bt.aoeex.com:8000/announce,udp://104.238.198.186:8000/announce,https://open.acgnxtracker.com:443/announce,http://tracker.tfile.me:80/announce,http://share.camoe.cn:8080/announce,http://retracker.omsk.ru:2710/announce,http://open.acgnxtracker.com:80/announce,http://explodie.org:6969/announce,http://agusiq-torrents.pl:6969/announce,http://104.238.198.186:8000/announce
 ```
 
 #### 使用h5ai作为文件管理器
@@ -1133,14 +1148,12 @@ services:
 
 ### BaiduExporter
 
-> 博主使用的是BaiduExporter, 上面那个下载助手导出来链接在我这边并不能下载成功. . 囧
->
 > 官方是这么说明的
 >
 > * Chrome : Click Settings -> Extensions, drag BaiduExporter.crx file to the page, install it, or check Developer mode -> Load unpacked extension, navigate to the chrome/release folder.
 > * Firefox : Open about:debugging in Firefox, click "Load Temporary Add-on" and navigate to the chrome/release folder, select manifest.json, click OK.
 
-1、到 *[Github](https://github.com/acgotaku/BaiduExporter)* 下载与源码
+1、到 *[Github](https://github.com/acgotaku/BaiduExporter)* 下载源码
 
 2、打开Chrome -> 扩展程序 -> 勾选开发者模式 -> 加载已解压的扩展程序 , 然后会弹出文件框, 找到刚才下载的源码, 找到chrome -> release, 添加成功！
 
@@ -1173,28 +1186,12 @@ tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
 ```
 
-## Filezilla
-```
-sudo apt install filezilla
-sudo apt install filezilla-locales
-```
-
 ## 备份工具 Timeshift
 ```
 sudo apt install timeshift
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
-
-## 键盘输入声音特效（Tickys）
-
-***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
-下载`tickys`之后执行:
-```
-sudo apt install tickys
-```
-然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
-![](https://cdn.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
 
 ## 硬件信息
 
@@ -1308,6 +1305,18 @@ cmatrix -b
 ![](https://cdn.yangbingdong.com/img/individuation/cmatrix.png)
 
 够骚气. . . 
+
+## 键盘输入声音特效（Tickys）
+
+***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
+下载`tickys`之后执行:
+
+```
+sudo apt install tickys
+```
+
+然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
+![](https://cdn.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
 
 ## 软件图标（.desktop）文件位置
 
