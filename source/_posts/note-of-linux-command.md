@@ -285,7 +285,79 @@ cat /etc/group
 - 将~下的登入目录栏修改为`/home/hadoop`, 其他部分不变
 - 将原来的用户目录`/home/seed`修改为新的用户目录`/home/hadoop`
 
-# 递归下载抓取整个网站内容
+# 网络相关
+
+## curl
+
+> 来自: ***[https://itbilu.com/linux/man/4yZ9qH_7X.html](https://itbilu.com/linux/man/4yZ9qH_7X.html)***
+>
+> `curl`是一个开源的用于数据传输的命令行工具与库，它使用`URL`语法格式，支持众多传输协议，包括：HTTP、HTTPS、FTP、FTPS、GOPHER、TFTP、SCP、SFTP、SMB、TELNET、DICT、LDAP、LDAPS、FILE、IMAP、SMTP、POP3、RTSP和RTMP。`curl`库提供了很多强大的功能，你可以利用它来进行HTTP/HTTPS请求、上传/下载文件等，且支持Cookie、认证、代理、限速等。
+
+**直接访问**:
+
+```
+curlyangbingdong.com
+```
+
+**重定向跟踪**
+
+页面使用了重定向，这时我们可以添加`-L`参数来跟踪URL重定向：
+
+```
+curl -L https://git.io/vokNn
+```
+
+**页面保存**
+
+```
+curl -o [文件名] https://git.io/vokNn
+```
+
+**查看头信息**
+
+如果需要查看访问页面的可以添加`-i`或`--include`参数：
+
+```
+curl -i yangbingdong.com
+```
+
+添加`-i`参数后，页面响应头会和页面源码（响应体）一块返回。如果只想查看响应头，可以使用`-I`或`--head`参数.
+
+**POST数据提交**
+
+`curl`使用`POST`提交表单数据时，除了`-X`参数指定请求方法外，还要使用`--data`参数添加提交数据：
+
+```
+curl -X POST --data 'keyword=linux' itbilu.com
+```
+
+**添加请求头**
+
+有时在进行HTTP请求时，需要自定义请求头。在`curl`中，可以通过`-H`或`--header`参数来指定请求头。多次使用`-H`或`--header`参数可指定多个请求头。
+
+如，指定`Content-Type`及`Authorization`请求头：
+
+```
+curl -H 'Content-Type:application/json' -H 'Authorization: bearer eyJhbGciOiJIUzI1NiJ9' itbilu.com
+```
+
+**Cookie支持**
+
+`Cookie`是一种常用的保持服务端会话信息的方法，`crul`也支持使用`Cookie`。
+
+可以通过`--cookie`参数指定发送请求时的`Cookie`值，也可以通过`-b [文件名]`来指定一个存储了`Cookie`值的本地文件：
+
+```
+curl -b stored_cookies_in_file itbilu.com
+```
+
+`Cookie`值可能会被服务器所返回的值所修改，并应用于下次HTTP请求。这时，可以能过`-c`参数指定存储服务器返回`Cookie`值的存储文件：
+
+```
+curl -b cookies.txt -c newcookies.txt itbilu.com
+```
+
+## 递归下载抓取整个网站内容
 
 ```
 wget -r -p -k -np <URL>
@@ -327,56 +399,6 @@ du -hs `ls -Al |grep ^d|awk '{print $9}'`
 
 解压缩`tar`文件: `tar -xvf <压缩包文件>`
 解压缩`tar.gz`文件: `tar -zxvf <压缩包文件>`
-
-# 目录操作命令
-在**Windows系统**中, 有`C`、`D`、`E`等众多的盘符, 每个盘符就是一个根目录. 在`Linux`、`Unix`、`MacOS`等系统的**文件系统**中, **只有一个根目录**, 那就是`root`, 以一个斜杠代表（`/`）. 
-## 切换目录: `cd`
-该命令和Windows中没有太大的区别, 都表示改变当前的工作目录. 
-```
-cd <目标目录>
-```
-## 显示当前目录: `pwd`
-显示当前目录的路径, 返回字符串. 在Windows使用cd不带参数的方式代替. 该命令同样也没有参数. 
-## 遍历目录: `ls`
-显示当前目录中的内容, 常用的命令有: 
-```
-以列表显示当前目录所有的目录和文件
-ls -l
-```
-在`Linux`、`Unix`、`MacOS`等系统中, 隐藏文件均是点（.）开头的, 下面命令以列表显示当前目录所有的目录和文件, 包括隐藏的目录和文件. 
-```
-ls -al
-```
-显示所有的目录, 包括隐藏的目录, 但是不包括文件
-```
-ls -adl
-```
-## 复制: `cp`
-`cp`是`copy`的简称, 用于复制文件和目录. 复制的时候, 源路径和目录路径可以是一个文件, 也可以是一个目录. 
-```
-cp <源路径> <目标路径>
-```
-## 移动: `mv`
-`mv`是移动(`move`)的简称, 用于移动文件和目录. 
-```
-mv  <源路径> <目标路径>
-```
-## 删除: `rm`
-`rm`命令可以用于删除目录和文件, 但是通过`rm`删除目录的话, 必须加上`rm -rf <目录名称>`. 
-删除文件直接就是`rm <文件名>`
-
-注意: 
-在`Linux`或者`Unix`系统中, 通过`rm`或者文件管理器删除文件将会从文件系统的目录结构上解除链接(`unlink`).
-然而如果文件是被打开的（有一个进程正在使用）, 那么进程将仍然可以读取该文件, 磁盘空间也一直被占用. 
-可以通过`lsof`命令查看文件是否被打开. 详见 列出打开的文件. 
-## 删除目录: rmdir
-删除目录的时候, 必须确保目录是空的, 否则无法删除. 命令格式: `rm <目录>`. 
-
-## 管理员权限打开文件夹
-
-```
-sudo nautilus
-```
 
 # 查找相关
 

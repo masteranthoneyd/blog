@@ -390,8 +390,9 @@ sudo apt-get install zsh
 接下来我们需要下载 `oh-my-zsh` 项目来帮我们配置 `zsh`, 采用`wget`安装(需要先安装`git`)
 ```
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
-chsh -s /usr/bin/zsh
 ```
+
+重启后生效.
 
 ### 语法高亮
 
@@ -431,7 +432,7 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 
 然后编辑`~/.zshrc`, 找到`ZSH_THEME`修改为你想要的主题即可（感觉`ys`这个主题不错）. 
 
-`agnoster`这款主题也不错, 但需要先安装一些 *[字体样式](https://github.com/powerline/fonts)*: 
+`agnoster`, *[bullet-train](https://github.com/caiogondim/bullet-train.zsh)* 这两款主题也不错, 但需要先安装一些 *[字体样式](https://github.com/powerline/fonts)*: 
 
 ```
 sudo apt-get install fonts-powerline
@@ -1339,6 +1340,6 @@ sudo apt install tickys
 > * ***[https://www.jianshu.com/p/23b0d3015db8](https://www.jianshu.com/p/23b0d3015db8)***
 > * ***[https://blog.diqigan.cn/posts/ubuntu-18-10-beautify.html](https://blog.diqigan.cn/posts/ubuntu-18-10-beautify.html)***
 
-使用Ubuntu的这一路过来真的是跌跌撞撞, 一路摸爬滚打不断谷歌百度解决各种奇怪的系统问题, 磨合了也有好长一段日子, 重装系统的次数也数不过来了, 有一段时间甚至觉得重装系统已是日常, 有时候一装就是到凌晨2点. . . 给我最大的收获并不是觉得自己用Ubuntu用得多牛X, 而是锻炼了自己的耐性, 小强般的韧性. 曾经一度想放弃Ubuntu, 但一路都在边缘徘徊, 还是坚持了下来. . . 
+使用Ubuntu的这一路过来真的是跌跌撞撞, 一路摸爬滚打不断解决各种奇怪的系统问题, 磨合了也有好长一段日子, 重装系统的次数也数不过来了. . . 给我最大的收获并不是觉得自己用Ubuntu用得多牛X, 而是锻炼意志. . . 
 
 本文将定期更新, 与时俱进~
