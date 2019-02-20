@@ -244,11 +244,11 @@ wget -qO- https://raw.githubusercontent.com/gusbemacbe/suru-plus/master/install.
 
 ```
 # 安装
-wget -qO- https://git.io/fhQdI | sh
+curl -fsSL https://raw.githubusercontent.com/gusbemacbe/suru-plus-folders/master/install.sh | sh
 # 查看颜色
 suru-plus-folders -l --theme Suru++
 # 更换
-suru-plus-folders -C brown --theme Suru++
+suru-plus-folders -C cyan --theme Suru++
 ```
 
 #### Papirus
@@ -435,16 +435,18 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 `agnoster`, *[bullet-train](https://github.com/caiogondim/bullet-train.zsh)* 这两款主题也不错, 但需要先安装一些 *[字体样式](https://github.com/powerline/fonts)*: 
 
 ```
-sudo apt-get install fonts-powerline
-```
-
-或者通过源码安装: 
-
-```
-git clone git@github.com:powerline/fonts.git
+git clone https://github.com/powerline/fonts.git --depth=1
 cd fonts
 ./install.sh
+cd ..
+rm -rf fonts
 ```
+
+**装完后需要在终端配置Powerline字体**.
+
+其他主题:
+
+***[https://github.com/bhilburn/powerlevel9k](https://github.com/bhilburn/powerlevel9k)***
 
 ## 字体
 
@@ -1317,10 +1319,19 @@ cmatrix -b
 ## 键盘输入声音特效（Tickys）
 
 ***[官网](http://www.yingdev.com/projects/tickeys)*** 或者 ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
-下载`tickys`之后执行:
+
+Tickeys依赖 `gksu`, 然而 `gksu` 在Ubuntu18之后被移除了, 所以想要安装还需要装回 `gksu`:
 
 ```
-sudo apt install tickys
+cat <<EOF | sudo tee /etc/apt/sources.list.d/artful.list
+deb http://archive.ubuntu.com/ubuntu/ artful universe
+EOF
+sudo apt update
+sudo apt install -i gksu
+sudo dpkg -i tickeys_0.2.5_amd64.deb
+
+# 如有依赖未安装
+sudo apt install -f
 ```
 
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
