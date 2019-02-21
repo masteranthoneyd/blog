@@ -281,7 +281,7 @@ sudo apt install paper-cursor-theme
 
 ```
 sudo add-apt-repository -y ppa:dyatlov-igor/la-capitaine
-sudo apt install la-capitaine-cursor-theme
+sudo apt install -y la-capitaine-cursor-theme
 ```
 
 #### Oxy Blue
@@ -1342,6 +1342,10 @@ sudo apt install -f
 - `/usr/share/applications` # 大部分启动图标都在此
 - `~/.local/share/applications` # 一部分本地图标
 - `/var/lib/snapd/desktop/applications` # snap 类软件在此
+
+## 终端写出图形文字
+
+***[Text to ASCII Art Generator](http://patorjk.com/software/taag/#p=display&f=Slant&t=Composer)***
 
 # Finally
 
