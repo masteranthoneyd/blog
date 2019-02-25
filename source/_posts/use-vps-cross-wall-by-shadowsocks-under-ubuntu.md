@@ -363,6 +363,7 @@ sudo apt install proxychains
 配置proxychains: 
 编辑`/etc/proxychains.conf`, 最下面有一行`socks4 127.0.0.1 9050`, 把这一行注释掉, 添加一行`socks5 127.0.0.1 1080`
 测试: 
+
 ```shell
 proxychains curl www.google.com
 ```
@@ -373,6 +374,8 @@ proxychains firefox
 ```
 使用`shadowsocks`+`proxychains`代理打开新的Firefox实现浏览器翻墙. 
 也可以通过输入`proxychains bash`建立一个新的`shell`, 基于这个`shell`运行的所有命令都将使用代理. 
+
+>  如果需要配置**不输出代理信息**, 编辑 `/etc/proxychains.conf` 将 `#quiet_mode` 改为 `quiet_mode`.
 
 ## Privoxy
 
