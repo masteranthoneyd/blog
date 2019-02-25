@@ -790,25 +790,21 @@ sed [option] 'command' input_file
 `-r` 让sed命令支持扩展的正则表达式(默认是基础正则表达式)；
 `-i` 直接修改读取的文件内容，而不是由屏幕输出。
 
-
-
 常用的命令：
 
-`a \`： append即追加字符串， a \的后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选择的行的后面都加上字符串s；
+`a\`： append即追加字符串， a \的后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选择的行的后面都加上字符串s；
 
-`c \`： 取代/替换字符串，c \后面跟上字符串s(多行字符串可以用\n分隔)，则会将当前选中的行替换成字符串s；
+`c\`： 取代/替换字符串，c \后面跟上字符串s(多行字符串可以用\n分隔)，则会将当前选中的行替换成字符串s；
 
 `d`： delete即删除，该命令会将当前选中的行删除；
 
-`i \`： insert即插入字符串，i \后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选中的行的前面都插入字符串s；
+`i\`： insert即插入字符串，i \后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选中的行的前面都插入字符串s；
 
 `p`： print即打印，该命令会打印当前选择的行到屏幕上；
 
 `s`： 替换，通常s命令的用法是这样的：`1，2s/old/new/g`，将old字符串替换成new字符串；其中的g 表示global全局替换，如果没有global的话，只会替换每一行中的第一个匹配的内容；
 
 `=`： 显示文件行号 
-
- 
 
 在sed 命令中的定位问题：
 
@@ -976,4 +972,38 @@ printf "0x%x\n" 666
 printf "%d\n" 0x29a
 ```
 
+## Shell自动交互
+
+### 输入重定向Here Document
+
+```
+#!/bin/bash
+
+ftp -i -n 192.168.167.187 << EOF
+user hzc 123456
+pwd
+cd test
+pwd
+close
+bye
+EOF
+```
+
+### 管道，echo + sleep + |
+
+```
+#!/bin/bash
+
+(echo "curpassword"
+sleep 1
+echo "newpassword"
+sleep 1
+echo "newpassword")|passwd
+```
+
+### expect
+
+```
+sudo apt-get install expect 
+```
 

@@ -284,7 +284,7 @@ sudo apt-get install shadowsocks-qt5
 假如你上面任选一种方式已经开始运行`sslocal`了, 火狐那个代理插件老是订阅不了`gfwlist`所以配置自动模式的话不好使. 这里用的是chrome, 你可以在Ubuntu软件中心下载得到. 
 
 ### 安装插件
-我们需要给chrome安装`SwitchyOmega`插件, 但是没有代理之前是不能从谷歌商店安装这个插件的, 但是我们可以从Github上直接下载最新版***[https://github.com/FelisCatus/SwitchyOmega/releases/](https://github.com/FelisCatus/SwitchyOmega/releases/)***（这个是chrome的）然后浏览器地址打开`chrome://extensions/`, 将下载的插件托进去安装. 
+我们需要给chrome安装`SwitchyOmega`插件, 但是没有代理之前是不能从谷歌商店安装这个插件的, 但是我们可以从Github上直接下载最新版***[https://github.com/FelisCatus/SwitchyOmega/releases/](https://github.com/FelisCatus/SwitchyOmega/releases/)***（这个是chrome的）然后浏览器地址打开`chrome://extensions/`,  启用**开发者模式**,将下载的插件托进去安装. 
 
 ### 设置代理地址
 安装好插件会自动跳到设置选项, 有提示你可以跳过. 左边新建情景模式-选择代理服务器-比如命名为shadowProxy（叫什么无所谓）其他默认之后创建, 之后在代理协议选择SOCKS5, 地址为`127.0.0.1`,端口默认`1080` . 然后保存即应用选项. 
