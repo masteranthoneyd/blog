@@ -90,7 +90,15 @@ collation-server = utf8mb4_unicode_ci
 default-time-zone='+8:00'
 ```
 
+### 连接不上
 
+若抛出酱紫的错误:
+
+```
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+```
+
+那么你可能使用了 `localhost` 链接, 改为 `127.0.0.1` 或内网地址则OK.
 
 # 客户端以及GUI
 
@@ -558,6 +566,64 @@ SELECT * FROM information_schema.COLUMNS WHERE table_schema='test_db' AND table_
 SHOW INDEX FROM test_table;
 -- 或者
 SHOW KEYS from test_table;
+```
+
+# 备份数据与恢复
+
+从Navicat中导入导出数据是比较慢的, 我们可以通过 `mysqldump` (安装 `mysql-client` 后自带)备份.
+
+## mysqldump 备份
+
+备份一个数据库:
+
+```
+mysqldump -u [uname] -p[pass] db_name > db_backup.sql
+```
+
+备份所有数据库:
+
+```
+mysqldump -u [uname] -p[pass] --all-databases > all_db_backup.sql
+```
+
+备份特定的表:
+
+```
+mysqldump -u [uname] -p[pass] db_name table1 table2 > table_backup.sql
+```
+
+导出压缩一步到位:
+
+```
+mysqldump -u [uname] -p[pass] db_name | gzip > db_backup.sql.gz
+```
+
+远程数据库:
+
+```
+mysqldump -P 3306 -h [ip_address] -u [uname] -p[pass] db_name > db_backup.sql
+```
+
+遇到 `mysqldump: Got error: 1044: Access denied for user` 解决办法:
+
+加上 `--single-transaction` 即可, 网上有人说使用 `--skip-lock-tables`, 这个会影响数据的一致性(可能比丢数据还要遭糕)，故不推荐使用这个方法:
+
+```
+mysqldump --single-transaction -P 3306 -h [ip_address] -u [uname] -p[pass] db_name > db_backup.sql
+```
+
+## 恢复
+
+恢复一个数据库:
+
+```
+mysql -h [host] -P [port] -u [uname] -p[pass] db_name < db_backup.sql
+```
+
+恢复全部数据库:
+
+```
+mysql -h [host] -P [port] -u [uname] -p[pass] < db_backup_all.sql
 ```
 
 # Finally

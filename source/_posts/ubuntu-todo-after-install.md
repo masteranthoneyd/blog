@@ -145,6 +145,74 @@ sudo visudo
 
 这样所有sudo组内的用户使用sudo时就不需要密码了. 
 
+## Apt Fast
+
+> ***[https://github.com/ilikenwf/apt-fast](https://github.com/ilikenwf/apt-fast)***
+>
+> apt-fast 是一个为 `apt-get` 和 `aptitude` 做的 **shell 脚本封装**，通过对每个包进行并发下载的方式可以大大减少 APT 的下载时间。apt-fast 使用 **aria2c** 下载管理器来减少 APT 下载时间。就像传统的 apt-get 包管理器一样，apt-fast 支持几乎所有的 apt-get 功能，如， `install` , `remove` , `update` , `upgrade` , `dist-upgrade` 等等，并且更重要的是它也支持 proxy。
+
+```
+sudo add-apt-repository -y ppa:apt-fast/stable && \
+sudo apt -y install apt-fast
+```
+
+之后就可以用 `apt-fast`  代替 `apt` 或 `apt-get` 命令了.
+
+## Gdebi
+
+有时候安装deb包不满足依赖还需要手动执行`sudo apt install -f`, 我们可以使用`gdebi`解决这个问题:
+
+```
+sudo apt install gdebi
+```
+
+之后使用`sudo gdebi xxx.deb`安装即可
+
+## Snap
+
+```
+sudo apt install -y snapd
+```
+
+### 配置代理
+
+```
+sudo systemctl edit snapd.service
+```
+
+```
+[Service]
+Environment=http_proxy=http://proxy:port
+Environment=https_proxy=http://proxy:port
+```
+
+```
+sudo systemctl daemon-reload
+sudo systemctl restart snapd.service
+```
+
+### 常用命令
+
+```
+# 列出已经安装的snap包
+sudo snap list
+
+# 搜索要安装的snap包
+sudo snap find <text to search>
+
+# 安装一个snap包
+sudo snap install <snap name>
+
+# 更新一个snap包，如果你后面不加包的名字的话那就是更新所有的snap包
+sudo snap refresh <snap name>
+
+# 把一个包还原到以前安装的版本
+sudo snap revert <snap name>
+
+# 删除一个snap包
+sudo snap remove <snap name>
+```
+
 # 科学上网篇
 
 ## 方式一: 下载Lantern
@@ -596,29 +664,6 @@ sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
 # 软件篇
 
 > Java开发者的环境搭建请看: ***[Ubuntu的Java开发环境基本搭建](/2017/ubuntu-dev-environment-to-build/)***
-
-## Apt Fast
-
-> ***[https://github.com/ilikenwf/apt-fast](https://github.com/ilikenwf/apt-fast)***
->
-> apt-fast 是一个为 `apt-get` 和 `aptitude` 做的 **shell 脚本封装**，通过对每个包进行并发下载的方式可以大大减少 APT 的下载时间。apt-fast 使用 **aria2c** 下载管理器来减少 APT 下载时间。就像传统的 apt-get 包管理器一样，apt-fast 支持几乎所有的 apt-get 功能，如， `install` , `remove` , `update` , `upgrade` , `dist-upgrade` 等等，并且更重要的是它也支持 proxy。
-
-```
-sudo add-apt-repository -y ppa:apt-fast/stable && \
-sudo apt -y install apt-fast
-```
-
-之后就可以用 `apt-fast`  代替 `apt` 或 `apt-get` 命令了.
-
-## Gdebi
-
-有时候安装deb包不满足依赖还需要手动执行`sudo apt install -f`, 我们可以使用`gdebi`解决这个问题:
-
-```
-sudo apt install gdebi
-```
-
-之后使用`sudo gdebi xxx.deb`安装即可
 
 ## 搜狗输入法
 
@@ -1339,11 +1384,52 @@ sudo apt install -f
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
 ![](https://cdn.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
 
+# 附录
+
 ## 软件图标（.desktop）文件位置
 
 - `/usr/share/applications` # 大部分启动图标都在此
 - `~/.local/share/applications` # 一部分本地图标
 - `/var/lib/snapd/desktop/applications` # snap 类软件在此
+
+## gsetting 与 dconf
+
+gsetting 与 dconf 是 Linux Gnome下实现对应用程序的配置及管理功能的工具.
+
+gsetting命令:
+
+```
+#gsettings list-schemas             显示系统已安装的不可重定位的schema
+#gsettings list-relocatable-schemas 显示已安装的可重定位的schema
+#gsettings list-children SCHEMA     显示指定schema的children，其中SCHEMA指xml文件中schema的id属性值，例如实例中的"org.lili.test.app.testgsettings"
+#gsettings list-keys SCHEMA         显示指定schema的所有项(key)
+#gsettings range SCHEMA KEY         查询指定schema的指定项KEY的有效取值范围
+#gsettings get SCHEMA KEY           显示指定schema的指定项KEY的值
+#gsettings set SCHEMA KEY VALUE     设置指定schema的指定项KEY的值为VALUE
+#gsettings reset SCHEMA KEY         恢复指定schema的指定项KEY的值为默认值
+#gsettings reset-recursively SCHEMA 恢复指定schema的所有key的值为默认值
+#gsettings list-recursively [SCHEMA]如果有SCHEMA参数，则递归显示指定schema的所有项(key)和值(value)，如果没有SCHEMA参数，则递归显示所有schema的所有项(key)和值(value)
+```
+
+dconf 可以实现配置的导入与导出:
+
+```
+dconf dump /org/gnome/shell/extensions/dynamic-top-bar/ > ~/backup.txt
+
+dconf load /org/gnome/shell/extensions/topicons/ <<- EOF
+[/]
+icon-size=24
+icon-spacing=12
+tray-pos='right'
+tray-order=1
+EOF
+```
+
+也可以使用 `dconf-editor` 对其进行管理
+
+```
+sudo apt install -y dconf-editor
+```
 
 ## 终端写出图形文字
 

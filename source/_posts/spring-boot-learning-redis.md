@@ -167,6 +167,12 @@ OK
 4) "test"
 ```
 
+# GUI
+
+***[https://github.com/uglide/RedisDesktopManager](https://github.com/uglide/RedisDesktopManager)***
+
+***[https://rdbtools.com/](https://rdbtools.com/)***
+
 # Redis常用命令
 
 > 最新命令参考: ***[http://redisdoc.com](http://redisdoc.com)***
@@ -417,7 +423,7 @@ slowlog get [n] // n 表示返回的日志记录条数
 
 ## redis-rdb-tools
 
-> ***[https://github.com/sripathikrishnan/redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)***
+***[https://github.com/sripathikrishnan/redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)***
 
 ## rdr
 
