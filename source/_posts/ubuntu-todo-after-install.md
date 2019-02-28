@@ -153,7 +153,7 @@ sudo visudo
 
 ```
 sudo add-apt-repository -y ppa:apt-fast/stable && \
-sudo apt -y install apt-fast
+sudo apt install -y apt-fast
 ```
 
 之后就可以用 `apt-fast`  代替 `apt` 或 `apt-get` 命令了.
@@ -1245,7 +1245,8 @@ mv a /usr/share/stardict/dic
 
 ## 备份工具 Timeshift
 ```
-sudo apt install timeshift
+sudo add-apt-repository -y ppa:teejee2008/ppa
+sudo apt install -y timeshift
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
