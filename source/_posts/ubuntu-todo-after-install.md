@@ -1040,9 +1040,7 @@ sudo apt install deepin-screenshot
 ## 系统清理软件 BleachBit
 
 ```
-sudo add-apt-repository ppa:n-muench/programs-ppa
-sudo apt update 
-sudo apt install bleachbit 
+sudo apt install -y bleachbit
 ```
 
 ## 多协议下载器 Aria2
