@@ -17,15 +17,16 @@ tags: [VPS,ShadowSocks]
 
 ## What is ShadowSocks
 ShadowSocks(影梭) 是由***[clowwindy](https://github.com/shadowsocks/shadowsocks)***所开发的一个开源 Socks5 代理. 如其***[官网](http://shadowsocks.org/en/index.html)***所言 , 它是 “`A secure socks5 proxy, designed to protect your Internet traffic`” （一个安全的 `Socks5` 代理）. 其作用, 亦如该项目主页的 ***[wiki](https://github.com/shadowsocks/shadowsocks/wiki)***（***[中文版](https://github.com/shadowsocks/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)***） 中所说, “`A fast tunnel proxy that helps you bypass firewalls`” （一个**可穿透防火墙**的快速代理）. 
-不过, 在中国, 由于***[GFW](https://zh.wikipedia.org/wiki/%E9%98%B2%E7%81%AB%E9%95%BF%E5%9F%8E)***[^1]的存在, 更多的网友用它来进行**科学上网**. 
+不过, 在中国, 由于 ***[GFW](https://zh.wikipedia.org/wiki/%E9%98%B2%E7%81%AB%E9%95%BF%E5%9F%8E)*** 的存在, 更多的网友用它来进行**科学上网**. 
 
 ## This is a story...
 ### long long ago…
 我们的互联网通讯是这样的: 
 ![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-01.png)
 ### when evil comes
-然后有一天, GFW[^1] 就出现了, 他像一个收过路费的强盗一样夹在了在用户和服务之间, 每当用户需要获取信息, 都经过了 GFW, GFW将它不喜欢的内容统统过**滤掉**, 于是客户当触发 GFW 的**过滤规则**的时候, 就会收到 `Connection Reset` 这样的响应内容, 而无法接收到正常的内容: 
+然后有一天, GFW 就出现了, 他像一个收过路费的强盗一样夹在了在用户和服务之间, 每当用户需要获取信息, 都经过了 GFW, GFW将它不喜欢的内容统统过**滤掉**, 于是客户当触发 GFW 的**过滤规则**的时候, 就会收到 `Connection Reset` 这样的响应内容, 而无法接收到正常的内容: 
 ![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-02.png)
+
 ### ssh tunnel
 聪明的人们想到了**利用境外服务器代理**的方法来绕过 GFW 的过滤, 其中包含了各种HTTP代理服务、Socks服务、VPN服务… 其中以 `ssh tunnel` 的方法比较有代表性: 
 1) 首先用户和境外服务器基于 ssh 建立起一条加密的通道
@@ -80,6 +81,9 @@ Linode只能使用**信用卡支付**, 官方会随机手工抽查, 被抽查到
 参考 ***[免密码登录远程服务器](/2017/node-of-linux-command/#免密码登录远程服务器)***
 
 # ShadowSocks服务端安装
+
+## 基于Docker
+
 > 安装方式各种各样. . . 推荐Docker安装
 
 ### 拉取镜像
@@ -193,6 +197,7 @@ Enjoy it!
 `/etc/shadowsocks-libev/config.json`
 
 # ShadowSocks客户端安装
+
 ## 安装与启动
 
 ### Docker
@@ -924,8 +929,3 @@ SSR GUI客户端: ***[erguotou520/electron-ssr](https://github.com/erguotou520/e
 更多精彩内容请查看: ***[https://teddysun.com](https://teddysun.com)***
 
 v2ray: ***[https://github.com/v2ray/v2ray-core](https://github.com/v2ray/v2ray-core)***
-
-
-[^1]: 防火长城（英语: Great Firewall( of China), 常用简称: GFW, 中文也称中国国家防火墙, 中国大陆民众俗称防火墙等）, 是对中华人民共和国政府在其互联网边界审查系统（包括相关行政审查系统）的统称. 此系统起步于1998年, 其英文名称得自于2002年5月17日Charles R. Smith所写的一篇关于中国网络审查的文章《The Great Firewall of China》, 取與Great Wall（长城）相谐的效果, 简写为Great Firewall, 缩写GFW. 隨着使用的拓广, 中文「墙」和英文「GFW」有时也被用作动词, 网友所說的「被墙」即指被防火长城所屏蔽, 「翻墙」也被引申为浏览国外网站、香港等特区网站的行为. 
-
-
