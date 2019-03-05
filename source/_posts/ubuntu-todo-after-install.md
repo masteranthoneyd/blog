@@ -298,6 +298,10 @@ sudo apt install ultra-flat-icons
 sudo apt install arc-theme
 ```
 
+#### Sweet
+
+***[https://www.gnome-look.org/p/1253385/](https://www.gnome-look.org/p/1253385/)***
+
 ### 图标
 
 #### Suru Plus
@@ -658,8 +662,13 @@ sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
 
 推荐几个不错的壁纸下载网站: 
 
-* ***[https://pixabay.com](https://pixabay.com)***
 * ***[https://wallpapershome.com](https://wallpapershome.com)***
+
+* ***[https://pixabay.com](https://pixabay.com)***
+
+* ***[https://alpha.wallhaven.cc/](https://alpha.wallhaven.cc/)***
+
+  
 
 # 软件篇
 
@@ -747,7 +756,11 @@ Configure>>  Addon  >>Advanced>>Classic
 
 下载最新版本, 解压后打开目录里面的`electronic-wechat`, 然后创建个软连接换个图标拉倒桌面就可以了
 
+上面的 `electronic-wechat` 已**不再维护**.
+
 另外, Github中还有一个Linux版的Wechat: ***[https://github.com/eNkru/electron-wechat](https://github.com/eNkru/electron-wechat)***
+
+或者也可以使用 ***[Deepin Wine](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
 
 ## QQ
 
@@ -1267,9 +1280,11 @@ sudo apt install hardinfo -y
 
 ![](https://cdn.yangbingdong.com/img/individuation/System%20Information_002.png)
 
-## deepin-wine-ubuntu
+## Deepin Wine For Ubuntu
 
 这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
+
+这个是 Docker 版本的: ***[https://github.com/RokasUrbelis/docker-wine-linux](https://github.com/RokasUrbelis/docker-wine-linux)***
 
 # 其他设置篇
 

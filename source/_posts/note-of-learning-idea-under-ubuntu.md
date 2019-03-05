@@ -584,7 +584,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 ```bash
 #!/bin/bash  
 gsettings set org.gnome.desktop.wm.keybindings toggle-shaded "[]" 
-gsettings set org.gnome.settings-daemon.plugins.media-keys screensaver "[]"
+gsettings set org.gnome.settings-daemon.plugins.media-keys screencast "[]"
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "[]" 
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "[]"
 gsettings set org.gnome.desktop.wm.keybindings begin-move "[]" 
