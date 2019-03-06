@@ -1457,6 +1457,6 @@ sudo apt install -y dconf-editor
 > * ***[https://www.jianshu.com/p/23b0d3015db8](https://www.jianshu.com/p/23b0d3015db8)***
 > * ***[https://blog.diqigan.cn/posts/ubuntu-18-10-beautify.html](https://blog.diqigan.cn/posts/ubuntu-18-10-beautify.html)***
 
-使用Ubuntu的这一路过来真的是跌跌撞撞, 一路摸爬滚打不断解决各种奇怪的系统问题, 磨合了也有好长一段日子, 重装系统的次数也数不过来了. . . 给我最大的收获并不是觉得自己用Ubuntu用得多牛X, 而是锻炼意志. . . 
+使用Ubuntu的这一路过来跌跌撞撞, 摸爬滚打不断解决各种奇怪的系统问题, 磨合了也有好长一段日子, 重装系统的次数也数不过来了. . . 给我最大的收获并不是觉得自己用Ubuntu用得多牛X, 而是修身养性. . . 
 
 本文将定期更新, 与时俱进~
