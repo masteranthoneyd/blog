@@ -1,4 +1,4 @@
-安装: `curl https://getcaddy.com | proxychains4 bash -s personal hook.service,http.forwardproxy,http.git,tls.dns.linode`
+`curl https://getcaddy.com | bash -s personal http.cache,http.git,http.minify,tls.dns.linode,hook.service,http.forwardproxy`
 
 **配置caddy**
 
@@ -44,11 +44,9 @@ vi /etc/caddy/Caddyfile
 
 ```
 blog.yangbingdong.com {
-    root /var/www
+    root /var/www/blog.yangbingdong.com
     gzip
-    tls yangbingdong1994@gmail.com {
-        dns linode
-    }
+    tls yangbingdong1994@gmail.com
 }
 ```
 
@@ -106,9 +104,7 @@ http://axiong.me {
     redir https://axiong.me
 }
 https://axiong.me {
-    #tls off
     #tls admin@example.com
-    tls /etc/ssl/caddy/certs/axiong.me/fullchain.cer /etc/ssl/caddy/certs/axiong.me/ssl.key
     minify
     gzip
     log / /var/log/caddy/pub-axiong.me_access.log "{combined}" {
@@ -126,14 +122,12 @@ https://axiong.me {
     }
     root /var/www/axiong.me/public
     git {
-        repo https://github.com/nickfan/axiong.me
-        path /var/www/axiong.me
-        then hugo --destination=/var/www/axiong.me/public
-        hook /webhook [你在github后台设置的webhook的口令]
+        repo git@github.com:JefferyWang/blog.git
+        branch master
+        path /var/www/blog.wangjunfeng.com
+        then hugo --destination=/var/www/blog.wangjunfeng.com/public
+        hook /webhook NtaZj251UH8xqB9WrRYo3Xbpvwnm6Jhs
         hook_type github
-        clone_args --recursive
-        pull_args --recurse-submodules
-        interval 3600
     }
     hugo
 }
