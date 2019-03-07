@@ -985,6 +985,23 @@ sudo apt update && \
 sudo apt install google-chrome-stable
 ```
 
+### Extensions
+
+推荐几个不错的Chrome扩展:
+
+| 插件                                                         | 说明                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ***[Proxy SwitchyOmega](https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif)*** | 谁用谁知道...                                                |
+| ***[Axure RP Extension for Chrome](https://chrome.google.com/webstore/detail/axure-rp-extension-for-ch/dogkpdfcklifaemcdfbildhcofnopogp)*** | 可以打开Axure原型文件                                        |
+| ***[GNOME Shell integration](https://chrome.google.com/webstore/detail/gnome-shell-integration/gphhapmejobijbbhgpjhcjognlahblep)*** | 可用过Chrome扩展Gnome插件                                    |
+| ***[Adblock Plus](https://chrome.google.com/webstore/detail/adblock-plus-free-ad-bloc/cfhdojbkjhnklbpkdaibdccddilifddb)*** | 广告拦截                                                     |
+| ***[Google translate](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb)*** | 谷歌翻译                                                     |
+| ***[ElasticSearch Head](https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm)*** | ElasticSearch Head Chome插件                                 |
+| ***[BaiduExporter](https://github.com/acgotaku/BaiduExporter)*** | 导出百度盘链接                                               |
+| ***[Octotree](https://chrome.google.com/webstore/detail/octotree/bkhaagjahfmjljalopjnoealnfndnagc)*** | Github左侧展示树状结构                                       |
+| ***[Enhanced Github](https://chrome.google.com/webstore/detail/enhanced-github/anlikcnbgdeidpacdbdljnabclhahhmd)*** | 可下载Github中单个文件                                       |
+| ***[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)*** | 油猴, 脚本网站: *[https://greasyfork.org/zh-CN](https://greasyfork.org/zh-CN)*, *[https://openuserjs.org/](https://openuserjs.org/)* |
+
 ## XMind 8 Crack
 
 ### Setup
