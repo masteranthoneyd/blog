@@ -481,12 +481,10 @@ location / {
 > 参考: 
 > ***[Installing NGINX Open Source](https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/)***
 > ***[Nginx 初学者指南](https://www.crazy-code.tech/index.php/2016/11/11/nginx-beginner-guide/)***
+> ***[超实用的 Nginx 极简教程，覆盖了常用场景](https://mp.weixin.qq.com/s/OrpOil-AKjdf8tDfDdc-RA)***
 
 顺便写了个安装脚本: 
 ***[源码版](https://github.com/masteranthoneyd/about-shell/blob/master/nginx-by-source.sh)***
 ***[预编译版](https://github.com/masteranthoneyd/about-shell/blob/master/nginx-by-pre-built-package.sh)***
-
-人生在于折腾, 这几天玩VPS有很大的收获, 学会了一些以前不会的命令、写脚本、穿墙、Nginx等等, 坚持折腾！
-PS: 链接换成加粗斜体, 一个一个地找好累, 于是又学会了正则表达式: `\[[\w\s]*\]\(https?://[a-z\.\?/_=0-9\s#&-]*\)`, 一键替换～
 
 

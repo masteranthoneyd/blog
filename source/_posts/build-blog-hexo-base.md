@@ -422,6 +422,9 @@ hexo d
 > ***[Hexo 3.1.1 静态博客搭建指南](http://lovenight.github.io/2015/11/10/Hexo-3-1-1-%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E6%8C%87%E5%8D%97/)***
 > ***[Hexo官方文档](https://hexo.io/zh-cn/)***
 > ***[NexT官方文档](http://theme-next.iissnan.com/getting-started.html)***
+>
+> 大部分热门的静态页面生成器都可在下面这个网页找到:
+> ***[https://www.staticgen.com/](https://www.staticgen.com/)***
 
 
 
