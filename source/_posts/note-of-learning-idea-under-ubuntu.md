@@ -461,12 +461,6 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
-## activate-power-mode 或 Power mode ||
-
-这个抖动的窗口老年人实在受不了...
-
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/activate-power-mode.gif)
-
 # Skills
 
 ## 演出模式

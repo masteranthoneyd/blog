@@ -828,8 +828,6 @@ sudo apt install peek
 
 终端执行`peek`即可运行
 
-![](https://cdn.yangbingdong.com/img/individuation/Peek%202018-01-22%2015-49.gif)
-
 ## StarUml
 
 这个一款绘图工具
