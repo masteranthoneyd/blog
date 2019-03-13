@@ -237,23 +237,30 @@ nginx -v
 ## 预编译包安装
 > 博主用的就是这种方式, **简单粗暴**！当然上面的方式也是过, 但毕竟只是个业余的, 手动一个个模块配置上去的话, 小白表示搞不定. 
 
-### 添加源
-```shell
-echo "deb http://nginx.org/packages/ubuntu/ trusty nginx" >> /etc/apt/sources.list
-echo "deb-src http://nginx.org/packages/ubuntu/ trusty nginx" >> /etc/apt/sources.list
+```
+sudo apt install curl gnupg2 ca-certificates lsb-release
+echo "deb http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+sudo apt update && sudo apt install -y nginx openssl
 ```
 
-### 更新并导入升级Key完成安装
-```shell
-wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key && apt-get update && apt-get upgrade && apt-get install openssl nginx
-```
+查看版本:
 
-### 查看
 ```shell
 nginx -V
 ```
 
+启动:
+
+```
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+# sudo systemctl stop | start | restart | reload | disable | enable nginx
+```
+
 # NGINX初学
+
 ## 校验, 启动, 停止和重新加载配置
 
 ```shell
