@@ -461,6 +461,18 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
+## Rainbow Brackets
+
+> ***[https://github.com/izhangzhihao/intellij-rainbow-brackets](https://github.com/izhangzhihao/intellij-rainbow-brackets)***
+
+这个可以实现配对括号相同颜色, 并且实现选中区域代码高亮的功能, 对增强写代码的有趣性和排错等都有一些帮助。
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/with-material-theme-ui.png)
+
+高亮效果:  Ctrl+鼠标右键单击
+
+选中部分外暗淡效果: Alt+鼠标右键单击
+
 # Skills
 
 ## 演出模式

@@ -102,7 +102,7 @@ export JAVA_HOME=/usr/local/jdk
 ```
 2. `PATH`不需要`export`, 因为早在其他的地方, 已经`export`过了！, `\$JAVA_HOME` 表示引用前面配置的 `JAVA_HOME` 变量, 分隔符一定是冒号, **Windows**是分号,最后再引用原来的`PATH`的值
 ```
-PATH=$JAVA_HOME/bin:$PATH
+export PATH=$JAVA_HOME/bin:$PATH
 ```
 3. 配置以后, 可以重新登录让配置生效, 也可以使用`source`临时加载配置文件. 使用`source`命令加载的配置, 仅在当前`shell`有效, 关闭以后失效. 
 ```
@@ -129,7 +129,7 @@ javac -version
 
 ```
 export SCALA_HOME=/usr/local/scala
-PATH=$PATH:$SCALA_HOME/bin
+export PATH=$PATH:$SCALA_HOME/bin
 ```
 
 4、查看是否安装成功
@@ -171,7 +171,7 @@ plugins=(... golang)
 ```
 sudo tee /etc/profile.d/go.sh <<- EOF
 export GOPATH=${HOME}/go
-PATH=\$GOPATH/bin:\$PATH
+export PATH=\$GOPATH/bin:\$PATH
 EOF
 ```
 
