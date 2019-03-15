@@ -409,12 +409,65 @@ hexo d
 
 当然, 如果站内有部分资源不是https方式（比如图片）, 锁就绿不起来了. 
 
+# 文件压缩
+
+压缩方式有挺多的, 如果是用 ***[NexT](http://theme-next.iissnan.com/getting-started.html)*** 主题, 可以使用 `hexo-all-minifier`, 但速度不太理想.
+
+这里可以使用 Go 语言编写的 ***[minify](https://github.com/tdewolff/minify/tree/master/cmd/minify)***, 性能挺高效果也还可以.
+
+Ubuntu 下的 Golang 安装可以参考***[这里](https://yangbingdong.com/2017/ubuntu-dev-environment-to-build/#Golang)***.
+
+下载:
+
+```
+go get github.com/tdewolff/minify/cmd/minify
+```
+
+之后 `minify` 命令会放在 `$GOPATH/bin` 下面
+
+命令:
+
+```
+Usage: minify [options] [input]
+
+Options:
+  -a, --all                              Minify all files, including hidden files and files in hidden directories
+      --css-decimals int                 Number of decimals to preserve in numbers, -1 is all (default -1)
+  -h, --help                             Show usage
+      --html-keep-conditional-comments   Preserve all IE conditional comments
+      --html-keep-default-attrvals       Preserve default attribute values
+      --html-keep-document-tags          Preserve html, head and body tags
+      --html-keep-end-tags               Preserve all end tags
+      --html-keep-whitespace             Preserve whitespace characters but still collapse multiple into one
+  -l, --list                             List all accepted filetypes
+      --match string                     Filename pattern matching using regular expressions
+      --mime string                      Mimetype (eg. text/css), optional for input filenames, has precedence over -type
+  -o, --output string                    Output file or directory (must have trailing slash), leave blank to use stdout
+  -r, --recursive                        Recursively minify directories
+      --svg-decimals int                 Number of decimals to preserve in numbers, -1 is all (default -1)
+      --type string                      Filetype (eg. css), optional for input filenames
+      --url string                       URL of file to enable URL minification
+  -v, --verbose                          Verbose
+      --version                          Version
+  -w, --watch                            Watch files and minify upon changes
+      --xml-keep-whitespace              Preserve whitespace characters but still collapse multiple into one
+
+Input:
+  Files or directories, leave blank to use stdin
+```
+
+使用 `hexo g` 生成 `public` 文件后:
+
+```
+$GOPATH/bin/minify -r -a -o public public
+```
+
 # 总结
 
 最后用拙劣的语言总结一下博主搭建Hexo博客的体会, 六个字: 简洁但, 不简单. 
 再六个字, 正如NexT官方说的: 精于心, 简于形
 = =貌似这个博客也不怎么简洁, 有点花俏, 装X嫌疑
-但无论怎样, 折腾这个博客让我受益匪浅, 正如之前听到的一句名言, 忘了谁说的: 不努力试一把, 又怎么会知道绝望...好像很有道理, 绝望中寻找光芒, 绝处逢生...嘿嘿嘿
+人生在于折腾...
 
 # 参考
 > ***[使用Hexo搭建个人博客(基于hexo3.0) ](http://opiece.me/2015/04/09/hexo-guide/)***

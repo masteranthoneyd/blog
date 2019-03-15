@@ -213,6 +213,71 @@ sudo snap revert <snap name>
 sudo snap remove <snap name>
 ```
 
+## 关闭 avahi-daemon 服务
+
+`avahi-daemon` 造成过网络异常，用处也不大，停止服务并关闭开机启动：
+
+```shell
+sudo systemctl stop avahi-daemon.socket
+sudo systemctl stop avahi-daemon.service
+sudo /lib/systemd/systemd-sysv-install disable avahi-daemon
+
+sudo systemctl disable avahi-daemon.socket
+sudo systemctl disable avahi-daemon.service
+```
+
+## 显卡驱动
+
+查看可安装显卡:
+
+```
+ubuntu-drivers devices
+```
+
+安装:
+
+```
+# 安装系统推荐驱动
+sudo ubuntu-drivers autoinstall
+
+# 安装指定驱动
+sudo apt install nvidia-340
+```
+
+安装Beta版本驱动:
+
+```
+sudo add-apt-repository ppa:graphics-drivers/ppa -y
+
+# 再次查看可安装的显卡驱动
+ubuntu-drivers devices
+```
+
+输出如下:
+
+```
+$ ubuntu-drivers devices
+== /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
+modalias : pci:v000010DEd00001380sv00001458sd0000362Dbc03sc00i00
+vendor   : NVIDIA Corporation
+model    : GM107 [GeForce GTX 750 Ti]
+driver   : nvidia-driver-396 - third-party free
+driver   : nvidia-340 - distro non-free
+driver   : nvidia-driver-390 - distro non-free
+driver   : nvidia-driver-410 - third-party free
+driver   : nvidia-driver-418 - third-party free recommended
+driver   : nvidia-driver-415 - third-party free
+driver   : xserver-xorg-video-nouveau - distro free builtin
+```
+
+安装:
+
+```
+sudo ubuntu-drivers autoinstall  # sudo apt install nvidia-418
+```
+
+重启后生效.
+
 # 科学上网篇
 
 ## 方式一: 下载Lantern

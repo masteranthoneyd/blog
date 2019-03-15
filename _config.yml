@@ -167,7 +167,7 @@ html_minifier:
 css_minifier:
   enable: true
   exclude: 
-    - '/home/ybd/GitRepo/blog/themes/next/source/static/css/main.0603c539.css'
+    - '/home/ybd/data/git-repo/github/own/blog/themes/next/source/static/css/main.0603c539.css'
 
 js_minifier:
   enable: true
@@ -175,7 +175,7 @@ js_minifier:
   output:
   compress:
   exclude: 
-    - '/home/ybd/GitRepo/blog/themes/next/source/static/js/*.*.js'
+    - '/home/ybd/data/git-repo/github/own/blog/themes/next/source/static/js/*.*.js'
 
 image_minifier:
   enable: true

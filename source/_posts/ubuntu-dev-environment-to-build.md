@@ -140,6 +140,59 @@ scala -version
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
 
+# Golang
+
+**安装**:
+
+```
+# apt 安装
+sudo apt install golang
+
+# snap 安装
+sudo snap install go --classic
+```
+
+**查看版本**:
+
+```
+go version
+```
+
+**智能补全**:
+
+修改 `.zshrc`: 
+
+```
+plugins=(... golang)
+```
+
+**环境变量配置**:
+
+```
+sudo tee /etc/profile.d/go.sh <<- EOF
+export GOPATH=${HOME}/go
+PATH=\$GOPATH/bin:\$PATH
+EOF
+```
+
+运行Hello world:
+
+```
+go get github.com/golang/example/hello
+```
+
+之后 `hello` 命令会下载到 `${HOME}/go/bin` 中.
+
+解决 `unrecognized import path "golang.org/x/sys/unix`:
+
+```
+mkdir -p $GOPATH/src/golang.org/x/
+cd !$
+git clone https://github.com/golang/net.git
+git clone https://github.com/golang/sys.git
+git clone https://github.com/golang/tools.git
+```
+
 #  IDE
 
 ## Eclipse
