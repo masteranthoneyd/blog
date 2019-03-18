@@ -154,6 +154,16 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
 
+## 自定义代码颜色
+
+### 方法参数
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-prameter-color.png)
+
+### 选择变量显示使用地方
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-select-color.png)
+
 # Keyboard shortcuts
 
 > JetBrains官方快捷键手册: *[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)*
