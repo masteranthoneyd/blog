@@ -1,8 +1,8 @@
 ---
-title: Access Blocked Sites(科学上网):VPS自搭建ShadowSocks与加速
+title: Access Blocked Sites Guide(科学上网指南)
 date: 2017-04-19 18:15:57
 categories: [VPS]
-tags: [VPS,ShadowSocks]
+tags: [VPS, ShadowSocks, V2Ray]
 ---
 ![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
 # Preface
@@ -543,6 +543,20 @@ vi /etc/ssh/sshd_config
 ```shell
 service ssh restart
 ```
+
+# V2Ray
+
+> V2Ray 是 clowwindy 被喝茶之后 V2Ray 项目组为表示抗议开发的，一开始就致力于让大家更好更快的科学上网...
+>
+> 项目地址: ***[https://github.com/v2ray/v2ray-core](https://github.com/v2ray/v2ray-core)***
+>
+> 参考文档: ***[https://toutyrater.github.io/](https://toutyrater.github.io/)*** (已被墙)
+>
+> 一键安装:
+> ***[https://github.com/Jrohy/multi-v2ray](https://github.com/Jrohy/multi-v2ray)***
+> ***[https://github.com/233boy/v2ray](https://github.com/233boy/v2ray)***
+
+
 
 # VPS Security
 
