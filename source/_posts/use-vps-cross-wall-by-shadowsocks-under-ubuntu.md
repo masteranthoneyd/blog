@@ -469,13 +469,12 @@ phymyadmin 访问 `ip:888`
 博主用的**[Linode](https://www.linode.com/)**不能直接命令更换内核, 需要到管理后台设置: 
 ![](https://cdn.yangbingdong.com/img/docker-shadowsocks/change-kernel.png)
 
-### 安装
+### 脚本安装
 
 ```
 wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && \
 chmod +x bbr.sh && \
 ./bbr.sh
-
 ```
 
 安装完后, 会提示要重启 VPS, 选择 **`Y`** 回车重启即可. 
@@ -488,13 +487,24 @@ lsmod | grep bbr
 
 出现 `tcp_bbr` 即说明 BBR 已经启动. 
 
+### 手动安装
+
+如果是最新内核:
+
+```
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+sysctl -p
+```
+
 ## 开启TCP Fast Open
 
 这个需要服务器和客户端都是Linux 3.7+的内核, 一般Linux的服务器发行版只有debian jessie有3.7+的, 客户端用Linux更是珍稀动物, 所以这个不多说, 如果你的服务器端和客户端都是Linux 3.7+的内核, 那就在服务端和客户端的`vi /etc/sysctl.conf`文件中再加上一行. 
 
 ```
-# turn on TCP Fast Open on both client and server side
-net.ipv4.tcp_fastopen = 3
+echo "net.ipv4.tcp_fastopen = 3" | sudo tee -a /etc/sysctl.conf
+echo "3" | sudo tee /proc/sys/net/ipv4/tcp_fastopen
+sudo sysctl -p
 ```
 
 然后把`vi /etc/shadowsocks.json`配置文件中`"fast_open": false`改为`"fast_open": true`. 这样速度也将会有非常显著的提升. 
@@ -556,7 +566,22 @@ service ssh restart
 > ***[https://github.com/Jrohy/multi-v2ray](https://github.com/Jrohy/multi-v2ray)***
 > ***[https://github.com/233boy/v2ray](https://github.com/233boy/v2ray)***
 
+docker-compose:
 
+```
+version: '3.7'
+services:
+  v2ray:
+    image: v2ray/official
+    container_name: v2ray
+    restart: always
+    ports:
+      - "1080:1080"
+
+    volumes:
+      - ./config.json:/etc/v2ray/config.json
+    command: v2ray -config=/etc/v2ray/config.json
+```
 
 # VPS Security
 
