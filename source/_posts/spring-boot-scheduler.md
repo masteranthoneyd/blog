@@ -642,7 +642,7 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 
 ## Elastic Job
 
-> ***[Elastic Job](http://elasticjob.io/)***
+> 官网: ***[Elastic Job](http://elasticjob.io/)***
 
 ### Elastic Job 与 Sping Cloud 集成解决依赖冲突问题
 
@@ -654,7 +654,7 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 
 解决方式是排除Elastic Job中`curator`相关依赖，重新导入：
 
-```
+```xml
 <properties>
    <elastic-job.version>2.1.5</elastic-job.version>
    <curator.version>2.10.0</curator.version>
@@ -698,3 +698,167 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 </dependencies>
 ```
 
+### Spting Boot 集成
+
+> Github: ***[https://github.com/yinjihuan/elastic-job-spring-boot-starter](https://github.com/yinjihuan/elastic-job-spring-boot-starter)***
+
+pom.xml:
+
+```xml
+<dependency>
+    <groupId>com.github.yinjihuan</groupId>
+    <artifactId>elastic-job-spring-boot-starter</artifactId>
+    <version>1.0.4</version>
+    <exclusions>
+        <exclusion>
+            <artifactId>curator-client</artifactId>
+            <groupId>org.apache.curator</groupId>
+        </exclusion>
+        <exclusion>
+            <artifactId>curator-framework</artifactId>
+            <groupId>org.apache.curator</groupId>
+        </exclusion>
+        <exclusion>
+            <artifactId>curator-recipes</artifactId>
+            <groupId>org.apache.curator</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-framework</artifactId>
+    <version>${curator.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-client</artifactId>
+    <version>${curator.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-recipes</artifactId>
+    <version>${curator.version}</version>
+</dependency>
+```
+
+还需要加上repository配置:
+
+```xml
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+```
+
+yml配置:
+
+```yaml
+elastic:
+  job:
+    zk:
+      serverLists: 192.168.6.113:2181
+      namespace: test
+```
+
+只需一个注解即可开启任务:
+
+```java
+@ElasticJobConf(name = JobName, cron = "0 0 0 * * ?", failover = true, misfire = true, overwrite = true,
+		eventTraceRdbDataSource = "dataSource")
+@Slf4j
+public class MySimpleJob implements SimpleJob {
+
+	static final String JobName = "MySimpleJob";
+
+	@Override
+	public void execute(ShardingContext shardingContext) {
+		log.info("执行定时任务: " + shardingContext);
+	}
+}
+```
+
+`eventTraceRdbDataSource = "dataSource"` 是启用事件追踪, 但在最新版的Spring Boot 中并不会创建 `JOB_EXECUTION_LOG` 与 `JOB_STATUS_TRACE_LOG` 这两个记录表, 最好是手动创建, 下面是建表语句:
+
+```sql
+CREATE TABLE `JOB_EXECUTION_LOG` (
+  `id` varchar(40) NOT NULL,
+  `job_name` varchar(100) NOT NULL,
+  `task_id` varchar(255) NOT NULL,
+  `hostname` varchar(255) NOT NULL,
+  `ip` varchar(50) NOT NULL,
+  `sharding_item` int(11) NOT NULL,
+  `execution_source` varchar(20) NOT NULL,
+  `failure_cause` varchar(4000) DEFAULT NULL,
+  `is_success` int(11) NOT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `complete_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+
+CREATE TABLE `JOB_STATUS_TRACE_LOG` (
+  `id` varchar(40) NOT NULL,
+  `job_name` varchar(100) NOT NULL,
+  `original_task_id` varchar(255) NOT NULL,
+  `task_id` varchar(255) NOT NULL,
+  `slave_id` varchar(50) NOT NULL,
+  `source` varchar(50) NOT NULL,
+  `execution_type` varchar(20) NOT NULL,
+  `sharding_item` varchar(100) NOT NULL,
+  `state` varchar(20) NOT NULL,
+  `message` varchar(4000) DEFAULT NULL,
+  `creation_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `TASK_ID_STATE_INDEX` (`task_id`,`state`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+```
+
+### 运维平台
+
+ElasticJob提供了一个运维平台拱查看任务执行详情.
+
+需要clone ElasticJob源码并install, 会生成运维平台的压缩包, 解压后通过脚本可一键启动运维平台.
+
+根据启动脚本的内容, 可做成Docker镜像, 只需将lib包中的jar包copy进去再按照脚本的启动方式配置entrypoint即可.
+
+Dockerfile:
+
+```dockerfile
+FROM frolvlad/alpine-oraclejre8:slim
+MAINTAINER ybd <yangbingdong1994@gmail.com>
+ADD elastic-job-lite-console.tar.gz /
+WORKDIR elastic-job-lite-console
+ENTRYPOINT exec java -classpath ./lib/*:. io.elasticjob.lite.console.ConsoleBootstrap 8080
+```
+
+docker-compose.yml:
+
+```
+version: '3.7'
+
+services:
+  job-console:
+    image: yangbingdong/elastic-job-console:latest
+    restart: always
+    ports:
+      - "8090:8080"
+    networks:
+      - backend
+    volumes:
+      - ./auth.properties:/elastic-job-lite-console/conf/auth.propertise
+
+networks:
+  backend:
+    external: true
+```
+
+auth.properties:
+
+```
+root.username=admin
+root.password=admin
+guest.username=guest
+guest.password=guest
+```
