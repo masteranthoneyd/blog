@@ -23,7 +23,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 ### Maven配置
 
-```
+```xml
 <!-- Spring Boot 依赖-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -101,7 +101,7 @@ logging:
 
 上面是简单的打印, 生产环境需要采用以下xml的配置: 
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="OFF" monitorInterval="30">
     <properties>
@@ -177,7 +177,7 @@ logging:
 
 `log4j2.yml`:
 
-```
+```yaml
 Configuration:
   status: "OFF"
   monitorInterval: 10
@@ -217,6 +217,100 @@ Configuration:
 
 更多配置请参照: *[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
 
+### 日志文件配置
+
+若不使用ELK, 也可以将日志记录到日志文件中, 通过目录映射的方式将日志挂载到物理目录, 以下是使用日志文件的配置:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN" monitorInterval="1800">
+    <properties>
+        <property name="UNKNOWN" value="????"/>
+        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %5p | %X{IP} | %X{USER_ACCOUNT} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
+
+        <property name="basePath">/log4j2Logs</property>
+        <property name="every_file_size">10MB</property>
+        <property name="output_log_level">INFO</property>
+
+        <property name="rolling_fileName">${basePath}/all.log</property>
+        <property name="rolling_filePattern">${basePath}/%d{yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="rolling_max">20</property>
+
+        <property name="info_fileName">${basePath}/info.log</property>
+        <property name="info_filePattern">${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="info_max">10</property>
+
+        <property name="warn_fileName">${basePath}/warn.log</property>
+        <property name="warn_filePattern">${basePath}/%d{yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="warn_max">10</property>
+
+        <property name="error_fileName">${basePath}/error.log</property>
+        <property name="error_filePattern">${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="error_max">10</property>
+
+        <property name="console_print_level">INFO</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+        </Console>
+
+        <RollingFile name="RollingFile" fileName="${rolling_fileName}" filePattern="${rolling_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            <DefaultRolloverStrategy max="${rolling_max}" />
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="InfoFile" fileName="${info_fileName}" filePattern="${info_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${info_max}" />
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="WarnFile" fileName="${warn_fileName}" filePattern="${warn_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${warn_max}" />
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="${error_fileName}" filePattern="${error_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${error_max}" />
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+</configuration>
+```
+
+> 上面是按日志按级别分类的, 到达一定大小后自动压缩保存
+
 ## 日志配置文件中获取Application配置
 
 ### Logback
@@ -233,7 +327,7 @@ Configuration:
 
 只能写一个Lookup: 
 
-```
+```java
 /**
  * @author ybd
  * @date 18-5-11
@@ -355,7 +449,7 @@ MDC.put("IP", IpUtil.getIpAddr(request));
 
 `settings.xml`: 
 
-```
+```xml
 <server>
     <id>docker-registry</id>
     <username>admin</username>
@@ -407,7 +501,7 @@ mvn --encrypt-password <password>
 
 Dockerfile: 
 
-```
+```dockerfile
 FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER ybd <yangbingdong1994@gmail.com>
 ARG TZ 
@@ -478,7 +572,7 @@ ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -DLog4jC
 
 resources插件, 使用`@变量@`形式获取Maven变量到Dockerfile中（同时拷贝构建的Jar包到Dockerfile同一目录中, 这种方式是方便手动构建镜像）
 
-```
+```xml
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -539,7 +633,7 @@ ${maven.build.timestamp}
 
 如果要使用`GMT+8`, 就需要`build-helper-maven-plugin`插件, 当然也有其他的实现方式, 这里不做展开. 
 
-```
+```xml
 <build>
     <plugins>
         <plugin>
@@ -576,7 +670,7 @@ ${maven.build.timestamp}
 
 这也是集成并构建Docker镜像的关键
 
-```
+```xml
     <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
@@ -638,7 +732,7 @@ ${maven.build.timestamp}
 
 主要`properties`:
 
-```
+```xml
 <properties>
     <!-- ########## Docker 相关变量 ########## -->
     <docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
@@ -779,6 +873,78 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
 
+### Jib
+
+> Jib 是 Google 开源的另外一款Docker打包工具.
+>
+> jib-maven-plugin: ***[https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin)***
+
+pom配置:
+
+```xml
+<project>
+  ...
+  <build>
+    <plugins>
+      ...
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>1.0.2</version>
+        <configuration>
+          <to>
+            <image>myimage</image>
+          </to>
+        </configuration>
+      </plugin>
+      ...
+    </plugins>
+  </build>
+  ...
+</project>
+```
+
+官方配置例子:
+
+```xml
+<configuration>
+  <from>
+    <image>openjdk:alpine</image>
+  </from>
+  <to>
+    <image>localhost:5000/my-image:built-with-jib</image>
+    <credHelper>osxkeychain</credHelper>
+    <tags>
+      <tag>tag2</tag>
+      <tag>latest</tag>
+    </tags>
+  </to>
+  <container>
+    <jvmFlags>
+      <jvmFlag>-Xms512m</jvmFlag>
+      <jvmFlag>-Xdebug</jvmFlag>
+      <jvmFlag>-Xmy:flag=jib-rules</jvmFlag>
+    </jvmFlags>
+    <mainClass>mypackage.MyApp</mainClass>
+    <args>
+      <arg>some</arg>
+      <arg>args</arg>
+    </args>
+    <ports>
+      <port>1000</port>
+      <port>2000-2003/udp</port>
+    </ports>
+    <labels>
+      <key1>value1</key1>
+      <key2>value2</key2>
+    </labels>
+    <format>OCI</format>
+  </container>
+</configuration>
+```
+
+更多配置请看官方文档.
+
 ## Docker Swarm环境下获取ClientIp
 
 在Docker Swarm环境中, 服务中获取到的ClientIp永远是`10.255.0.X`这样的Ip, 搜索了一大圈, 最终的解决方安是通过Nginx转发中添加参数, 后端再获取. 
@@ -819,7 +985,7 @@ docker pull docker.elastic.co/logstash/logstash:6.3.0
 
 这里直接使用docker-compose（需要先创建外部网络）:
 
-```
+```yaml
 version: '3.4'
 services:
   zoo:
@@ -901,7 +1067,7 @@ public class LicenseVerifier
 
 ```
 
-```
+```java
 package org.elasticsearch.xpack.core;
 
 import org.elasticsearch.common.SuppressForbidden;
@@ -1101,7 +1267,7 @@ xpack.monitoring.ui.container.elasticsearch.enabled: true
 
 `docker-compose.yml`:
 
-```
+```yaml
 version: '3'
 services:
   elk-elasticsearch:
@@ -1242,7 +1408,7 @@ Kibana默认读取浏览器时区, 可通过`dateFormat:tz`进行修改:
 
 `docker-compose`:
 
-```
+```yaml
 version: '3'
 services:
   apm-server:
