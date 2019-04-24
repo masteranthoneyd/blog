@@ -391,6 +391,10 @@ Zookeeper UI, 支持删除操作
 
 为了测试需要，我们需要将简单 Java 领域对象转成 JSON 字符串方便用 postman 或者 curl 模拟数据。详细使用文档，参考：*[https://plugins.jetbrains.com/plugin/9686-pojo-to-json](https://plugins.jetbrains.com/plugin/9686-pojo-to-json)*
 
+## CamelCase
+
+下划线转驼峰插件, 安装好之后可通过快捷键 `Shift+Alt+U` 更换驼峰.
+
 ## Grep Console
 
 参考：*[https://plugins.jetbrains.com/plugin/7125-grep-console](https://plugins.jetbrains.com/plugin/7125-grep-console)*

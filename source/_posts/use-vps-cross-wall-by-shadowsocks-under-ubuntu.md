@@ -883,7 +883,11 @@ DAEMON_PURGE = 1h #当以后台方式运行时, 清除机制在 HOSTS_DENY 中�
 
 ## vDDoS（只支持CentOS和CloudLinux）
 
-Github: ***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
+***[https://github.com/duy13/vDDoS-Protection](https://github.com/duy13/vDDoS-Protection)***
+
+## CCKiller
+
+***[https://github.com/jagerzhang/CCKiller](https://github.com/jagerzhang/CCKiller)***
 
 # VPS Speed Test
 
