@@ -638,13 +638,53 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 
 > ***[https://github.com/ifesdjeen/hashed-wheel-timer](https://github.com/ifesdjeen/hashed-wheel-timer)***
 
-# 分布式任务调度
+![](https://cdn.yangbingdong.com/img/scheduler/o_timewheel.png)
 
-## Elastic Job
+> 时间轮算法可以类比于时钟，如上图箭头（指针）按某一个方向按固定频率轮动，每一次跳动称为一个 tick。这样可以看出定时轮由个3个重要的属性参数，ticksPerWheel（一轮的tick数），tickDuration（一个tick的持续时间）以及 timeUnit（时间单位），例如当ticksPerWheel=60，tickDuration=1，timeUnit=秒，这就和现实中的始终的秒针走动完全类似了。
+
+例子, 使用Netty中的时间轮实现:
+
+```java
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
+import io.netty.util.TimerTask;
+
+import java.util.concurrent.TimeUnit;
+
+public class HashedWheelTimerTest {
+	static class MyTimerTask implements TimerTask {
+		boolean flag;
+
+		public MyTimerTask(boolean flag) {
+			this.flag = flag;
+		}
+
+		public void run(Timeout timeout) throws Exception {
+			System.out.println("执行延迟任务...");
+			this.flag = false;
+		}
+	}
+
+	public static void main(String[] argv) throws InterruptedException {
+		MyTimerTask timerTask = new MyTimerTask(true);
+		Timer timer = new HashedWheelTimer();
+		timer.newTimeout(timerTask, 5, TimeUnit.SECONDS);
+		int i = 1;
+		while (timerTask.flag) {
+			Thread.sleep(1000);
+			System.out.println(i + "秒过去了");
+			i++;
+		}
+	}
+}
+```
+
+# Elastic Job
 
 > 官网: ***[Elastic Job](http://elasticjob.io/)***
 
-### Elastic Job 与 Sping Cloud 集成解决依赖冲突问题
+## Elastic Job 与 Sping Cloud 集成解决依赖冲突问题
 
 由于Elastic Job自身的 `curator-client`,`curator-framework`,`curator-recipes`与Spring Cloud组件中的`curator-client`,`curator-framework`,`curator-recipes`有版本冲突，在启动过程会报如下错误：
 
@@ -698,7 +738,7 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 </dependencies>
 ```
 
-### Spting Boot 集成
+## Spting Boot 集成
 
 > Github: ***[https://github.com/yinjihuan/elastic-job-spring-boot-starter](https://github.com/yinjihuan/elastic-job-spring-boot-starter)***
 
@@ -815,7 +855,7 @@ CREATE TABLE `JOB_STATUS_TRACE_LOG` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 ```
 
-### 运维平台
+## 运维平台
 
 ElasticJob提供了一个运维平台拱查看任务执行详情.
 
@@ -862,3 +902,20 @@ root.password=admin
 guest.username=guest
 guest.password=guest
 ```
+
+# Redis Keyspace Notifications
+
+通过设置一个过期键, 并在过期的时候回调监听者实现延迟任务.
+
+可参考:  ***[Spring监听Redis Keyspace Event](/2018/spring-boot-learning-redis/#Spring%E7%9B%91%E5%90%ACRedis-Keyspace-Event)***
+
+> Redis的**pub/sub**机制存在一个硬伤，官网内容如下
+> **原**:Because Redis Pub/Sub is fire and forget currently there is no way to use this feature if your application demands reliable notification of events, that is, if your Pub/Sub client disconnects, and reconnects later, all the events delivered during the time the client was disconnected are lost.
+>
+> 就是说Redis的发布/订阅目前是即发即弃(fire and forget)模式的，因此无法实现事件的可靠通知。也就是说，如果发布/订阅的客户端断链之后又重连，则在客户端断链期间的所有事件都丢失了。
+
+# RabbitMQ 延迟队列
+
+这是一个不错的方案, 结合 `rabbitmq_delayed_message_exchange` 插件可以很优雅地做到延迟任务.
+
+可参考: ***[延迟队列](/2019/rabbitmq-and-spring-amqp-learning/#%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97)***

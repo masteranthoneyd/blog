@@ -1,4 +1,11 @@
-# RabbitMQ 入门
+---
+title: Rabbit & Spring AMQP 入门
+date: 2019-04-25 16:44:51
+categories: [Programming, Java]
+tags: [Java, Spring Boot, Spring Cloud, RabbitMQ]
+---
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/spring-rabbitmq-banner.png)
 
 # Preface
 
@@ -9,7 +16,11 @@
 >
 > RabbitMQ是一个开源的AMQP**实现**, 服务器端用Erlang语言编写. 
 
-# 安装
+<!--more-->
+
+# 启动
+
+这里使用Docker启动.
 
 docker-compose:
 
@@ -37,8 +48,6 @@ networks:
   backend:
     external: true
 ```
-
-
 
 # 基本概念
 
@@ -87,7 +96,7 @@ public class BasicSingleSendAndReceive {
 		Connection connection = getConnection();
 		Channel channel = connection.createChannel();
 
-		// 声明队列, 主要为了防止消息接收者先运行此程序, 队列还不存在时创建队列。
+		// 声明队列, 主要为了防止消息接收者先运行此程序, 队列还不存在时创建队列.
 		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 		Consumer consumer = new DefaultConsumer(channel) {
 			@Override
@@ -186,16 +195,27 @@ Queue是RabbitMQ的内部对象, 用于存储消息, RabbitMQ中的消息都只�
 
 消息的 `header` 信息是 `key-value` 的形式, 每条消息可以包含多条 `header` 信息, 路由规则是通过 `header` 信息的 `key` 来匹配的, Spring Boot 封装的匹配规则有三种:
 
-- where(key).exists() :匹配单个 `key`
-- whereAll(keys).exist() :同时匹配多个 `key`
-- whereAny(keys).exist() :匹配多个 `key` 中的一个或多个
+- `where(key).exists()` :匹配单个 `key`
+- `whereAll(keys).exist()` :同时匹配多个 `key`
+- `whereAny(keys).exist()` :匹配多个 `key` 中的一个或多个
 
 发送到 `headers exchange` 的消息, 会通过消息的 `header` 匹配:
 
-```
-    @Bean    Binding bindingHeadersQueue1(Queue headersQueue1, HeadersExchange headersExchange) {        return BindingBuilder.bind(headersQueue1).to(headersExchange).where("one").exists();    }
-    @Bean    Binding bindingHeadersQueue2(Queue headersQueue1, HeadersExchange headersExchange) {        return BindingBuilder.bind(headersQueue1).to(headersExchange).whereAll("all1", "all2").exist();    }
-    @Bean    Binding bindingHeadersQueue3(Queue headersQueue3, HeadersExchange headersExchange) {        return BindingBuilder.bind(headersQueue3).to(headersExchange).whereAny("any1", "any2").exist();    }
+```java
+@Bean
+Binding bindingHeadersQueue1(Queue headersQueue1, HeadersExchange headersExchange) {
+	return BindingBuilder.bind(headersQueue1).to(headersExchange).where("one").exists();
+}
+
+@Bean
+Binding bindingHeadersQueue2(Queue headersQueue1, HeadersExchange headersExchange) {
+	return BindingBuilder.bind(headersQueue1).to(headersExchange).whereAll("all1", "all2").exist();
+}
+
+@Bean
+Binding bindingHeadersQueue3(Queue headersQueue3, HeadersExchange headersExchange) {
+	return BindingBuilder.bind(headersQueue3).to(headersExchange).whereAny("any1", "any2").exist();
+}
 ```
 
 - 如果 `header` 信息存在 `one=XXXX`, 会路由到 `QUEUE-1`
@@ -256,8 +276,8 @@ ExChange 指定持久化也一样:
 在Spring Cloud Stream中指定Queue与Exchange持久化只需要通过以下两个参数配置, 默认值都为 `true`:
 
 ```
-, cloud.stream.rabbit.bindings.<channelName>.consumer.durableSubscription=
-, cloud.stream.rabbit.bindings.<channelName>.consumer.exchangeDurable=
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.durableSubscription=
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.exchangeDurable=
 ```
 
 # 手动ACK
@@ -271,13 +291,13 @@ ExChange 指定持久化也一样:
 ### Spring Cloud Stream
 
 ```
-, cloud.stream.rabbit.bindings.<channelName>.consumer.acknowledgeMode=MANUAL
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.acknowledgeMode=MANUAL
 ```
 
 ### Spring AMQP
 
 ```
-, rabbitmq.listener.simple.acknowledge-mode=MANUAL
+spring.rabbitmq.listener.simple.acknowledge-mode=MANUAL
 ```
 
 ## 代码示例
@@ -327,6 +347,171 @@ public class RabbitConsumer {
     }
 }
 
+```
+
+# Spring Cloud Stream消费失败处理
+
+## 重试
+
+Spring Cloud Stream 中, 如果消息处理失败, 默认会自动重试三次, 可以通过一下参数配置:
+
+```
+spring.cloud.stream.bindings.<channelName>.consumer.max-attempts=1
+```
+
+>  一般地, 如果这个消息因为代码缺陷而失败, 那么无论重试多少次都是失败的. 所以个人觉得这个还是设置为1比较合适.
+
+## 自定义错误处理
+
+```yaml
+spring:
+  cloud:
+    stream:
+      default:
+        contentType: application/json
+        consumer:
+          maxAttempts: 1
+      bindings:
+        error-topic-output:
+          destination: error-topic
+        error-topic-input:
+          destination: error-topic
+          group: test
+```
+
+```java
+public interface ErrorTopic {
+	String OUTPUT = "error-topic-output";
+	String INPUT = "error-topic-input";
+
+	@Output(OUTPUT)
+	MessageChannel output();
+
+	@Input(INPUT)
+	SubscribableChannel input();
+}
+```
+
+```java
+@EnableBinding(ErrorTopic.class)
+@Component
+@Slf4j
+public class ErrorTopicListener {
+
+	@StreamListener(ErrorTopic.INPUT)
+	public void receive(String payload) {
+		log.info("Received: " + payload);
+		throw new IllegalArgumentException("模拟一个异常");
+	}
+
+	@ServiceActivator(inputChannel = "error-topic.test.errors")
+	public void error(Message<?> message) throws InterruptedException {
+		log.info("Message consumer failed, call fallback! Message: {}", message);
+	}
+
+}
+```
+
+通过使用`@ServiceActivator(inputChannel = "error-topic.test.errors")`指定了某个通道的错误处理映射。其中，`inputChannel`的配置中对应关系如下：
+
+- `error-topic`：对应 `destination`
+- `test`：对应 `group`
+
+运行结果:
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-custom-hendle.png)
+
+> 这种方式一般比较适合有明确的错误处理, 应用场景比较少.
+
+## DLQ队列
+
+通过下面参数开启DLQ转发:
+
+```
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.auto-bind-dlq=true
+```
+
+当消息消费失败后, 消息会原封不动地转发到 `error-topic.test.dlq` 这个死信队列中.
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq01.png)
+
+点击进入死信队列, 可以使用 `Get Message` 查看消息, `Move message` 可以将消息移动到原先的队列中继续消费.
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq02.png)
+
+**设置死信队列消息过期时间**:
+
+如果某些消息存在时效性, 可通过一下参数配置过期时间, 超过时间后, 消息会自动移除掉:
+
+```
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.dlq-ttl=10000
+```
+
+将异常信息放到消息header中:
+
+```
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.republish-to-dlq=true
+```
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq03.png)
+
+## 重新入队
+
+重新入队是指消息消费失败了之后, 消息将不会被抛弃, 而是重新放入队列中. 
+
+可以通过以下参数开启:
+
+```
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.requeue-rejected=true
+```
+
+这样会导致一个问题就是, 业务代码的缺陷导致的异常, 无论消费多少次, 这个消息总是失败的. 那么会导致消息堆积越来越大, 那么可以通过配合DLQ来避免这个情况:
+
+```
+spring.cloud.stream.rabbit.bindings.<channelName>.consumer.auto-bind-dlq=true
+```
+
+然后到达一定重试次数之后抛出 `AmqpRejectAndDontRequeueException` 这个指定的异常, 消息就会被推到死信队列中了:
+
+```java
+@StreamListener(TestTopic.INPUT)
+public void receive(String payload) {
+    log.info("Received payload : " + payload + ", " + count);
+    if (count == 3) {
+        count = 1;
+        throw new AmqpRejectAndDontRequeueException("tried 3 times failed, send to dlq!");
+    } else {
+        count ++;
+        throw new RuntimeException("Message consumer failed!");
+    }
+}
+```
+
+**总结**:
+
+上面介绍了几种Spring Cloud Stream RabbitMQ中的重试策略, 个人认为比较适合实际业务场景的做法是, 失败后, 将消息持久化到数据库中, 后续再通过邮件或钉钉等方式通知开发人员进行处理. 因为一般场景下 , 绝大部分的异常消息都是由于业务代码的缺陷导致的, 所以怎么重试都会失败, 并且消费逻辑中一定要做好**幂等**校验.
+
+# Spring Cloud Stream 消息路由到不同的处理逻辑
+
+通过设置header可以实现逻辑路由:
+
+```java
+testTopic.output().send(MessageBuilder.withPayload(message).setHeader("version", "1.0").build());
+            testTopic.output().send(MessageBuilder.withPayload(message).setHeader("version", "2.0").build());
+```
+
+处理: 
+
+```java
+@StreamListener(value = TestTopic.INPUT, condition = "headers['version']=='1.0'")
+public void receiveV1(String payload, @Header("version") String version) {
+	log.info("Received v1 : " + payload + ", " + version);
+}
+
+@StreamListener(value = TestTopic.INPUT, condition = "headers['version']=='2.0'")
+public void receiveV2(String payload, @Header("version") String version) {
+	log.info("Received v2 : " + payload + ", " + version);
+}
 ```
 
 # 延迟队列
@@ -662,6 +847,80 @@ public ListenerContainerCustomizer customListenerContainerCustomizer() {
 }
 ```
 
+启用了独占模式的队列中, 可以看到这个:
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-exclusive.png)
+
+# 消息分区
+
+> 这个应用场景比较少, 就不详细记录了
+
+消费者配置:
+
+```properties
+spring.cloud.stream.bindings.<channelName>.group=test
+spring.cloud.stream.bindings.<channelName>.consumer.partitioned=true
+spring.cloud.stream.instanceCount=3
+```
+
+分别4分配置:
+
+```properties
+# application-1
+spring.cloud.stream.instanceIndex=0
+# application-2
+spring.cloud.stream.instanceIndex=1
+# application-3
+spring.cloud.stream.instanceIndex=2
+```
+
+生产者配置:
+
+```properties
+# 按照payload中age字段分区, 支持SpEL表达式
+spring.cloud.stream.bindings.partition-channel.producer.partitionKeyExpression=payload.age
+spring.cloud.stream.bindings.partition-channel.producer.partitionCount=3
+```
+
+启动后Exahange如下所示:
+
+![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-partition.png)
+
+如果需要自定义消息分区策略, 其实现`PartitionKeyExtractorStrategy`, `PartitionSelectorStrategy`接口:
+
+```java
+package com.cloud.shf.stream.partition.extractor;
+public class MyPartitionKeyExtractor implements PartitionKeyExtractorStrategy, PartitionSelectorStrategy {
+    @Override
+    public int selectPartition(Object key, int divisor) {
+        return ((Map<String, Integer>) key).get("router");
+    }
+ 
+    @Override
+    public Object extractKey(Message<?> message) {
+        return message.getHeaders();
+    }
+}
+```
+
+策略配置:
+
+```properties
+spring.cloud.stream.bindings.<channelName>.producer.partitionKeyExtractorClass=com...MyPartitionKeyExtractor
+spring.cloud.stream.bindings.<channelName>.producer.partitionSelectorClass=com...MyPartitionKeyExtractor
+```
+
+> Spring Cloud Stream RabbitMQ 的分区实现显得有点不灵活, 动态扩容比较困难.
+
+# 附录
+
+## 多Binder配置
+
+`spring.cloud.stream.bindings.{channel-name}.binder`:设定指定通道binder名称，完全自定义；
+`spring.cloud.stream.binders.{binder-name}.type`：对自定义的binder设定其类型，rabbit或者kafka；
+`spring.cloud.stream.binders.{binder-name}.environment.{*}`：对自定义的binder设定其配置项，如host等；
+`spring.cloud.stream.default-binder`：除了特殊的通道需要设定binder，其他的channel需要从所有自定义的binder选择一个作为默认binder，即所有非指定binder的通道均采用此`default-binder`
+
 # Finally
 
 > 参考:
@@ -671,4 +930,5 @@ public ListenerContainerCustomizer customListenerContainerCustomizer() {
 > ***[http://blog.didispace.com/spring-cloud-starter-finchley-7-7/](http://blog.didispace.com/spring-cloud-starter-finchley-7-7/)***
 >
 > ***[https://blog.csdn.net/eumenides_/article/details/86025773](https://blog.csdn.net/eumenides_/article/details/86025773)***
-
+>
+> ***[https://blog.csdn.net/songhaifengshuaige/article/details/79266444](https://blog.csdn.net/songhaifengshuaige/article/details/79266444)***
