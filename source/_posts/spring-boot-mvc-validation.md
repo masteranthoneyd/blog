@@ -17,7 +17,7 @@ tags: [Java, Spring Boot, Spring]
 
 ## Spring MVC 流程
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-process.jpg)
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-process-new.png)
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-convert-processing.png)
 
@@ -42,6 +42,8 @@ tags: [Java, Spring Boot, Spring]
 10、`DispatcherServlet`根据`View`进行渲染视图（即将模型数据填充至视图中）. 
 
 11、 `DispatcherServlet`响应用户. 
+
+> 更多源码解析请参考: ***[【深入浅出spring】Spring MVC 流程解析](https://segmentfault.com/a/1190000013816079)***
 
 ## Spring MVC集成FastJson
 
@@ -154,14 +156,26 @@ server:
 
 ## 全局异常处理
 
-### 方式一: 添加自定义的错误页面
+在Spring Boot 2.X 中, 对于MVC抛出的异常, 默认会映射到 `/error`:  
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-error.png)
+
+> 参考: ***[https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-error-handling](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-error-handling)***
+
+由于默认情况下, Spring MVC 将报错转发到 `/error` 接口, 所以对应的Spring中也会有默认的异常处理类 `BasicErrorController`:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error01.png)
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error02.png)
+
+### 添加自定义的错误页面
 
 - `html`静态页面: 在`resources/public/error/` 下定义. 如添加404页面: `resources/public/error/404.html`页面, 中文注意页面编码
 - 模板引擎页面: 在`templates/error/`下定义. 如添加5xx页面: `templates/error/5xx.ftl`
 
 > 注: `templates/error/` 这个的优先级比较`resources/public/error/`高
 
-### 方式二: 通过@ControllerAdvice
+### 通过@ControllerAdvice
 
 ```java
 @Slf4j
@@ -191,6 +205,8 @@ public class ErrorExceptionHandler {
 }
 ```
 
+* `@RestControllerAdvice` 可用于返回JSON格式报文.
+
 或者继承`ResponseEntityExceptionHandler`更灵活地控制状态码、`Header`等信息: 
 
 ```java
@@ -211,6 +227,51 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 更多方式请看: ***[http://www.baeldung.com/exception-handling-for-rest-with-spring](http://www.baeldung.com/exception-handling-for-rest-with-spring)***
 
+## 404处理
+
+Spring Boot 2.X 中会有一个Resouce的Mapping来处理静态资源, 当输入一个不存在的请求时, 总会匹配到这个Mapping:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-mapping.png)
+
+此时的404错误是 `ResourceHttpRequestHandler#handleRequest` 中因为找不到resource从而调用`response#sendError` 发出的:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-not-found.png)
+
+一般地如果是前后分离的项目, 都不要将资源放在后端, 所以可以用过以下配置关闭这个万能的Mapping:
+
+```yaml
+spring:
+  resources:
+    add-mappings: false
+```
+
+通过以上配置后, 将加载不了静态资源, 如果需要加载, 需要自定义配置, 比如Swagger:
+
+```java
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	registry.addResourceHandler("/swagger-ui.html")
+			.addResourceLocations("classpath:/META-INF/resources/", "/static", "/public");
+
+	registry.addResourceHandler("/webjars/**")
+			.addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+
+}
+```
+
+如果需要通过抛异常的方式捕获404这个异常, 需要通过以下配置:
+
+```yaml
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+```
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-throw-not-found.png)
+
+之后可以通过 `@ExceptionHandler(value = NoHandlerFoundException.class)` 处理这个404了, 而不是转发到 `/error`.
+
 ## 静态资源
 
 设置静态资源放到指定路径下
@@ -218,6 +279,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 ```
 spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/static/
 ```
+
+> ***[https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-spring-mvc-static-content](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-spring-mvc-static-content)***
 
 ## 自定义消息转化器
 

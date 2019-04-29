@@ -1,4 +1,4 @@
-# 使用JWT(JSON Web Token)实现简单的登录鉴权
+# Spring Boot + JWT 实现简单的登录鉴权
 
 > ***[JWT](https://github.com/jwtk/jjwt#compression)*** 是什么就不说了, 下面利用JWT实现简单的无状态RestFul认证
 

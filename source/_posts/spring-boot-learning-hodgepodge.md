@@ -708,6 +708,10 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
    ```
 
+# Spring Bean生命周期
+
+![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-bean-process.webp)
+
 # 元注解与组合注解
 
 ## 元注解
