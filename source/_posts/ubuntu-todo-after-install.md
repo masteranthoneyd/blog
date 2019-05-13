@@ -1064,6 +1064,7 @@ sudo apt install google-chrome-stable
 | ***[Octotree](https://chrome.google.com/webstore/detail/octotree/bkhaagjahfmjljalopjnoealnfndnagc)*** | Github左侧展示树状结构                                       |
 | ***[Enhanced Github](https://chrome.google.com/webstore/detail/enhanced-github/anlikcnbgdeidpacdbdljnabclhahhmd)*** | 可下载Github中单个文件                                       |
 | ***[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)*** | 油猴, 脚本网站: *[https://greasyfork.org/zh-CN](https://greasyfork.org/zh-CN)*, *[https://openuserjs.org/](https://openuserjs.org/)* |
+| ***[CrxMouse Chrome™ Gestures](https://chrome.google.com/webstore/detail/crxmouse-chrome-gestures/jlgkpaicikihijadgifklkbpdajbkhjo)*** | 高度可自定义的鼠标手势, 超级拖拽, 鼠标滚轮手势, 遥感手势, 提升工作效率 |
 
 ## XMind 8 Crack
 

@@ -621,6 +621,155 @@ spring:
     driver-class-name: net.sf.log4jdbc.DriverSpy
 ```
 
+# Spring 事务监控
+
+某些特殊的场景下, 我们需要在事务开启时, 完成时做一些事情, 比如释放一些资源. 
+
+## TransactionSynchronization
+
+Spring事务的核心部分在 `TransactionInterceptor#invoke`, `TransactionInterceptor` 继承了 `TransactionAspectSupport`, `TransactionAspectSupport` 使用 `AbstractPlatformTransactionManager` 的实现类操作事务. `AbstractPlatformTransactionManager` 中的 `processCommit` 以及  `processRollback` 中的几个节点会调用到 `TransactionSynchronizationUtils` 中的一些方法: 
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx01.png)
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx02.png)
+
+这些被trigger的类就是 `TransactionSynchronization` 的实现类.
+
+`TransactionSynchronizationUtils` 通过 `TransactionSynchronizationManager#getSynchronizations` 来获取 `TransactionSynchronization` 列表, 而 `TransactionSynchronizationManager` 是通过 `ThreadLocal` 来管理这些类的:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx03.png)
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx04.png)
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
+
+示例:
+
+```java
+@Component
+@Slf4j
+public class TestTransactionSynchronization extends TransactionSynchronizationAdapter {
+
+	@Override
+	public int getOrder() {
+		return 0;
+	}
+
+	@Override
+	public void suspend() {
+		log.info("#################### suspend");
+	}
+
+	@Override
+	public void resume() {
+		log.info("#################### resume");
+	}
+
+	@Override
+	public void flush() {
+		log.info("#################### flush");
+	}
+
+	@Override
+	public void beforeCommit(boolean readOnly) {
+		log.info("#################### beforeCommit");
+	}
+
+	@Override
+	public void beforeCompletion() {
+		log.info("#################### beforeCompletion");
+	}
+
+	@Override
+	public void afterCommit() {
+		log.info("#################### afterCommit");
+	}
+
+	@Override
+	public void afterCompletion(int status) {
+		log.info("#################### afterCompletion");
+	}
+}
+```
+
+那么这个类什么时候注册进 `TransactionSynchronizationManager` 呢? 答案是每次事务开启的时候, 因为这个是使用 `ThreadLocal` 保存的, 每次事务过后会被清空掉. 我们可以使用切面, 将打有 `@Transactional` 注解的方法增强一下:
+
+```java
+@Component
+@Aspect
+@Slf4j
+public class TestTransactionAspect {
+
+	@Autowired
+	private TestTransactionSynchronization testTransactionSynchronization;
+
+
+	@Before(value = "@annotation(tx)")
+	public void doAfterReturning(Transactional tx) {
+		TransactionSynchronizationManager.registerSynchronization(testTransactionSynchronization);
+	}
+}
+```
+
+这样就行了~
+
+## 继承DataSourceTransactionManager
+
+上面的方法有一个缺点, 不能在事务开启时做一些事情, 可以通过继承 `DataSourceTransactionManager` 来实现:
+
+```java
+@Slf4j
+public class CustomTransactionManager extends DataSourceTransactionManager {
+
+	private static final long serialVersionUID = -5831041749053502702L;
+
+	public CustomTransactionManager(DataSource dataSource) {
+		super(dataSource);
+	}
+
+	@Override
+	protected void doCleanupAfterCompletion(Object transaction) {
+		log.info("#################### doCleanupAfterCompletion");
+		super.doCleanupAfterCompletion(transaction);
+	}
+
+	@Override
+	protected void doBegin(Object transaction, TransactionDefinition definition) {
+		log.info("#################### doBegin");
+		super.doBegin(transaction, definition);
+	}
+}
+```
+
+配置类:
+
+```java
+@Configuration
+@ConditionalOnClass({PlatformTransactionManager.class})
+@EnableConfigurationProperties(DataSourceProperties.class)
+public class CustomDataSourceTransactionManagerAutoConfiguration {
+
+	@Bean
+	public DataSourceTransactionManager transactionManager(DataSource dataSource,
+														   ObjectProvider<TransactionManagerCustomizers> transactionManagerCustomizers) {
+		DataSourceTransactionManager transactionManager = new CustomTransactionManager(dataSource);
+		transactionManagerCustomizers.ifAvailable(
+				(customizers) -> customizers.customize(transactionManager));
+		return transactionManager;
+	}
+}
+```
+
+## 判断当前方法是否在事务环境中
+
+通过上面的 `TransactionSynchronizationManager` 可以发现定义了很多 `ThreadLocal`:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
+
+可以看到变量中有一个 `actualTransactionActive` 以及 `currentTransactionReadOnly`, 通过这两个变量可以判断当前是否在事务当中, Spring很多代码中也是通过这个来判断的, 比如 `RedisConnectionUtils#isActualNonReadonlyTransactionActive` :
+
+![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx06.png)
+
 # 对象映射
 
 > ***[https://www.baeldung.com/java-performance-mapping-frameworks](https://www.baeldung.com/java-performance-mapping-frameworks)***
