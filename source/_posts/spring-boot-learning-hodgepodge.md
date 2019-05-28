@@ -175,6 +175,73 @@ spring:
 
 此时在项目或其他JAR包中应该存在`application-docker-log4j2.yml`.
 
+### 通过编码导入配置文件
+
+实现 `SpringApplicationRunListener`(**注意构造器, 不声明会报错, 因为Spring是通过反射调用构造器的**):
+
+```java
+public class MvcProfileIncludeInitializer implements SpringApplicationRunListener {
+
+	public static final String PROFILE_MVC = "mvc";
+
+	public MvcProfileIncludeInitializer(SpringApplication application, String[] args) {
+	}
+
+	@Override
+	public void starting() {
+		SystemProfileAppender.appendProfile(PROFILE_MVC);
+	}
+
+	@Override
+	public void environmentPrepared(ConfigurableEnvironment environment) {
+	}
+
+	@Override
+	public void contextPrepared(ConfigurableApplicationContext context) {
+	}
+
+	@Override
+	public void contextLoaded(ConfigurableApplicationContext context) {
+	}
+
+	@Override
+	public void started(ConfigurableApplicationContext context) {
+	}
+
+	@Override
+	public void running(ConfigurableApplicationContext context) {
+	}
+
+	@Override
+	public void failed(ConfigurableApplicationContext context, Throwable exception) {
+	}
+}
+```
+
+```java
+public class SystemProfileAppender {
+
+	public static void appendProfile(String profile) {
+		String property = System.getProperty(ConfigFileApplicationListener.INCLUDE_PROFILES_PROPERTY);
+		if (StringUtils.isBlank(property)) {
+			property = profile;
+		} else {
+			property = property + "," + profile;
+		}
+		System.setProperty(ConfigFileApplicationListener.INCLUDE_PROFILES_PROPERTY, property);
+	}
+}
+```
+
+在 `resource/META-INF/spring-factories` 中添加:
+
+```
+org.springframework.boot.SpringApplicationRunListener=\
+  com.xxx.xxx.MvcProfileIncludeInitializer
+```
+
+这样相当于 include 了 `application-mvc.yml` 了.
+
 ## 配置文件-多环境配置
 
 ### 多环境配置的好处

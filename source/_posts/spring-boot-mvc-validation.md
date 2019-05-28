@@ -179,28 +179,59 @@ server:
 
 ```java
 @Slf4j
-@ControllerAdvice
-//@RestControllerAdvice
-public class ErrorExceptionHandler {
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 
-	@ExceptionHandler({ RuntimeException.class })
-	@ResponseStatus(HttpStatus.OK)
-	public ModelAndView processException(RuntimeException exception) {
-		log.info("自定义异常处理-RuntimeException");
-		ModelAndView m = new ModelAndView();
-		m.addObject("roncooException", exception.getMessage());
-		m.setViewName("error/500");
-		return m;
+	@SuppressWarnings("ConstantConditions")
+	@ExceptionHandler(value = {
+			MethodArgumentNotValidException.class,
+			BindException.class,
+			ConstraintViolationException.class})
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public Response<Void> validExceptionHandler(Exception ex) {
+		String validateFailReason;
+		if (ex instanceof MethodArgumentNotValidException) {
+			validateFailReason = ((MethodArgumentNotValidException) ex).getBindingResult()
+																	   .getFieldError()
+																	   .getDefaultMessage();
+		} else if (ex instanceof BindException) {
+			validateFailReason = ((BindException) ex).getFieldError().getDefaultMessage();
+		} else if (ex instanceof ConstraintViolationException) {
+			validateFailReason = ((ConstraintViolationException) ex).getConstraintViolations().stream()
+																	.findAny()
+																	.map(ConstraintViolation::getMessage)
+																	.orElse("Unknown error message");
+		} else {
+			validateFailReason = "Unknown error message";
+		}
+		return Response.error(validateFailReason);
 	}
 
-	@ExceptionHandler({ Exception.class })
-	@ResponseStatus(HttpStatus.OK)
-	public ModelAndView processException(Exception exception) {
-		log.info("自定义异常处理-Exception");
-		ModelAndView m = new ModelAndView();
-		m.addObject("roncooException", exception.getMessage());
-		m.setViewName("error/500");
-		return m;
+	@ExceptionHandler(value = BusiException.class)
+	@ResponseStatus(INTERNAL_SERVER_ERROR)
+	public Response<Void> busiExceptionHandler(BusiException ex) {
+		log.error("业务异常捕获: " + ex.getMessage());
+		return Response.error(ex);
+	}
+
+	@ExceptionHandler(value = NoHandlerFoundException.class)
+	@ResponseStatus(NOT_FOUND)
+	public Response<Void> notFoundExceptionHandler(NoHandlerFoundException ex) {
+		return Response.error(ex, NOT_FOUND.value());
+	}
+
+	@ExceptionHandler(value = TokenException.class)
+	@ResponseStatus(FORBIDDEN)
+	public Response<Void> tokenExceptionHandler(TokenException ex) {
+		log.error("Token校验异常捕获: " + ex.getMessage());
+		return Response.error(ex.getMessage(), FORBIDDEN.value());
+	}
+
+	@ExceptionHandler(value = Exception.class)
+	@ResponseStatus(INTERNAL_SERVER_ERROR)
+	public Response<Void> defaultErrorHandler(Exception ex) {
+		log.error("全局异常捕获: ", ex);
+		return Response.error(ex);
 	}
 }
 ```

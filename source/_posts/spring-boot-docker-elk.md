@@ -97,9 +97,135 @@ logging:
     console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
 ```
 
-### log4j2.xml完整配置
+### log4j2 详细配置
 
-上面是简单的打印, 生产环境需要采用以下xml的配置: 
+先来看一下常用的输出格式:
+
+* `%d{yyyy-MM-dd HH:mm:ss.SSS}`: 输出时间，精确度为毫秒.
+* `%-5level` | `%-5p`: 输出日志级别, -5表示左对齐并且固定占5个字符宽度, 如果不足用空格补齐.
+* `%t` | `%thread`: 线程名称
+* `%c{precision}` | `logger{precision}`: 输出的Logger名字, `{precision}` 表示保留的名字长度, 比如 `%c{1}` 是这样的 `Foo`, `%c{3}` 是这样的 `apache.commons.Foo`
+* `%C{precision}` | `%class{precision}`: 实际上输出log的类名, 如果一个类有子类(`Son extend Father`), 在 `Father` 中调用 `log.info`, 那么`%C{1}` 输出的是 `Father`. 
+* `M` | `method`: 输出log所在的方法名.
+* `L` | `line`: 输出log所在的行数.
+* `%msg{nolookups}`: 输出的log日志, `{nolookups}` 表示忽略掉一些内置函数比如 `logger.info("Try ${date:YYYY-MM-dd}")`, 如果不加 `{nolookups}` 那么输出的日志会是这样的 `Try 2019-05-28`.
+* `%n`: 换行, 一般跟在 `%msg` 后面.
+* `%xEx` | `%xwEx`: 输出异常, 后者会在异常信息的开始与结束append空的一行, 与 `%ex` 的区别在于在每一行异常信息后面会追加jar包的信息.
+
+#### 输出到文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status,这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,你会看到log4j2内部各种详细输出 -->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身,设置间隔秒数 -->
+<configuration status="WARN" monitorInterval="1800">
+    <properties>
+        <property name="UNKNOWN" value="????"/>
+        
+        <!-- 应用的名字, 需要自己写spring的拓展 -->
+        <property name="server_name" value="${spring:spring.application.name}"/>
+        
+        <!-- 控制台输出的格式 -->
+        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
+		
+        <!-- 日志默认存放的位置,这里设置为项目根路径下,也可指定绝对路径 -->
+        <property name="basePath">./log4j2Logs/${server_name}</property>
+        <!-- 日志默认切割的最小单位 -->
+        <property name="every_file_size">20MB</property>
+        <!-- 日志默认输出级别 -->
+        <property name="output_log_level">INFO</property>
+
+        <!-- 日志默认存放路径(所有级别日志) -->
+        <property name="rolling_fileName">${basePath}/all.log</property>
+        <!-- 日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="rolling_filePattern">${basePath}/%d{yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <!-- 日志默认同类型日志,同一文件夹下可以存放的数量,不设置此属性则默认为7个 -->
+        <property name="rolling_max">20</property>
+
+        <property name="info_fileName">${basePath}/info.log</property>
+        <property name="info_filePattern">${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="info_max">10</property>
+
+        <property name="warn_fileName">${basePath}/warn.log</property>
+        <property name="warn_filePattern">${basePath}/%d{yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="warn_max">10</property>
+
+        <property name="error_fileName">${basePath}/error.log</property>
+        <property name="error_filePattern">${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="error_max">10</property>
+
+        <!-- 控制台显示的日志最低级别 -->
+        <property name="console_print_level">INFO</property>
+    </properties>
+
+    <!--定义appender -->
+    <Appenders>
+        <!-- 用来定义输出到控制台的配置 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 设置控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="${console_print_level}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+        </Console>
+
+        <!-- 打印root中指定的level级别以上的日志到文件 -->
+        <RollingFile name="RollingFile" fileName="${rolling_fileName}" filePattern="${rolling_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <!-- 设置同类型日志,同一文件夹下可以存放的数量,如果不设置此属性则默认存放7个文件 -->
+            <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            <DefaultRolloverStrategy max="${rolling_max}" />
+            <!-- 匹配INFO以及以上级别 -->
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="InfoFile" fileName="${info_fileName}" filePattern="${info_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${info_max}" />
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="WarnFile" fileName="${warn_fileName}" filePattern="${warn_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${warn_max}" />
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="${error_fileName}" filePattern="${error_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${error_max}" />
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+    </Appenders>
+
+    <!--然后定义logger,只有定义了logger并引入的appender,appender才会生效 -->
+    <Loggers>
+        <!--建立一个默认的root的logger -->
+        <Root level="{output_log_level}" includeLocation="true">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+</configuration>
+```
+
+#### 输出到 Kafka
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -107,8 +233,8 @@ logging:
     <properties>
         <Property name="UNKNOWN" value="????"/>
         <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
-        <Property name="SERVER_NAME" value="${spring:spring.application.name}"/>
-        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | ${SERVER_NAME} | %5p | %X{IP} | %X{UA} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
+        <Property name="server_name" value="${spring:spring.application.name}"/>
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
     </properties>
 
     <Appenders>
@@ -167,7 +293,7 @@ logging:
 
 需要引入依赖以识别: 
 
-```
+```xml
 <!-- 加上这个才能辨认到log4j2.yml文件 -->
 <dependency>
     <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -216,100 +342,6 @@ Configuration:
 ```
 
 更多配置请参照: *[http://logging.apache.org/log4j/2.x/manual/layouts.html](http://logging.apache.org/log4j/2.x/manual/layouts.html)*
-
-### 日志文件配置
-
-若不使用ELK, 也可以将日志记录到日志文件中, 通过目录映射的方式将日志挂载到物理目录, 以下是使用日志文件的配置:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration status="WARN" monitorInterval="1800">
-    <properties>
-        <property name="UNKNOWN" value="????"/>
-        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %5p | %X{IP} | %X{USER_ACCOUNT} | %t -> %c{1}#%M:%L | %msg%n%xwEx"/>
-
-        <property name="basePath">/log4j2Logs</property>
-        <property name="every_file_size">10MB</property>
-        <property name="output_log_level">INFO</property>
-
-        <property name="rolling_fileName">${basePath}/all.log</property>
-        <property name="rolling_filePattern">${basePath}/%d{yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log.gz</property>
-        <property name="rolling_max">20</property>
-
-        <property name="info_fileName">${basePath}/info.log</property>
-        <property name="info_filePattern">${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz</property>
-        <property name="info_max">10</property>
-
-        <property name="warn_fileName">${basePath}/warn.log</property>
-        <property name="warn_filePattern">${basePath}/%d{yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz</property>
-        <property name="warn_max">10</property>
-
-        <property name="error_fileName">${basePath}/error.log</property>
-        <property name="error_filePattern">${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
-        <property name="error_max">10</property>
-
-        <property name="console_print_level">INFO</property>
-    </properties>
-
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
-        </Console>
-
-        <RollingFile name="RollingFile" fileName="${rolling_fileName}" filePattern="${rolling_filePattern}">
-            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
-            <SizeBasedTriggeringPolicy size="${every_file_size}"/>
-            <DefaultRolloverStrategy max="${rolling_max}" />
-            <Filters>
-                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </RollingFile>
-
-        <RollingFile name="InfoFile" fileName="${info_fileName}" filePattern="${info_filePattern}">
-            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
-            <SizeBasedTriggeringPolicy size="${every_file_size}" />
-            <DefaultRolloverStrategy max="${info_max}" />
-            <Filters>
-                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </RollingFile>
-
-        <RollingFile name="WarnFile" fileName="${warn_fileName}" filePattern="${warn_filePattern}">
-            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
-            <SizeBasedTriggeringPolicy size="${every_file_size}" />
-            <DefaultRolloverStrategy max="${warn_max}" />
-            <Filters>
-                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </RollingFile>
-
-        <RollingFile name="ErrorFile" fileName="${error_fileName}" filePattern="${error_filePattern}">
-            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
-            <SizeBasedTriggeringPolicy size="${every_file_size}" />
-            <DefaultRolloverStrategy max="${error_max}" />
-            <Filters>
-                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </RollingFile>
-    </Appenders>
-
-    <Loggers>
-        <Root level="info" includeLocation="true">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
-        </Root>
-    </Loggers>
-</configuration>
-```
-
-> 上面是按日志按级别分类的, 到达一定大小后自动压缩保存
 
 ## 日志配置文件中获取Application配置
 
@@ -1264,6 +1296,24 @@ xpack.monitoring.ui.container.elasticsearch.enabled: true
 ```
 
 ### 启动ELK
+
+在此之前, 官方提到了`vm.max_map_count`的值在生产环境最少要设置成262144, 设置的方式有两种:
+
+1. 永久性的修改, 在`/etc/sysctl.conf`文件中添加一行:
+
+   ```
+   grep vm.max_map_count /etc/sysctl.conf # 查找当前的值。
+   
+   vm.max_map_count=262144 # 修改或者新增
+   ```
+
+2. 正在运行的机器:
+
+   ```
+   sysctl -w vm.max_map_count=262144
+   ```
+
+
 
 `docker-compose.yml`:
 
