@@ -88,6 +88,21 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 -Dlog4j2.AsyncQueueFullPolicy=Discard
 ```
 
+### 系统时钟参数
+
+通过 `log4j2.clock` 指定, 默认使用 `SystemClock`, 我们可以使用 `org.apache.logging.log4j.core.util.CachedClock`. 其他选项看接口实现类, 也可以自己实现 `Clock` 接口.
+
+### Log4j 环境变量配置文件
+
+上面的全局异步以及系统始终参数配置都是通过系统环境变量来设置的, 下面方式可以通过配置文件的方式来设置.
+
+在 `resource` 下定义 `log4j2.component.properties`  配置文件:
+
+```properties
+Log4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+log4j2.clock=com.xxx.CustomLog4jClock
+```
+
 ### application.yml简单配置
 
 ```
@@ -97,7 +112,7 @@ logging:
     console: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} | %clr{%5p} | %clr{%15.15t}{faint} | %clr{%-50.50c{1.}}{cyan} | %5L | %clr{%M}{magenta} | %msg%n%xwEx" # 控制台日志输出格式
 ```
 
-### log4j2 详细配置
+### log4j2.xml 详细配置
 
 先来看一下常用的输出格式:
 
@@ -112,7 +127,77 @@ logging:
 * `%n`: 换行, 一般跟在 `%msg` 后面.
 * `%xEx` | `%xwEx`: 输出异常, 后者会在异常信息的开始与结束append空的一行, 与 `%ex` 的区别在于在每一行异常信息后面会追加jar包的信息.
 
+所以我们的pattern是这样的: `%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx`.
+
+使用 ` | ` 作为分隔符是因为后面输出到Logstash时用于字段分割.
+
+#### 输出到 Kafka
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF" monitorInterval="30">
+    <properties>
+        <Property name="UNKNOWN" value="????"/>
+        <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
+        <Property name="server_name" value="${spring:spring.application.name}"/>
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
+    </properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+        </Console>
+
+        <Kafka name="kafka" topic="log-collect" ignoreExceptions="false">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+            <Property name="bootstrap.servers">${KAFKA_SERVERS}</Property>
+            <Property name="request.timeout.ms">5000</Property>
+            <Property name="transaction.timeout.ms">5000</Property>
+            <Property name="max.block.ms">3000</Property>
+        </Kafka>
+
+        <RollingFile name="failoverKafkaLog" fileName="./failoverKafka/${SERVER_NAME}.log"
+                     filePattern="./failoverKafka/${SERVER_NAME}.%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+
+        <Failover name="failover" primary="kafka" retryIntervalSeconds="300">
+            <Failovers>
+                <AppenderRef ref="failoverKafkaLog"/>
+            </Failovers>
+        </Failover>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO" includeLocation="true">
+            <AppenderRef ref="failover"/>
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+
+</configuration>
+```
+- `bootstrap.servers`是kafka的地址, 接入Docker network之后可以配置成`kafka:9092`
+- `topic`要与Logstash中配置的一致
+- 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
+- Kafka地址通过`${spring:ybd.kafka.bootstrap}`读取配置文件获取, 这个需要自己拓展Log4j, 具体请看下面的获取Application配置
+- `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`, 通过`MDC.put(key, value)`放进去, 同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
+- `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时, 日志触发Failover, 写到文件中, 不阻塞程序, 进而保证了吞吐. `retryIntervalSeconds`的默认值是1分钟, 是通过异常来切换的, 所以可以适量加大间隔. 
+- `KafkaAppender` `ignoreExceptions` 必须设置为`false`, 否则无法触发Failover
+- `KafkaAppender` `max.block.ms`默认是1分钟, 当Kafka宕机时, 尝试写Kafka需要1分钟才能返回Exception, 之后才会触发Failover, 当请求量大时, log4j2 队列很快就会打满, 之后写日志就Blocking, 严重影响到主服务响应
+- 日志的格式采用`" | "`作为分割符方便后面Logstash进行切分字段
+
 #### 输出到文件
+
+> 这种方式可以用于存档, 同是使用 Filebeat 抓取文件日志输出到 Logstash.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -224,70 +309,6 @@ logging:
     </Loggers>
 </configuration>
 ```
-
-#### 输出到 Kafka
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration status="OFF" monitorInterval="30">
-    <properties>
-        <Property name="UNKNOWN" value="????"/>
-        <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
-        <Property name="server_name" value="${spring:spring.application.name}"/>
-        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
-    </properties>
-
-    <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-        </Console>
-
-        <Kafka name="kafka" topic="log-collect" ignoreExceptions="false">
-            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
-            <Property name="bootstrap.servers">${KAFKA_SERVERS}</Property>
-            <Property name="request.timeout.ms">5000</Property>
-            <Property name="transaction.timeout.ms">5000</Property>
-            <Property name="max.block.ms">3000</Property>
-        </Kafka>
-
-        <RollingFile name="failoverKafkaLog" fileName="./failoverKafka/${SERVER_NAME}.log"
-                     filePattern="./failoverKafka/${SERVER_NAME}.%d{yyyy-MM-dd}.log">
-            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout>
-                <Pattern>${LOG_PATTERN}</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-            </Policies>
-        </RollingFile>
-
-        <Failover name="failover" primary="kafka" retryIntervalSeconds="300">
-            <Failovers>
-                <AppenderRef ref="failoverKafkaLog"/>
-            </Failovers>
-        </Failover>
-    </Appenders>
-
-    <Loggers>
-        <Root level="INFO" includeLocation="true">
-            <AppenderRef ref="failover"/>
-            <AppenderRef ref="console"/>
-        </Root>
-    </Loggers>
-
-</configuration>
-```
-- `bootstrap.servers`是kafka的地址, 接入Docker network之后可以配置成`kafka:9092`
-- `topic`要与Logstash中配置的一致
-- 启用了全局异步需要将`includeLocation`设为`true`才能打印路径之类的信息
-- Kafka地址通过`${spring:ybd.kafka.bootstrap}`读取配置文件获取, 这个需要自己拓展Log4j, 具体请看下面的获取Application配置
-- `LOG_PATTERN`中的`%X{IP}`、`%X{UA}`, 通过`MDC.put(key, value)`放进去, 同时在`<Root>`中设置`includeLocation="true"`才能获取`%t`、` %c`等信息
-- `KafkaAppender`结合`FailoverAppender`确保当Kafka Crash时, 日志触发Failover, 写到文件中, 不阻塞程序, 进而保证了吞吐. `retryIntervalSeconds`的默认值是1分钟, 是通过异常来切换的, 所以可以适量加大间隔. 
-- `KafkaAppender` `ignoreExceptions` 必须设置为`false`, 否则无法触发Failover
-- `KafkaAppender` `max.block.ms`默认是1分钟, 当Kafka宕机时, 尝试写Kafka需要1分钟才能返回Exception, 之后才会触发Failover, 当请求量大时, log4j2 队列很快就会打满, 之后写日志就Blocking, 严重影响到主服务响应
-- 日志的格式采用`" | "`作为分割符方便后面Logstash进行切分字段
 
 ### 也可以使用log4j2.yml
 
@@ -1172,7 +1193,9 @@ xpack.monitoring.collection.enabled: true
 
 #### Logstash
 
-`logstash.conf`配置文件(**注意下面的topics要与上面log4j2.xml中的一样**):
+##### Kafka Input
+
+`logstash.conf` 配置文件(**注意下面的topics要与上面log4j2.xml中的一样**):
 
 ```
 input {
@@ -1252,6 +1275,89 @@ output {
 
 ```
 
+##### Filebeat Input
+
+```
+input {
+  beats {
+#    host => filebeat
+    port => 5044
+  }
+}
+filter {
+
+  mutate{  # 切分日志信息并添加相应字段
+
+    split => [ "message"," | " ]
+
+    add_field => {
+      "timestamp" => "%{[message][0]}"
+    }
+
+    add_field => {
+      "level" => "%{[message][1]}"
+    }
+
+    add_field => {
+      "server_name" => "%{[message][2]}"
+    }
+
+    add_field => {
+      "ip" => "%{[message][3]}"
+
+    }
+
+    add_field => {
+      "logger" => "%{[message][4]}"
+    }
+
+    add_field => {
+      "thread_class_method" => "%{[message][5]}"
+    }
+
+    add_field => {
+      "content" => "%{[message][6]}"
+    }
+
+  }
+
+  date {  # 将上面得到的日期信息, 也就是日志打印的时间作为时间戳
+    match => [ "timestamp", "yyyy-MM-dd HH:mm:ss.SSS" ]
+    locale => "en"
+    target => "@timestamp" 
+    timezone => "Asia/Shanghai" # 这里如果不设置时区, 在Kibana中展示的时候会多了8个小时
+  }
+
+  geoip { # 分析ip
+    source => "ip"
+  }
+
+  mutate{
+    # 定义去除的字段
+    remove_field => ["agent", "source", "input", "@version", "log", "ecs", "_score", "beat", "offset","prospector", "host.name", "message"]
+  }
+
+}
+output {
+    # 输出到控制台
+    stdout{ codec => rubydebug }
+
+    # 输出到 Elasticsearch
+    elasticsearch {
+        hosts  => ["elk-elasticsearch:9200"]
+        index  => "logstash-%{server_name}-%{+YYYY.MM.dd}"
+
+        # manage_template => false # 关闭logstash默认索引模板
+        # template_name => "crawl" #映射模板的名字
+        # template_overwrite => true
+        # user => "elastic" # 如果选择开启xpack security需要输入帐号密码
+        # password => "changeme"
+    }
+}
+```
+
+
+
 `logstash.yml`:
 
 ```
@@ -1260,6 +1366,22 @@ xpack.monitoring.elasticsearch.url: http://elk-elasticsearch:9200 # Docker版的
 
 # xpack.monitoring.elasticsearch.username: "elastic" # 如果选择开启xpack security需要输入帐号密码
 # xpack.monitoring.elasticsearch.password: "changeme"
+```
+
+User-Agent 分析配置:
+
+```
+# 将 UA 输出到日志当中, 在 mutate 中添加:
+    add_field => {
+      "device" => "%{[message][4]}"
+    }
+
+# 在 filter 中添加
+  useragent { # 分析User-Agent
+    source => "device"
+    target => "userDevice"
+    remove_field => [ "device" ]
+  }
 ```
 
 #### Kibana
@@ -1273,6 +1395,32 @@ elasticsearch.url: http://elk-elasticsearch:9200
 xpack.monitoring.ui.container.elasticsearch.enabled: true
 #elasticsearch.username: "elastic"
 #elasticsearch.password: "changeme"
+```
+
+#### Filebeat
+
+这是另外一种基于文件的日志收集.
+
+filebeat.yml:
+
+```yaml
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /log4j2Logs/example/all.log
+  multiline:
+    pattern: ^\d{4} # 多行处理，正则表示如果前面几个数字不是4个数字开头，那么就会合并到一行
+    negate: true # 正则是否开启，默认false不开启
+    match: after # 不匹配的正则的行是放在上面一行的前面还是后面
+  fields:      # 在采集的信息中添加一个自定义字段 service
+    service: example
+
+
+output.logstash:
+  hosts: ["logstash:5044"]
+#output.console:
+#  pretty: true
 ```
 
 ### 申请License
@@ -1383,6 +1531,21 @@ services:
       - logstash
       - -f
       - /etc/logstash.conf
+      
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat:7.1.1
+#    restart: always
+#    volumes:
+#      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+#      - /home/ybd/data/git-repo/bitbucket/central-city/cc-component/log4j2Logs:/log4j2Logs
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.role == manager
+#    networks:
+#      backend:
+#        aliases:
+#          - filebeat
 
 # docker network create -d=overlay --attachable backend
 # docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
