@@ -1111,3 +1111,55 @@ echo "newpassword")|passwd
 sudo apt-get install expect 
 ```
 
+## 写入文件或追加
+
+有时候简单的东西不想通过 vi 编辑文件, 或者在脚本中需要写入或追加文字到文件中, 我们可以通过以下方式实现.
+
+1. 单行通过 `echo` 实现:
+
+   ```
+   # 覆盖写入
+   echo "hello" > test.txt
+   
+   # 追加
+   echo "hello" >> test.txt
+   ```
+
+2. 多行可以通过 `cat` 实现:
+
+   ```
+   # 覆盖写入
+   cat <<- EOF > test.txt
+   hello1
+   hello2
+   EOF
+   
+   # 追加
+   cat <<- EOF >> test.txt
+   hello1
+   hello2
+   EOF
+   ```
+
+3. 当文件需要权限时, 可使用 `tee` 命令实现:
+
+   ```
+   # 覆盖写入
+   echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/sudoers
+   
+   # 追加
+   echo "forward-socks5 / 127.0.0.1:1080 ." | sudo tee -a /etc/privoxy/config
+   ```
+
+   当然也可以多行输入:
+
+   ```
+   sudo tee /etc/docker/daemon.json <<- EOF
+   {
+     "registry-mirrors": ["${DOCKER_MIRRORS}"]
+   }
+   EOF
+   ```
+
+   
+

@@ -1293,6 +1293,12 @@ services:
 1. 查看文件h5ai： *[http://localhost:8000](http://localhost:8000/)*
 2. AriaNg： *[http://localhost:8000/aria2/](http://localhost:8000/aria2/)* 注意地址后面一定要带`/` 
 
+### 其他下载器
+
+一款跨平台的快速，简单，干净的视频下载器：Annie，支持Bilibili/Youtube等多个网站: ***[https://github.com/iawia002/annie](https://github.com/iawia002/annie)***
+
+一款开源、免费带Web面板的多功能下载神器: ***[https://github.com/pyload/pyload](https://github.com/pyload/pyload)***
+
 ## 百度网盘相关
 
 ### BaiduExporter

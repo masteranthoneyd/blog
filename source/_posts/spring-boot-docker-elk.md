@@ -140,7 +140,7 @@ logging:
         <Property name="UNKNOWN" value="????"/>
         <Property name="KAFKA_SERVERS" value="${spring:ybd.kafka.bootstrap}"/>
         <Property name="server_name" value="${spring:spring.application.name}"/>
-        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
     </properties>
 
     <Appenders>
@@ -212,7 +212,7 @@ logging:
         <property name="server_name" value="${spring:spring.application.name}"/>
         
         <!-- 控制台输出的格式 -->
-        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
+        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
 		
         <!-- 日志默认存放的位置,这里设置为项目根路径下,也可指定绝对路径 -->
         <property name="basePath">./log4j2Logs/${server_name}</property>
@@ -1356,8 +1356,6 @@ output {
 }
 ```
 
-
-
 `logstash.yml`:
 
 ```
@@ -1587,6 +1585,107 @@ $ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/lic
 ![](https://cdn.yangbingdong.com/kibana-license.png)
 
 ![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana02.png)
+
+### 动态模板
+
+我们可以自定义Logstash输出到ElasticSearch的Mapping.
+
+logstash.conf 的 output 配置:
+
+```
+output {
+    # 输出到控制台
+    stdout{ codec => rubydebug }
+
+    # 输出到 Elasticsearch
+    elasticsearch {
+        hosts  => ["elk-elasticsearch:9200"]
+        index  => "logstash-%{server_name}-%{+YYYY.MM.dd}"
+
+        template => "/usr/share/logstash/config/logstash-template.json"
+        template_name => "logstash" #映射模板的名字
+        template_overwrite => true
+    }
+```
+
+配置模板:
+
+logstash-template.json:
+
+```json
+{
+    "template":"logstash-*",
+    "settings":{
+        "index.number_of_shards":5,
+        "number_of_replicas":0
+    },
+    "mappings":{
+        "dynamic_templates":[
+            {
+                "message_field":{
+                    "match":"content",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "type":"text"
+                    }
+                }
+            },
+            {
+                "string_fields":{
+                    "match":"*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "type":"keyword"
+                    }
+                }
+            }
+        ],
+        "properties":{
+            "@timestamp":{
+                "type":"date"
+            },
+            "@version":{
+                "type":"keyword"
+            },
+            "geoip":{
+                "dynamic":true,
+                "properties":{
+                    "ip":{
+                        "type":"ip"
+                    },
+                    "location":{
+                        "type":"geo_point"
+                    },
+                    "latitude":{
+                        "type":"float"
+                    },
+                    "longitude":{
+                        "type":"float"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+docker-compose.yml 中添加配置文件的映射:
+
+```
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.1.1
+    #    ports:
+    #      - "4560:4560"
+    restart: always
+    environment:
+      - LS_JAVA_OPTS=-Xmx512m -Xms512m
+    volumes:
+      - ./logstash/logstash.conf:/etc/logstash.conf
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./elasticsearch/logstash-template.json:/usr/share/logstash/config/logstash-template.json
+```
+
+
 
 ## Kibana相关设置
 
