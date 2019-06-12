@@ -1,8 +1,8 @@
 ---
 title: 线上问题定位常用技巧
 date: 2019-05-05 17:09:02
-categories:[Java, MAT]
-tags:[Programming, Java]
+categories: [Programming, Java]
+tags: [Java, MAT]
 ---
 
 ![](https://cdn.yangbingdong.com/img/online-debug/locate.png)
