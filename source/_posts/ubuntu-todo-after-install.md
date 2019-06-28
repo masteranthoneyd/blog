@@ -290,7 +290,7 @@ sudo chmod -R 777 /usr/bin/lantern
 ```
 
 ## 方式二: 自搭建 Shadowsocks
-***[Access Blocked Sites(翻墙):VPS自搭建ShadowSocks与加速](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
+***[Access Blocked Sites Guide(科学上网指南)](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
 
 # 主题美化篇
 
