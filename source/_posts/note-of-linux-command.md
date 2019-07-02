@@ -1111,6 +1111,20 @@ echo "newpassword")|passwd
 sudo apt-get install expect 
 ```
 
+## Shell脚本加密
+
+```
+sudo apt install -y shc
+```
+
+```
+shc -e "01/12/2019" -m "Script expired, pleace contact yangbingdong1994@gmail.com" -v -r -T -f shell.sh
+```
+
+* `-e`: 过期时间
+* `-m`: 过期消息
+* `-f`: 需要加密的脚本
+
 ## 写入文件或追加
 
 有时候简单的东西不想通过 vi 编辑文件, 或者在脚本中需要写入或追加文字到文件中, 我们可以通过以下方式实现.
