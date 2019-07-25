@@ -3,6 +3,7 @@ title: Access Blocked Sites Guide(科学上网指南)
 date: 2017-04-19 18:15:57
 categories: [VPS]
 tags: [VPS, ShadowSocks, V2Ray]
+password: admin123
 ---
 ![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
 # Preface

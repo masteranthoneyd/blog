@@ -629,6 +629,35 @@ public abstract class BaseEntity {
 }
 ```
 
+这里可以配合Auditing实现一些审计功能, 参考`AuditingEntityListener`:
+
+```java
+@Entity
+@Table(name = "user_customer", schema = "test", catalog = "")
+@EntityListeners(CustomAuditingEntityListener.class)
+public class UserCustomerEntity {
+
+}
+```
+
+```java
+@Configurable
+public class CustomAuditingEntityListener {
+   
+   @PrePersist
+   public void touchForCreate(Object target) {
+      // if(target.getCreateTime == null){ set createTime hear }
+   }
+   
+   @PreUpdate
+   public void touchForUpdate(Object target) {
+      // inject update time
+   }
+}
+```
+
+
+
 ## @JoinColumn
 
 `@JoinColumn` 主要配合 `@OneToOne`、`@ManyToOne`、`@OneToMany` 一起使用，单独使用没有意义, 用来定义多个字段的关联关系。
@@ -941,7 +970,211 @@ public class UserInfoManager {
 //可以仔细体会上面这个案例，实际工作中应该大部分都是这种写法，就算扩展也是百变不离其中。
 ```
 
-> 推荐一个对Specification的封装: ***[https://github.com/wenhao/jpa-spec](https://github.com/wenhao/jpa-spec)***
+# JPA Spec封装
+
+```java
+public final class SpecificationFactory {
+   /**
+    * 模糊查询，匹配对应字段
+    */
+   public static Specification containsLike(String attribute, String value) {
+      return (root, query, cb)-> cb.like(root.get(attribute), "%" + value + "%");
+   }
+   /**
+    * 某字段的值等于 value 的查询条件
+    */
+   public static Specification equal(String attribute, Object value) {
+      return (root, query, cb) -> cb.equal(root.get(attribute),value);
+   }
+   /**
+    * 获取对应属性的值所在区间
+    */
+   public static Specification isBetween(String attribute, int min, int max) {
+      return (root, query, cb) -> cb.between(root.get(attribute), min, max);
+   }
+   public static Specification isBetween(String attribute, double min, double max) {
+      return (root, query, cb) -> cb.between(root.get(attribute), min, max);
+   }
+   public static Specification isBetween(String attribute, Date min, Date max) {
+      return (root, query, cb) -> cb.between(root.get(attribute), min, max);
+   }
+   /**
+    * 通过属性名和集合实现 in 查询
+    */
+   public static Specification in(String attribute, Collection c) {
+      return (root, query, cb) ->root.get(attribute).in(c);
+   }
+   /**
+    * 通过属性名构建大于等于 Value 的查询条件
+    */
+   public static Specification greaterThan(String attribute, BigDecimal value) {
+      return (root, query, cb) ->cb.greaterThan(root.get(attribute),value);
+   }
+   public static Specification greaterThan(String attribute, Long value) {
+      return (root, query, cb) ->cb.greaterThan(root.get(attribute),value);
+   }
+......
+}
+```
+
+调用:
+
+```java
+userRepository.findAll(
+      SpecificationFactory.containsLike("firstName", userParam.getLastName()),
+      pageable);
+      
+userRepository.findAll(Specifications.where(
+      SpecificationFactory.containsLike("firstName", userParam.getLastName()))
+            .and(SpecificationFactory.greaterThan("version",userParam.getVersion())),
+      pageable);
+```
+
+这样一来可读性以及代码优雅度都提高了.
+
+推荐一个对Specification的封装库: ***[https://github.com/wenhao/jpa-spec](https://github.com/wenhao/jpa-spec)***
+
+# EntityManager与自定义Repository
+
+## EntityManager的两种获取方式
+
+获取`EntityManager`有两种方式.
+
+方式一: `@PersistenceContext`
+
+```java
+@Repository
+@Transactional(readOnly = true)
+public class UserRepositoryImpl implements UserRepositoryCustom {
+    @PersistenceContext  //获得entityManager的实例
+    EntityManager entityManager;
+}
+```
+
+方式二:  继承 `SimpleJpaRepository`
+
+```java
+public class BaseRepositoryCustom<T, ID> extends SimpleJpaRepository<T, ID> {
+    public BaseRepositoryCustom(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+        super(entityInformation, entityManager);
+    }
+    public BaseRepositoryCustom(Class<T> domainClass, EntityManager em) {
+        super(domainClass, em);
+    }
+}
+```
+
+## 自定义 Repository
+
+### 自定义个别的特殊场景私有的 Repository
+
+定义接口:
+
+```java
+public interface UserRepositoryCustom {
+    List<User> customerMethodNamesLike(String firstName);
+}
+```
+
+实现接口:
+
+```java
+/**
+ * 用@Repository 将此实现交个Spring bean加载
+ * 咱们模仿SimpleJpaRepository 默认将所有方法都开启一个事务
+ */
+@Repository
+@Transactional(readOnly = true)
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+    @PersistenceContext
+    EntityManager entityManager;
+    
+    @Override
+    public List<User> customerMethodNamesLike(String firstName) {
+        Query query = entityManager.createNativeQuery("SELECT u.* FROM user as u " +
+                "WHERE u.name LIKE ?", User.class);
+        query.setParameter(1, firstName + "%");
+        return query.getResultList();
+    }
+}
+```
+
+> 上面除了entityManager, 也可以使用JdbcTemplate来自己实现逻辑
+
+继承接口:
+
+```java
+public interface UserRepository extends Repository<User, Long>,UserRepositoryCustom {
+}
+```
+
+然后直接调用就行了:
+
+```java
+userRepository.customerMethodNamesLike("jack");
+```
+
+我们还可以覆盖 JPA 里面的默认实现方法:
+
+```java
+//假设我们要覆盖默认的save方法的逻辑
+interface CustomizedSave<T> {
+  <S extends T> S save(S entity);
+}
+class CustomizedSaveImpl<T> implements CustomizedSave<T> {
+  public <S extends T> S save(S entity) {
+    // Your custom implementation
+  }
+}
+//用法保持不变，如下：
+interface UserRepository extends CrudRepository<User, Long>, CustomizedSave<User> {
+}
+//CustomizedSave通过泛化可以被多个Repository使用
+interface PersonRepository extends CrudRepository<Person, Long>, CustomizedSave<Person> {
+}
+```
+
+**实际工作中应用于逻辑删除场景：**
+
+> 在实际工作的生产环境中，我们可能经常会用到逻辑删除，所以做法是一般自定义覆盖 Data JPA 帮我们提供 remove 方法，然后实现逻辑删除的逻辑即可。
+
+### 公用的通用的场景替代默认的 SimpleJpaRepository
+
+声明定制共享行为的接口，用 `@NoRepositoryBean`:
+
+```java
+@NoRepositoryBean
+public interface MyRepository<T, ID extends Serializable> extends PagingAndSortingRepository<T, ID> {
+  void sharedCustomMethod(ID id);
+}
+```
+
+继承 SimpleJpaRepository 扩展自己的方法实现逻辑:
+
+```java
+public class MyRepositoryImpl<T, ID extends Serializable>
+  extends SimpleJpaRepository<T, ID> implements MyRepository<T, ID> {
+  private final EntityManager entityManager;
+  public MyRepositoryImpl(JpaEntityInformation entityInformation, EntityManager entityManager) {
+    super(entityInformation, entityManager);
+    // Keep the EntityManager around to used from the newly introduced methods.
+    this.entityManager = entityManager;
+  }
+  public void sharedCustomMethod(ID id) {
+    // 通过entityManager实现自己的额外方法的实现逻辑。这里不多说了
+  }
+}
+```
+
+使用 JavaConfig 配置自定义 MyRepositoryImpl 作为其他接口的动态代理的实现基类:
+
+```java
+@Configuration
+@EnableJpaRepositories(repositoryBaseClass = MyRepositoryImpl.class)
+class ApplicationConfiguration { … }
+```
+
+> 具有全局的性质，即使没有继承它所有的动态代理类也会变成它.
 
 # 使用Tips
 

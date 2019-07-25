@@ -150,6 +150,12 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
 
+## Tab 键改为4个空格
+
+> 代码规范会要求编程时使用4个空格缩进而不是tab，因为不同编辑器下4个空格的宽度看起来是一致的，而tab则长短可能会不一致。
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
+
 ## Maven 自动下载源码
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
@@ -486,6 +492,18 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 高亮效果:  Ctrl+鼠标右键单击
 
 选中部分外暗淡效果: Alt+鼠标右键单击
+
+## Jclasslib
+
+> 这是一个查看Java字节码的插件
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jclasslib.png)
+
+## JOL
+
+> Java Object Layout, 查看Java对象大小的插件
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jol.png)
 
 # Skills
 

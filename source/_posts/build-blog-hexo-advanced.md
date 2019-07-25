@@ -1738,6 +1738,7 @@ sed -i "s/http:\/\/img.yangbingdong.com/https:\/\/cdn.yangbingdong.com/g" ./*
 > ***[http://www.shellsec.com/news/34054.html](http://www.shellsec.com/news/34054.html)***
 > ***[https://www.0101tx.com/pages/hexonextsanf.html](https://www.0101tx.com/pages/hexonextsanf.html)***
 > ***[https://reuixiy.github.io/technology/computer/computer-aided-art/2017/06/09/hexo-next-optimization.html](https://reuixiy.github.io/technology/computer/computer-aided-art/2017/06/09/hexo-next-optimization.html)***
+> ***[https://io-oi.me/tech/hexo-next-optimization.html](https://io-oi.me/tech/hexo-next-optimization.html)***
 
 
 [^1]: basic footnote content

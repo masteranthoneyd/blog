@@ -95,7 +95,7 @@ CAS操作比单线程无锁慢了1个数量级；有锁且多线程并发的情�
 
 下面是`ArrayBlockingQueue`通过加锁的方式实现的`offer`方法, 保证线程安全. 
 
-```
+```java
 public boolean offer(E e) {
     checkNotNull(e);
     final ReentrantLock lock = this.lock;
@@ -127,7 +127,7 @@ CAS会先把`Entry`现在的`value`跟线程当初读出的值相比较, 若相�
 
 代码示例是`AtomicInteger`的`getAndAdd`方法. CAS是CPU的一个指令, 由CPU保证原子性. 
 
-```
+```java
 /**
  * Atomically adds the given value to the current value.
  *
@@ -194,7 +194,7 @@ CPU每次从主存中拉取数据时, 会把相邻的数据也存入同一个cac
 
 下面的例子是测试利用cache line的特性和不利用cache line的特性的效果对比. 
 
-```
+```java
 public class CacheLineEffect {
     //考虑一般缓存行大小是64字节, 一个 long 类型占8字节
     static  long[][] arr;
@@ -251,7 +251,7 @@ Loop times:65ms
 
 对于伪共享, 一般的解决方案是, 增大数组元素的间隔使得由不同线程存取的元素位于不同的缓存行上, 以空间换时间. 
 
-```
+```java
 public class FalseSharing implements Runnable{
         public final static long ITERATIONS = 500L * 1000L * 100L;
         private int arrayIndex = 0;
@@ -408,7 +408,7 @@ Disruptor通过以下设计来解决队列速度慢的问题:
 
 防止不同生产者对同一段空间写入的代码, 如下所示: 
 
-```
+```java
 public long tryNext(int n) throws InsufficientCapacityException
 {
     if (n < 1)
@@ -494,7 +494,7 @@ LockSupport.parkNanos(1);
 
 ## 自定义事件
 
-```
+```java
 package com.yangbingdong.springbootdisruptor.basic;
 
 import lombok.Data;
@@ -513,7 +513,7 @@ public class LongEvent {
 
 ## 定义事件工厂
 
-```
+```java
 package com.yangbingdong.springbootdisruptor.basic;
 
 
@@ -538,7 +538,7 @@ public class LongEventFactory implements EventFactory<LongEvent> {
 
 ## 定义消费者
 
-```
+```java
 package com.yangbingdong.springbootdisruptor.basic;
 
 
@@ -564,7 +564,7 @@ public class LongEventHandler implements EventHandler<LongEvent> {
 
 ### 3.0版本之前
 
-```
+```java
 package com.yangbingdong.springbootdisruptor.basic;
 
 
@@ -603,7 +603,7 @@ public class LongEventProducer {
 
 ### 3.0版本之后使用Translators
 
-```
+```java
 package com.yangbingdong.springbootdisruptor.basic;
 
 
@@ -629,7 +629,7 @@ public class LongEventProducerWithTranslator implements EventTranslatorOneArg<Lo
 
 ### 单生产者, 单消费者
 
-```
+```java
 @Test
 public void singleProducerLongEventDefaultTest() throws InterruptedException {
 	// Executor that will be used to construct new threads for consumers
@@ -666,7 +666,7 @@ public void singleProducerLongEventDefaultTest() throws InterruptedException {
 
 新版的Disruptor不建议我们使用`Executor`, 而使用`ThreadFactory`代替: 
 
-```
+```java
 @Test
 public void singleProducerLongEventUseThreadFactoryTest() throws InterruptedException {
 	ThreadFactory threadFactory = new ThreadFactory() {
@@ -702,7 +702,7 @@ public void singleProducerLongEventUseThreadFactoryTest() throws InterruptedExce
 
 新版Disruptor使用Translators: 
 
-```
+```java
 @Test
 public void singleProducerLongEventUseTranslatorsTest() throws InterruptedException {
 	ThreadFactory threadFactory = new ThreadFactory() {
@@ -740,7 +740,7 @@ public void singleProducerLongEventUseTranslatorsTest() throws InterruptedExcept
 
 java8版: 
 
-```
+```java
 @SuppressWarnings("unchecked")
 @Test
 public void singleProducerLongEventJava8Test() {
@@ -768,7 +768,7 @@ public void singleProducerLongEventJava8Test() {
 
 ### 多生产者, 单消费者
 
-```
+```java
 @SuppressWarnings("unchecked")
 @Test
 public void multiProducerOneCustomerTest() throws InterruptedException {
@@ -816,7 +816,7 @@ private void produce(Disruptor<LongEvent> disruptor, LongEventProducerWithTransl
 
 先处理完c1和c2才处理c3: 
 
-```
+```java
 @Test
 public void multiCustomerOneProducerTest() throws InterruptedException {
 	int bufferSize = 1 << 8;
@@ -849,7 +849,7 @@ public void multiCustomerOneProducerTest() throws InterruptedException {
 
 如图, 消费者1b消费时, 必须保证消费者1a已经完成对该消息的消费；消费者2b消费时, 必须保证消费者2a已经完成对该消息的消费；消费者c3消费时, 必须保证消费者1b和2b已经完成对该消息的消费. 
 
-```
+```java
 @SuppressWarnings("unchecked")
 @Test
 public void multiCustomerOneProducerTest2() throws InterruptedException {
@@ -881,7 +881,7 @@ public void multiCustomerOneProducerTest2() throws InterruptedException {
 
 再来一个复杂点的: 
 
-```
+```java
 @SuppressWarnings("unchecked")
 @Test
 public void multiCustomerOneProducerTest3() throws InterruptedException {
@@ -918,7 +918,7 @@ public void multiCustomerOneProducerTest3() throws InterruptedException {
 
 Disruptor默认会把异常包装成`RuntimeException`并抛出去, 导致线程挂掉或阻塞, 我们需要自定义异常处理器: 
 
-```
+```java
 disruptor.setDefaultExceptionHandler(new ExceptionHandler<LongEvent>() {
 			@Override
 			public void handleEventException(Throwable ex, long sequence, LongEvent event) {
@@ -942,7 +942,7 @@ disruptor.setDefaultExceptionHandler(new ExceptionHandler<LongEvent>() {
 
 > 来自官方翻译: 当通过Disruptor传递数据时, 对象可能比预期寿命更长. 为避免发生这种情况, 可能需要在处理事件后清除事件. 如果你有一个单一的事件处理程序清除在同一个处理程序中的值是足够的. 如果你有一连串的事件处理程序, 那么你可能需要一个特定的处理程序放置在链的末尾来处理对象. 
 
-```
+```java
 class ObjectEvent<T>
 {
     T val;
@@ -978,7 +978,7 @@ public static void main(String[] args)
 
 # 消费者分片
 
-```
+```java
 public final class MyHandler implements EventHandler<ValueEvent>
 {
     private final long ordinal;
@@ -1001,6 +1001,103 @@ public final class MyHandler implements EventHandler<ValueEvent>
 ```
 
 使用`disruptor.handleEventsWithWorkerPool(...)`也可以实现这种类似消费者组的功能. 
+
+或者更简单地实现`WorkHandler`也可以:
+
+```java
+class DisruptorInnerShardingHandler<S> implements WorkHandler<DisruptorEvent<S>> {
+
+	private Map<Class, DisruptorEventSourceHandler<S>> handlerMap;
+
+	public DisruptorInnerShardingHandler(Map<Class, DisruptorEventSourceHandler<S>> handlerMap) {
+		this.handlerMap = handlerMap;
+	}
+
+	@Override
+	public void onEvent(DisruptorEvent<S> event) throws Exception {
+		try {
+			Class sourceClass = event.getSourceClass();
+			DisruptorEventSourceHandler<S> sourceHandler = handlerMap.get(sourceClass);
+			notNull(sourceHandler, "Source handler not found: " + sourceClass);
+			sourceHandler.handlerSource(event.getSource());
+		} finally {
+			event.clean();
+		}
+	}
+}
+```
+
+# 避免伪缓存
+
+```java
+public class FalseSharing {
+
+
+    public static void main(String[] args) throws Exception {
+        testPointer();
+    }
+
+    private static void testPointer() throws Exception {
+        Pointer pointer = new Pointer();
+        long start = System.currentTimeMillis();
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 100000000; i++) {
+                pointer.x++;
+            }
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 100000000; i++) {
+                pointer.y++;
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println(System.currentTimeMillis() - start);
+        System.out.println(pointer);
+    }
+
+    private static class Pointer {
+        volatile long x;
+        
+        volatile long y;
+    }
+
+}	
+```
+
+上述代码中x跟y会加载到同一个缓存行, 运行时间为 **3581ms**.
+
+下面通过填充内存解决伪缓存:
+
+```java
+private static class Pointer {
+    volatile long x;
+    long p1, p2, p3, p4, p5;
+    volatile long y;
+}
+```
+
+因为缓存行为64个字节, 可以填充5个long类型的字段(Java对象头16个字节), 运行时间为 **586ms**.
+
+或者使用Java8提供的 `@sun.misc.Contended` 注解:
+
+```java
+private static class Pointer {
+    MyLong x = new MyLong();
+    MyLong y = new MyLong();
+}
+
+@Contended
+private static class MyLong {
+    volatile long value;
+}
+```
+
+**注意: 需要在启动参数中加上 `-XX:-RestrictContended` 才能生效.**
 
 # 总结
 

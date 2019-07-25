@@ -1327,6 +1327,10 @@ services:
 
 2、进入 *[百度网盘直接下载助手(显示直接下载入口)](https://greasyfork.org/zh-CN/scripts/36549-%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%8A%A9%E6%89%8B-%E6%98%BE%E7%A4%BA%E7%9B%B4%E6%8E%A5%E4%B8%8B%E8%BD%BD%E5%85%A5%E5%8F%A3)* , 点击`安装`或者`install`,完了直接刷新界面, 进入到自己的百度云盘选择所需的下载文件即可. 
 
+### pan-light
+
+百度网盘不限速客户端, golang + qt5, 跨平台图形界面: ***[https://github.com/peterq/pan-light](https://github.com/peterq/pan-light)***
+
 ## Stardict火星译王
 
 ```

@@ -1,0 +1,23 @@
+version: '3'
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.1.0
+    #    ports:
+    #      - "4560:4560"
+    restart: always
+    environment:
+      - LS_JAVA_OPTS=-Xmx512m -Xms512m
+    volumes:
+      - ./logstash.conf:/etc/logstash.conf
+      - ./movie.cvs:/initialize/movie.cvs
+    networks:
+      - es7net
+    entrypoint:
+      - logstash
+      - -f
+      - /etc/logstash.conf
+
+networks:
+  es7net:
+    driver: bridge
+
