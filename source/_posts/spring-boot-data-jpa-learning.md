@@ -1,6 +1,17 @@
-# Spring Data JPA 拾遗
+---
+title: Spring Data JPA 拾遗
+date: 2019-07-17 16:45:26
+categories: [Programming, Java, Spring Boot]
+tags: [Java, Spring Boot]
+---
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-logo.png)
+
+# Preface
+
+>  JPA在国内的使用频率较小, 但也是一个值得学习的极为优秀的ORM框架, DDD的思想在里面体现得淋漓尽致.
+
+<!--more-->
 
 # 结构图
 
@@ -409,10 +420,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 在 Spring Data JPA 1.4 以后，支持在 `@Query` 中使用 SpEL 表达式（简介）来接收变量。
 
 SpEL 支持的变量
-
-| 变量名       | 使用方式                         | 描述                                              |
-| ------------ | -------------------------------- | ------------------------------------------------- |
-| `entityName` | `select x from #{#entityName} x` | 根据指定的 Repository 自动插入相关的 `entityName` |
 
 > 有两种方式能被解析出来：
 >
@@ -1250,6 +1257,7 @@ public class AccessLog implements Serializable {
 ```
 
 属性转换器：
+
 ```java
 //@Converter(autoApply = true)
 public class ReqReceiveDataConverter implements AttributeConverter<List<ReqReceiveData>, String> {
@@ -1265,9 +1273,9 @@ public class ReqReceiveDataConverter implements AttributeConverter<List<ReqRecei
 }
 ```
 
-* `@Convert`声明使用某个属性转换器(`ReqReceiveDataConverter`)
-* `ReqReceiveDataConverter`需要实现`AttributeConverter<X,Y>`，`X`为实体的字段类型，`Y`对应需要持久化到DB的类型
-* `@Converter(autoApply = true)`注解作用，如果有多个实体需要用到此属性转换器，不需要每个实体都的字段加上`@Convert`注解，自动对全部实体生效
+- `@Convert`声明使用某个属性转换器(`ReqReceiveDataConverter`)
+- `ReqReceiveDataConverter`需要实现`AttributeConverter<X,Y>`，`X`为实体的字段类型，`Y`对应需要持久化到DB的类型
+- `@Converter(autoApply = true)`注解作用，如果有多个实体需要用到此属性转换器，不需要每个实体都的字段加上`@Convert`注解，自动对全部实体生效
 
 ## 发布领域事件
 
@@ -1290,12 +1298,12 @@ class MyComponent {
 
 通过JPA我们可以优雅地发布领域事件，有以下两种实现方式：
 
-* 继承`AbstractAggregateRoot`，并使用其`registerEvent()`方法注册发布事件
+- 继承`AbstractAggregateRoot`，并使用其`registerEvent()`方法注册发布事件
 
   ```java
   public class BankTransfer extends AbstractAggregateRoot {
      ...
-
+  
       public BankTransfer complete() {
           id = UUID.randomUUID().toString();
           registerEvent(new BankTransferCompletedEvent(id));
@@ -1304,28 +1312,28 @@ class MyComponent {
       
       ...
   }
-
+  
   ```
 
   ```java
   @Service
   public class BankTransferService {
-
+  
       ...
       
       @Transactional
       public String completeTransfer(BankTransfer bankTransfer) {
           return repository.save(bankTransfer.complete()).getId();
       }
-
+  
       ...
   }
-
+  
   ```
 
   **但此方式拿不到实体id，因为是在生成id之前生成的event**
 
-* 使用`@DomainEvents`注解方法发布事件
+- 使用`@DomainEvents`注解方法发布事件
 
   ```java
   public class MessageEvent implements Serializable {
@@ -1334,14 +1342,14 @@ class MyComponent {
       
   	@Transient
   	private transient List<Object> domainEvents = new ArrayList<>(16);
-
+  
   	@DomainEvents
   	Collection<Object> domainEvents() {
   		log.info("publish domainEvents......");
   		domainEvents.add(new SaveMsgEvent().setId(this.id));
   		return Collections.unmodifiableList(domainEvents);
   	}
-
+  
   	@AfterDomainEventPublication
   	void callbackMethod() {
   		log.info("AfterDomainEventPublication..........");
@@ -1358,7 +1366,7 @@ class MyComponent {
   @Component
   @Slf4j
   public class DomainEventListener {
-
+  
   	@Async
   	@TransactionalEventListener(SaveMsgEvent.class)
   	public void processSaveMsgEvent(SaveMsgEvent saveMsgEvent) throws InterruptedException {
@@ -1410,7 +1418,9 @@ gbk = 2 byte = 1 character
 utf8mb4 = 4 byte = 1 character 
 ```
 
-## 使用AttributeConverter转换JSON字符串时，Hibernate执行insert之后再执行update
+## insert后update
+
+使用AttributeConverter转换JSON字符串时，Hibernate执行insert之后再执行update
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-dirty01.png)
 

@@ -1,10 +1,17 @@
-# Spring Boot 之数据篇
+---
+title: Spring Boot 之数据篇
+date: 2019-06-15 11:43:02
+categories: [Programming, Java, Spring Boot]
+tags: [Java, Spring Boot]
+---
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-data-learning.png)
 
 # Preface
 
 > 后端应用当中与DB交互也是必不可少的一部, 在Java中我们将交互部分抽象成了 **ORM**(Object Relational Mapping), 以下是数据源以及ORM相关...
+
+<!--more-->
 
 # 数据源
 
@@ -786,4 +793,4 @@ public class CustomDataSourceTransactionManagerAutoConfiguration {
 
 # Spring Data JPA
 
-> 请看 ***[Spring Data JPA 拾遗](/2018/spring-boot-data-jpa-learning)***
+> 请看 ***[Spring Data JPA 拾遗](/2019/spring-boot-data-jpa-learning)***
