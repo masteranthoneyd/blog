@@ -134,3 +134,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 ```
 
 就这么简单!
+
+# 权限设计
+
+![](https://cdn.yangbingdong.com/img/spring-auth/auth-design.jpg)

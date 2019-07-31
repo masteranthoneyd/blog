@@ -834,6 +834,30 @@ public class UserRole {
 }
 ```
 
+## @SQLDelete&@Where
+
+这两个注解可以配合完成逻辑删除
+
+```java
+@SQLDelete(sql = "update user set delete_flag = 1 where id = ?")
+@Where(clause = "delete_flag = 0")
+@Entity
+public class User extends BaseEntity {
+
+	@NotBlank(message = "姓名不能为空")
+	private String name;
+	private String email;
+
+	@ManyToMany
+	@JoinTable(
+			name = "userRole",
+			joinColumns = @JoinColumn(name = "userId", referencedColumnName="id"),
+			inverseJoinColumns=@JoinColumn(name="roleId",referencedColumnName="id")
+	)
+	private List<Role> roles;
+}
+```
+
 # QueryByExampleExecutor基本用法
 
 > 这个使用比较少
@@ -1177,6 +1201,24 @@ class ApplicationConfiguration { … }
 > 具有全局的性质，即使没有继承它所有的动态代理类也会变成它.
 
 # 使用Tips
+
+## 使用 @Embedded 关联一对一的值对象
+
+可理解为DDD中的值对象
+
+```java
+@Entity
+public class Order {
+    @Embedded
+    private CustomerVo customerVo;
+}
+
+@Embeddable
+public class CustomerVo {
+    private int customerId;
+    private String customerName;
+}
+```
 
 ## 使用 @Convert 关联一对多的值对象
 

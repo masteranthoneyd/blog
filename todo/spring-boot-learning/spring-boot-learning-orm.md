@@ -780,6 +780,10 @@ public class CustomDataSourceTransactionManagerAutoConfiguration {
 - Hibernate：Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库，并且对象有自己的生命周期，**着力点对象与对象之间关系**，有自己的 HQL 查询语言，所以数据库移植性很好。Hibernate 是完备的 ORM 框架，是符合 JPA 规范的，有自己的缓存机制，上手来说比较难，比较适合企业级的应用系统开发。
 - Spring Data JPA：可以理解为 JPA 规范的再次封装抽象，底层还是使用了 Hibernate 的 JPA 技术实现，引用 JPQL(Java Persistence Query Language)查询语言，属于 Spring 的整个生态体系的一部分。由于 Spring Boot 和 Spring Cloud 在市场上的流行，Spring Data JPA 也逐渐进入大家的视野，他们有机的整体，使用起来比较方便，加快了开发的效率，使开发者不需要关系和配置更多的东西，完全可以沉浸在 Spring 的完整生态标准的实现下，上手简单、开发效率高，又对对象的支持比较好，又有很大的灵活性，市场的认可度越来越高。
 
+# MyBatis
+
+对于MyBatis, 现已有很优秀的二次封装框架, 比如 ***[Mapper4](https://github.com/abel533/Mapper)***, ***[MtBatis-Plus](https://github.com/baomidou/mybatis-plus)*** 等.
+
 # Spring Data JPA
 
 > 请看 ***[Spring Data JPA 拾遗](/2018/spring-boot-data-jpa-learning)***
