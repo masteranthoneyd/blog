@@ -812,58 +812,37 @@ Configure>>  Addon  >>Advanced>>Classic
 
 再次重启. 
 
-## Wechat for Ubuntu
+## Deepin Wine For Ubuntu
 
-下载地址: 
-***[https://github.com/geeeeeeeeek/electronic-wechat/releases](https://github.com/geeeeeeeeek/electronic-wechat/releases)***
-***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径: `UbuntuTools -> wechat4Ubuntu`)
+这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
 
+```
+git clone https://gitee.com/wszqkzqk/deepin-wine-for-ubuntu.git
+cd deepin-wine-for-ubuntu
+./install.sh
+```
 
-下载最新版本, 解压后打开目录里面的`electronic-wechat`, 然后创建个软连接换个图标拉倒桌面就可以了
+>  这个是 Docker 版本的: ***[https://github.com/RokasUrbelis/docker-wine-linux](https://github.com/RokasUrbelis/docker-wine-linux)***
 
-上面的 `electronic-wechat` 已**不再维护**.
+在 ***[https://mirrors.aliyun.com/deepin/pool/non-free/d/](https://mirrors.aliyun.com/deepin/pool/non-free/d/)*** 中寻找需要的软件, 使用 `dpkg` 安装即可.
 
-另外, Github中还有一个Linux版的Wechat: ***[https://github.com/eNkru/electron-wechat](https://github.com/eNkru/electron-wechat)***
+### 企业微信
 
-或者也可以使用 ***[Deepin Wine](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
+***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.weixin.work/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.weixin.work/)***
 
-## QQ
+安装完需要安装一下这个依赖, 不要会出现cpu彪高以及图片不能正常展示的问题:
 
-### Wine-QQ Appimage版本
+```
+sudo apt install libjpeg62:i386
+```
 
-Github: ***[https://github.com/askme765cs/Wine-QQ-TIM](https://github.com/askme765cs/Wine-QQ-TIM)***
+### Wechat
 
-下载玩对应的Appimage后, 右键属性, 在权限中允许执行, 然后可以直接打开了
+***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat/)***
 
-### QQ轻聊版
+### QQ
 
-> 这种方式比较麻烦, 可以直接才上面的Appimage
-
-虽然不太想安装QQ, 但工作时候团队交流需要, QQ国际版又太难看, 所以装个Deepin的轻聊版. 
-工具包下载: ***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi) (提取路径: `UbuntuTools>qq4Ubuntu`)
-
-内含文件: 
-
-- `crossover_16.0.0-1.deb`
-- `crossover16crack.tar.gz`
-- `apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
-
-#### crossover安装与破解
-这个轻聊版是Deepin的作品, 要在Ubuntu上使用, 就要安装**crossover**, 很不幸这玩意是收费的, 很幸运的是这玩意是可以破解的. 
-1、安装的工具包下载下来解压后会有三个文件, 首先先安装`crossover_16.0.0-1.deb`, 缺少依赖就执行一下`sudo apt -f install`, 安装完后**先不要打开**crossover. 
-2、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
-3、把破解文件 (`crossover16crack`->`winewrapper.exe.so`) 替换路径: `/opt/cxoffice/lib/wine`下的`winewrapper.exe.so`文件. 提示已有文件, 点“替换”破解完成. 
-
-#### Deepin QQ轻聊版
-1、用归档管理器打开`apps.com.qq.im.light_7.9.14308deepin0_i386.deb`
-2、点开 `data.tar.xz` 找到 `./opt/cxoffice/support`
-3、把 `apps.com.qq.im.light` 这个文件夹提取出来
-4、在命令行输入`sudo nautilus`打开一个root权限的文件管理器
-5、然后将这个文件夹复制到系统的 `/opt/cxoffice/support` 下 
-![](https://cdn.yangbingdong.com/img/individuation/crossover-file.png)
-6、然后打开 `crossover` , 发现多了一个容器 , 点击图标即可运行QQ轻聊版 
-![](https://cdn.yangbingdong.com/img/individuation/crossover.png)
-7、如果运行后出现乱码, 把 Windows 系统下的 `%systemroot%\fonts\simsun.ttf (simsun.ttc)` 复制到容器的对应文件夹就可以
+***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.qq.im/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.qq.im/)***
 
 ## GUI-SmartGit
 
@@ -1370,12 +1349,6 @@ sudo apt install hardinfo -y
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/System%20Information_002.png)
-
-## Deepin Wine For Ubuntu
-
-这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
-
-这个是 Docker 版本的: ***[https://github.com/RokasUrbelis/docker-wine-linux](https://github.com/RokasUrbelis/docker-wine-linux)***
 
 # 其他设置篇
 
