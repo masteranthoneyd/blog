@@ -840,6 +840,16 @@ sudo apt install libjpeg62:i386
 
 ***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat/)***
 
+### 微信开发者工具
+
+***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat.devtools/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.wechat.devtools/)***
+
+确保安装了依赖:
+
+```
+sudo apt-get install libxtst6:i386
+```
+
 ### QQ
 
 ***[https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.qq.im/](https://mirrors.aliyun.com/deepin/pool/non-free/d/deepin.com.qq.im/)***
