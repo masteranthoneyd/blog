@@ -654,6 +654,8 @@ sudo update-grub
 
 ## GDM 登录背景图
 
+> 更多GDM主题请看 ***[https://www.pling.com/s/Gnome/browse/cat/131/order/latest/](https://www.pling.com/s/Gnome/browse/cat/131/order/latest/)***
+>
 > 修改之前可以备份一下`ubuntu.css`文件, 避免错了改不会来...
 
 更换登录界面的背景图需要修改文件 `ubuntu.css`，它位于 `/usr/share/gnome-shell/theme` 。
