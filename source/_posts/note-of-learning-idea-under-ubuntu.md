@@ -468,7 +468,9 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ## Translation
 
-详细使用文档，参考：***[https://plugins.jetbrains.com/plugin/8579-translation](https://plugins.jetbrains.com/plugin/8579-translation)***
+详细使用文档，参考：***[https://github.com/YiiGuxing/TranslationPlugin](https://github.com/YiiGuxing/TranslationPlugin)***
+
+有道智云: ***[https://ai.youdao.com/](https://ai.youdao.com/)***
 
 快捷键:
 
