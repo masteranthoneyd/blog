@@ -6,8 +6,9 @@ tags: [Ubuntu]
 ---
 ![](https://cdn.yangbingdong.com/img/individuation/ubuntu-desktop.png)
 # 前言
->  时间已经来到了9102年, 当初的***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本已经回归GNOME环境, 各种主题优化教程也层出不穷了, 说明Ubuntu的使用人群也渐渐增加...
+>  时间已经来到了9102年, 当初的***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本已经回归GNOME环境, 各种主题优化教程也层出不穷了, 说明 Ubuntu 的使用人群也渐渐增加...
 >
+>  一键安装主题软件脚本: ***[ubuntu-desktop-initializer](https://github.com/masteranthoneyd/ubuntu-desktop-initializer)***
 
 <!--more-->
 
@@ -873,6 +874,8 @@ wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
 sudo add-apt-repository -y 'deb https://typora.io/linux ./'
 sudo apt install typora
 ```
+
+如果加粗或斜体没有正确显示, 需要编辑 `github.css`(默认主题是Github), 将 `body` 标签中 `Open Sans` 改为 `Open Sans Regular`
 
 ## GIF制作软件 Peek
 

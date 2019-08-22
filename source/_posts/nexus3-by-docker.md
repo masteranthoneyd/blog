@@ -1,10 +1,17 @@
-# Nexus搭建与Maven配置
+---
+title: Nexus搭建与Maven配置
+date: 2019-01-21 14:40:59
+categories: [Maven]
+tags: [Maven]
+---
 
 ![](https://cdn.yangbingdong.com/img/docker-nexus3/nexus-logo.png)
 
 # Preface
 
 > 一般每个企业里面都有属于自己的Nexus服务器作为自己的私服（代理），私服好处众多，例如加速构建、稳定，节省带宽、节省中央`maven`仓库的带宽，控制和审计，可以建立本地内部仓库、可以建立公共仓库等等。`Docker` 可以大大简化服务器的部署，并且Nexus3已经支持`Docker Image`啦～爽歪歪
+
+<!--more-->
 
 # Get Image
 
@@ -350,6 +357,4 @@ docker run --rm -v nexus-data1:/vdata -v $(pwd):/backup ubuntu:latest tar zxvf /
 # End
 
 > 参考： ***[https://hub.docker.com/r/sonatype/nexus3/](https://hub.docker.com/r/sonatype/nexus3/)***
-
-
 
