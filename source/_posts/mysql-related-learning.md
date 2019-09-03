@@ -626,6 +626,10 @@ mysql -h [host] -P [port] -u [uname] -p[pass] db_name < db_backup.sql
 mysql -h [host] -P [port] -u [uname] -p[pass] < db_backup_all.sql
 ```
 
+# 死锁排查
+
+***[解决死锁之路（终结篇）- 再见死锁](https://mp.weixin.qq.com/s/HT1tWfEPnigBO9fhML6y0w)***
+
 # Finally
 
 看到一片美团技术团队的博文非常好: ***[https://tech.meituan.com/mysql-index.html](https://tech.meituan.com/mysql-index.html)***

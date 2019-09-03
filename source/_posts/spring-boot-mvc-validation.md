@@ -94,6 +94,85 @@ public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
 * SpringBoot 2.0.1版本中加载`WebMvcConfigurer`的顺序发生了变动，故需使用`converters.add(0, converter);`指定`FastJsonHttpMessageConverter`在converters内的顺序，否则在SpringBoot 2.0.1及之后的版本中将优先使用Jackson处理。详情：***[WebMvcConfigurer is overridden by WebMvcAutoConfiguration #12389](https://github.com/spring-projects/spring-boot/issues/12389)***
 * 在`FastJsonHttpMessageConverter`之前插入一个`StringHttpMessageConverter`是为了在Controller层返回String类型不会再次被FastJson序列化.
 
+### FastJson枚举映射
+
+实现 `ObjectSerializer,` 以及 `ObjectDeserializer`:
+
+```java
+public class EnumCodec implements ObjectSerializer, ObjectDeserializer {
+
+    private static ConcurrentHashMap<Class<?>, Method> methodCache = new ConcurrentHashMap<>(16);
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
+        Object value = parser.parse();
+        Class enumClass = (Class) type;
+        Method getValueMethod = getMethod(enumClass);
+        Enum enumeration = EnumUtils.valueOf(enumClass, value, getValueMethod);
+        return (T) enumeration;
+    }
+
+    @Override
+    public int getFastMatchToken() {
+        return JSONToken.LITERAL_INT;
+    }
+
+    @Override
+    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) {
+        SerializeWriter out = serializer.getWriter();
+        if (object == null) {
+            serializer.getWriter().writeNull();
+            return;
+        }
+        IEnum enumeration = (IEnum) object;
+        out.write(enumeration.getValue().toString());
+    }
+
+    private static Method getMethod(Class<?> clazz) {
+        Method method = methodCache.get(clazz);
+        if (method != null) {
+            return method;
+        }
+        try {
+            method = clazz.getDeclaredMethod("getValue");
+            methodCache.put(clazz, method);
+            return method;
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+在枚举字段上添加注解:
+
+```java
+@JSONField(serializeUsing = EnumCodec.class, deserializeUsing = EnumCodec.class)
+private AgeEnum age;
+```
+
+```java
+public enum AgeEnum implements EnumValueProvider {
+  ONE(1, "一岁"),
+  TWO(2, "二岁"),
+  THREE(3, "三岁");
+
+  private int value;
+  private String desc;
+
+  AgeEnum(final int value, final String desc) {
+    this.value = value;
+    this.desc = desc;
+  }
+
+  @Override
+  public Integer getValue() {
+    return value;
+  }
+}
+```
+
 ### WebFlux
 
 上面针对的是Web MVC, **对于Webflux目前不支持这种方式**.

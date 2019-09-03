@@ -887,66 +887,6 @@ sudo apt install peek
 
 终端执行`peek`即可运行
 
-## StarUml
-
-这个一款绘图工具
-下载: ***[http://staruml.io/download](http://staruml.io/download)***
-安装依赖: ***[https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5](https://launchpad.net/ubuntu/trusty/amd64/libgcrypt11/1.5.3-2ubuntu4.5)***
-然后`dpkg`安装就好了, 如果还有依赖直接`apt install -f`修复一下就好. 
-安装好之后修改`LicenseManagerDomain.js`
-查找: 
-
-```
-dpkg -S staruml | grep LicenseManagerDomain.js
-```
-修改: 
-```
-sudo gedit /opt/staruml/www/license/node/LicenseManagerDomain.js
-```
-如下: 
-```
-(function () {
-    "use strict";
-
-    var NodeRSA = require('node-rsa');
-    
-    function validate(PK, name, product, licenseKey) {
-        var pk, decrypted;
-		return {  
-            name: "yangbingdong",  
-            product: "StarUML",  
-            licenseType: "vip",  
-            quantity: "yangbingdong.com",  
-            licenseKey: "later equals never!"  
-        };  
-        try {
-            pk = new NodeRSA(PK);
-            decrypted = pk.decrypt(licenseKey, 'utf8');
-        } catch (err) {
-            return false;
-        }
-        var terms = decrypted.trim().split("\n");
-        if (terms[0] === name && terms[1] === product) {
-            return { 
-                name: name, 
-                product: product, 
-                licenseType: terms[2],
-                quantity: terms[3],
-                licenseKey: licenseKey
-            };
-        } else {
-            return false;
-        }
-    }
-    ......
-```
-改完打开StarUml -> `Help` -> `Enter License`, 不是输入任何东西直接确定
-
-## VirtualBox
-```
-sudo apt install virtualbox
-```
-
 ## KVM
 
 KVM要求我们的CPU支持硬件虚拟化(hardware virtualization)．在终端里输入下面的命令来查看CPU是否支持硬件虚拟化: 
@@ -1131,7 +1071,9 @@ sudo apt install deepin-screenshot
 sudo apt install -y bleachbit
 ```
 
-## 多协议下载器 Aria2
+## 下载相关
+
+### 多协议下载器 Aria2
 
 > aria2: ***[https://github.com/aria2/aria2](https://github.com/aria2/aria2)***
 >
@@ -1139,7 +1081,7 @@ sudo apt install -y bleachbit
 
 一般在Linux环境中下载东西都是比较不友好的, 不支持多种协议, 方式单一, 但这款Aria2就是为了解决多协议问题而诞生的, 配合UI界面可以很方便地~~随心所欲~~地下载. 
 
-### 直接安装
+#### 直接安装
 
 ```
 sudo apt install aria2
@@ -1162,12 +1104,12 @@ sudo gedit /etc/aria2/aria2.conf
 sudo aria2c --conf-path=/etc/aria2/aria2.conf -D
 ```
 
-### GUI
+#### GUI
 
 1. ***[Uget](https://ugetdm.com/)***
 2. chrome 扩展 ***[YAAW for Chrome](https://chrome.google.com/webstore/detail/yaaw-for-chrome/dennnbdlpgjgbcjfgaohdahloollfgoc)***
 
-### 通过 Docker 搭建 Aria2 以及 AriaNg Web UI
+#### 通过 Docker 搭建 Aria2 以及 AriaNg Web UI
 
 ![](https://cdn.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
 
@@ -1175,7 +1117,7 @@ sudo aria2c --conf-path=/etc/aria2/aria2.conf -D
 
 参考 *[aria2-ariang-docker](https://github.com/wahyd4/aria2-ariang-docker)* 以及 *[aria2-ariang-x-docker-compose](https://github.com/wahyd4/aria2-ariang-x-docker-compose)*
 
-#### 配置`aria2.conf`
+##### 配置`aria2.conf`
 
 这个文件是从作者地 Github下载下来的, 主要加了代理, 而这个代理是 `sock5` 通过 `privoxy`
 
@@ -1248,7 +1190,7 @@ save-session-interval=10
 bt-tracker=udp://tracker.leechers-paradise.org:6969/announce, udp://tracker.internetwarriors.net:1337/announce, udp://tracker.opentrackr.org:1337/announce, udp://9.rarbg.to:2710/announce, udp://tracker.coppersurfer.tk:6969/announce, udp://exodus.desync.com:6969/announce, udp://explodie.org:6969/announce, http://tracker3.itzmx.com:6961/announce, udp://tracker1.itzmx.com:8080/announce, udp://tracker.tiny-vps.com:6969/announce, udp://thetracker.org:80/announce, udp://open.demonii.si:1337/announce, udp://denis.stalker.upeer.me:6969/announce, udp://bt.xxx-tracker.com:2710/announce, http://tracker4.itzmx.com:2710/announce, udp://tracker2.itzmx.com:6961/announce, udp://tracker.torrent.eu.org:451/announce, udp://tracker.port443.xyz:6969/announce, udp://tracker.cyberia.is:6969/announce, udp://open.stealth.si:80/announce
 ```
 
-#### 使用h5ai作为文件管理器
+##### 使用h5ai作为文件管理器
 
 ```
 version: '3.4'
@@ -1286,6 +1228,10 @@ services:
 
 1. 查看文件h5ai： *[http://localhost:8000](http://localhost:8000/)*
 2. AriaNg： *[http://localhost:8000/aria2/](http://localhost:8000/aria2/)* 注意地址后面一定要带`/` 
+
+### Motrix
+
+***[https://github.com/agalwood/Motrix](https://github.com/agalwood/Motrix)***
 
 ### 其他下载器
 
