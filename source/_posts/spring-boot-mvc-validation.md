@@ -614,6 +614,201 @@ public class GlobalControllerAdvisor implements ResponseBodyAdvice {
 
 ***[http://blog.didispace.com/Spring-Boot-And-Feign-Use-localdate/](http://blog.didispace.com/Spring-Boot-And-Feign-Use-localdate/)***
 
+## RequestBody 多读
+
+有时候, 我们想要在过滤器或者拦截器中记录一下请求信息, POST 请求的 body 部分需要在 Request 中读取 InputStream. 但默认情况下只能读取一次, 可以通过继承 `HttpServletRequestWrapper` 实现:
+
+```java
+@Slf4j
+public class RequestBodyCachingWrapper extends HttpServletRequestWrapper {
+
+    private byte[] body;
+
+    private BufferedReader reader;
+
+    private ServletInputStream inputStream;
+
+    public RequestBodyCachingWrapper(HttpServletRequest request) throws IOException{
+        super(request);
+        loadBody(request);
+    }
+
+    private void loadBody(HttpServletRequest request) throws IOException{
+        body = IoUtil.readBytes(request.getInputStream());
+        inputStream = new RequestCachingInputStream(body);
+    }
+
+    public byte[] getBody() {
+        return body;
+    }
+
+    @Override
+    public ServletInputStream getInputStream() throws IOException {
+        if (inputStream != null) {
+            return inputStream;
+        }
+        return super.getInputStream();
+    }
+
+    @Override
+    public BufferedReader getReader() throws IOException {
+        if (reader == null) {
+            reader = new BufferedReader(new InputStreamReader(inputStream, getCharacterEncoding()));
+        }
+        return reader;
+    }
+
+    private static class RequestCachingInputStream extends ServletInputStream {
+
+        private final ByteArrayInputStream inputStream;
+
+        public RequestCachingInputStream(byte[] bytes) {
+            inputStream = new ByteArrayInputStream(bytes);
+        }
+        @Override
+        public int read() throws IOException {
+            return inputStream.read();
+        }
+
+        @Override
+        public boolean isFinished() {
+            return inputStream.available() == 0;
+        }
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setReadListener(ReadListener readlistener) {
+        }
+
+    }
+
+}
+```
+
+Filter:
+
+```java
+public class RequestBodyCachingFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String method = request.getMethod();
+        if (!"GET".equals(method) && !"OPTIONS".equals(method)) {
+            filterChain.doFilter(new RequestBodyCachingWrapper(request), response);
+        }
+    }
+
+}
+```
+
+configuration:
+
+```java
+@Conditional(RequestBodyCachingCondition.class)
+@Bean
+public FilterRegistrationBean<RequestBodyCachingFilter> requestBodyCachingFilterFilterRegistrationBean() {
+    FilterRegistrationBean<RequestBodyCachingFilter> registrationBean = new FilterRegistrationBean<>();
+    RequestBodyCachingFilter requestBodyCachingFilter = new RequestBodyCachingFilter();
+    registrationBean.setFilter(requestBodyCachingFilter);
+    registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE - 8);
+    return registrationBean;
+}
+```
+
+获取 requestBody:
+
+```java
+public static String getRequestBody() {
+    RequestBodyCachingWrapper wrapper = WebUtils.getNativeRequest(currentRequest(), RequestBodyCachingWrapper.class);
+    if (wrapper != null) {
+        byte[] buf = wrapper.getBody();
+        if (buf.length > 0) {
+            return new String(buf);
+        }
+    }
+    return StrUtil.EMPTY;
+}
+```
+
+## Restful 性能优化
+
+在 Spring MVC 中, 通过 `@PathVariable` 注解可轻松实现 Restful 风格的请求. 但是对于这种请求, Spring MVC 不能通过 url 直接获取到对应的 `HandlerMethod`, 而是通过 for 循环一个个地匹配, 效率低下.
+
+我们可以通过重写 `RequestMappingHandlerMapping#lookupHandlerMethod` 方法, 思路是, 如果是匹配类型的 restful 请求, 其真正映射到的是 `@RequestMapping#name`, 请求时将 `name` 放在 Header 中, 查找的时候直接拿到通过 Hash 定位即可, 性能与直接匹配的效果一样.
+
+继承 `RequestMappingHandlerMapping`:
+
+```java
+public class EnhanceRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
+
+    public static final String X_INNER_ACTION = "X-Inner-Action";
+
+    private Map<String, RequestMappingInfoHandlerMethodPair> urlPairLookup;
+
+    @Override
+    protected void handlerMethodsInitialized(Map<RequestMappingInfo, HandlerMethod> handlerMethods) {
+        super.handlerMethodsInitialized(handlerMethods);
+        urlPairLookup = new HashMap<>(handlerMethods.size());
+        handlerMethods.forEach((k, v) -> {
+            Set<String> pathPatterns = getMappingPathPatterns(k);
+            if (pathPatterns.size() > 1) {
+                throw new IllegalArgumentException("Not allow multi paths");
+            }
+            String path = new ArrayList<>(pathPatterns).get(0);
+            if (getPathMatcher().isPattern(path)) {
+                if (k.getName() == null) {
+                    throw new IllegalArgumentException("Pattern path must have a name");
+                }
+                path = k.getName();
+            }
+            RequestMappingInfoHandlerMethodPair pair = buildPair(k, v);
+            urlPairLookup.put(path, pair);
+        });
+    }
+
+    @Override
+    protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) {
+        String lookupPathKey = defaultIfNull(request.getHeader(X_INNER_ACTION), lookupPath);
+        RequestMappingInfoHandlerMethodPair pair = urlPairLookup.get(lookupPathKey);
+        if (pair == null) {
+            return null;
+        }
+        request.setAttribute(BEST_MATCHING_HANDLER_ATTRIBUTE, pair.handlerMethod);
+        handleMatch(pair.requestMappingInfo, lookupPath, request);
+        return pair.handlerMethod;
+    }
+
+    private RequestMappingInfoHandlerMethodPair buildPair(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
+        return new RequestMappingInfoHandlerMethodPair(requestMappingInfo, handlerMethod);
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class RequestMappingInfoHandlerMethodPair {
+        private RequestMappingInfo requestMappingInfo;
+        private HandlerMethod handlerMethod;
+    }
+}
+```
+
+配置:
+
+```java
+@Configuration(proxyBeanMethods = false)
+public class EnhanceWebMvcConfigurationSupport extends WebMvcConfigurationSupport {
+
+    @Override
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+        return new EnhanceRequestMappingHandlerMapping();
+    }
+}
+```
+
 # Validation
 
 ## 常用注解（大部分**JSR**中已有）
