@@ -726,6 +726,26 @@ sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
 
 4. 重启即可.
 
+## 动态桌面
+
+在 Windows 中有 **Wallpaper Engine**, 收费的. 但在 Linux 中有一款开源的动态桌面软件 ***[komorebi](https://github.com/cheesecakeufo/komorebi)*** .
+
+在 ***[releases](https://github.com/cheesecakeufo/komorebi/releases)*** 页面中下载 deb 包安装即可.
+
+依赖:
+
+```
+sudo apt install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools
+```
+
+安装完后在启动器中搜索 `komorebi`, 除了看到 `komorebi` 之外还有一个 `Wallpaper Creator`, 这个是用来制作动态桌面壁纸的.
+
+之后直接打开 `komorebi` 即可, 在桌面上右键即可打开菜单进行配置.
+
+效果:
+
+![](https://cdn.yangbingdong.com/img/gnome/dynamic-desktop.gif)
+
 ## 壁纸推荐
 
 推荐几个不错的壁纸下载网站: 
