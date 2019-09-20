@@ -421,6 +421,10 @@ slowlog get [n] // n 表示返回的日志记录条数
 
 # rdb文件分析
 
+## RCT(Redis Computed Tomography)
+
+***[https://github.com/xaecbd/RCT](https://github.com/xaecbd/RCT)***
+
 ## redis-rdb-tools
 
 ***[https://github.com/sripathikrishnan/redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)***
@@ -428,6 +432,8 @@ slowlog get [n] // n 表示返回的日志记录条数
 ## rdr
 
 > ***[https://github.com/xueqiu/rdr](https://github.com/xueqiu/rdr)***
+>
+> 下载链接失效了, 可以在这里下载: ***[https://github.com/gohouse/rdr/releases](https://github.com/gohouse/rdr/releases)***
 
 首先查看Redis的dump目录设置:
 
