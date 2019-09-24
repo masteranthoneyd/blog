@@ -938,7 +938,7 @@ Pointcut匹配表达式详解可以参考: ***[https://blog.csdn.net/elim168/art
 
 如果是使用`@Around`, 则方法参数应该使用`ProceedingJoinPoint, `因为`ProceedingJoinPoint.proceed()`可获取方法返回值, 且必须返回`Object`: 
 
-```
+```java
 @Around("logHttp()")
 public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
     ...
@@ -968,7 +968,17 @@ context.registerBean(beanName, handler.getClass());
 AbstractShardingHandler<AopLogEvent> shardingBean = (AbstractShardingHandler<AopLogEvent>) context.getBean(beanName);
 ```
 
+上面的 `registerBean` 底层是用到了 `DefaultListableBeanFactory# registerBeanDefinition`, 以前的用法是这样的:
 
+```java
+BeanDefinitionBuilder beanDefinitionBuilder =
+                BeanDefinitionBuilder.genericBeanDefinition(PersonManager.class);
+        beanDefinitionBuilder.addPropertyReference("personDao", "personDao");
+        BeanDefinition personManagerBeanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        defaultListableBeanFactory.registerBeanDefinition("personManager1", personManagerBeanDefinition);
+```
+
+更多动态注册请看 ***[https://zhuanlan.zhihu.com/p/30590254](https://zhuanlan.zhihu.com/p/30590254)***
 
 # 自动配置的原理与自定义starter
 

@@ -919,3 +919,17 @@ guest.password=guest
 这是一个不错的方案, 结合 `rabbitmq_delayed_message_exchange` 插件可以很优雅地做到延迟任务.
 
 可参考: ***[延迟队列](/2019/rabbitmq-and-spring-amqp-learning/#%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97)***
+
+# 其他
+
+## XXL Job
+
+由个人开源的中心化分布式调度平台:
+
+***[http://www.xuxueli.com/xxl-job/#/](http://www.xuxueli.com/xxl-job/#/)***
+
+## Saturn
+
+唯品会基于 Elastic Job 开发的分布式任务调度平台:
+
+***[https://vipshop.github.io/Saturn/#](https://vipshop.github.io/Saturn/#)***
