@@ -19,6 +19,8 @@ tags: [Docker, Swarm]
 
 ## Harbor
 
+> 官方文档: ***[https://goharbor.io/docs/](https://goharbor.io/docs/)***
+
 ![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-arch.png)
 
 Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器, 通过添加一些企业必需的功能特性, 例如安全、标识和管理等, 扩展了开源Docker Distribution. 作为一个企业级私有Registry服务器, Harbor提供了更好的性能和安全. 提升用户使用Registry构建和运行环境传输镜像的效率. Harbor支持安装在多个Registry节点的镜像资源复制, 镜像全部保存在私有Registry中, 确保数据和知识产权在公司内部网络中管控. 另外, Harbor也提供了高级的安全特性, 诸如用户管理, 访问控制和活动审计等. 
@@ -32,85 +34,40 @@ Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器, �
 - **RESTful API** - RESTful API 提供给管理员对于Harbor更多的操控, 使得与其它管理软件集成变得更容易. 
 - **部署简单** - 提供在线和离线两种安装工具, 也可以安装到vSphere平台(OVA方式)虚拟设备. 
 
-- 集成clair进行镜像安全漏洞扫描
-
-Harbor共由七个容器组成:
-
-a.`harbor-adminserver`:harbor系统管理服务
-
-b.`harbor-db`: 由官方mysql镜像构成的数据库容器
-
-c.`harbor-jobservice`:harbor的任务管理服务
-
-d.`harbor-log`:harbor的日志收集、管理服务
-
-e.`harbor-ui`:harbor的web页面服务
-
-f.`nginx`:负责流量转发和安全验证
-
-g.`registry`:官方的Docker registry, 负责保存镜像
-
-### Condition
-
-前置条件: 
-
-1.需要`Python2.7`或以上
-
-2.Docker版本要在1.10或以上
-
-3.Docker compose版本要在1.6.0或以上
+- 集成clair进行镜像安全漏洞扫描等等
 
 ### Download
 
-[***Release页面***](https://github.com/vmware/harbor/releases)下载离线安装包（或在线也可以, 不过安装的时候很慢）
+[***Release页面***](https://github.com/goharbor/harbor/releases) 下载离线安装包（或在线也可以, 不过安装的时候很慢）
 
 ### Config
 
-解压缩之后, 目录下会生成`harbor.conf`文件, 该文件就是Harbor的配置文件. 
+解压缩之后, 目录下会生成`harbor.yml`文件, 该文件就是Harbor的配置文件, 这里只展示一部分, 后续会根据这个配置来生成 `docker-compose.yml`: 
 
 ```
-# 1. hostname设置访问地址, 可以使用ip、域名, 不可以设置为127.0.0.1或localhost
-# 2. 默认情况下, harbor使用的端口是80, 若使用自定义的端口, 除了要改docker-compose.yml文件中的配置外, 
-# 这里的hostname也要加上自定义的端口, 在docker login、push时会报错
-# hostname = ${IP_ADDR}:${PORT}
-hostname = 192.168.1.102:8888
+# 不能配置 localhost 或 127.0.0.1, 只能配置内网ip或者域名
+hostname: 172.16.8.196
 
-# 访问协议, 默认是http, 也可以设置https, 如果设置https, 则nginx ssl需要设置on
-ui_url_protocol = http
+# 默认端口是80
+http:
+  port: 8080
 
-# mysql数据库root用户默认密码root123, 实际使用时修改下
-db_password = root123
+# 登录密码, 账号为 admin
+harbor_admin_password: Harbor12345
 
-#Maximum number of job workers in job service  
-max_job_workers = 3 
+# 数据存放目录
+data_volume: /root/docker/harbor/data
 
-#The path of secretkey storage
-secretkey_path = /data
-
-# 启动Harbor后, 管理员UI登录的密码, 默认是Harbor12345
-# 若修改了此处的admin登录密码. 则登录后台时使用修改后的密码
-harbor_admin_password = Harbor12345
-
-# 认证方式, 这里支持多种认证方式, 如LADP、本次存储、数据库认证. 默认是db_auth, mysql数据库认证
-auth_mode = db_auth
-
-# 是否开启自注册
-self_registration = on
-
-# Token有效时间, 默认30分钟
-token_expiration = 30
-
-# 用户创建项目权限控制, 默认是everyone（所有人）, 也可以设置为adminonly（只能管理员）
-project_creation_restriction = everyone
+# 日志配置
+log:
+  level: info
+  local:
+    rotate_count: 5
+    rotate_size: 20M
+    location: /root/docker/harbor/data/log/harbor  # 这个要写最对路径
+    
+_version: 1.9.0
 ```
-
-harbor默认监听80端口, 我们修改为8888端口, 同时`docker-compose.yml`也需要修改`proxy`的端口
-
-![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/proxy-port.png)
-
-还可以修改仓库的存储位置: 
-
-![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-registry-data.png)
 
 ### Install
 
@@ -134,9 +91,9 @@ harbor默认监听80端口, 我们修改为8888端口, 同时`docker-compose.yml
 
 启动之后浏览器打开刚才修改的hostname
 
-![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-tools/harbor-dashboard.png)
+![](https://cdn.yangbingdong.com/img/docker-visual-management-and-orchestrate-toolsharbor-homepage.png)
 
-**帐号密码默认是** `admin/Harbor12345`, 可在配置文件`harbor.conf`中修改
+**帐号密码默认是** `admin/Harbor12345`, 可在配置文件`harbor.yml`中修改
 
 **修改配置文件之后**需要重新生成一些内置配置: 
 

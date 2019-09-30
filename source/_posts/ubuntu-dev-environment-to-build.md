@@ -701,7 +701,7 @@ Default locale: zh_CN, platform encoding: UTF-8
 OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 ```
 
-## 淘宝镜像
+## 阿里镜像
 
 ```
 <mirrors>
@@ -714,6 +714,7 @@ OS name: "linux", version: "4.4.0-67-generic", arch: "amd64", family: "unix"
 </mirrors>
 ```
 # MongoDB
+
 ## 安装
 ```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
