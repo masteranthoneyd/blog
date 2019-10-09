@@ -279,20 +279,6 @@ sudo ubuntu-drivers autoinstall  # sudo apt install nvidia-418
 
 重启后生效.
 
-# 科学上网篇
-
-## 方式一: 下载Lantern
-**如果为了更方便地科学上网, 建议下载`Lantern`** （免费版限流）
-可在github（免翻墙）找到*[开源项目](https://github.com/getlantern/lantern/)*, 拉到下面`README`下载对应版本
-
-```
-sudo dpkg -i lantern.deb
-sudo chmod -R 777 /usr/bin/lantern
-```
-
-## 方式二: 自搭建 Shadowsocks
-***[Access Blocked Sites Guide(科学上网指南)](/2017/use-vps-cross-wall-by-shadowsocks-under-ubuntu/)***
-
 # 主题美化篇
 
 推荐一个网站 ***[Gnome Look](https://www.gnome-look.org/)***, 这里面有大量的主题, 并且都是以压缩包形式的.
