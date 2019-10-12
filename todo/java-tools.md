@@ -19,3 +19,7 @@
 Github: ***[https://github.com/rholder/guava-retrying](https://github.com/rholder/guava-retrying)***
 
 使用: ***[Guava-Retry实践](https://blog.csdn.net/songhaifengshuaige/article/details/79440285)***
+
+## EasyExcel
+
+***[https://github.com/alibaba/easyexcel](https://github.com/alibaba/easyexcel)***

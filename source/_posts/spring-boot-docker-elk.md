@@ -833,6 +833,9 @@ ${maven.build.timestamp}
 
 ```
 mvn clean install
+
+# 如果由外部传入 TAG, pom.xml 中通过 ${env.DOCKER_TAG_DATE} 获取
+export DOCKER_TAG_DATE=`date '+%Y-%m-%d_%H-%M'` && mvn clean install
 ```
 
 ```
@@ -916,17 +919,29 @@ null: null
 
 ### 运行Docker
 
+#### 普通运行
+
 运行程序
 
 ```
 docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 ```
 
+#### Docker Swarm 运行
+
+`docker-compose.yml` 中的 `image` 通过 `.env` 配置, 但 通过 `docker stack` 启动并不会读取到 `.env` 的镜像变量, 但可以通过以下命令解决:
+
+```
+export $(cat .env) && docker stack deploy -c docker-compose.yml demo-stack
+```
+
 ### 添加运行时JVM参数
 
 只需要在Docker启动命令中加上`-e "JAVA_OPTS=-Xmx128m"`即可
 
-### Jib
+### 其他的Docker构建工具
+
+#### Jib
 
 > Jib 是 Google 开源的另外一款Docker打包工具.
 >
@@ -935,68 +950,87 @@ docker run --name some-server -e ACTIVE=docker -p 8080:8080 -d [IMAGE]
 pom配置:
 
 ```xml
-<project>
-  ...
-  <build>
-    <plugins>
-      ...
-      <plugin>
-        <groupId>com.google.cloud.tools</groupId>
-        <artifactId>jib-maven-plugin</artifactId>
-        <version>1.0.2</version>
-        <configuration>
-          <to>
-            <image>myimage</image>
-          </to>
-        </configuration>
-      </plugin>
-      ...
-    </plugins>
-  </build>
-  ...
-</project>
-```
-
-官方配置例子:
-
-```xml
-<configuration>
-  <from>
-    <image>openjdk:alpine</image>
-  </from>
-  <to>
-    <image>localhost:5000/my-image:built-with-jib</image>
-    <credHelper>osxkeychain</credHelper>
-    <tags>
-      <tag>tag2</tag>
-      <tag>latest</tag>
-    </tags>
-  </to>
-  <container>
-    <jvmFlags>
-      <jvmFlag>-Xms512m</jvmFlag>
-      <jvmFlag>-Xdebug</jvmFlag>
-      <jvmFlag>-Xmy:flag=jib-rules</jvmFlag>
-    </jvmFlags>
-    <mainClass>mypackage.MyApp</mainClass>
-    <args>
-      <arg>some</arg>
-      <arg>args</arg>
-    </args>
-    <ports>
-      <port>1000</port>
-      <port>2000-2003/udp</port>
-    </ports>
-    <labels>
-      <key1>value1</key1>
-      <key2>value2</key2>
-    </labels>
-    <format>OCI</format>
-  </container>
-</configuration>
+<plugin>
+    <groupId>com.google.cloud.tools</groupId>
+    <artifactId>jib-maven-plugin</artifactId>
+    <version>1.6.1</version>
+    <configuration>
+        <!--from节点用来设置镜像的基础镜像，相当于Docerkfile中的FROM关键字-->
+        <from>
+            <!--使用openjdk官方镜像，tag是8-jdk-stretch，表示镜像的操作系统是debian9,装好了jdk8-->
+            <!--<image>gcr.io/distroless/java:8</image>-->
+            <image>yangbingdong/docker-oraclejdk8:latest</image>
+        </from>
+        <to>
+            <!--镜像名称和tag，使用了mvn内置变量${project.version}，表示当前工程的version-->
+            <!--suppress MavenModelInspection, MybatisMapperXmlInspection -->
+            <image>${docker.registry.url}/${docker.registry.name}/${project.artifactId}:${env.DOCKER_TAG_DATE}</image>
+            <auth>
+                <username>admin</username>
+                <password>Harbor12345</password>
+            </auth>
+        </to>
+        <!--容器相关的属性-->
+        <container>
+            <!--jvm内存参数-->
+            <jvmFlags>
+                <jvmFlag>-Xmx1g</jvmFlag>
+                <!--suppress MavenModelInspection, MybatisMapperXmlInspection -->
+                <jvmFlag>-Dspring.profiles.active=${ACTIVE:-docker}</jvmFlag>
+            </jvmFlags>
+            <!--要暴露的端口-->
+            <ports>
+                <port>8080</port>
+            </ports>
+            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+            <format>OCI</format>
+        </container>
+        <allowInsecureRegistries>true</allowInsecureRegistries>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>compile</phase>
+            <goals>
+                <!--suppress MybatisMapperXmlInspection -->
+                <goal>dockerBuild</goal>
+                <!--<goal>build</goal>-->
+            </goals>
+        </execution>
+    </executions>
+</plugin>
 ```
 
 更多配置请看官方文档.
+
+#### Dockerfile Maven
+
+这是 spotify 在 开源 `docker-maven-plugin` 之后的又一款插件, 用法大概如下:
+
+```xml
+<plugin>
+    <groupId>com.spotify</groupId>
+    <artifactId>dockerfile-maven-plugin</artifactId>
+    <version>1.4.12</version>
+    <executions>
+        <execution>
+            <id>default</id>
+            <phase>package</phase>
+            <goals>
+                <goal>build</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <repository>${docker.registry.url}/${docker.registry.name}</repository>
+        <!--suppress MavenModelInspection -->
+        <tag>${env.DOCKER_TAG_DATE}</tag>
+        <contextDirectory>${dockerfile.compiled.position}</contextDirectory>
+        <dockerfile>${dockerfile.compiled.position}/Dockerfile</dockerfile>
+    </configuration>
+</plugin>
+```
+
+感觉灵活性没有 `docker-maven-plugin` 好.
 
 ## Docker Swarm环境下获取ClientIp
 
