@@ -1006,30 +1006,6 @@ sudo apt install google-chrome-stable
 | ***[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)*** | 油猴, 脚本网站: *[https://greasyfork.org/zh-CN](https://greasyfork.org/zh-CN)*, *[https://openuserjs.org/](https://openuserjs.org/)* |
 | ***[CrxMouse Chrome™ Gestures](https://chrome.google.com/webstore/detail/crxmouse-chrome-gestures/jlgkpaicikihijadgifklkbpdajbkhjo)*** | 高度可自定义的鼠标手势, 超级拖拽, 鼠标滚轮手势, 遥感手势, 提升工作效率 |
 
-## XMind 8 Crack
-
-### Setup
-
-一款思维导图软件, 前往 *[XMind官网](http://www.xmindchina.net/xiazai.html)* 下载压缩包.
-
-解压后先执行一下解压包根目录下的`setup.sh`: 
-
-```
-sudo sh setup.sh
-```
-
-### Crack
-
-* 将`XMindCrack.jar`复制到根目录的`plugins`文件中
-
-
-* 以文本格式打开根目录中 `XMind.ini`
-* 在最后一行添加`-javaagent:../plugins/XMindCrack.jar`
-* 禁止XMind访问网络: 在host文件中添加`127.0.0.1 www.xmind.net`, 然后重启网络`sudo /etc/init.d/networking restart`
-* 打开XMind输入序列号
-
-**`XMindCrack.jar`**与**序列号**如果有需要可以私聊博主. 
-
 ## 截图
 
 ### Shutter
@@ -1045,7 +1021,7 @@ sudo apt install shutter
 名字随便起, 命令: `shutter -s`
 点击确定, 再点禁用, 键盘按下`ctrl+alt+a`, 完成设置
 
-### 编辑按钮变成程灰色解决方法
+#### 编辑按钮变成程灰色解决方法
 
 需要3个deb包: 
 
@@ -1298,6 +1274,21 @@ sudo apt install -y timeshift
 ```
 
 ![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
+
+## 抓包
+
+### Charles
+
+> 官网下载地址: ***[https://www.charlesproxy.com/download/](https://www.charlesproxy.com/download/)***
+
+apt 安装:
+
+```bash
+wget -q -O - https://www.charlesproxy.com/packages/apt/PublicKey | sudo apt-key add 
+sudo sh -c 'echo deb https://www.charlesproxy.com/packages/apt/ charles-proxy main > /etc/apt/sources.list.d/charles.list'
+sudo apt update
+sudo apt install -y charles-proxy
+```
 
 ## 硬件信息
 

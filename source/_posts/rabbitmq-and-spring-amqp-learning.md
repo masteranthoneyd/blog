@@ -244,6 +244,63 @@ Binding bindingHeadersQueue3(Queue headersQueue3, HeadersExchange headersExchang
 
 > spring-amqp中的recoveryInterval默认值是5000(即5秒)
 
+# ListenerContainer线程池配置
+
+## Spring AMQP
+
+Spring Boot 的相关配置在 `RabbitAutoConfiguration` -> `RabbitAnnotationDrivenConfiguration`.
+
+ListernContainer的线程池可以配置在 `SimpleRabbitListenerContainerFactory` 中:
+
+```java
+@Bean(name = "rabbitListenerContainerFactory")
+public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(
+        SimpleRabbitListenerContainerFactoryConfigurer configurer,
+        ConnectionFactory connectionFactory) {
+    SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.setCorePoolSize(16);
+    taskExecutor.setMaxPoolSize(16);
+    taskExecutor.setQueueCapacity(500);
+    taskExecutor.setKeepAliveSeconds(60);
+    taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+    taskExecutor.setThreadNamePrefix("rabbitExecutor-");
+    taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    taskExecutor.initialize();
+    factory.setTaskExecutor(taskExecutor);
+    configurer.configure(factory, connectionFactory);
+    return factory;
+}
+```
+
+## Spring Cloud Stream
+
+对于 Spring Cloud Stream, 可以实现 `ListenerContainerCustomizer` 接口定制化配置:
+
+```java
+public class CustomListenerContainerCustomizer implements ListenerContainerCustomizer {
+
+	@Override
+	public void configure(Object container, String destinationName, String group) {
+		if (container instanceof SimpleMessageListenerContainer) {
+			if (destinationName.equals(MEIYA_QUEUE_ANALIFEBANK_QUEUE)) {
+				SimpleMessageListenerContainer simpleMessageListenerContainer = (SimpleMessageListenerContainer) container;
+                ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+                taskExecutor.setCorePoolSize(16);
+                taskExecutor.setMaxPoolSize(16);
+                taskExecutor.setQueueCapacity(500);
+                taskExecutor.setKeepAliveSeconds(60);
+                taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+                taskExecutor.setThreadNamePrefix("rabbitExecutor-");
+                taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+                taskExecutor.initialize();
+                simpleMessageListenerContainer.setTaskExecutor(taskExecutor);
+			}
+		}
+	}
+}
+```
+
 # 持久化
 
 开启消息持久化可在RabbitMQ重启后不丢失消息.
