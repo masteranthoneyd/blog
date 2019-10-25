@@ -399,3 +399,57 @@ public class BlockedQueue<T>{
 }
 ```
 
+## Java 线程
+
+在 Java 领域，实现并发程序的主要手段就是多线程。线程是操作系统里的一个概念，虽然各种不同的开发语言如 Java、C# 等都对其进行了封装，但是万变不离操作系统。Java 语言里的线程本质上就是操作系统的线程，它们是一一对应的。
+
+通用的线程生命周期:
+
+![](https://cdn.yangbingdong.com/img/concurrent/general-thread-module.png)
+
+Java 中线程的生命周期(对应 Thread.State 枚举类):
+
+![](https://cdn.yangbingdong.com/img/concurrent/java-thread-module.png)
+
+* RUNNABLE 与 BLOCKED 的状态转换: 只有一种场景会触发这种转换，就是线程等待 synchronized 的隐式锁。
+* RUNNABLE 与 WAITING 的状态转换(三种场景):
+  * 第一种场景，获得 `synchronized` 隐式锁的线程，调用无参数的 Object.wait() 方法；
+  * 第二种场景，调用无参数的 `Thread.join()` 方法；
+  * 第三种场景，调用 `LockSupport.park()` 方法。
+* RUNNABLE 与 TIMED_WAITING 的状态转换(五种场景):
+  * 调用**带超时参数**的 `Thread.sleep(long millis)` 方法；
+  * 获得 synchronized 隐式锁的线程，调用**带超时参数**的 `Object.wait(long timeout)` 方法；
+  * 调用**带超时参数**的 `Thread.join(long millis)` 方法；
+  * 调用**带超时参数**的 `LockSupport.parkNanos(Object blocker, long deadline)` 方法；
+  * 调用**带超时参数**的 `LockSupport.parkUntil(long deadline)` 方法。
+* 从 NEW 到 RUNNABLE 状态: 调用了 `Thread.start()` 实例方法.
+* 从 RUNNABLE 到 TERMINATED 状态: 
+  * `run()` 方法跑完;
+  * 程序异常退出终止;
+  * 调用 `interrupt()` 抛出 throws InterruptedException 异常。
+
+**stop() 和 interrupt() 方法的主要区别**:
+
+`stop()` 方法会真的**杀死**线程，不给线程喘息的机会，如果线程持有 `ReentrantLock` 锁，被 `stop()` 的线程并不会自动调用 `ReentrantLock` 的 `unlock()` 去释放锁，那其他线程就再也没机会获得 `ReentrantLock` 锁，这实在是太危险了。所以该方法就不建议使用了，类似的方法还有 `suspend()` 和 `resume()` 方法，这两个方法同样也都不建议使用了.
+
+而 interrupt 是一个状态, 当线程 A 处于 WAITING、TIMED_WAITING 状态时，如果其他线程调用线程 A 的 `interrupt()` 方法，会使线程 A 返回到 RUNNABLE 状态，同时线程 A 的代码会触发 `InterruptedException` 异常。上面我们提到转换到 WAITING、TIMED_WAITING 状态的触发条件，都是调用了类似 `wait()`、`join()`、`sleep()` 这样的方法，我们看这些方法的签名，发现都会 `throws InterruptedException` 这个异常。这个异常的触发条件就是：其他线程调用了该线程的 `interrupt()` 方法。
+
+### 创建多少线程才合适
+
+多线程的本质就是提高 CPU 以及 IO 的利用率, 但是对于设置多少线程, 对于不同的场景计算方式不一样.
+
+对于 **CPU 密集型**的计算场景，理论上“线程的数量 =CPU 核数”就是最合适的。不过在工程上，线程的数量一般会设置为“**CPU 核数 +1**”，这样的话，当线程因为偶尔的内存页失效或其他原因导致阻塞时，这个额外的线程可以顶上，从而保证 CPU 的利用率。
+
+对于 **IO 密集型**的场景, 最佳线程数 = CPU 核数 * [ 1 +（I/O 耗时 / CPU 耗时）].
+
+### 为什么局部变量是线程安全的
+
+CPU 去哪里找到调用方法的参数和返回地址: 通过 CPU 的**堆栈寄存器**, CPU 支持一种栈结构，就像手枪的弹夹，先入后出。因为这个栈是和方法调用相关的，因此经常被称为**调用栈**。
+
+每个方法在调用栈里都有自己的独立空间，称为**栈帧**，每个栈帧里都有对应方法需要的参数和返回地址。当**调用**方法时，会创建新的栈帧，并**压入**调用栈；当方法**返回**时，对应的栈帧就会被自动**弹出**。也就是说，**栈帧和方法是同生共死的**。
+
+局部变量的**作用域是方法内部**, 而方法与调用栈共存亡, 所以**局部变量就是放到了调用栈里**.
+
+![](https://cdn.yangbingdong.com/img/concurrent/method-stack.png)
+
+**调用栈与线程的关系**: 每个线程都有自己独立的调用栈. 因为每个线程都有自己的调用栈，局部变量保存在线程各自的调用栈里面，**不会共享**，所以自然也就没有并发问题。没有共享，就没有伤害。
