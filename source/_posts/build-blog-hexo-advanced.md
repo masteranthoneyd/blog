@@ -34,7 +34,7 @@ mob_share:
 ```
 
 Step3、在`next/layout/_partials/share/`里面添加`mob_share.swig`: 
-```
+```html
 <!--MOB SHARE BEGIN-->
 <div class="-hoofoo-share-title">分享到: </div>
 <div class="-hoofoo-share-buttons">
@@ -73,7 +73,7 @@ Step3、在`next/layout/_partials/share/`里面添加`mob_share.swig`:
 ```
 
 Step4、在`next/layout/post.swig`中添加条件分支: 
-```
+```stylus
 {% if theme.jiathis %}
       {% include '_partials/share/jiathis.swig' %}
     {% elseif theme.baidushare %}
@@ -88,7 +88,7 @@ Step4、在`next/layout/post.swig`中添加条件分支:
 ```
 
 Step5、在`next/source/css/_common/components/third-party/`里添加样式文件`mob_share.styl`: 
-```
+```css
 .-hoofoo-share-buttons{
     display: inline-block;
 }
@@ -178,7 +178,7 @@ Step6、同一目录下的 `third-party.styl` 中添加:
 
 Step7、在`next/layout/_scripts/third-party/`里添加脚本文件`mob_share.swig`: 
 
-```
+```html
 {% if theme.mob_share.enable %}
 <script type="text/javascript">
     //微信二维码点击背景关闭
@@ -196,12 +196,12 @@ Step8、在`next/layout/_layout.swig`的`body`标签结束前添加:
 
 ## 添加顶部加载条
 打开`/themes/next/layout/_partials/head.swig`文件, 添加如下代码: 
-```
+```html
 <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
 <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
 ```
 但是, 默认的是粉色的, 要改变颜色可以在`/themes/next/layout/_partials/head.swig`文件中添加如下代码（接在刚才link的后面）
-```
+```html
 <style>
     .pace .pace-progress {
         background: #ff009e; /*进度条颜色*/
@@ -219,7 +219,7 @@ Step8、在`next/layout/_layout.swig`的`body`标签结束前添加:
 
 ## 文章加密访问
 打开`themes->next->layout->_partials->head.swig`文件,插入这样一段代码: 
-```
+```html
 <script>
     (function(){
         if('{{ page.password }}'){
@@ -251,13 +251,13 @@ password: 123456
 既然Disqus已被墙, 那么为了对没有梯子的同学标示友好, 我们可以选择点击加载Disqus评论的方式, 这个问题貌似也得到了主题作者的关注-> ***(NexT5.2.0)[https://github.com/iissnan/hexo-theme-next/milestone/7]***
 具体做法如下: 
 打开`themes/next/layout/_partials/comments.swig`, 在文件内容 `<div id="disqus_thread">`前面加入下面内容: 
-```
+```html
 <div style="text-align:center;">
   <button class="btn" id="load-disqus" onclick="disqus.load();">加载 Disqus 评论</button>
 </div>
 ```
 再打开`themes/next/layout/_scripts/third-party/comments/disqus.swig`, 需要替换原本的 Disqus 的加载的内容, 如果希望显示评论数量, 就保留 run_disqus_script('count.js') 这一行, 这样页面载入时还会加载 disqus 的资源: 
-```
+```html
 run_disqus_script('count.js');
 {% if page.comments %}
   run_disqus_script('embed.js');
@@ -483,7 +483,7 @@ $code-border-radius             = 4px
 ```
 ## 文章末尾追加版权信息
 找到`themes/next/layout/_macro/post.swig`, 在`footer`之前添加如下代码(添加之前确保已添加***[样式](#%E5%A5%BD%E7%8E%A9%E7%9A%84%E6%A0%B7%E5%BC%8F)***): 
-```
+```html
 <div>
 	    <p id="div-border-left-red">
 	   <b>本文基于<a target="_blank" title="Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)" href="http://creativecommons.org/licenses/by-sa/4.0/"> 知识共享署名-相同方式共享 4.0 </a>国际许可协议发布</b><br/>
@@ -502,7 +502,7 @@ $code-border-radius             = 4px
 
 ## 添加热度
 在`/themes/hexo-theme-next/layout/_macro/post.swig`里面的下面的位置加上如下代码: 
-```
+```html
 {% if post.categories and post.categories.length %}
         <span class="post-category" >
         </span>
@@ -534,7 +534,7 @@ $code-border-radius             = 4px
 
 ## 把侧边栏头像变成圆形, 并且鼠标停留在上面发生旋转效果
 ﻿修改`themes\next\source\css\_common\components\sidebar\sidebar-author.styl`: 
-```
+```css
 .site-author-image {
 
   display: block;
@@ -568,7 +568,7 @@ $code-border-radius             = 4px
 
 ## 修改链接文字样式
 打开`themes\next\source\css\_common\components\post\post.styl`添加以下代码: 
-```
+```csss
 .post-body p a{
 
  color: #0593d3;
@@ -583,7 +583,8 @@ $code-border-radius             = 4px
 ```
 
 `themes/next/source/css/_common/components/post/post-title.styl`修改为: 
-```
+
+```stylus
 .posts-expand .post-title-link {
 
   display: inline-block;
@@ -598,7 +599,7 @@ $code-border-radius             = 4px
 
 ## 为next主题的主页文章添加阴影效果
 打开`themes/next/source/css/_custom/custom.styl`文件添加: 
-```
+```css
  .post {
    margin-top: 60px;
    margin-bottom: 60px;
@@ -625,7 +626,7 @@ $code-border-radius             = 4px
 
 eg :
 
-```
+```html
 <script type="text/javascript" color="255,132,0" opacity='0.6' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
 ```
 
@@ -634,7 +635,7 @@ eg :
 ### 如何添加?
 #### 修改代码
 打开`next/layout/_layout.swig`, 在`</body>`之前添加如下代码: 
-```
+```html
 {% if theme.canvas_nest %}
 
 <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
@@ -653,7 +654,26 @@ canvas_nest: true
 ```
 至此, 大功告成, 运行hexo clean 和 hexo g hexo s之后就可以看到效果了
 
+## 鼠标点击爆炸特效
+
+![](https://cdn.yangbingdong.com/img/build-hexo/hexo-next-click-boom.png)
+
+在 `themes/next/source/js/src` 新建js文件 `fireworks.js`:
+
+```js
+"use strict";function updateCoords(e){pointerX=(e.clientX||e.touches[0].clientX)-canvasEl.getBoundingClientRect().left,pointerY=e.clientY||e.touches[0].clientY-canvasEl.getBoundingClientRect().top}function setParticuleDirection(e){var t=anime.random(0,360)*Math.PI/180,a=anime.random(50,180),n=[-1,1][anime.random(0,1)]*a;return{x:e.x+n*Math.cos(t),y:e.y+n*Math.sin(t)}}function createParticule(e,t){var a={};return a.x=e,a.y=t,a.color=colors[anime.random(0,colors.length-1)],a.radius=anime.random(16,32),a.endPos=setParticuleDirection(a),a.draw=function(){ctx.beginPath(),ctx.arc(a.x,a.y,a.radius,0,2*Math.PI,!0),ctx.fillStyle=a.color,ctx.fill()},a}function createCircle(e,t){var a={};return a.x=e,a.y=t,a.color="#F00",a.radius=0.1,a.alpha=0.5,a.lineWidth=6,a.draw=function(){ctx.globalAlpha=a.alpha,ctx.beginPath(),ctx.arc(a.x,a.y,a.radius,0,2*Math.PI,!0),ctx.lineWidth=a.lineWidth,ctx.strokeStyle=a.color,ctx.stroke(),ctx.globalAlpha=1},a}function renderParticule(e){for(var t=0;t<e.animatables.length;t++){e.animatables[t].target.draw()}}function animateParticules(e,t){for(var a=createCircle(e,t),n=[],i=0;i<numberOfParticules;i++){n.push(createParticule(e,t))}anime.timeline().add({targets:n,x:function(e){return e.endPos.x},y:function(e){return e.endPos.y},radius:0.1,duration:anime.random(1200,1800),easing:"easeOutExpo",update:renderParticule}).add({targets:a,radius:anime.random(80,160),lineWidth:0,alpha:{value:0,easing:"linear",duration:anime.random(600,800)},duration:anime.random(1200,1800),easing:"easeOutExpo",update:renderParticule,offset:0})}function debounce(e,t){var a;return function(){var n=this,i=arguments;clearTimeout(a),a=setTimeout(function(){e.apply(n,i)},t)}}var canvasEl=document.querySelector(".fireworks");if(canvasEl){var ctx=canvasEl.getContext("2d"),numberOfParticules=30,pointerX=0,pointerY=0,tap="mousedown",colors=["#FF1461","#18FF92","#5A87FF","#FBF38C"],setCanvasSize=debounce(function(){canvasEl.width=2*window.innerWidth,canvasEl.height=2*window.innerHeight,canvasEl.style.width=window.innerWidth+"px",canvasEl.style.height=window.innerHeight+"px",canvasEl.getContext("2d").scale(2,2)},500),render=anime({duration:1/0,update:function(){ctx.clearRect(0,0,canvasEl.width,canvasEl.height)}});document.addEventListener(tap,function(e){"sidebar"!==e.target.id&&"toggle-sidebar"!==e.target.id&&"A"!==e.target.nodeName&&"IMG"!==e.target.nodeName&&(render.play(),updateCoords(e),animateParticules(pointerX,pointerY))},!1),setCanvasSize(),window.addEventListener("resize",setCanvasSize,!1)}"use strict";function updateCoords(e){pointerX=(e.clientX||e.touches[0].clientX)-canvasEl.getBoundingClientRect().left,pointerY=e.clientY||e.touches[0].clientY-canvasEl.getBoundingClientRect().top}function setParticuleDirection(e){var t=anime.random(0,360)*Math.PI/180,a=anime.random(50,180),n=[-1,1][anime.random(0,1)]*a;return{x:e.x+n*Math.cos(t),y:e.y+n*Math.sin(t)}}function createParticule(e,t){var a={};return a.x=e,a.y=t,a.color=colors[anime.random(0,colors.length-1)],a.radius=anime.random(16,32),a.endPos=setParticuleDirection(a),a.draw=function(){ctx.beginPath(),ctx.arc(a.x,a.y,a.radius,0,2*Math.PI,!0),ctx.fillStyle=a.color,ctx.fill()},a}function createCircle(e,t){var a={};return a.x=e,a.y=t,a.color="#F00",a.radius=0.1,a.alpha=0.5,a.lineWidth=6,a.draw=function(){ctx.globalAlpha=a.alpha,ctx.beginPath(),ctx.arc(a.x,a.y,a.radius,0,2*Math.PI,!0),ctx.lineWidth=a.lineWidth,ctx.strokeStyle=a.color,ctx.stroke(),ctx.globalAlpha=1},a}function renderParticule(e){for(var t=0;t<e.animatables.length;t++){e.animatables[t].target.draw()}}function animateParticules(e,t){for(var a=createCircle(e,t),n=[],i=0;i<numberOfParticules;i++){n.push(createParticule(e,t))}anime.timeline().add({targets:n,x:function(e){return e.endPos.x},y:function(e){return e.endPos.y},radius:0.1,duration:anime.random(1200,1800),easing:"easeOutExpo",update:renderParticule}).add({targets:a,radius:anime.random(80,160),lineWidth:0,alpha:{value:0,easing:"linear",duration:anime.random(600,800)},duration:anime.random(1200,1800),easing:"easeOutExpo",update:renderParticule,offset:0})}function debounce(e,t){var a;return function(){var n=this,i=arguments;clearTimeout(a),a=setTimeout(function(){e.apply(n,i)},t)}}var canvasEl=document.querySelector(".fireworks");if(canvasEl){var ctx=canvasEl.getContext("2d"),numberOfParticules=30,pointerX=0,pointerY=0,tap="mousedown",colors=["#FF1461","#18FF92","#5A87FF","#FBF38C"],setCanvasSize=debounce(function(){canvasEl.width=2*window.innerWidth,canvasEl.height=2*window.innerHeight,canvasEl.style.width=window.innerWidth+"px",canvasEl.style.height=window.innerHeight+"px",canvasEl.getContext("2d").scale(2,2)},500),render=anime({duration:1/0,update:function(){ctx.clearRect(0,0,canvasEl.width,canvasEl.height)}});document.addEventListener(tap,function(e){"sidebar"!==e.target.id&&"toggle-sidebar"!==e.target.id&&"A"!==e.target.nodeName&&"IMG"!==e.target.nodeName&&(render.play(),updateCoords(e),animateParticules(pointerX,pointerY))},!1),setCanvasSize(),window.addEventListener("resize",setCanvasSize,!1)};
+```
+
+打开`themes/next/layout/_layout.swig`,在`</body>`上面写下如下代码:
+
+```html
+<canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+<script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+<script type="text/javascript" src="/js/src/fireworks.js"></script>
+```
+
 ## 添加音乐
+
 去往*[网易云音乐](http://music.163.com/)*搜索喜欢的音乐, 点击生成外链播放器, 复制代码直接放到博文末尾即可, `height`设为0可隐藏播放器, 但仍然可以播放音乐, `auto`设成0可手动播放, 默认是1自动播放, 可把代码放到`themes/next/layout/_custom/sidebar.swig`文件里, 播放器会显示在站点预览中
 
 ## 添加注脚
@@ -704,7 +724,7 @@ npm install hexo-wordcount --save
 
 ### 修改post.swig模板
 找到`themes\next\layout\_macro\post.swig`并打开插入以下代码: 
-```
+```html
 {# LeanCould PageView #}
          {% if theme.leancloud_visitors.enable %}
             <span id="{{ url_for(post.path) }}" class="leancloud_visitors" data-flag-title="{{ post.title }}">
@@ -777,7 +797,7 @@ npm install --save live2d-widget-model-wanko
 
 **站点配置**添加: 
 
-```
+```yaml
 # hexo-helper-live2d配置, 参考https://github.com/EYHN/hexo-helper-live2d/blob/master/README.zh-CN.md
 live2d:
   enable: true
@@ -865,7 +885,7 @@ show_date_time();
 
 `themes/next/source/js/src`下创建`dytitle.js`: 
 
-```
+```js
 var OriginTitile = document.title;
 var titleTime;
 document.addEventListener('visibilitychange', function () {
@@ -886,7 +906,7 @@ document.addEventListener('visibilitychange', function () {
 
 修改`themes/next/layout/layout.swing`,在 `</body>` 之前添加: :
 
-```
+```css
 <script type="text/javascript" src="/js/src/dytitle.js"></script>
 ```
 ## 修改文章底部的那个带#号的标签
@@ -904,7 +924,7 @@ document.addEventListener('visibilitychange', function () {
 
 ## 添加到样式文件
 打开`themes/next/source/css/_custom/custom.styl`, 把调试好的样式加进去, 保存后`Ctrl+F5`就能看到效果了, 前提是在本地运行的, 下面列出博主的一些自定义样式: 
-```
+```css
 // Custom styles.
 // 页面头部背景
 .header {  background:url(https://cdn.yangbingdong.com/img/header/header_background.jpg);}
@@ -1032,7 +1052,7 @@ body {
 
 ## 好玩的样式
 先在`themes/next/source/css/_custom/custom.styl`中添加以下样式: 
-```
+```css
 // 下载样式
 a#download {
 display: inline-block;
@@ -1259,14 +1279,14 @@ border-top-color: #9954bb;
 **用法如下**: 
 ### 文字增加背景色块
 <span id="inline-blue">站点配置文件</span> , <span id="inline-purple">主题配置文件</span>
-```
+```html
 <span id="inline-blue">站点配置文件</span>, 
 <span id="inline-purple">主题配置文件</span>
 ```
 ### 引用边框变色
 <p id="div-border-left-red">如果没有安装成功, 那可能就是墙的原因. 建议下载 `Node.js` 直接安装. </p>
 <p id="div-border-top-blue">关于更多基本操作和基础知识, 请查阅 [Hexo](https://hexo.io/zh-cn/) 与 [NexT](http://theme-next.iissnan.com/) 官方文档.</p>
-```
+```html
 <p id="div-border-left-red">如果没有安装成功, 那可能就是墙的原因. 建议下载 `Node.js` 直接安装. </p>
 <p id="div-border-top-blue">关于更多基本操作和基础知识, 请查阅 [Hexo](https://hexo.io/zh-cn/) 与 [NexT](http://theme-next.iissnan.com/) 官方文档.</p>
 ```
@@ -1298,7 +1318,7 @@ border-top-color: #9954bb;
 ### 图形边框效果
 <a id="download" href="https://git-scm.com/download/win"><i class="fa fa-download"></i><span> Download Now</span>
 </a>
-```
+```html
 <a id="download" href="https://git-scm.com/download/win"><i class="fa fa-download"></i><span> Download Now</span>
 </a>
 ```
@@ -1354,7 +1374,7 @@ highlight:
 
 顶部的文字样式: 
 
-```
+```css
 // 文章```代码块顶部样式
 .highlight figcaption {
     margin: 0em;
@@ -1448,7 +1468,7 @@ npm install hexo-generator-baidu-sitemap --save
 ```
 
 在`站点配置文件`中添加如下代码. 
-```
+```yaml
 # hexo sitemap
 sitemap:
   path: sitemap.xml
@@ -1469,7 +1489,7 @@ baidusitemap:
 ﻿npm install hexo-baidu-url-submit --save
 ```
 在根目录下, 把以下内容配置到`站点配置文件`中:
-```
+```yml
 baidu_url_submit:
   count: 3 ## 比如3, 代表提交最新的三个链接
   host: www.henvyluk.com ## 在百度站长平台中注册的域名
@@ -1485,7 +1505,7 @@ root: /
 permalink: :year/:month/:day/:title/
 ```
 接下来添加一个新的`deploy`的类型: 
-```
+```yml
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
@@ -1548,7 +1568,7 @@ hexo默认的文章链接形式为`domain/year/month/day/postname`, 默认就是
 npm install hexo-autonofollow --save
 ```
 编辑**站点配置文件**, 新增以下内容到任意位置: 
-```
+```yml
 nofollow:
   enable: true
   exclude:
@@ -1667,7 +1687,7 @@ npm install hexo-generator-category --save
 npm install hexo-generator-tag --save
 ```
 站点配置文件: 
-```
+```yml
 index_generator:
   per_page: 6
 
@@ -1693,7 +1713,7 @@ hexo server -d
 open http://localhost:4000/admin/
 ```
 站点配置文件: 
-```
+```yml
 admin:
   qiniuCfg:
       imageslim: true  # 启动图片瘦身, 仅华东区bucket可以使用

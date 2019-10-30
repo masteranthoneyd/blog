@@ -76,10 +76,17 @@
   {% include '_scripts/baidu-push.swig' %}
   {% include '_components/algolia-search/assets.swig' %}
 
-  <script type="text/javascript" color="255,0,204" opacity='0.5' zIndex="-2" count="80" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+  <!-- 背景特效 -->
+  <script type="text/javascript" color="255,0,204" opacity='0.5' zIndex="-2" count="40" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
 
 
 {% include '_scripts/third-party/mob_share.swig' %}
+
+<!-- 点击爆炸特效 -->
+<canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+<script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+<script type="text/javascript" src="/js/src/fireworks.js"></script>
+
 <!--卖萌-->
 <script type="text/javascript" src="/js/src/dytitle.js"></script>
 </body>
