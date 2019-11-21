@@ -567,9 +567,59 @@ service ssh restart
 > ***[https://github.com/Jrohy/multi-v2ray](https://github.com/Jrohy/multi-v2ray)***
 > ***[https://github.com/233boy/v2ray](https://github.com/233boy/v2ray)***
 
-docker-compose:
+## 服务端
 
+`docker-compose.yml`:
+
+```yaml
+version: '3.7'
+services:
+  v2ray:
+    image: v2ray/official
+    container_name: v2ray
+    restart: always
+    ports:
+      - "443:443"
+
+    volumes:
+      - ./config.json:/etc/v2ray/config.json
+    command: v2ray -config=/etc/v2ray/config.json
 ```
+
+`config.json`:
+
+```json
+{
+    "inbounds":[
+        {
+            "port":443,
+            "protocol":"vmess",
+            "settings":{
+                "clients":[
+                    {
+                        "id":"b371a709-f63c-42d7-88bf-2a67cff72267",
+                        "alterId":64
+                    }
+                ]
+            }
+        }
+    ],
+    "outbounds":[
+        {
+            "protocol":"freedom",
+            "settings":{
+
+            }
+        }
+    ]
+}
+```
+
+## 客户端
+
+`docker-compose.yml`:
+
+```yaml
 version: '3.7'
 services:
   v2ray:
@@ -578,11 +628,58 @@ services:
     restart: always
     ports:
       - "1080:1080"
-
+      - "1080:1080/udp"
     volumes:
-      - ./config.json:/etc/v2ray/config.json
-    command: v2ray -config=/etc/v2ray/config.json
+      - ./client-config.json:/etc/v2ray/config.json
+    command: ["v2ray", "-config=/etc/v2ray/config.json"]
 ```
+
+`client-config.json`:
+
+```json
+{
+    "inbounds":[
+        {
+            "port":1080,
+            "protocol":"socks",
+            "sniffing":{
+                "enabled":true,
+                "destOverride":[
+                    "http",
+                    "tls"
+                ]
+            },
+            "settings":{
+                "auth":"noauth"
+            }
+        }
+    ],
+    "outbounds":[
+        {
+            "protocol":"vmess",
+            "settings":{
+                "vnext":[
+                    {
+                        "address":"123.456.678.0",
+                        "port":443,
+                        "users":[
+                            {
+                                "id":"b371a709-f63c-42d7-88bf-2a67cff72267",
+                                "alterId":64
+                            }
+                        ]
+                    }
+                ],
+                "mux":{
+                    "enabled":true
+                }
+            }
+        }
+    ]
+}
+```
+
+
 
 # VPS Security
 

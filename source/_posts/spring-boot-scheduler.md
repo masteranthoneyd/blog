@@ -920,6 +920,36 @@ guest.password=guest
 
 可参考: ***[延迟队列](/2019/rabbitmq-and-spring-amqp-learning/#%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97)***
 
+# 基于 Redis Sorted Set 轮训的延迟任务
+
+1. 将关键数据以及**执行时间戳**分别作为 `Sorted Set` 的 `member` 和 `score` 添加到 `Sorted Set` 中.
+2. 通过周期任务使用 `ZRANGEBYSCORE` 命令读取指定数量的数据并删除 `Sorted Set` 中对应的数据.
+
+对于第二部需要使用 lua 保证原子性:
+
+```lua
+local zset_key = KEYS[1]
+local min_score = ARGV[1]
+local max_score = ARGV[2]
+local offset = ARGV[3]
+local limit = ARGV[4]
+-- TYPE命令的返回结果是{'ok':'zset'}这样子,这里利用next做一轮迭代
+local status, type = next(redis.call('TYPE', zset_key))
+if status ~= nil and status == 'ok' then
+    if type == 'zset' then
+        local list = redis.call('ZRANGEBYSCORE', zset_key, max_score, min_score, 'LIMIT', offset, limit)
+        if list ~= nil and #list > 0 then
+            -- unpack函数能把table转化为可变参数
+            redis.call('ZREM', zset_key, unpack(list))
+            return list
+        end
+    end
+end
+return nil
+```
+
+`ZRANGEBYSCORE` 的时间复杂度为 `O(log(N)+M)`, 为了避免带来性能问题, 我们可以对key取模进行哈希处理.
+
 # 其他
 
 ## XXL Job
