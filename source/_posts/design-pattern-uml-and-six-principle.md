@@ -141,6 +141,8 @@ UML类的符号是一个被划分成三块的方框: 类名, 属性, 和操作. 
 
 ![](https://cdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/uml-relation.png)
 
+这是一个类图的记忆方法: ***[https://mp.weixin.qq.com/s/yfp5ejzm4kHW44kU876SYQ](https://mp.weixin.qq.com/s/yfp5ejzm4kHW44kU876SYQ)***
+
 ## StarUML
 
 *[StarUML](http://staruml.io/)*...就是一个画UML的很炫酷的工具=.=

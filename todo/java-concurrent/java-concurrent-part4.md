@@ -317,6 +317,8 @@ Thread-Per-Message 在 Java 中的知名度不大, 是因为线程的成本很�
 
 > 有一个java库叫Quasar Fiber ，通过javaagent技术可以实现轻量级线程
 > 官网: ***[http://www.paralleluniverse.co/quasar/](http://www.paralleluniverse.co/quasar/)***
+>
+> 阿里也有一个 wisp2, 不过目前没开源.
 
 # Worker Thread模式
 

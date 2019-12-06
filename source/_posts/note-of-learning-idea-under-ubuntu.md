@@ -170,6 +170,12 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-select-color.png)
 
+## 修改快捷键
+
+### Fix doc comment
+
+打开 Setting, Keymap -> Other -> Fix doc comment
+
 # Keyboard shortcuts
 
 > JetBrains官方快捷键手册: *[https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf](https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf)*
