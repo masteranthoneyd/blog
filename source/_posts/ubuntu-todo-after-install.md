@@ -100,6 +100,12 @@ sudo dd if=ubuntu-16.04-desktop-amd64.iso of=/dev/sdc bs=1M
 
 到此制作完成. 
 
+## 安装建议
+
+* 硬盘格式: GPT ; 引导类型: UEFI.
+* 单系统用户, 务必准备一个 **EFI (ESP)** 分区, 否则无法写入 GRUB 引导.
+* 最小安装
+
 # 系统篇
 
 ## 换源
@@ -145,6 +151,20 @@ sudo visudo
 ```
 
 这样所有sudo组内的用户使用sudo时就不需要密码了. 
+
+## exfat驱动
+
+```
+sudo apt install exfat-fuse exfat-utils
+```
+
+## 统一Win10和Ubuntu18.04双系统的时间
+
+> 双系统导致的时间不统一.
+
+```
+timedatectl set-local-rtc 1 --adjust-system-clock
+```
 
 ## Apt Fast
 
@@ -825,13 +845,15 @@ Configure>>  Addon  >>Advanced>>Classic
 
 这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
 
-```
+```bash
 git clone https://gitee.com/wszqkzqk/deepin-wine-for-ubuntu.git
 cd deepin-wine-for-ubuntu
 ./install.sh
 ```
 
->  这个是 Docker 版本的: ***[https://github.com/RokasUrbelis/docker-wine-linux](https://github.com/RokasUrbelis/docker-wine-linux)***
+>  **关于托盘**：安装 *TopIconPlus* 的 gnome-shell 扩展。
+>
+>  然后在所有软件中找到 **优化 (Gnome-tweak-tool)** ，在扩展中打开 *Topicons plus* 。
 
 在 ***[https://mirrors.aliyun.com/deepin/pool/non-free/d/](https://mirrors.aliyun.com/deepin/pool/non-free/d/)*** 中寻找需要的软件, 使用 `dpkg` 安装即可.
 
@@ -972,7 +994,22 @@ sudo dpkg -i libpng12-0_1.2.49-1+deb7u2_amd64.deb
 sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
 ```
 
+## 有道云笔记客户端
+
+官方并没有停 Linux 的客户端, 但 Github 有非官方的开源版:
+
+***[https://github.com/jamasBian/youdao-note-electron](https://github.com/jamasBian/youdao-note-electron)***
+
+## 坚果云同步
+
+***[官网下载](https://www.jianguoyun.com/s/downloads/linux)***
+
+```
+sudo gdebi  nautilus_nutstore_amd64.deb
+```
+
 ## Chrome
+
 到*[chrome官网](https://www.google.com/chrome/browser/desktop/index.html)* 下载linux版的chrome. 
 不能翻墙的小朋友可以到***[博主的百度盘](https://pan.baidu.com/s/1c2uyTEw)*** (密码: 9bpi)
 ```
@@ -1275,6 +1312,24 @@ sudo apt install -y timeshift
 
 ![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
 
+## Albert
+
+```bash
+sudo apt install curl
+curl https://build.opensuse.org/projects/home:manuelschneid3r/public_key | sudo apt-key add -
+sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/manuelschneid3r/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/home:manuelschneid3r.list"
+sudo apt-get update
+sudo apt-get install albert
+```
+
+第一次打开的时候需要设置快捷键, 推荐 `Ctrl` + `~`.
+
+隐藏 Albert 图标只需要在设置中将 `showTray` 的勾选去除即可.
+
+> 去除图标之后设置就不知道怎么按出来了, 这时候可以在 `/home/{USER}/.config/albert/albert.conf` 中配置.
+>
+> 或者通过快捷键按出 Albert 输入栏, 设置一般在输入栏的右上角.
+
 ## 抓包
 
 ### Charles
@@ -1310,11 +1365,6 @@ sudo apt install hardinfo -y
 
 # 其他设置篇
 
-## exfat驱动
-```
-sudo apt install exfat-fuse exfat-utils
-```
-
 ## Grub2
 
 ### 设置引导等待时间
@@ -1346,28 +1396,6 @@ sudo update-grub
 
 ```
 gnome-session-properties
-```
-
-## 统一Win10和Ubuntu18.04双系统的时间
-
-装了双系统会出现win10中的时间总是慢8个小时（时区不对）
-
-```
-统一Win10和Ubuntu18.04双系统的时间
-```
-
-### 方式一
-
-```
-timedatectl set-local-rtc 1 --adjust-system-clock
-```
-
-### 方式二
-
-```
-sudo apt install ntpdate
-sudo ntpdate time.windows.com
-sudo hwclock --localtime --systohc
 ```
 
 ## 提高逼格
@@ -1428,6 +1456,22 @@ sudo apt install -f
 - `~/.local/share/applications` # 一部分本地图标
 - `/var/lib/snapd/desktop/applications` # snap 类软件在此
 
+## 生成软件图标工具
+
+工具安装:
+
+```
+sudo apt install gnome-panel
+```
+
+创建:
+
+```
+sudo gnome-desktop-item-edit /usr/share/applications/ --create-new
+```
+
+然后会弹出一个框, 在里面选择命令以及图标生成即可.
+
 ## gsetting 与 dconf
 
 gsetting 与 dconf 是 Linux Gnome下实现对应用程序的配置及管理功能的工具.
@@ -1465,6 +1509,12 @@ EOF
 
 ```
 sudo apt install -y dconf-editor
+```
+
+## 强制清空回收站
+
+```
+sudo rm -rf $HOME/.local/share/Trash/files/*
 ```
 
 ## 终端写出图形文字

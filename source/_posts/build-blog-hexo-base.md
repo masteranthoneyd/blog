@@ -291,8 +291,12 @@ scheme: Muse
 在次执行 `hexo clean` 和 `heox s` 可预览效果
 **大部分的设定都能在*[NexT的官方文档](http://theme-next.iissnan.com/getting-started.html)* 里面找到, 如侧栏、头像、打赏、评论等等, 在此就不多讲了, 照着文档走就行了, 接下只是个性定制的问题**
 
+# 其他主题推荐
+
+***[Material-X](https://xaoxuu.com/wiki/material-x/)***
 
 # 注册Github和Coding并分别创建Pages
+
 在本地运行没有问题的话, 那么可以部署到外网去, 在此之前, 先得有服务器让你的项目可以托管, 那么Github Page与Coding Page就是个很好的东西, 它们可以让我们访问**静态文件**, 而Hexo生成的恰恰是静态文件
 具体请查看 *[Coding Page](https://coding.net/help/doc/pages/index.html)* 、 *[Github Page](https://pages.github.com/)*
 

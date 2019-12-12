@@ -145,6 +145,8 @@ public class EnumCodec implements ObjectSerializer, ObjectDeserializer {
 }
 ```
 
+#### 方式一: 字段上加注解
+
 在枚举字段上添加注解:
 
 ```java
@@ -152,7 +154,10 @@ public class EnumCodec implements ObjectSerializer, ObjectDeserializer {
 private AgeEnum age;
 ```
 
+#### 方式二: 类上加注解
+
 ```java
+@JSONType(serializeEnumAsJavaBean = true, serializer = EnumCodec.class, deserializer = EnumCodec.class)
 public enum AgeEnum implements EnumValueProvider {
   ONE(1, "一岁"),
   TWO(2, "二岁"),
@@ -739,7 +744,7 @@ public static String getRequestBody() {
 
 在 Spring MVC 中, 通过 `@PathVariable` 注解可轻松实现 Restful 风格的请求. 但是对于这种请求, Spring MVC 不能通过 url 直接获取到对应的 `HandlerMethod`, 而是通过 for 循环一个个地匹配, 效率低下.
 
-我们可以通过重写 `RequestMappingHandlerMapping#lookupHandlerMethod` 方法, 思路是, 如果是匹配类型的 restful 请求, 其真正映射到的是 `@RequestMapping#name`, 请求时将 `name` 放在 Header 中, 查找的时候直接拿到通过 Hash 定位即可, 性能与直接匹配的效果一样.
+我们可以通过重写 `RequestMappingHandlerMapping#lookupHandlerMethod` 方法, 思路是, 如果是匹配类型的 restful 请求, 其真正映射到的是 `@RequestMapping#name`, 请求时将 `name` 放在 Header 中, 查找的时候直接拿到通过 Hash 定位即可, 性能与直接匹配的效果一样.
 
 继承 `RequestMappingHandlerMapping`:
 
