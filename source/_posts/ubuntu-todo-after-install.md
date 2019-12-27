@@ -501,20 +501,21 @@ hardcode-tray --conversion-tool Inkscape
 
 | 扩展                                                         | 简要功能描述                       |
 | ------------------------------------------------------------ | ---------------------------------- |
-| *[Applications Menu](https://extensions.gnome.org/extension/6/applications-menu/)* | 在顶部添加一个应用程序入口         |
-| *[Coverflow Alt-Tab](https://extensions.gnome.org/extension/97/coverflow-alt-tab/)* | Alt Tab 切换应用（更酷炫的界面）   |
-| *[Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)* | Dock （大名鼎鼎）                  |
-| *[EasyScreenCast](https://extensions.gnome.org/extension/690/easyscreencast/)* | 录屏工具（录制质量优秀）           |
-| *[Extension update notifier](https://extensions.gnome.org/extension/1166/extension-update-notifier/)* | 自动推送所有扩展的更新信息         |
-| *[Internet speed meter](https://extensions.gnome.org/extension/1461/internet-speed-meter/) / [NetSpeed](https://extensions.gnome.org/extension/104/netspeed/)* | 顶栏显示当前网络速度               |
-| *[OpenWeather](https://extensions.gnome.org/extension/750/openweather/)* | 顶栏显示天气情况（支持中文）       |
-| *[Dynamic Top Bar](https://extensions.gnome.org/extension/885/dynamic-top-bar/)* | 动态调整状态栏透明度               |
-| *[Places Status Indicator](https://extensions.gnome.org/extension/8/places-status-indicator/)* | 提供快捷目录入口（同文件管理器）   |
-| *[Popup dict Switcher](https://extensions.gnome.org/extension/1349/popup-dict-switcher/)* | 一键开关划词翻译                   |
-| *[Removable Drive Menu](https://extensions.gnome.org/extension/7/removable-drive-menu/)* | 移除可移动设备                     |
-| *[Screenshot Tool](https://extensions.gnome.org/extension/1112/screenshot-tool/)* | 截图工具（挺方便）                 |
-| *[Sound Input & Output Device Chooser](https://extensions.gnome.org/extension/906/sound-output-device-chooser/)* | 更方便的调整声音、亮度             |
-| *[System-monitor](https://extensions.gnome.org/extension/120/system-monitor/) / [System-monitor](https://extensions.gnome.org/extension/1064/system-monitor/)* | 在状态栏中显示系统信息（很多类型） |
+| ***[Applications Menu](https://extensions.gnome.org/extension/6/applications-menu/)*** | 在顶部添加一个应用程序入口         |
+| ***[Coverflow Alt-Tab](https://extensions.gnome.org/extension/97/coverflow-alt-tab/)*** | Alt Tab 切换应用（更酷炫的界面）   |
+| ***[Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)*** | Dock （大名鼎鼎）                  |
+| ***[Dash to Panel](https://extensions.gnome.org/extension/1160/dash-to-panel/)*** | 对顶栏的操作处理（诸如自动隐藏等） |
+| ***[EasyScreenCast](https://extensions.gnome.org/extension/690/easyscreencast/)*** | 录屏工具（录制质量优秀）           |
+| ***[Extension update notifier](https://extensions.gnome.org/extension/1166/extension-update-notifier/)*** | 自动推送所有扩展的更新信息         |
+| ***[Internet speed meter](https://extensions.gnome.org/extension/1461/internet-speed-meter/) / [NetSpeed](https://extensions.gnome.org/extension/104/netspeed/)*** | 顶栏显示当前网络速度               |
+| ***[OpenWeather](https://extensions.gnome.org/extension/750/openweather/)*** | 顶栏显示天气情况（支持中文）       |
+| ***[Dynamic Top Bar](https://extensions.gnome.org/extension/885/dynamic-top-bar/)*** | 动态调整状态栏透明度               |
+| ***[Places Status Indicator](https://extensions.gnome.org/extension/8/places-status-indicator/)*** | 提供快捷目录入口（同文件管理器）   |
+| ***[Popup dict Switcher](https://extensions.gnome.org/extension/1349/popup-dict-switcher/)*** | 一键开关划词翻译                   |
+| ***[Removable Drive Menu](https://extensions.gnome.org/extension/7/removable-drive-menu/)*** | 移除可移动设备                     |
+| ***[Screenshot Tool](https://extensions.gnome.org/extension/1112/screenshot-tool/)*** | 截图工具（挺方便）                 |
+| ***[Sound Input & Output Device Chooser](https://extensions.gnome.org/extension/906/sound-output-device-chooser/)*** | 更方便的调整声音、亮度             |
+| ***[System-monitor](https://extensions.gnome.org/extension/120/system-monitor/) / [System-monitor](https://extensions.gnome.org/extension/1064/system-monitor/)*** | 在状态栏中显示系统信息（很多类型） |
 
 > 若出现安装失败，请检查 **是否满足相关依赖** 。
 
@@ -532,7 +533,7 @@ sudo apt-get install zsh
 ```
 
 接下来我们需要下载 `oh-my-zsh` 项目来帮我们配置 `zsh`, 采用`wget`安装(需要先安装`git`)
-```
+```bash
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 ```
 
@@ -894,7 +895,28 @@ sudo add-apt-repository ppa:eugenesan/ppa
 sudo apt update
 sudo apt install smartgithg
 ```
+## SVN GUI-SmartSVN
+
+下载地址: ***[https://www.smartsvn.com/download/](https://www.smartsvn.com/download/)***
+
+`smartsvn.license`:
+
+```
+Name=csdn  
+Address=1337 iNViSiBLE Str.  
+Email=admin@csdn.net  
+FreeUpdatesUntil=2099-09-26  
+LicenseCount=1337  
+Addon-xMerge=true  
+Addon-API=true  
+Enterprise=true  
+Key=4kl-<Zqcm-iUF7I-IVmYG-XAyvv-KYRoC-xlgsv-sSBds-VAnP6
+```
+
+注册时, 选中上面文件就OK了.
+
 ## Typora(Markdown编辑器)
+
 *[官方](https://typora.io/#linux)* 安装方法如下: 
 
 ```
@@ -1042,6 +1064,7 @@ sudo apt install google-chrome-stable
 | ***[Enhanced Github](https://chrome.google.com/webstore/detail/enhanced-github/anlikcnbgdeidpacdbdljnabclhahhmd)*** | 可下载Github中单个文件                                       |
 | ***[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)*** | 油猴, 脚本网站: *[https://greasyfork.org/zh-CN](https://greasyfork.org/zh-CN)*, *[https://openuserjs.org/](https://openuserjs.org/)* |
 | ***[CrxMouse Chrome™ Gestures](https://chrome.google.com/webstore/detail/crxmouse-chrome-gestures/jlgkpaicikihijadgifklkbpdajbkhjo)*** | 高度可自定义的鼠标手势, 超级拖拽, 鼠标滚轮手势, 遥感手势, 提升工作效率 |
+| ***[掘金](https://chrome.google.com/webstore/detail/%E6%8E%98%E9%87%91/lecdifefmmfjnjjinhaennhdlmcaeeeb)*** | 为程序员、设计师、产品经理每日发现优质内容                   |
 
 ## 截图
 
@@ -1258,6 +1281,10 @@ services:
 
 一款开源、免费带Web面板的多功能下载神器: ***[https://github.com/pyload/pyload](https://github.com/pyload/pyload)***
 
+## 磁力搜
+
+磁力链接聚合搜索: ***[https://github.com/xiandanin/magnetW](https://github.com/xiandanin/magnetW)***
+
 ## 百度网盘相关
 
 ### BaiduExporter
@@ -1322,13 +1349,29 @@ sudo apt-get update
 sudo apt-get install albert
 ```
 
-第一次打开的时候需要设置快捷键, 推荐 `Ctrl` + `~`.
+第一次打开的时候需要设置快捷键, 推荐 `Ctrl` + `~`.
 
 隐藏 Albert 图标只需要在设置中将 `showTray` 的勾选去除即可.
 
 > 去除图标之后设置就不知道怎么按出来了, 这时候可以在 `/home/{USER}/.config/albert/albert.conf` 中配置.
 >
 > 或者通过快捷键按出 Albert 输入栏, 设置一般在输入栏的右上角.
+
+## PostMan
+
+下载: ***[https://www.getpostman.com/downloads/](https://www.getpostman.com/downloads/)***
+
+Json Body 字体问题:
+
+在Linux中, postman 的 body 和 response 使用的默认字体如果没有安装的话, 会导致字体和光标的位置不一致, 例如字体显示长度只有30, 而光标在70的位置, 导致编辑困难.
+
+解决:
+
+```bash
+sudo wget -P /usr/share/fonts/custom https://github.com/fangwentong/dotfiles/raw/master/ubuntu-gui/fonts/Monaco.ttf
+sudo chmod 744 /usr/share/fonts/custom/Monaco.ttf
+sudo mkfontscale  && sudo mkfontdir && sudo fc-cache -fv
+```
 
 ## 抓包
 

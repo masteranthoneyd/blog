@@ -347,7 +347,7 @@ indenpence
 
 - `Log`类: 
 
-  ```
+  ```java
   @CommonsLog
   Creates private static final org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(LogExample.class);
   @JBossLog
@@ -363,6 +363,8 @@ indenpence
   @XSlf4j
   Creates private static final org.slf4j.ext.XLogger log = org.slf4j.ext.XLoggerFactory.getXLogger(LogExample.class);
   ```
+  
+- `@SneakyThrows`: 将 Checked Exception 转换成 `RuntimeException`
 
 
 `Lombok`的功能不仅如此, 更详细请看***[features](https://projectlombok.org/features/all)***
