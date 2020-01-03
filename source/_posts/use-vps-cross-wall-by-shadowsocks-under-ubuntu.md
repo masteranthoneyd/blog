@@ -201,6 +201,12 @@ Enjoy it!
 
 官网各大客户端: ***[https://shadowsocks.org/en/download/clients.html](https://shadowsocks.org/en/download/clients.html)***
 
+- <i class="fa fa-windows"></i> windows
+- <i class="fa fa-apple"></i> mac os
+- <i class="fa fa-linux"></i> linux
+- <i class="fa fa-apple"></i> ios
+- <i class="fa fa-android"></i> android
+
 ## 安装与启动
 
 ### Docker
