@@ -199,6 +199,15 @@ Enjoy it!
 
 # ShadowSocks客户端安装
 
+官网各大客户端: ***[https://shadowsocks.org/en/download/clients.html](https://shadowsocks.org/en/download/clients.html)***
+
+- [x] <i class="fa fa-windows"></i> windows
+- [x] <i class="fa fa-apple"></i> mac os
+- [x] <i class="fa fa-linux"></i> linux
+- [x] <i class="fa fa-apple"></i> ios
+- [x] <i class="fa fa-android"></i> android
+- [ ] <i class="fa fa-weixin"></i> weixin
+
 ## 安装与启动
 
 ### Docker
@@ -1088,3 +1097,10 @@ SSR GUI客户端: ***[erguotou520/electron-ssr](https://github.com/erguotou520/e
 更多精彩内容请查看: ***[https://teddysun.com](https://teddysun.com)***
 
 v2ray: ***[https://github.com/v2ray/v2ray-core](https://github.com/v2ray/v2ray-core)***
+
+
+<head> 
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script> 
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/v4-shims.js"></script> 
+</head> 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
