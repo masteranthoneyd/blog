@@ -282,6 +282,10 @@ sudo apt-get install shadowsocks-qt5
 ```
 由于是图形界面, 配置和windows基本没啥差别就不赘述了. 经过上面的配置, 你只是启动了sslocal 但是要上网你还需要配置下浏览器到指定到代理端口比如1080才可以正式上网. 
 
+## 支持ss协议的镜像
+
+***[https://github.com/mritd/dockerfile/tree/master/shadowsocks2](https://github.com/mritd/dockerfile/tree/master/shadowsocks2)***
+
 # 使用ShadowSocks代理实现科学上网
 
 **毕竟Shadowsocks是sock5代理, 不能接受http协议, 所以我们需要把sock5转化成http流量. **
@@ -679,7 +683,21 @@ services:
 }
 ```
 
+## 多用户管理UI
 
+***[https://blog.sprov.xyz/2019/08/03/v2-ui/](https://blog.sprov.xyz/2019/08/03/v2-ui/)***
+
+# Trajon
+
+比较新一点的翻墙神器:
+
+***[https://www.atrandys.com/category/kxsw/trojan](https://www.atrandys.com/category/kxsw/trojan)***
+
+# Just My Socks
+
+搬瓦工官方机场: ***[https://justmysocks.net/](https://justmysocks.net/)***
+
+使用: ***[https://blog.shuziyimin.org/840](https://blog.shuziyimin.org/840)***
 
 # VPS Security
 
