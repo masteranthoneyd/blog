@@ -1281,9 +1281,15 @@ services:
 
 一款开源、免费带Web面板的多功能下载神器: ***[https://github.com/pyload/pyload](https://github.com/pyload/pyload)***
 
-## 磁力搜
+### 磁力搜
 
 磁力链接聚合搜索: ***[https://github.com/xiandanin/magnetW](https://github.com/xiandanin/magnetW)***
+
+**注意**: 这个默认需要9000端口, 所以打开前确保9000端口没有被占用.
+
+### bugstag
+
+***[https://github.com/gxtrobot/bustag](https://github.com/gxtrobot/bustag)***
 
 ## 百度网盘相关
 
