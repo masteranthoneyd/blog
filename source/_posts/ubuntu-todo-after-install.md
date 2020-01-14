@@ -753,6 +753,8 @@ sudo apt install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plu
 
 ![](https://cdn.yangbingdong.com/img/gnome/dynamic-desktop.gif)
 
+附动画: ***[https://cdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip](https://cdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip)***
+
 ## 壁纸推荐
 
 推荐几个不错的壁纸下载网站: 

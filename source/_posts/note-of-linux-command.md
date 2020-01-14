@@ -41,6 +41,7 @@ ssh -o ServerAliveInterval=30 root@123.456.88 -p 2333
 ```
 
 ## 生成SSH密钥和公钥
+
 打开终端, 使用下面的`ssh-keygen`来生成`RSA`密钥和公钥. `-t`表示type, 就是说要生成`RSA`加密的钥匙: 
 ```shell
 ssh-keygen -t rsa -C "your_email@youremail.com"
@@ -88,7 +89,29 @@ scp -P <端口> -r <源文件夹> <目标文件夹>
 scp -P 2333 /home/ybd/file root@123.456.78:/root/file
 ```
 
+## SSH 与 SCP 使用代理
+
+```
+ssh -o ProxyCommand="nc -X 5 -x proxy.net:1080 %h %p" user@server.net
+```
+
+常用参数：
+
+- -X 指定代理协议
+
+  - `4` SOCKS v.4
+  - `5` SOCKS v.5**（默认）**
+  - `connect` HTTPS proxy
+
+- -x 代理地址[:端口]
+
+  如果没有指定端口，采用协议常用端口，如：
+
+  - SOCKETS 使用 1080
+  - HTTPS 使用 3128
+
 ## 免密码登录远程服务器
+
 ### 姿势一
 使用上述`scp`把公钥**上传**到服务器, 然后: 
 ```
