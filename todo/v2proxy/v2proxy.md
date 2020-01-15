@@ -296,6 +296,14 @@ services:
 
 ***[https://github.com/mark-logs-code-hub/trojan-wiz](https://github.com/mark-logs-code-hub/trojan-wiz)***
 
+或者是一下我写的...:
+
+```
+wget -N --no-check-certificate 'https://raw.githubusercontent.com/masteranthoneyd/about-shell/master/trojan.sh' && chmod +x trojan.sh && ./trojan.sh $DOMAIN
+```
+
+将 `$DOMAIN` 换成自己的域名.
+
 ### 客户端
 
 `docker-compose.yml`:
