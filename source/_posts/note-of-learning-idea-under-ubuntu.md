@@ -598,7 +598,6 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 -XX:MaxMetaspaceSize=2048m
 -XX:ReservedCodeCacheSize=512m
 -XX:+UseG1GC
--XX:-UseParNewGC
 -XX:-UseConcMarkSweepGC
 -XX:SoftRefLRUPolicyMSPerMB=200
 -XX:+UseCompressedOops
