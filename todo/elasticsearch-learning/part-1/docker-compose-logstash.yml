@@ -1,7 +1,7 @@
 version: '3'
 services:
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.1.0
+    image: logstash:7.6.0
     #    ports:
     #      - "4560:4560"
     restart: always
