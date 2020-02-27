@@ -40,7 +40,7 @@ services:
     ports:
       - "9001:9000"
     command:
-      - -Dhosts.0.host=http://elasticsearch:9200
+      - -Dhosts.0.host=http://es01:9200
     networks:
       - es7net
   kibana:
@@ -51,20 +51,20 @@ services:
       - XPACK_GRAPH_ENABLED=true
       - TIMELION_ENABLED=true
       - XPACK_MONITORING_COLLECTION_ENABLED="true"
+      - ELASTICSEARCH_HOSTS=http://es01:9200
     ports:
       - "5601:5601"
     networks:
       - es7net
-  elasticsearch:
+  es01:
     image: elasticsearch:7.6.0
-    container_name: es7_01
     environment:
       - cluster.name=geektime
-      - node.name=es7_01
+      - node.name=es01
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-      - discovery.seed_hosts=es7_01
-      - cluster.initial_master_nodes=es7_01,es7_02
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
     ulimits:
       memlock:
         soft: -1
@@ -75,16 +75,15 @@ services:
       - 9200:9200
     networks:
       - es7net
-  elasticsearch2:
+  es02:
     image: elasticsearch:7.6.0
-    container_name: es7_02
     environment:
       - cluster.name=geektime
-      - node.name=es7_02
+      - node.name=es02
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-      - discovery.seed_hosts=es7_01
-      - cluster.initial_master_nodes=es7_01,es7_02
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
     ulimits:
       memlock:
         soft: -1
@@ -93,11 +92,30 @@ services:
       - es7data2:/usr/share/elasticsearch/data
     networks:
       - es7net
+  es03:
+    image: elasticsearch:7.6.0
+    environment:
+      - cluster.name=geektime
+      - node.name=es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es7data3:/usr/share/elasticsearch/data
+    networks:
+      - es7net
 
 volumes:
   es7data1:
     driver: local
   es7data2:
+    driver: local
+  es7data3:
     driver: local
 
 networks:
@@ -189,6 +207,31 @@ services:
 networks:
   es7net:
     driver: bridge
+```
+
+## 插件
+
+```
+#查看插件
+bin/elasticsearch-plugin list
+#查看安装的插件
+GET http://localhost:9200/_cat/plugins?v
+```
+
+直接安装在自定义镜像中:
+
+```
+FROM elasticsearch:7.6.0
+MAINTAINER yangbingdong <yangbingdong1994@gmail.com>
+ARG TZ 
+ARG HTTP_PROXY
+ENV TZ=${TZ:-"Asia/Shanghai"} http_proxy=${HTTP_PROXY} https_proxy=${HTTP_PROXY}
+RUN bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.0/elasticsearch-analysis-ik-7.6.0.zip \
+  && bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.0/elasticsearch-analysis-pinyin-7.6.0.zip \
+  && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+ENV http_proxy=
+ENV https_proxy=
 ```
 
 # 基础入门
@@ -287,3 +330,373 @@ GET /_cat/indices?v&s=docs.count:desc
 * 副本分片: 解决数据的高可用问题, 是主分片的拷贝.
   * 副本分片数可以动态调整
   * 增加副本数, 可以一定程度提高服务的可用性(读取的吞吐)
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/get-cluster-health.png)
+
+## 基本CRUD与批量操作
+
+### CRUD
+
+主要有5个操作(Type名都用`_doc`):
+
+* Index: 如果 ID 不存在则创建新的文档, 否则, 删除现有的文档再创建信息的文档, 版本号增加
+
+  * ```
+    PUT my_index/_doc/1
+    {"user" : "Mike"}
+    ```
+
+* Create: 如果 ID 已存在, 则创建失败
+
+  * ```
+    PUT my_index/_create/1
+    {"user" : "Mike"}
+    POST my_index/_doc (不指定ID,  自动生成)
+    {"user" : "Mike"}
+    ```
+
+* Read: 读取文档
+
+  * ```
+    GET my_index/_doc/1
+    ```
+
+* Update: 文档必须已经存在, 更新时只会对相应字段做增量修改
+
+  * ```
+    POST my_index/_update/1
+    {
+        "doc":{
+            "post_date" : "2019-05-15T14:12:12",
+            "message" : "trying out Elasticsearch"
+        }
+    }
+    ```
+
+* Delete: 删除文档
+
+  * ```
+    DELETE my_index/_doc/1
+    ```
+
+Index 与 Create 不一样的地方在于: 文档不存在, 则索引新的文档, 否则删除后再索引, 版本号加1.
+
+Update 方法则不会删除文档, 只是更新数据, Post 方法的 Payload 需要包含在 `doc` 中.
+
+### 批量操作
+
+> 批量操作可以减少网络开销, 但是单次的批量操作数据量不宜过大, 以免引发性能问题.
+
+批量操作(Bulk API) 只支持四种类型: Index/Create/Update/Delete:
+
+```
+POST _bulk
+{ "index" : { "_index" : "test", "_id" : "1" } }
+{ "delete" : { "_index" : "test", "_id" : "2" } }
+{ "create" : { "_index" : "test2", "_id" : "3" } }
+{ "update" : {"_id" : "1", "_index" : "test"} }
+```
+
+mget 批量获取:
+
+```
+GET /_mget
+{"docs":[{"_index":"test","_id":"1"},{"_index":"test","_id":"2"}]}
+
+#URI中指定index
+GET /test/_mget
+{"docs":[{"_id":"1"},{"_id":"2"}]}
+```
+
+批量查询:
+
+```
+POST kibana_sample_data_ecommerce/_msearch
+{}
+{"query" : {"match_all" : {}},"size":1}
+{"index" : "kibana_sample_data_flights"}
+{"query" : {"match_all" : {}},"size":2}
+```
+
+## 倒排索引入门
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index.png)
+
+正排索引与倒排索引:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index02.png)
+
+倒排索引分为两个部分:
+
+* 单词词典(Term Dictionary), 记录了所有文档的单词, 记录单词到**倒排列表**的关联关系
+  * 单词词典一般比较大, 可以通过 B+ 树或者哈希拉链法实现, 以满足高性能的插入与查询
+* 倒排列表(Posting List), 记录了单词对应的文档结合, 有倒排索引项组成:
+  * 文档 ID
+  * 词频 TF, 改单词在文档中出现的次数, 用于相关性评分
+  * 位置(Position), 单词在文档中分词的位置, 用于语句搜索(phrase query)
+  * 偏移(Offset), 记录单词的开始结束位置, 实现高亮显示
+
+一个例子- Elasticsearch:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index03.png)
+
+> 每个 JSON 文档中的每个字段, 又有自己的倒排索引
+>
+> 可以指定对某些字段不做索引, 以节省存储空间
+
+## 通过 Analyzer 进行分词
+
+分词(Analysis)是把文本转换一系列单词的过程, 通过 Analyzer 实现, 可使用 Elasticsearch 内置的 Analyzer 或者自定义 Analyzer.
+
+除了在数据写入时转换词条, 匹配  Query 语句时也需要用相同的分析器对查询语句进行分析.
+
+分词器(Analyzer)是专门处理分词的组件, 由三个部分组成:
+
+* Character Filters: 针对原始文本处理, 例如去除 HTML 标签
+* Tokenizer: 按照规则切分单词
+* Token Filter: 将切分的单词进行加工, 小写, 删除 stopwords, 增加同义词等)
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
+
+Elasticsearch 内置分词器:
+
+* Standard Analyzer – 默认分词器, 按词切分, 小写处理
+* Simple Analyzer – 按照非字母切分(符号被过滤), 小写处理
+* Stop Analyzer – 小写处理, 停用词过滤(the, a, is)
+* Whitespace Analyzer – 按照空格切分, 不转小写
+* Keyword Analyzer – 不分词, 直接将输入当作输出
+* Patter Analyzer – 正则表达式, 默认 \W+ (非字符分隔)
+* Language – 提供了30多种常见语言的分词器
+
+```
+GET _analyze
+{
+  "analyzer": "standard",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "simple",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "stop",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "whitespace",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "keyword",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "pattern",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+
+GET _analyze
+{
+  "analyzer": "english",
+  "text": "2 running Quick brown-foxes leap over lazy dogs in the summer evening."
+}
+```
+
+其他分词器:
+
+***[IK](https://github.com/medcl/elasticsearch-analysis-ik)***
+
+***[HanPL](https://github.com/KennFalcon/elasticsearch-analysis-hanlp)***
+
+***[jieba](https://github.com/sing1ee/elasticsearch-jieba-plugin)***
+
+## Search API 简介
+
+Elasticsearch Search API 提供了 URI Search 以及 Request Body Search. 两者都要遵循以下基本语法:
+
+| 语法                   | 范围              |
+| ---------------------- | ----------------- |
+| /_search               | 集群上所有的索引  |
+| /index1/_search        | index1            |
+| /index1,index2/_search | index1, index2    |
+| /index*/_search        | 以index开头的索引 |
+
+URI Search:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/uri-search-demo.png)
+
+Request Body Search:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/request-body-search-demo.png)
+
+Response:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/search-response-demo.png)
+
+## QueryDSL介绍
+
+DEMO:
+
+```
+POST /kibana_sample_data_ecommerce/_search
+{
+  "profile": true,  # 这个参数可以输出Elasticsearch是怎么查询的
+  "sort":[{"order_date":"desc"}],  # 排序
+  "from":10,  # 分页开始
+  "size":20,  # 分页结束
+  "_source":["order_date"], # 指定返回字段
+  "query":{
+    "match_all": {}
+  }
+}
+```
+
+* 分页不宜过深, 越往后成本越大
+* 排序最好在数字类型或者日期类型上面排序
+
+`match` 查询, 支持全文搜索和精确查询, 取决于字段是否支持全文检索:
+
+```
+POST movies/_search
+{
+  "query": {
+    "match": {
+      "title": "last christmas"
+    }
+  }
+}
+```
+
+全文检索会将查询的字符串先进行分词, `last christmas`会分成为`last`和`christmas`, 然后在倒排索引中进行匹配, 默认是 OR 逻辑, 如果要实现 AND 逻辑, 可以这样处理:
+
+```
+POST movies/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "last christmas",
+        "operator": "and" 
+      }
+    }
+  }
+}
+```
+
+`match_phrase` 查询, 短语查询，精确匹配，查询`one love`会匹配`title`字段包含`one love`短语的，而不会进行分词查询:
+
+```
+POST movies/_search
+{
+  "query": {
+    "match_phrase": {
+      "title":{
+        "query": "one love",
+        "slop": 1
+      }
+    }
+  }
+}
+```
+
+## Query & Simple Query String
+
+插入数据:
+
+```
+PUT /users/_doc/1
+{
+  "name":"Ruan Yiming",
+  "about":"java, golang, node, swift, elasticsearch"
+}
+
+PUT /users/_doc/2
+{
+  "name":"Li Yiming",
+  "about":"Hadoop"
+}
+```
+
+Query String, 类似 URI Query:
+
+```
+POST users/_search
+{
+  "query": {
+    "query_string": {
+      "default_field": "name",
+      "query": "Ruan AND Yiming"
+    }
+  }
+}
+
+POST users/_search
+{
+  "query": {
+    "query_string": {
+      "fields":["name","about"],
+      "query": "(Ruan AND Yiming) OR (Java AND Elasticsearch)"
+    }
+  }
+}
+
+# 多fields
+GET /movies/_search
+{
+	"profile": true,
+	"query":{
+		"query_string":{
+			"fields":[
+				"title",
+				"year"
+			],
+			"query": "2012"
+		}
+	}
+}
+```
+
+Simple Query String: 
+
+* 类似 Query String, 但会忽略错误语法, 只支持部分查询语法
+* 不支持 AND OR NOT, 会当做字符串处理
+* Term 之间的默认关系是 OR, 可以通过 Operator 指定
+* 支持部分逻辑
+  * `+` 代表 AND
+  * `|` 代表 OR
+  * `-` 代表 NOT
+
+```
+POST users/_search
+{
+  "query": {
+    "simple_query_string": {
+      "query": "Ruan Yiming",
+      "fields": ["name"],
+      "default_operator": "AND"
+    }
+  }
+}
+
+GET /movies/_search
+{
+	"profile":true,
+	"query":{
+		"simple_query_string":{
+			"query":"Beautiful +mind",
+			"fields":["title"]
+		}
+	}
+}
+```
+

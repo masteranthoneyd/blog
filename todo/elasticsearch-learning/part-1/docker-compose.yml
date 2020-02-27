@@ -6,7 +6,7 @@ services:
     ports:
       - "9001:9000"
     command:
-      - -Dhosts.0.host=http://elasticsearch:9200
+      - -Dhosts.0.host=http://es01:9200
     networks:
       - es7net
   kibana:
@@ -17,20 +17,20 @@ services:
       - XPACK_GRAPH_ENABLED=true
       - TIMELION_ENABLED=true
       - XPACK_MONITORING_COLLECTION_ENABLED="true"
+      - ELASTICSEARCH_HOSTS=http://es01:9200
     ports:
       - "5601:5601"
     networks:
       - es7net
-  elasticsearch:
-    image: elasticsearch:7.6.0
-    container_name: es7_01
+  es01:
+    image: yangbingdong/elasticsearch-ik-pinyin:7.6.0
     environment:
       - cluster.name=geektime
-      - node.name=es7_01
+      - node.name=es01
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-      - discovery.seed_hosts=es7_01
-      - cluster.initial_master_nodes=es7_01,es7_02
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
     ulimits:
       memlock:
         soft: -1
@@ -41,16 +41,15 @@ services:
       - 9200:9200
     networks:
       - es7net
-  elasticsearch2:
-    image: elasticsearch:7.6.0
-    container_name: es7_02
+  es02:
+    image: yangbingdong/elasticsearch-ik-pinyin:7.6.0
     environment:
       - cluster.name=geektime
-      - node.name=es7_02
+      - node.name=es02
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-      - discovery.seed_hosts=es7_01
-      - cluster.initial_master_nodes=es7_01,es7_02
+      - discovery.seed_hosts=es01
+      - cluster.initial_master_nodes=es01,es02
     ulimits:
       memlock:
         soft: -1
