@@ -458,7 +458,7 @@ POST kibana_sample_data_ecommerce/_msearch
 
 ![](https://cdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
 
-Elasticsearch 内置分词器:
+*[Elasticsearch 内置分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html)*:
 
 * Standard Analyzer – 默认分词器, 按词切分, 小写处理
 * Simple Analyzer – 按照非字母切分(符号被过滤), 小写处理
@@ -698,5 +698,482 @@ GET /movies/_search
 		}
 	}
 }
+```
+
+## Dynamic Mapping 和常见字段类型
+
+什么是 Mapping:
+
+* Mapping 类似数据库中的 schema
+  * 定义索引中的字段名称
+  * 定义字段类型
+  * 字段倒排索引的相关配置, 比如 Analyzed, Not Analyzed, Analyzer
+
+字段类型:
+
+* 简单类型
+  * Text / Keyword
+  * Data
+  * Integer / Floating
+  * Boolean
+  * IPv4 / IPv6
+* 复杂类型
+  * 对象类型 / 嵌套类型
+* 特殊类型
+  * geo_point & geo_shape / percolator
+
+Dynamic Mapping: 
+
+* 写入文档时候, 索引不存在则自动创建
+* 类型自动推断, 但可以通过设置修改这种行为, 比如字符串会推断成 text 类型, 并新增一个 keyword 类型的 keyword 子字段
+* 但是会产生不良影响, 比如类型推断错误
+
+通过索引创建事可以指定 Dynamic 的行为:
+
+```
+PUT movies
+{
+  "mapping": {
+    "_doc": {
+      "dynamic": "false"
+    }
+  }
+}
+```
+
+对应的是可以设置成:
+
+* true: 默认值, 可以自动推断
+* false: 新增的字段不被索引, 可以存进 ES
+* strict: 不能新增字段, 直接报错
+
+## 显式Mapping设置
+
+API:
+
+```
+PUT your_index
+{
+  "mappings": {
+    // 自定义
+  }
+}
+```
+
+例如:
+
+```
+PUT users
+{
+    "mappings" : {
+      "properties" : {
+        "firstName" : {
+          "type" : "text"
+        },
+        "lastName" : {
+          "type" : "keyword"
+          "null_value": "NULL"
+        },
+        "mobile" : {
+          "type" : "text",
+          "index": false
+        }
+      }
+    }
+}
+```
+
+参数说明:
+
+* `index`: 默认为 true, 设置 false 后字段不能被索引, 同时可以节省存储空间
+
+* `null_value`: 实现 NULL 值的搜索, 只有 Keyword 支持
+
+* `copy_to`: 将字段拷贝到目标字段, 且目标字段不出现在 `_source` 中
+
+  ```
+  PUT users
+  {
+    "mappings": {
+      "properties": {
+        "firstName":{
+          "type": "text",
+          "copy_to": "fullName"
+        },
+        "lastName":{
+          "type": "text",
+          "copy_to": "fullName"
+        }
+      }
+    }
+  }
+  
+  GET users/_search?q=fullName:(Ruan Yiming)
+  ```
+
+  
+
+创建 Mapping 建议: 创建临时索引, 写入样本数据, 获取动态创建的 Mapping 定义, 在这基础上修改.
+
+## 多字段特性及Mapping中配置自定义Analyzer
+
+字段还可以为其创建子字段, 可以实现一些精确匹配(增加 keyword 类型的字段), 或者使用不同的 analyzer(pinyin搜索)
+
+```
+PUT my_index
+{
+  "mappings": {
+    "properties": {
+      "city": {
+        "type": "text",
+        "fields": {
+          "raw": { 
+            "type":  "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Exact Values vs Full Text
+
+* Exact Value(精确值, 不会被分词): 包括数字/日期/具体的一个字符串(比如 Apple Store), 对应 ES 中的 keyword
+* Full Text(全文本, 默认会分词): 对应 ES 中的 text
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/exact-value-vs-full-value.png)
+
+### 自定义分词器
+
+如果 ES 自带的分词器不满足, 我们可以自定义分词器, 通过组合 *[Character Filter](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)*, *[Tokenizer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)*, *[Token Filter](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)* 实现:
+
+```
+PUT my_index
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_custom_analyzer": { 
+          "type": "custom",
+          "char_filter": [
+            "emoticons"
+          ],
+          "tokenizer": "punctuation",
+          "filter": [
+            "lowercase",
+            "english_stop"
+          ]
+        }
+      },
+      "tokenizer": {
+        "punctuation": { 
+          "type": "pattern",
+          "pattern": "[ .,!?]"
+        }
+      },
+      "char_filter": {
+        "emoticons": { 
+          "type": "mapping",
+          "mappings": [
+            ":) => _happy_",
+            ":( => _sad_"
+          ]
+        }
+      },
+      "filter": {
+        "english_stop": { 
+          "type": "stop",
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+# 测试
+POST my_index/_analyze
+{
+  "analyzer": "my_custom_analyzer",
+  "text": "I'm a :) person, and you?"
+}
+```
+
+## Index Template 和 Dynamic Template
+
+### Index Template
+
+创建索引模板(Index Template)可以更好地管理某些索引, 比如日志索引: logs-1, logs-2 这类有规律的索引.
+
+Index Template 可以帮助我们设定 Mapping 和 Settings, 并按照一定规则匹配到新创建的索引之上
+
+* 模板仅在一个索引被新创建时, 才会起作用, 修改模板不会影响已经创建的索引
+* 可以设定多个模板, 这些设置会被 merger 在一起, 可以通过 order 的数值, 空值 merging 的过程
+
+Index Template 的工作方式(当一个索引被创建时):
+
+* 应用 ES 默认的 settings 和 mappings
+* 应用 order 数值低的 Index Template 设定
+* 应用 order 数值高的 Index Template 设定, 之前的设定会被覆盖
+* 应用创建索引时, 用户所指定的 settings 和 mappings, 并覆盖之前模板中的设定
+
+```
+#数字字符串被映射成text，日期字符串被映射成日期
+PUT ttemplate/_doc/1
+{
+	"someNumber":"1",
+	"someDate":"2019/01/01"
+}
+GET ttemplate/_mapping
+
+
+#Create a default template
+PUT _template/template_default
+{
+  "index_patterns": ["*"],
+  "order" : 0,
+  "version": 1,
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas":1
+  }
+}
+
+
+PUT /_template/template_test
+{
+    "index_patterns" : ["test*"],
+    "order" : 1,
+    "settings" : {
+    	"number_of_shards": 1,
+        "number_of_replicas" : 2
+    },
+    "mappings" : {
+    	"date_detection": false,
+    	"numeric_detection": true
+    }
+}
+
+#查看template信息
+GET /_template/template_default
+GET /_template/temp*
+
+
+#写入新的数据，index以test开头
+PUT testtemplate/_doc/1
+{
+	"someNumber":"1",
+	"someDate":"2019/01/01"
+}
+GET testtemplate/_mapping
+get testtemplate/_settings
+
+PUT testmy
+{
+	"settings":{
+		"number_of_replicas":5
+	}
+}
+
+put testmy/_doc/1
+{
+  "key":"value"
+}
+
+get testmy/_settings
+DELETE testmy
+DELETE /_template/template_default
+DELETE /_template/template_test
+```
+
+### Dynamic Template
+
+什么是 Dynamic Template:
+
+* 根据 Elasticsearch 识别的数据类型, 结合字段名称, 来动态设定字段类型, 比如:
+  * 所有字符串设定成Keyword, 或者关闭 keyword 字段
+  * is 开头的字段都设置成 boolean
+  * long_ 开头的都设置成 long 类型
+* Dynamic Template 是定义在某个索引的 Mapping 中
+* Template 有个一名字
+* 匹配规则是一个数组
+* 为匹配到的字段设置 Mapping
+
+例子:
+
+```
+#Dynaminc Mapping 根据类型和字段名
+DELETE my_index
+
+PUT my_index/_doc/1
+{
+  "firstName":"Ruan",
+  "isVIP":"true"
+}
+
+GET my_index/_mapping
+DELETE my_index
+PUT my_index
+{
+  "mappings": {
+    "dynamic_templates": [
+            {
+        "strings_as_boolean": {
+          "match_mapping_type":   "string",
+          "match":"is*",
+          "mapping": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "strings_as_keywords": {
+          "match_mapping_type":   "string",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+DELETE my_index
+#结合路径
+PUT my_index
+{
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "full_name": {
+          "path_match":   "name.*",
+          "path_unmatch": "*.middle",
+          "mapping": {
+            "type":       "text",
+            "copy_to":    "full_name"
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+PUT my_index/_doc/1
+{
+  "name": {
+    "first":  "John",
+    "middle": "Winston",
+    "last":   "Lennon"
+  }
+}
+
+GET my_index/_search?q=full_name:John
+```
+
+* match_mapping_type: 匹配自动识别的字段类型, 比如 string, boolean等
+* match, unmatch: 匹配字段名称
+* path_match, path_unmatch: 字段路径
+
+## 聚合分析简介
+
+什么是***[聚合](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)***? 那就是对数据进行一个分析统计.
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/aggs-demo.png)
+
+聚合主要分为四类:
+
+* Bucket Aggregation: 一些列满足特定条件的文档集合
+* Metric Aggregation: 一些数学运算, 可以对文档字段进行统计分析
+* Pipeline Aggregation: 对其他的聚合结果进行二次聚合
+* Matrix Aggregation: 支持对多个字段的操作并提供一个结果矩阵
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-and-matrix.png)
+
+一个 Bucket 的例子:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-demo.png)
+
+支持嵌套:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-nest-demo.png)
+
+```
+#按照目的地进行分桶统计
+GET kibana_sample_data_flights/_search
+{
+	"size": 0,
+	"aggs":{
+		"flight_dest":{
+			"terms":{
+				"field":"DestCountry"
+			}
+		}
+	}
+}
+
+
+
+#查看航班目的地的统计信息，增加平均，最高最低价格
+GET kibana_sample_data_flights/_search
+{
+	"size": 0,
+	"aggs":{
+		"flight_dest":{
+			"terms":{
+				"field":"DestCountry"
+			},
+			"aggs":{
+				"avg_price":{
+					"avg":{
+						"field":"AvgTicketPrice"
+					}
+				},
+				"max_price":{
+					"max":{
+						"field":"AvgTicketPrice"
+					}
+				},
+				"min_price":{
+					"min":{
+						"field":"AvgTicketPrice"
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+#价格统计信息+天气信息
+GET kibana_sample_data_flights/_search
+{
+	"size": 0,
+	"aggs":{
+		"flight_dest":{
+			"terms":{
+				"field":"DestCountry"
+			},
+			"aggs":{
+				"stats_price":{
+					"stats":{
+						"field":"AvgTicketPrice"
+					}
+				},
+				"wather":{
+				  "terms": {
+				    "field": "DestWeather",
+				    "size": 5
+				  }
+				}
+
+			}
+		}
+	}
+}
+
 ```
 
