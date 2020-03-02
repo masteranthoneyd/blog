@@ -3,6 +3,7 @@ services:
   cerebro:
     image: lmenezes/cerebro:0.8.5
     container_name: cerebro
+    restart: always
     ports:
       - "9001:9000"
     command:
@@ -12,6 +13,7 @@ services:
   kibana:
     image: kibana:7.6.0
     container_name: kibana7
+    restart: always
     environment:
       - I18N_LOCALE=zh-CN
       - XPACK_GRAPH_ENABLED=true
@@ -24,6 +26,7 @@ services:
       - es7net
   es01:
     image: yangbingdong/elasticsearch-ik-pinyin:7.6.0
+    restart: always
     environment:
       - cluster.name=geektime
       - node.name=es01
@@ -43,6 +46,7 @@ services:
       - es7net
   es02:
     image: yangbingdong/elasticsearch-ik-pinyin:7.6.0
+    restart: always
     environment:
       - cluster.name=geektime
       - node.name=es02
