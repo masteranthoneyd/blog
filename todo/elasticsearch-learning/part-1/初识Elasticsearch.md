@@ -24,10 +24,16 @@ docker pull logstash:7.6.0
 `/etc/sysctl.conf` 追加:
 
 ```
+sudo tee -a /etc/sysctl.conf << EOF
 vm.max_map_count=262144
+EOF
 ```
 
-`sudo sysctl -p` 刷新.
+ 刷新配置:
+
+```
+sudo sysctl -p
+```
 
 `docker-compose.yml`:
 
