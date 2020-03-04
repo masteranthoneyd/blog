@@ -1,4 +1,17 @@
-> 并发设计模式
+---
+title: 并发设计模式
+date: 2019-10-29 11:45:41
+categories: [Programming, Java, Concurrent]
+tags: [Java, Concurrent]
+---
+
+![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part5-banner.jpg)
+
+# Preface
+
+> 并发领域中也有诸多的设计模式.
+
+<!--more-->
 
 # Immutability模式
 

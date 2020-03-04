@@ -193,6 +193,6 @@ deploy:
 - type: git
   repo:
     github: git@github.com:masteranthoneyd/masteranthoneyd.github.io.git,master
-    coding: git@git.coding.net:ookamiantd/ookamiantd.git,master
+#    coding: git@git.coding.net:ookamiantd/ookamiantd.git,master
   
   
