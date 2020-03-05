@@ -361,3 +361,310 @@ POST movies/_search
 }
 ```
 
+# Query & Filtering 与多字符串串多字段查询
+
+一般高级的搜索功能都是多项的复合搜索, 即对多个字段的进行搜索. 在 Elasticsearch 中有 Query 和 Filter 两种不同的 Context:
+
+* Query Context: 相关性算分
+* Filter Context: 不需要算分, 可以利用 Cache, 性能更好
+
+Elasticsearch 提供 **bool Query** 进行复合查询, 一个 bool 查询, 是一个或多个查询子句的组合.
+
+## bool 查询
+
+bool 查询包括4种子句, 2个会影响算分, 两个不会:
+
+| must     | 必须匹配,  贡献算分                       |
+| -------- | ----------------------------------------- |
+| should   | 选择性匹配, 贡献算分                      |
+| must_not | Filter Context 查询字句句, 必须不不能匹配 |
+| filter   | Filter Context 必须匹配, 但是不不贡献算分 |
+
+查询语法:
+
+```
+POST /products/_bulk
+{ "index": { "_id": 1 }}
+{ "price" : 10,"avaliable":true,"date":"2018-01-01", "productID" : "XHDK-A-1293-#fJ3" }
+{ "index": { "_id": 2 }}
+{ "price" : 20,"avaliable":true,"date":"2019-01-01", "productID" : "KDKE-B-9947-#kL5" }
+{ "index": { "_id": 3 }}
+{ "price" : 30,"avaliable":true, "productID" : "JODL-X-1937-#pV7" }
+{ "index": { "_id": 4 }}
+{ "price" : 30,"avaliable":false, "productID" : "QQPX-R-3956-#aD8" }
+
+#基本语法
+POST /products/_search
+{
+  "query": {
+    "bool" : {
+      "must" : {
+        "term" : { "price" : "30" }
+      },
+      "filter": {
+        "term" : { "avaliable" : "true" }
+      },
+      "must_not" : {
+        "range" : {
+          "price" : { "lte" : 10 }
+        }
+      },
+      "should" : [
+        { "term" : { "productID.keyword" : "JODL-X-1937-#pV7" } },
+        { "term" : { "productID.keyword" : "XHDK-A-1293-#fJ3" } }
+      ],
+      "minimum_should_match" :1
+    }
+  }
+}
+```
+
+* 子查询可以任意顺序出现
+* 可以嵌套多个查询
+* 如果你的 bool 查询中, 没有 must 条件, should 中必须至少满足一条查询
+
+bool 嵌套:
+
+```
+#嵌套，实现了 should not 逻辑
+POST /products/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "term": {
+          "price": "30"
+        }
+      },
+      "should": [
+        {
+          "bool": {
+            "must_not": {
+              "term": {
+                "avaliable": "false"
+              }
+            }
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
+```
+
+### 控制字段的 Boosting
+
+下面例子中, 如果不设置 boost, 则两个文档的 `_score` 是一样的, 则按 `_id` 排序了, 如果需要分数更倾向于第二个文档, 可以通过控制 `boost` 来达到效果: 
+
+```
+DELETE blogs
+POST /blogs/_bulk
+{ "index": { "_id": 1 }}
+{"title":"Apple iPad", "content":"Apple iPad,Apple iPad" }
+{ "index": { "_id": 2 }}
+{"title":"Apple iPad,Apple iPad", "content":"Apple iPad" }
+
+
+POST blogs/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"match": {
+          "title": {
+            "query": "apple,ipad",
+            "boost": 2
+          }
+        }},
+
+        {"match": {
+          "content": {
+            "query": "apple,ipad"
+          }
+        }}
+      ]
+    }
+  }
+}
+```
+
+### Boosting Query
+
+再来看一个例子, 先插入数据:
+
+```
+DELETE news
+POST /news/_bulk
+{ "index": { "_id": 1 }}
+{ "content":"Apple Mac" }
+{ "index": { "_id": 2 }}
+{ "content":"Apple iPad" }
+{ "index": { "_id": 3 }}
+{ "content":"Apple employee like Apple Pie and Apple Juice" }
+```
+
+如果要**优先**搜索苹果公司的产品, 采用以下查询都是不行的:
+
+```
+POST news/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match":{"content":"apple"}
+      }
+    }
+  }
+}
+
+POST news/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match":{"content":"apple"}
+      },
+      "must_not": {
+        "match":{"content":"pie"}
+      }
+    }
+  }
+}
+```
+
+可以通过 Boosting query 解决:
+
+```
+POST news/_search
+{
+  "query": {
+    "boosting": {
+      "positive": {
+        "match": {
+          "content": "apple"
+        }
+      },
+      "negative": {
+        "match": {
+          "content": "pie"
+        }
+      },
+      "negative_boost": 0.5
+    }
+  }
+}
+```
+
+# 单字符串多字段查询
+
+## Dis Max Query
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/dis-max-query-case.png)
+
+先来看一个例子:
+
+```
+DELETE /blogs
+PUT /blogs/_doc/1
+{
+    "title": "Quick brown rabbits",
+    "body":  "Brown rabbits are commonly seen."
+}
+
+PUT /blogs/_doc/2
+{
+    "title": "Keeping pets healthy",
+    "body":  "My quick brown fox eats rabbits on a regular basis."
+}
+
+POST /blogs/_search
+{
+    "query": {
+        "bool": {
+            "should": [
+                { "match": { "title": "Brown fox" }},
+                { "match": { "body":  "Brown fox" }}
+            ]
+        }
+    }
+}
+```
+
+我们期望是优先展示第二个文档, 因为目测文档二条件更为符合, 但结果却是:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/dis-max-query-result.png)
+
+这是因为 bool should 算分策略导致的:
+
+* 查询 should 语句中的两个查询
+* 加和两个查询的评分
+* 乘以匹配语句句的总数
+* 除以所有语句句的总数
+
+这时候可以使用 **Disjunction max query**, 这个查询将任何与**任一查询**匹配的文档作为结果返回, 采用字段上最匹配的评分最终评分返回:
+
+```
+POST /blogs/_search
+{
+  "explain": true, 
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "title": "Brown fox" }},
+                { "match": { "body":  "Brown fox" }}
+            ]
+        }
+    }
+}
+```
+
+但是某些情况下(比如查询 `Quick pets`), 同时匹配 title 和 body 字段的文档比只与一个字段匹配的文档的相关度更高, 但 disjunction max query 查询只会简单地使用单个最佳匹配语句的评分 `_score` 作为整体评分, 怎么办?
+
+这时候可以使用 **Tie Breaker** 参数调整
+
+* 获得最佳匹配语句的评分 `_score`
+* 将**其他匹配语句的评分**与 `tie_breaker` 相乘
+* 对以上评分**求和**并规范化
+
+```
+POST blogs/_search
+{
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "title": "Quick pets" }},
+                { "match": { "body":  "Quick pets" }}
+            ],
+            "tie_breaker": 0.2
+        }
+    }
+}
+```
+
+>  Tier Breaker 是一个介于 0-1 之间的浮点数, 0代表使用最佳匹配, 1 代表所有语句同等重要.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
