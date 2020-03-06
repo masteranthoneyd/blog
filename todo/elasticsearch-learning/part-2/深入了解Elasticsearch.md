@@ -644,15 +644,147 @@ POST blogs/_search
 
 >  Tier Breaker 是一个介于 0-1 之间的浮点数, 0代表使用最佳匹配, 1 代表所有语句同等重要.
 
+## Multi Match
+
+这个 API 也是单字符串多字段查询的. 主要有三种场景.
+
+### Best Fields
+
+当字段之间相互竞争, 又相互关联. 例如 title 和 body 这样的字段, 评分来自最匹配字段
+
+```
+POST blogs/_search
+{
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "title": "Quick pets" }},
+                { "match": { "body":  "Quick pets" }}
+            ],
+            "tie_breaker": 0.2
+        }
+    }
+}
+
+// 这个等价于上面
+POST blogs/_search
+{
+  "query": {
+    "multi_match": {
+      "type": "best_fields",
+      "query": "Quick pets",
+      "fields": ["title","body"],
+      "tie_breaker": 0.2,
+      "minimum_should_match": "20%"
+    }
+  }
+}
+```
+
+* Best Fields 是默认类型, 可以不用指定
+* Minimum should match 等参数可以传递到生成的 query 中
+
+### Most Fields
+
+处理英文内容时一种常见的手段是, 在主字段( English Analyzer)抽取词干, 加入同义词, 以匹配更更多的文档. 相同的文本,加入子字段(Standard Analyzer)以提供更加精确的匹配, 其他字段作为匹配文档提高高相关度的信号, 匹配字段越多则越好.
+
+比如下面场景中, 文档1的分数比文档2的要高(受英文分词器的影响, 导致精确度降低):
+
+```
+DELETE /titles
+PUT /titles
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "english"
+      }
+    }
+  }
+}
+
+POST titles/_bulk
+{ "index": { "_id": 1 }}
+{ "title": "My dog barks" }
+{ "index": { "_id": 2 }}
+{ "title": "I see a lot of barking dogs on the road " }
 
 
+GET titles/_search
+{
+  "query": {
+    "match": {
+      "title": "barking dogs"
+    }
+  }
+}
+```
 
+这时候可以使用多数字段匹配解决:
 
+```
+DELETE /titles
+PUT /titles
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "english",
+        "fields": {"std": {"type": "text","analyzer": "standard"}}
+      }
+    }
+  }
+}
 
+POST titles/_bulk
+{ "index": { "_id": 1 }}
+{ "title": "My dog barks" }
+{ "index": { "_id": 2 }}
+{ "title": "I see a lot of barking dogs on the road " }
 
+GET /titles/_search
+{
+  "profile": "true", 
+   "query": {
+        "multi_match": {
+            "query":  "barking dogs",
+            "type":   "most_fields",
+            "fields": [ "title", "title.std" ]
+        }
+    }
+}
 
+// 自定义 boost 值
+GET /titles/_search
+{
+   "query": {
+        "multi_match": {
+            "query":  "barking dogs",
+            "type":   "most_fields",
+            "fields": [ "title^10", "title.std" ]
+        }
+    }
+}
+```
 
+### Cross Field
 
+ 对于某些实体,例如人名, 地址, 图书信息. 需要在多个字段中确定信息, 单个字段只能作为整体
+的一部分, 希望在任何这些列出的字段中找到尽可能多的词.
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields01.png)
+
+* 无法使用用 Operator
+* 可以用 copy_to 解决, 但是需要额外的存储空间
+
+使用跨字段搜索:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields02.png)
+
+* 支持使用用 Operator
+* 与 copy_to,  相比, 其中一个优势就是它可以在搜索时为单个字段提升权重
 
 
 
