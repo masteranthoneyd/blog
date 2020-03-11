@@ -1,0 +1,42 @@
+version: '2.2'
+services:
+  kibana:
+    image: kibana:7.6.0
+    container_name: kibana7
+    restart: always
+    environment:
+      - I18N_LOCALE=zh-CN
+      - XPACK_GRAPH_ENABLED=true
+      - TIMELION_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elasticsearch-net
+  elasticsearch:
+    image: yangbingdong/elasticsearch-ik-pinyin:7.6.0
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - node.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elasticsearch-net
+
+volumes:
+  elasticsearch-data:
+    driver: local
+
+networks:
+  elasticsearch-net:
+    driver: bridge

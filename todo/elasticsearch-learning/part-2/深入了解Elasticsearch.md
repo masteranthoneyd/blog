@@ -361,6 +361,70 @@ POST movies/_search
 }
 ```
 
+# 相关性算分
+
+* 搜索的相关性算分, 描述了一个文档和查询语句**匹配的程度**, 算分结果体现在 `_score` 字段.
+* 打分的本质是排序, 需要把最符合用户需求文档排在前面, ES 5 之前, 默认的相关性算分
+  采用 **TF-IDF**, 现在采用 **BM 25**.
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/es-tf-idf.png)
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/es-bm-25.png)
+
+## Boosting Query
+
+看一个例子:
+
+```
+PUT testscore/_bulk
+{ "index": { "_id": 1 }}
+{ "content":"we use Elasticsearch to power the search" }
+{ "index": { "_id": 2 }}
+{ "content":"we like elasticsearch" }
+{ "index": { "_id": 3 }}
+{ "content":"The scoring of documents is caculated by the scoring formula" }
+{ "index": { "_id": 4 }}
+{ "content":"you know, for search" }
+
+POST /testscore/_search
+{
+  "query": {
+    "match": {
+      "content": "elasticsearch"
+    }
+  }
+}
+```
+
+这个搜索的结果有两条数据, 分别是id为1跟2的文档, 但是2文档的得分会更高, 因为根据 TF-IDF 公式, 2的文档长度更短, 所以它的得分更高, 如果要使1排在前面, 可以使用 Boosting Query:
+
+```
+POST testscore/_search
+{
+    "query": {
+        "boosting" : {
+            "positive" : {
+                "term" : {
+                    "content" : "elasticsearch"
+                }
+            },
+            "negative" : {
+                 "term" : {
+                     "content" : "like"
+                }
+            },
+            "negative_boost" : 0.2
+        }
+    }
+}
+```
+
+参数 boost的含义:
+
+* 当 boost > 1 时,打分的相关度相对性提升
+* 当 0 < boost < 1 时,打分的权重相对性降低
+* 当 boost < 0 时,贡献负分
+
 # Query & Filtering 与多字符串串多字段查询
 
 一般高级的搜索功能都是多项的复合搜索, 即对多个字段的进行搜索. 在 Elasticsearch 中有 Query 和 Filter 两种不同的 Context:

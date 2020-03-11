@@ -11,13 +11,13 @@ services:
       - ./logstash.conf:/etc/logstash.conf
       - ./movie.cvs:/initialize/movie.cvs
     networks:
-      - es7net
+      - elasticsearch-net
     entrypoint:
       - logstash
       - -f
       - /etc/logstash.conf
 
 networks:
-  es7net:
+  elasticsearch-net:
     driver: bridge
 
