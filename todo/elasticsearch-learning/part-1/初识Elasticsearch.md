@@ -339,6 +339,25 @@ GET /_cat/indices?v&s=docs.count:desc
 
 ![](https://cdn.yangbingdong.com/img/elasticsearch/get-cluster-health.png)
 
+### 脑裂问题
+
+Split-Brain, 分布式系统的经典网络问题, 当出现网络问题, 一个节点和其他节点无法连接:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/splite-brain.png)
+
+如何避免: 7.0 之前通过设置quorum(仲裁),只有在 Master eligible 节点数大于 quorum 时,才能
+进行选举
+
+* Quorum = (master 节点总数 /2)+ 1
+* 当 3 个 master eligible 时,设置 `discovery.zen.minimum_master_nodes` 为 2,即可避免脑裂
+
+从 7.0 开始,无需这个配置, 移除 `minimum_master_nodes` 参数,让 Elasticsearch 自己选择可以形成仲裁的节点.
+
+### 分片与集群的故障转移
+
+需要集群具备故障转移的能力, 必须将索引的副本分片数设置为 1, 否则, 一点有节点就是, 就会造成数据
+丢失.
+
 ## 基本CRUD与批量操作
 
 ### CRUD
