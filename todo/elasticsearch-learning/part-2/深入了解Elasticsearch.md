@@ -365,7 +365,7 @@ POST movies/_search
 
 * 搜索的相关性算分, 描述了一个文档和查询语句**匹配的程度**, 算分结果体现在 `_score` 字段.
 * 打分的本质是排序, 需要把最符合用户需求文档排在前面, ES 5 之前, 默认的相关性算分
-  采用 **TF-IDF**, 现在采用 **BM 25**.
+  采用 **TF-IDF**(Term Frequency-Inverse Document Frequency), 现在采用 **BM 25**(Best Match, 貌似是经过 25 次迭代调整之后得出的算法, 它也是基于 TF-IDF 进化来的).
 
 ![](https://cdn.yangbingdong.com/img/elasticsearch/es-tf-idf.png)
 
@@ -850,15 +850,598 @@ GET /titles/_search
 * 支持使用用 Operator
 * 与 copy_to,  相比, 其中一个优势就是它可以在搜索时为单个字段提升权重
 
+## 分词器实战
+
+* IK 分词器: ***[https://github.com/medcl/elasticsearch-analysis-ik](https://github.com/medcl/elasticsearch-analysis-ik)***
+* 拼音分词器: ***[https://github.com/medcl/elasticsearch-analysis-pinyin](https://github.com/medcl/elasticsearch-analysis-pinyin)***
+* 繁体转换器: ***[https://github.com/medcl/elasticsearch-analysis-stconvert](https://github.com/medcl/elasticsearch-analysis-stconvert)***
+
+```
+DELETE prod
+PUT prod
+{
+  "settings": {
+    "refresh_interval": "5s",
+    "number_of_replicas": 5,
+    "number_of_shards": 1,
+    "analysis": {
+      "char_filter": {
+        "ts_convert_char_filter": {
+          "type": "stconvert",
+          "convert_type": "t2s"
+        },
+        "char_convert_char_filter": {
+          "type": "mapping",
+          "mappings": [
+            "six => 6"
+          ]
+        }
+      },
+      "tokenizer": {
+        "pinyin_tokenizer": {
+          "type": "pinyin",
+          "keep_first_letter": true
+        }
+      },
+      "filter": {
+        "pinyin_full_filter": {
+          "type": "pinyin",
+          "keep_first_letter": false,
+          "keep_joined_full_pinyin": true
+        },
+        "pinyin_simple_filter": {
+          "type": "pinyin",
+          "keep_full_pinyin": false
+        }
+      },
+      "analyzer": {
+        "ik_max_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_max_word"
+        },
+        "ik_smart_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_smart"
+        },
+        "ik_max_full_pinyin_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_max_word",
+          "filter": "pinyin_full_filter"
+        },
+        "ik_smart_full_pinyin_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_smart",
+          "filter": "pinyin_full_filter"
+        },
+        "ik_max_simple_pinyin_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_max_word",
+          "filter": "pinyin_simple_filter"
+        },
+        "ik_smart_simple_pinyin_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "ts_convert_char_filter",
+            "char_convert_char_filter"
+          ],
+          "tokenizer": "ik_smart",
+          "filter": "pinyin_simple_filter"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "prodName": {
+        "type": "text",
+        "analyzer": "ik_max_analyzer",
+        "search_analyzer": "ik_smart_analyzer",
+        "fields": {
+          "fpy": {
+            "type": "text",
+            "analyzer": "ik_max_full_pinyin_analyzer",
+            "search_analyzer": "ik_smart_full_pinyin_analyzer"
+          },
+          "spy": {
+            "type": "text",
+            "analyzer": "ik_max_simple_pinyin_analyzer",
+            "search_analyzer": "ik_smart_simple_pinyin_analyzer"
+          }
+        }
+      }
+    }
+  }
+}
+
+POST prod/_bulk
+{"index":{"_id":1}}
+{"prodName":"苹果手机2019"}
+{"index":{"_id":2}}
+{"prodName":"华为手机2020"}
+{"index":{"_id":3}}
+{"prodName":"sj手机2020"}
 
 
+POST prod/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "type": "most_fields",
+            "query": "手机",
+            "fields": [
+              "prodName^10",
+              "prodName.fpy^7",
+              "prodName.spy^5"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "highlight": {
+    "fields": {
+      "prodName": {
+        "pre_tags": ["<666>"],
+        "post_tags": ["</666>"]
+      }
+    }
+  }
+}
+```
+
+# 使用用 Search Template 和 Index Alias
+
+## Search Template
+
+Search Template 是一种解耦的手段, 开发人员更专注于业务, ES 专家优化 DSL.
+
+例子:
+
+```
+DELETE _scripts/prod_search_template
+POST _scripts/prod_search_template
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "_source": [
+        "prodName"
+      ],
+      "size": 20,
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "multi_match": {
+                "type": "most_fields",
+                "query": "{{q}}",
+                "fields": [
+                  "prodName^10",
+                  "prodName.fpy^7",
+                  "prodName.spy^5"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST prod/_search/template
+{
+  "id": "prod_search_template",
+  "params": {
+    "q": "手机"
+  }
+}
+```
+
+## Index Alias
+
+```
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "movies-2019",
+        "alias": "movies-latest"
+      }
+    }
+  ]
+}
+
+POST movies-latest/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+# 综合排序:Function Score Query 优化算分
+
+Function Score Query 可以在查询结束后, 对每一个匹配的文档进行一系列的重新算分, 根据新生成的分数进行排序.
+
+提供了几种默认的计算分值的函数:
+
+* Weight: 为每一个文档设置一个简单而不被规范化的权重
+* Field Value Factor: 使用该数值来修改 _score,例如将 "热度" 和 "点赞数" 作为算分的参考因素
+* Random Score: 为每一个用户使用一个不同的, 随机算分结果. 比如让每个用户能看到不同的随机排名,但是也希望同一个用户访问时,结果的相对顺序,保持一致 (Consistently Random)
+* 衰减函数: 以某个字段的值为标准, 距离某个值越近, 得分越高
+* Script Score: 自定义脚本完全控制所需逻辑
+
+例子:
+
+```
+DELETE blogs
+PUT /blogs/_doc/1
+{
+  "title":   "About popularity",
+  "content": "In this post we will talk about...",
+  "votes":   0
+}
+
+PUT /blogs/_doc/2
+{
+  "title":   "About popularity",
+  "content": "In this post we will talk about...",
+  "votes":   100
+}
+
+PUT /blogs/_doc/3
+{
+  "title":   "About popularity",
+  "content": "In this post we will talk about...",
+  "votes":   1000000
+}
+
+POST /blogs/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "multi_match": {
+          "query":    "popularity",
+          "fields": [ "title", "content" ]
+        }
+      },
+      "field_value_factor": {
+        "field": "votes",
+        "modifier": "log1p" ,
+        "factor": 0.1
+      },
+      "boost_mode": "sum",
+      "max_boost": 3
+    }
+  }
+}
+```
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/function-score-factor.png)
+
+`boost_mode` 可选:
+
+* `multiply` (默认): 算分与函数值的乘积
+* `sum`: 算分与函数的和
+* `min` / `max`: 算分与函数取 最小/ 最大值
+* `replace`: 使用函数值取代算分
+
+`max_boost` 可以将算分控制在一个最大值.
+
+>  参考: ***[https://www.elastic.co/guide/en/elasticsearch/reference/7.6/query-dsl-function-score-query.html](https://www.elastic.co/guide/en/elasticsearch/reference/7.6/query-dsl-function-score-query.html)***
+
+# 搜索提示 Suggester
+
+核心问题:
+
+- 匹配: 能够通过用户的输入进行前缀匹配
+- 排序: 根据建议词的优先级进行排序
+- 聚合: 能够根据建议词关联的商品进行聚合，比如聚合分类、聚合标签等
+- 纠错: 能够对用户的输入进行拼写纠错
+
+## Term & Phrase Suggester
+
+测试数据:
+
+```
+DELETE articles
+
+POST articles/_bulk
+{ "index" : { } }
+{ "body": "lucene is very cool"}
+{ "index" : { } }
+{ "body": "Elasticsearch builds on top of lucene"}
+{ "index" : { } }
+{ "body": "Elasticsearch rocks"}
+{ "index" : { } }
+{ "body": "elastic is the company behind ELK stack"}
+{ "index" : { } }
+{ "body": "Elk stack rocks"}
+{ "index" : {} }
+{  "body": "elasticsearch is rock solid"}
+```
+
+例子:
+
+```
+POST /articles/_search
+{
+  "suggest": {
+    "term-suggestion": {
+      "text": "lucen hocks",
+      "term": {
+        "suggest_mode": "always",
+        "field": "body",
+        "prefix_length": 0,
+        "sort": "frequency"
+      }
+    }
+  }
+}
+```
+
+* `term-suggestion` 为自定义字段, suggest 结果在此字段中
+* `term` 为 term suggest 关键字
+* `suggest_mode`:
+  * `missing`: 如索引中已经存在, 就不提供建议
+  * `popular`: 推荐出现频率更加高的词
+  * `always`: 无论是否存在, 都提供建议
+* `sort` 排序, 默认按照 `score` 排序, 也可以按照 `frequency`
+* 默认首字母不一致就不会匹配推荐,但是如果将 `prefix_length` 设置为 0, 就会为 `hock` 建议 `rock`
+
+Phrase Suggester 则是在 Term Suggester 上增加了一些额外的逻辑
+
+```
+POST /articles/_search
+{
+  "suggest": {
+    "my-suggestion": {
+      "text": "lucne and elasticsear rock hello world ",
+      "phrase": {
+        "field": "body",
+        "max_errors":2,
+        "confidence":0,
+        "direct_generator":[{
+          "field":"body",
+          "suggest_mode":"always"
+        }],
+        "highlight": {
+          "pre_tag": "<em>",
+          "post_tag": "</em>"
+        }
+      }
+    }
+  }
+}
+```
+
+* `max_errors`: 最多可以拼错的 Terms 数
+* `confidence`: 限制返回结果数, 默认为 1
+
+## 自动补全与基于上下文的提示
+
+### Completion Suggester
+
+* 自动完成功能, 用户每输入一个字符. 就需要即时发送一个查询请求到后端查找匹配项
+* 它对性能要求比较苛刻
+* Elasticsearch 将 Analyse 的数据编码成FST与索引放在一起, 它会被整个加载进内存里面, 速度非常快
+* FST只能**支持前缀查找**
+
+定义 mappings:
+
+```
+DELETE articles
+PUT articles
+{
+  "mappings": {
+    "properties": {
+      "title_completion":{
+        "type": "completion"
+      }
+    }
+  }
+}
+```
+
+* 字段 `type` 需要用 `completion`
+
+查询:
+
+```
+POST articles/_bulk
+{"index":{}}
+{"title_completion":"lucene is very cool"}
+{"index":{}}
+{"title_completion":"Elasticsearch builds on top of lucene"}
+{"index":{}}
+{"title_completion":"Elasticsearch rocks"}
+{"index":{}}
+{"title_completion":"elastic is the company behind ELK stack"}
+{"index":{}}
+{"title_completion":"Elk stack rocks"}
+{"index":{}}
+
+POST articles/_search?pretty
+{
+  "size": 0,
+  "suggest": {
+    "article-suggester": {
+      "prefix": "elk ",
+      "completion": {
+        "field": "title_completion"
+      }
+    }
+  }
+}
+```
+
+### Context Suggester
+
+Completion Suggester 的扩展, 可以在搜索中加入更多的上下文信息,例如,输入 `star`
+
+* 咖啡相关: 建议 Starbucks
+* 电影相关:  star wars
+
+实现 Context Suggester, 可以定义两种类型:
+
+* Category: 任意的字符串
+* Geo: 地理理位置信息
+
+```
+DELETE comments
+PUT comments
+PUT comments/_mapping
+{
+  "properties": {
+    "comment_autocomplete":{
+      "type": "completion",
+      "contexts":[{
+        "type":"category",
+        "name":"comment_category"
+      }]
+    }
+  }
+}
+
+POST comments/_doc
+{
+  "comment":"I love the star war movies",
+  "comment_autocomplete":{
+    "input":["star wars"],
+    "contexts":{
+      "comment_category":"movies"
+    }
+  }
+}
+
+POST comments/_doc
+{
+  "comment":"Where can I find a Starbucks",
+  "comment_autocomplete":{
+    "input":["starbucks"],
+    "contexts":{
+      "comment_category":"coffee"
+    }
+  }
+}
 
 
+POST comments/_search
+{
+  "suggest": {
+    "MY_SUGGESTION": {
+      "prefix": "sta",
+      "completion":{
+        "field":"comment_autocomplete",
+        "contexts":{
+          "comment_category":"coffee"
+        }
+      }
+    }
+  }
+}
+```
 
+# 跨级群搜索
 
+应用场景: 水平扩展出现瓶颈, 将数据分散到多个集群中
 
+启动三个集群:
 
+```
+bin/elasticsearch -E node.name=cluster0node -E cluster.name=cluster0 -E path.data=cluster0_data -E discovery.type=single-node -E http.port=9200 -E transport.port=9300
 
+bin/elasticsearch -E node.name=cluster1node -E cluster.name=cluster1 -E path.data=cluster1_data -E discovery.type=single-node -E http.port=9201 -E transport.port=9301
+
+bin/elasticsearch -E node.name=cluster2node -E cluster.name=cluster2 -E path.data=cluster2_data -E discovery.type=single-node -E http.port=9202 -E transport.port=9302
+```
+
+在每个集群上执行:
+
+```
+PUT /_cluster/settings
+{
+  "persistent": {
+    "cluster": {
+      "remote": {
+        "cluster0": {
+          "seeds": [
+            "127.0.0.1:9300"
+          ],
+          "transport.ping_schedule": "30s"
+        },
+        "cluster1": {
+          "seeds": [
+            "127.0.0.1:9301"
+          ],
+          "transport.compress": true,
+          "skip_unavailable": true
+        },
+        "cluster2": {
+          "seeds": [
+            "127.0.0.1:9302"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+创建测试数据:
+
+```
+POST /users/_doc
+{"name":"user1","age":10}
+
+POST /users/_doc
+{"name":"user2","age":20}
+
+POST /users/_doc
+{"name":"user3","age":30}
+```
+
+查询:
+
+```
+GET /users,cluster1:users,cluster2:users/_search
+{
+  "query": {
+    "range": {
+      "age": {
+        "gte": 20,
+        "lte": 40
+      }
+    }
+  }
+}
+```
 
 
 
