@@ -632,7 +632,7 @@ spring:
 
 某些特殊的场景下, 我们需要在事务开启时, 完成时做一些事情, 比如释放一些资源. 
 
-## TransactionSynchronization
+## 方式一: TransactionSynchronization
 
 Spring事务的核心部分在 `TransactionInterceptor#invoke`, `TransactionInterceptor` 继承了 `TransactionAspectSupport`, `TransactionAspectSupport` 使用 `AbstractPlatformTransactionManager` 的实现类操作事务. `AbstractPlatformTransactionManager` 中的 `processCommit` 以及  `processRollback` 中的几个节点会调用到 `TransactionSynchronizationUtils` 中的一些方法: 
 
@@ -720,7 +720,7 @@ public class TestTransactionAspect {
 
 这样就行了~
 
-## 继承DataSourceTransactionManager
+## 方式二: 继承DataSourceTransactionManager
 
 上面的方法有一个缺点, 不能在事务开启时做一些事情, 可以通过继承 `DataSourceTransactionManager` 来实现:
 
@@ -766,6 +766,86 @@ public class CustomDataSourceTransactionManagerAutoConfiguration {
 	}
 }
 ```
+
+## 方式三: @TransactionalEventListener
+
+使用 `@TransactionalEventListener` 可以在事务的某些阶段处理 Event
+
+```java
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@EventListener
+public @interface TransactionalEventListener {
+
+    // 指定当前标注方法处理事务的类型
+	TransactionPhase phase() default TransactionPhase.AFTER_COMMIT;
+
+    // 用于指定当前方法如果没有事务，是否执行相应的事务事件监听器
+	boolean fallbackExecution() default false;
+
+    // 与classes属性一样，指定了当前事件传入的参数类型，指定了这个参数之后就可以在监听方法上
+    // 直接什么一个这个参数了
+	@AliasFor(annotation = EventListener.class, attribute = "classes")
+	Class<?>[] value() default {};
+
+    // 作用于value属性一样，用于指定当前监听方法的参数类型
+	@AliasFor(annotation = EventListener.class, attribute = "classes")
+	Class<?>[] classes() default {};
+
+    // 这个属性使用Spring Expression Language对目标类和方法进行匹配，对于不匹配的方法将会过滤掉
+	String condition() default "";
+
+}
+```
+
+```java
+public enum TransactionPhase {
+    // 指定目标方法在事务commit之前执行
+	BEFORE_COMMIT,
+
+    // 指定目标方法在事务commit之后执行
+	AFTER_COMMIT,
+
+    // 指定目标方法在事务rollback之后执行
+	AFTER_ROLLBACK,
+    
+    // 指定目标方法在事务完成时执行，这里的完成是指无论事务是成功提交还是事务回滚了
+	AFTER_COMPLETION
+}
+```
+
+示例:
+
+```java
+@Component
+public class UserTransactionEventListener {
+
+  @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+  public void beforeCommit(PayloadApplicationEvent<User> event) {
+    System.out.println("before commit, id: " + event.getPayload().getId());
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void afterCommit(PayloadApplicationEvent<User> event) {
+    System.out.println("after commit, id: " + event.getPayload().getId());
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
+  public void afterCompletion(PayloadApplicationEvent<User> event) {
+    System.out.println("after completion, id: " + event.getPayload().getId());
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+  public void afterRollback(PayloadApplicationEvent<User> event) {
+    System.out.println("after rollback, id: " + event.getPayload().getId());
+  }
+}
+```
+
+* 它的原理也是利用了方式一中的 `TransactionSynchronization`. 
+* 贴上 `@TransactionalEventListener` 注解的方法会被 Spring 使用 `TransactionalEventListenerFactory` 包装成 `ApplicationListenerMethodTransactionalAdapter`
+* `ApplicationListenerMethodTransactionalAdapter` 中进一步将监听方法封装成 `TransactionSynchronizationEventAdapter`, 再通过 `TransactionSynchronizationManager.registerSynchronization` 进行注册
 
 ## 判断当前方法是否在事务环境中
 
