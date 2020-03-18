@@ -1443,7 +1443,92 @@ GET /users,cluster1:users,cluster2:users/_search
 }
 ```
 
+# 文档的存储
 
+![](https://cdn.yangbingdong.com/img/elasticsearch/index-document-process.png)
 
+* 文档会存储在具体的某个主分片和副本分片上: 例如文档1, 会存储在 P0 和 R0 分片上
+* 文档路由算法: `shard = hash(_routing) % number_of_primary_shards`
+  * Hash 算法确保文档均匀分散到分片中
+  * 默认的 `_routing` 值是文档 id
+  * 可以自行制定 routing 数值, 例如用相同国家的商品, 都分配到指定的 shard
+  * 设置 Index Settings 后, **Primary 数不能随意修改的根本原因**
 
+# 索引生命周期
 
+* 在 Lucene 中, Lucene Index 包含了若干个 Segment
+* 在 Elasticsearch 中, Index 包含了若干主从 Shard, Shard 包干了若干 Segment
+* Segment 是 Elasticsearch 中存储的最小文件单元, 也就是分段存储, Segment被设计为**不可变**(Immutable Design)的
+
+不可变性带来的好处就是:
+
+* 避免了锁带来的性能问题
+* 可以利用内存, 由于 Segment 不可变, 所以 Segment 被加载到内存后无需改变, 只要内存足够, Segment就可以长期驻村, 大大提升查询性能
+* 更新, 新增的增量的方式很轻, 性能好
+
+缺点也很明显:
+
+* 删除操作不会马上删除有一定的空间浪费
+* 频繁更新涉及到大量的删除动作, 会有大量的空间浪费
+
+## Lucene Index
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle.png)
+
+* 在 Lucene 中, 单个倒排索引文件被称为 Segment, 多个 Segment 汇总在一起, 称为 Lucene的 Index
+* 当有新文档写入时,会生成新 Segment, 查询时会同时查询所有 Segments, 并且对结果汇总, Lucene 中有一个文件, 用来记录所有 Segments 信息, 叫做 Commit Point
+* 删除的文档信息,保存在 `.del` 文件中
+
+## Refresh
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-refresh.png)
+
+* 将 Index buffer 写入 Segment 的过程叫 Refresh, Refresh 不执行 fsync 操作
+* Refresh 频率: 默认 1 秒发生一次,可通过 `index.refresh_interval` 配置. Refresh 后, 数据就可以被搜索到了, 这也是为什么Elasticsearch 被称为近实时搜索
+* 如果系统有大量的数据写入, 那就会产生很多的 Segment, Index Buffer 被占满时, 触发 Refresh, 默认值是 JVM 的 10%
+
+## Transaction Log
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-transaction-log.png)
+
+* Segment 写入磁盘的过程**相对耗时**, 借助文件系统缓存, Refresh 时, 先将Segment 写入缓存以**开放查询**
+* 为了保证数据不会丢失, 所以在 Index 文档时, 同时写 Transaction Log, 高版本开始, Transaction Log 默认落盘, 每个分片有一个 Transaction Log
+* 在 ES Refresh 时, Index Buffer 被清空, Transaction log 不会清空
+
+## Flush
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-flush.png)
+
+* 调用 Refresh, Index Buffer 清空
+* 调用 fsync, 将缓存中的 Segments写入磁盘
+* 清空(删除) Transaction Log
+* 默认 30 分钟调用一次或者 Transaction Log 满 (默认 512 MB)
+
+## Merge
+
+* Segment 很多, 需要被定期被合并
+  * 减少 Segments / 删除已经删除的文档
+* ES 和 Lucene 会自动进行 Merge 操作
+  * POST my_index/_forcemerge
+
+这个流程的目的是: 提升写入性能(异步落盘)
+
+# 剖析分布式查询
+
+Elasticsearch 的搜索分为两个阶段: Query & Fetch
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/elasticsearch-query-and-fetch.png)
+
+## Query 阶段
+
+* 节点收到请求, 以 Coordinating 节点的身份在6个主副分片中随机选择3个, 发送查询请求
+* 被选中的分片执行查询, **进行排序**, 然后每个分片都会返回 **From + Size** 个排序后的**文档 Id** 和排序值
+
+## Fetch 阶段
+
+* Coordinating 节点将每个分片返回的文档 Id 重新组合排序, 选取 From 到 From + Size 个文档 Id
+* 以 multi get 的请求方式, 到相应的分片获取详细的文档数据
+
+## 潜在问题
+
+由于每个分片需要查询 From + Size 的数量, 所以总的查询数量为 number_of_shard * (from + size), 所以在**深度分页**的情况下会有性能问题

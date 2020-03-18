@@ -338,44 +338,6 @@ GET /_cat/indices?v&s=docs.count:desc
   * 增加副本数, 可以一定程度提高服务的可用性(读取的吞吐)
   * 需要集群具备故障转移的能力, 必须将索引的副本分片数设置为 1![](https://cdn.yangbingdong.com/img/elasticsearch/get-cluster-health.png)
 
-#### 生命周期
-
-* 在 Lucene 中, Lucene Index 包含了若干个 Segment
-* 在 Elasticsearch 中, Index 包含了若干主从 Shard, Shard 包干了若干 Segment
-* Segment 是 Elasticsearch 中存储的最小文件单元, 也就是分段存储, Segment被设计为**不可变**(Immutable Design)的
-
-不可变性带来的好处就是:
-
-* 避免了锁带来的性能问题
-* 可以利用内存, 由于 Segment 不可变, 所以 Segment 被加载到内存后无需改变, 只要内存足够, Segment就可以长期驻村, 大大提升查询性能
-* 更新, 新增的增量的方式很轻, 性能好
-
-缺点也很明显:
-
-* 删除操作不会马上删除有一定的空间浪费
-* 频繁更新涉及到大量的删除动作, 会有大量的空间浪费
-
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-refresh.png)
-
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle.png)
-
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-transaction-log.png)
-
-
-
-这个流程的目的是: 提升写入性能(异步落盘)
-
-### 文档的存储
-
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-document-process.png)
-
-* 文档会存储在具体的某个主分片和副本分片上: 例如文档1, 会存储在 P0 和 R0 分片上
-* 文档路由算法: `shard = hash(_routing) % number_of_primary_shards`
-  * Hash 算法确保文档均匀分散到分片中
-  * 默认的 `_routing` 值是文档 id
-  * 可以自行制定 routing 数值, 例如用相同国家的商品, 都分配到指定的 shard
-  * 设置 Index Settings 后, **Primary 数不能随意修改的根本原因**
-
 ### 脑裂问题
 
 Split-Brain, 分布式系统的经典网络问题, 当出现网络问题, 一个节点和其他节点无法连接:
