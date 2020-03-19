@@ -674,13 +674,53 @@ $ xxd Test.class
 
 留意开头的魔数, 这是 Java 之父詹姆斯·高斯林（James Gosling）留下的彩蛋.
 
+# 常用的JVM参数
+
+> 来自 ***[无敌码农](https://mp.weixin.qq.com/s?__biz=MzU3NDY4NzQwNQ==&mid=2247483820&idx=1&sn=8418f0f6a618bb0f0ca0980af09a816f&chksm=fd2fd06eca5859786ab124dd204a7ec9b1ad3ed230b9b531086cc6729a277a05d3e8307b7e0d&scene=21#wechat_redirect)***
+
+java启动参数共分为三类:
+
+其一是标准参数（ `-`），所有的JVM实现都必须实现这些参数的功能，而且向后兼容
+
+其二是非标准参数（ `-X`），默认jvm实现这些参数的功能，但是并不保证所有jvm实现都满足，且不保证向后兼容
+
+其三是非Stable参数（ `-XX`），此类参数各个jvm实现会有所不同，将来可能会随时取消，需要慎重使用
+
+![](https://cdn.yangbingdong.com/img/jvm/jvm-param.webp)
+
+正确打印日志:
+
+```
+-XX:+PrintGCDetails
+-XX:+PrintGCDateStamps
+-Xloggc:/home/GCEASY/gc-%t.log
+```
+
+打印ClassLoader日志(这个参数会在控制台打印所有类加载/卸载信息):
+
+```
+-XX:+TraceClassLoading 
+-XX:+TraceClassUnloading
+```
+
+OOM时Dump内存:
+
+```
+-XX:+HeapDumpOnOutOfMemoryError 
+-XX:HeapDumpPath=/crashes/my-heap-dump.hprof
+```
+
+OOM时执行脚本（比如重启）:
+
+```
+-XX:OnOutOfMemoryError=/scripts/restart-myapp.sh
+```
+
 # 最后
 
 附上两张来自 ***[无敌码农](https://mp.weixin.qq.com/s?__biz=MzU3NDY4NzQwNQ==&mid=2247483820&idx=1&sn=8418f0f6a618bb0f0ca0980af09a816f&chksm=fd2fd06eca5859786ab124dd204a7ec9b1ad3ed230b9b531086cc6729a277a05d3e8307b7e0d&scene=21#wechat_redirect)*** 的图片: 
 
 ![](https://cdn.yangbingdong.com/img/jvm/jvm-men-thread.webp)
-
-![](https://cdn.yangbingdong.com/img/jvm/jvm-param.webp)
 
 > **参考并转载于: **
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***
