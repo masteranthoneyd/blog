@@ -342,6 +342,63 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 更多方式请看: ***[http://www.baeldung.com/exception-handling-for-rest-with-spring](http://www.baeldung.com/exception-handling-for-rest-with-spring)***
 
+### 异常处理性能优化
+
+Java 异常对象的构造是十分耗时的, 原因是创建异常对象时会调用父类 `Throwable` 的 `fillInStackTrace()` 方法生成栈追踪信息, 对于一般的**业务异常**, 我们可以适当优化, 先看一下 `RuntimeException` 的构造器:
+
+```java
+protected RuntimeException(String message, Throwable cause,
+                               boolean enableSuppression,
+                               boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+```
+
+这几个参数的意义如下：
+
+* `message`
+  异常的描述信息, 也就是在打印栈追踪信息时异常类名后面紧跟着的描述字符串
+* `cause`
+  导致此异常发生的父异常, 即追踪信息里的`caused by`
+* `enableSuppress`
+  关于异常挂起的参数, 这里我们永远设为 `false` 即可
+* `writableStackTrace`
+  表示是否生成栈追踪信息, 只要将此参数设为 `false`, 则在构造异常对象时就不会调用 f`illInStackTrace()`
+
+业务异常可以这样定义:
+
+```java
+public class XXXException extends RuntimeException {
+    /**
+     * 仅包含message, 没有cause, 也不记录栈异常, 性能最高
+     * @param msg
+     */
+    public XXXException(String msg) {
+        this(msg, false);
+    }
+
+    /**
+     * 包含message, 可指定是否记录异常
+     * @param msg
+     * @param recordStackTrace
+     */
+    public EngineException(String msg, boolean recordStackTrace) {
+        super(msg, null, false, recordStackTrace);
+    }
+
+    /**
+     * 包含message和cause, 会记录栈异常
+     * @param msg
+     * @param cause
+     */
+    public EngineException(String msg, Throwable cause) {
+        super(msg, cause, false, true);
+    }
+}
+```
+
+一般情况用第一个构造参数, 比较轻量级, 想要精准跟踪异常可以使用第三个构造参数.
+
 ## 404处理
 
 Spring Boot 2.X 中会有一个Resouce的Mapping来处理静态资源, 当输入一个不存在的请求时, 总会匹配到这个Mapping:
