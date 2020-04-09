@@ -1018,6 +1018,16 @@ sudo dpkg -i libpng12-0_1.2.49-1+deb7u2_amd64.deb
 sudo dpkg -i wps-office_10.1.0.5672~a21_amd64.deb
 ```
 
+## 数据库建模工具
+
+### PDMan
+
+***[http://www.pdman.cn/#/downLoad](http://www.pdman.cn/#/downLoad)***
+
+在线打开 pmd 文件:
+
+***[http://www.dmanywhere.cn/](http://www.dmanywhere.cn/)***
+
 ## 有道云笔记客户端
 
 官方并没有停 Linux 的客户端, 但 Github 有非官方的开源版:
