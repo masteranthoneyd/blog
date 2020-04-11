@@ -224,27 +224,42 @@ Binding bindingHeadersQueue3(Queue headersQueue3, HeadersExchange headersExchang
 
 > `header` 不能以 `x-` 开头, 参考官方文档:https://www.rabbitmq.com/tutorials/amqp-concepts.html#exchange-headers
 
-# Spring AMQP的几个参数
+# Spring AMQP的几个参数说明
 
-## prefetch
+```
+spring:
+  rabbitmq:
+    addresses: 127.0.0.1:5672
+    username: rabbitmq
+    password: rabbitmq
+    virtual-host: /
+    connection-timeout: 15000
 
-`prefetch`允许为每个consumer指定最大的unacked messages数目, 简单来说就是用来指定一个consumer一次可以从Rabbit中获取多少条message并缓存在client中(RabbitMQ提供的各种语言的client library), 一旦缓冲区满了, Rabbit将会停止投递新的message到该consumer中直到它发出ack.
+    ## 生产者配置
+    # 消息到达 exchange ack
+    publisher-confirm-type: correlated
+    # 消息被路由到队列 ack
+    publisher-returns: true
+    template:
+      # 必须开启这个才会触发 return callback
+      mandatory: true
 
-> spring-amqp中的prefetch默认值是1
+    ## 消费端配置
+    listener:
+      simple:
+        #消费并发消费数量, 默认为1
+        concurrency: 1
+        #最大消费端数
+        max-concurrency: 1
+        #自动签收auto  手动 manual
+        acknowledge-mode: manual
+        #限流（海量数据，同时只能过来一条）
+        prefetch: 1
+```
 
-## concurrency
+# ListenerContainer线程池配置(坑)
 
-`concurrency`设置的是对每个listener在初始化的时候设置的并发消费者的个数.
-
-> spring-amqp中的concurrency默认值为1
-
-## recoveryInterval
-
-`recoveryInterval` 指定消费者重连时间间隔, 比如RabbitMQ挂了或者配置了独占队列, 消费者会根据 `recoveryInterval` 配置的时间进行重试.
-
-> spring-amqp中的recoveryInterval默认值是5000(即5秒)
-
-# ListenerContainer线程池配置
+在 Spring 封装中默认使用 `SimpleAsyncTaskExecutor` 作为线程池.
 
 ## Spring AMQP
 
@@ -907,67 +922,6 @@ public ListenerContainerCustomizer customListenerContainerCustomizer() {
 启用了独占模式的队列中, 可以看到这个:
 
 ![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-exclusive.png)
-
-# 消息分区
-
-> 这个应用场景比较少, 就不详细记录了
-
-消费者配置:
-
-```properties
-spring.cloud.stream.bindings.<channelName>.group=test
-spring.cloud.stream.bindings.<channelName>.consumer.partitioned=true
-spring.cloud.stream.instanceCount=3
-```
-
-分别4分配置:
-
-```properties
-# application-1
-spring.cloud.stream.instanceIndex=0
-# application-2
-spring.cloud.stream.instanceIndex=1
-# application-3
-spring.cloud.stream.instanceIndex=2
-```
-
-生产者配置:
-
-```properties
-# 按照payload中age字段分区, 支持SpEL表达式
-spring.cloud.stream.bindings.partition-channel.producer.partitionKeyExpression=payload.age
-spring.cloud.stream.bindings.partition-channel.producer.partitionCount=3
-```
-
-启动后Exahange如下所示:
-
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-partition.png)
-
-如果需要自定义消息分区策略, 其实现`PartitionKeyExtractorStrategy`, `PartitionSelectorStrategy`接口:
-
-```java
-package com.cloud.shf.stream.partition.extractor;
-public class MyPartitionKeyExtractor implements PartitionKeyExtractorStrategy, PartitionSelectorStrategy {
-    @Override
-    public int selectPartition(Object key, int divisor) {
-        return ((Map<String, Integer>) key).get("router");
-    }
- 
-    @Override
-    public Object extractKey(Message<?> message) {
-        return message.getHeaders();
-    }
-}
-```
-
-策略配置:
-
-```properties
-spring.cloud.stream.bindings.<channelName>.producer.partitionKeyExtractorClass=com...MyPartitionKeyExtractor
-spring.cloud.stream.bindings.<channelName>.producer.partitionSelectorClass=com...MyPartitionKeyExtractor
-```
-
-> Spring Cloud Stream RabbitMQ 的分区实现显得有点不灵活, 动态扩容比较困难.
 
 # 附录
 

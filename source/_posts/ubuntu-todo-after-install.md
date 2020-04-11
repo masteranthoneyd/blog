@@ -1335,7 +1335,9 @@ services:
 
 百度网盘不限速客户端, golang + qt5, 跨平台图形界面: ***[https://github.com/peterq/pan-light](https://github.com/peterq/pan-light)***
 
-## Stardict火星译王
+## 翻译
+
+### Stardict火星译王
 
 ```
 sudo apt install stardict
@@ -1349,7 +1351,18 @@ tar -xjvf a.tar.bz2
 mv a /usr/share/stardict/dic
 ```
 
+### golddict翻译
+
+```
+sudo apt install goldendict
+```
+
+在 编辑 -> 词典 中添加有道翻译 `http://dict.youdao.com/search?q=%GDWORD%&ue=utf8`, 再禁用其他翻译源.
+
+选中英文, 按 `Ctrl` + `C` + `C` 即可弹出翻译界面.
+
 ## 备份工具 Timeshift
+
 ```
 sudo add-apt-repository -y ppa:teejee2008/ppa
 sudo apt install -y timeshift

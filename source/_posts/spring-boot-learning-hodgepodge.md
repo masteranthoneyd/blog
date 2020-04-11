@@ -1547,115 +1547,38 @@ public class SpringBootMailApplicationTests {
 }
 ```
 
-# 优雅停机
-
-可参考: ***[http://www.spring4all.com/article/1022](http://www.spring4all.com/article/1022)***
+# 手动停机
 
 ```java
-package com.yangbingdong.docker.config.shutdown;
-
-import io.undertow.server.HandlerWrapper;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.GracefulShutdownHandler;
-
-/**
- * @author ybd
- * @date 18-4-19
- * @contact yangbingdong1994@gmail.com
- */
-public class GracefulShutdownWrapper implements HandlerWrapper {
-	private GracefulShutdownHandler gracefulShutdownHandler;
-
-	@Override
-	public HttpHandler wrap(HttpHandler handler) {
-		if(gracefulShutdownHandler == null) {
-			this.gracefulShutdownHandler = new GracefulShutdownHandler(handler);
-		}
-		return gracefulShutdownHandler;
-	}
-
-	public GracefulShutdownHandler getGracefulShutdownHandler() {
-		return gracefulShutdownHandler;
-	}
-}
-```
-
-```java
-package com.yangbingdong.docker.config.shutdown;
-
-import io.undertow.server.handlers.GracefulShutdownHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-
-/**
- * @author ybd
- * @date 18-4-19
- * @contact yangbingdong1994@gmail.com
- */
-@RequiredArgsConstructor
+@RestController
 @Slf4j
-public class GracefulShutdownListener implements ApplicationListener<ContextClosedEvent> {
+public class ShutdownController implements ApplicationContextAware, DisposableBean {
 
-	private final GracefulShutdownWrapper gracefulShutdownWrapper;
+    private ApplicationContext applicationContext;
 
-	@Override
-	public void onApplicationEvent(ContextClosedEvent event) {
-		GracefulShutdownHandler gracefulShutdownHandler = gracefulShutdownWrapper.getGracefulShutdownHandler();
-		try {
-			gracefulShutdownHandler.shutdown();
-			gracefulShutdownHandler.awaitShutdown(5000L);
-		} catch (InterruptedException e) {
-			log.error("Graceful shutdown container error:", e);
-		}
-	}
-}
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
-```
+    @GetMapping("/close")
+    public String close() {
+        ((ConfigurableApplicationContext) applicationContext).close();
+        return "OK";
+    }
 
-```java
-package com.yangbingdong.springboot.common.config.shutdown;
+    @GetMapping("/exit")
+    public void exit() {
+        int exit = SpringApplication.exit(applicationContext, () -> 0);
+        System.exit(exit);
+    }
 
-import io.undertow.server.HandlerWrapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-/**
- * @author ybd
- * @date 18-4-19
- * @contact yangbingdong1994@gmail.com
- */
-@Configuration
-@ConditionalOnClass(HandlerWrapper.class)
-public class GracefulShutdownConfiguration {
-
-	@Bean
-	public GracefulShutdownWrapper gracefulShutdownWrapper() {
-		return new GracefulShutdownWrapper();
-	}
-
-	@Bean
-	public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> gracefulWebServerFactoryCustomizer() {
-		return factory -> {
-			if (factory instanceof UndertowServletWebServerFactory) {
-				UndertowServletWebServerFactory undertowServletWebServerFactory = (UndertowServletWebServerFactory) factory;
-				undertowServletWebServerFactory
-						.addDeploymentInfoCustomizers(deploymentInfo ->
-								deploymentInfo.addOuterHandlerChainWrapper(gracefulShutdownWrapper()));
-//				undertowServletWebServerFactory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.ENABLE_STATISTICS, true));
-			}
-		};
-	}
-
-	@Bean
-	public GracefulShutdownListener gracefulShutdown() {
-		return new GracefulShutdownListener(gracefulShutdownWrapper());
-	}
+    @Override
+    public void destroy() throws Exception {
+        log.warn("Application closing...");
+    }
 }
 ```
+
+
 
