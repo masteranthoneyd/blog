@@ -1532,3 +1532,6 @@ Elasticsearch 的搜索分为两个阶段: Query & Fetch
 ## 潜在问题
 
 由于每个分片需要查询 From + Size 的数量, 所以总的查询数量为 number_of_shard * (from + size), 所以在**深度分页**的情况下会有性能问题
+
+# 分页与遍历
+
