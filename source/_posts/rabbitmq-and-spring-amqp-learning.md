@@ -257,9 +257,9 @@ spring:
         prefetch: 1
 ```
 
-# ListenerContainer线程池配置(坑)
+# ListenerContainer线程池配置
 
-在 Spring 封装中默认使用 `SimpleAsyncTaskExecutor` 作为线程池.
+默认一个消费者对应一个新的线程, 可配置共享线程池节约线程.
 
 ## Spring AMQP
 
