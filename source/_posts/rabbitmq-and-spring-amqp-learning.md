@@ -418,84 +418,133 @@ public class RabbitConsumer {
         }
     }
 }
-
 ```
 
-# Spring Cloud Stream消费失败处理
+# Spring Boot 中使用方式
 
-## 重试
+## 创建队列交换机
 
-Spring Cloud Stream 中, 如果消息处理失败, 默认会自动重试三次, 可以通过一下参数配置:
-
-```
-spring.cloud.stream.bindings.<channelName>.consumer.max-attempts=1
-```
-
->  一般地, 如果这个消息因为代码缺陷而失败, 那么无论重试多少次都是失败的. 所以个人觉得这个还是设置为1比较合适.
-
-## 自定义错误处理
-
-```yaml
-spring:
-  cloud:
-    stream:
-      default:
-        contentType: application/json
-        consumer:
-          maxAttempts: 1
-      bindings:
-        error-topic-output:
-          destination: error-topic
-        error-topic-input:
-          destination: error-topic
-          group: test
-```
+### 通过@RabbitListener创建
 
 ```java
-public interface ErrorTopic {
-	String OUTPUT = "error-topic-output";
-	String INPUT = "error-topic-input";
+@RabbitListener(
+        bindings = @QueueBinding(
+                value = @Queue(value = "test-topic",durable = "true"),
+                exchange = @Exchange(name = "test-topic"),
+                key="test-topic"
+        )
+)
+@RabbitHandler
+public void onMessage(@Payload TestMessage testMessage, @Headers Map<String,Object> headers, Channel channel) throws Exception {
+    try {
+        log.info("收到消息, 当前线程: {}, 消息内容: {}", Thread.currentThread().getId(), testMessage);
+    } catch (Exception e) {
+        // 更新为消费失败
+        log.error("消费异常");
+    } finally {
+        // multiple 为 true 代表批量确认
+        channel.basicAck((Long) headers.get(AmqpHeaders.DELIVERY_TAG),false);
+    }
+}
+```
 
-	@Output(OUTPUT)
-	MessageChannel output();
+### 通过声明Bean创建
 
-	@Input(INPUT)
-	SubscribableChannel input();
+```java
+@Bean
+public Queue delayQueue() {
+    return new Queue(DELAY_QUEUE, true, false, false);
+}
+```
+
+### 通过RabbitAdmin动态注册
+
+```java
+@Bean
+public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+    return new RabbitAdmin(connectionFactory);
 }
 ```
 
 ```java
-@EnableBinding(ErrorTopic.class)
+@Configuration
+@PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:MQ-CONF/topic.yml")
+@EnableConfigurationProperties(MessagingProperty.class)
+public class MessagingConfiguration implements InitializingBean {
+
+    private final MessagingProperty messagingProperty;
+    private final RabbitAdmin rabbitAdmin;
+
+    public MessagingConfiguration(MessagingProperty messagingProperty, RabbitAdmin rabbitAdmin) {
+        this.messagingProperty = messagingProperty;
+        this.rabbitAdmin = rabbitAdmin;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        if (MqType.RABBIT.equals(messagingProperty.getMqType())) {
+            registryRabbit(messagingProperty);
+        }
+    }
+
+    private void registryRabbit(MessagingProperty messagingProperty) {
+        for (MessagingProperty.Topic topic : messagingProperty.getTopics()) {
+            String topicName = topic.getName();
+            Queue queue = new Queue(topicName, true, false, false);
+            DirectExchange exchange = new DirectExchange(topicName, true, false);
+            exchange.setDelayed(parseBoolean(topic.getProperties().getOrDefault("delayed", "false")));
+            Binding binding = BindingBuilder.bind(queue).to(exchange).with(topicName);
+            rabbitAdmin.declareQueue(queue);
+            rabbitAdmin.declareExchange(exchange);
+            rabbitAdmin.declareBinding(binding);
+        }
+    }
+}
+```
+
+`topic.yml`:
+
+```yml
+messaging:
+  mqType: rabbit
+  topics:
+    - name: test-topic
+      properties:
+        delayed: true
+```
+
+## 监听
+
+```java
 @Component
 @Slf4j
-public class ErrorTopicListener {
+public class RabbitMqConsumer {
 
-	@StreamListener(ErrorTopic.INPUT)
-	public void receive(String payload) {
-		log.info("Received: " + payload);
-		throw new IllegalArgumentException("模拟一个异常");
-	}
-
-	@ServiceActivator(inputChannel = "error-topic.test.errors")
-	public void error(Message<?> message) throws InterruptedException {
-		log.info("Message consumer failed, call fallback! Message: {}", message);
-	}
-
+    @RabbitListener(queues = "test-topic")
+    public void onOrderMessage(@Payload TestMessage testMessage, @Headers Map<String,Object> headers, Channel channel) throws Exception {
+        try {
+            log.info("收到消息, 当前线程: {}, 消息内容: {}", Thread.currentThread().getId(), testMessage);
+        } catch (Exception e) {
+            // 更新为消费失败
+            log.error("消费异常");
+        } finally {
+            // multiple 为 true 代表批量确认
+            channel.basicAck((Long) headers.get(AmqpHeaders.DELIVERY_TAG),false);
+        }
+    }
 }
 ```
 
-通过使用`@ServiceActivator(inputChannel = "error-topic.test.errors")`指定了某个通道的错误处理映射。其中，`inputChannel`的配置中对应关系如下：
+`@RabbitListener`注解的消费者监听方法, 默认有几个可以自动注入的参数对象:
 
-- `error-topic`：对应 `destination`
-- `test`：对应 `group`
+* `org.springframework.amqp.core.Message` 消息原始对象
+* `com.rabbitmq.client.Channel` 接收消息所所在的`channel`
+* `org.springframework.messaging.Message` amqp的原始消息对象转换为messaging后的消息对象, 该消息包含自定义消息头和标准的amqp消息头
 
-运行结果:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-custom-hendle.png)
+此外, 非以上参数, 自定义参数对象可以通过`@Header`/`@Headers`/`@Payload`标注为消息头或消息体接受对象.
 
-> 这种方式一般比较适合有明确的错误处理, 应用场景比较少.
-
-## DLQ队列
+# DLQ队列
 
 通过下面参数开启DLQ转发:
 
@@ -527,7 +576,7 @@ spring.cloud.stream.rabbit.bindings.<channelName>.consumer.republish-to-dlq=true
 
 ![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq03.png)
 
-## 重新入队
+# 重新入队
 
 重新入队是指消息消费失败了之后, 消息将不会被抛弃, 而是重新放入队列中. 
 
@@ -562,29 +611,6 @@ public void receive(String payload) {
 **总结**:
 
 上面介绍了几种Spring Cloud Stream RabbitMQ中的重试策略, 个人认为比较适合实际业务场景的做法是, 失败后, 将消息持久化到数据库中, 后续再通过邮件或钉钉等方式通知开发人员进行处理. 因为一般场景下 , 绝大部分的异常消息都是由于业务代码的缺陷导致的, 所以怎么重试都会失败, 并且消费逻辑中一定要做好**幂等**校验.
-
-# Spring Cloud Stream 消息路由到不同的处理逻辑
-
-通过设置header可以实现逻辑路由:
-
-```java
-testTopic.output().send(MessageBuilder.withPayload(message).setHeader("version", "1.0").build());
-            testTopic.output().send(MessageBuilder.withPayload(message).setHeader("version", "2.0").build());
-```
-
-处理: 
-
-```java
-@StreamListener(value = TestTopic.INPUT, condition = "headers['version']=='1.0'")
-public void receiveV1(String payload, @Header("version") String version) {
-	log.info("Received v1 : " + payload + ", " + version);
-}
-
-@StreamListener(value = TestTopic.INPUT, condition = "headers['version']=='2.0'")
-public void receiveV2(String payload, @Header("version") String version) {
-	log.info("Received v2 : " + payload + ", " + version);
-}
-```
 
 # 延迟队列
 
@@ -750,20 +776,19 @@ Configuration:
 public class RabbitMqConfiguration {
 
 	@Bean
-	public CustomExchange delayExchange() {
-		Map<String, Object> args = new HashMap<>();
-		args.put(X_DELAYED_TYPE_KEY, X_DELAYED_TYPE_VALUE);
-		return new CustomExchange(DELAY_EXCHANGE, DELAY_EXCHANGE_TYPE, true, false, args);
+	public DirectExchange delayExchange() {
+        DirectExchange exchange = new DirectExchange(topicName, true, false, false);
+        exchange.setDelayed(true);
 	}
 
 	@Bean
 	public Queue delayQueue() {
-		return new Queue(DELAY_QUEUE, true);
+		return new Queue(DELAY_QUEUE, true, false, false);
 	}
 
 	@Bean
 	public Binding delayBinging() {
-		return BindingBuilder.bind(delayQueue()).to(delayExchange()).with(DELAY_ROUTING_KEY).noargs();
+		return BindingBuilder.bind(delayQueue()).to(delayExchange()).with(DELAY_ROUTING_KEY);
 	}
 }
 ```
@@ -772,12 +797,6 @@ public class RabbitMqConfiguration {
 
 ```java
 public final class MqConstant {
-
-	public static final String X_DELAYED_TYPE_KEY = "x-delayed-type";
-
-	public static final String X_DELAYED_TYPE_VALUE = "direct";
-
-	public static final String DELAY_EXCHANGE_TYPE = "x-delayed-message";
 
 	public static final String DELAY_EXCHANGE = "delay_exchange";
 
@@ -831,7 +850,7 @@ public class RabbitConsumer {
 }
 ```
 
-## 查看延迟消息数量:
+## 查看延迟消息数量
 
 这个可以通过RabbitMQ的管理页面查看:
 
