@@ -1533,5 +1533,199 @@ Elasticsearch 的搜索分为两个阶段: Query & Fetch
 
 由于每个分片需要查询 From + Size 的数量, 所以总的查询数量为 number_of_shard * (from + size), 所以在**深度分页**的情况下会有性能问题
 
+# 排序以及 Doc Value & Field Data
+
+排序基本语法:
+
+```
+POST /kibana_sample_data_ecommerce/_search
+{
+  "size": 5,
+  "query": {
+    "match_all": {
+
+    }
+  },
+  "sort": [
+    {"order_date": {"order": "desc"}},
+    {"_doc":{"order": "asc"}},
+    {"_score":{ "order": "desc"}}
+  ]
+}
+```
+
+Elasticsearch 有两种实现方法:
+
+* Fielddata (ES 1.X 以及之前版本)
+* Doc Values (列列式存储,对 Text 类型无无效) (ES 2.X之后版本)
+
+## 打开 Fielddata
+
+```
+PUT kibana_sample_data_ecommerce/_mapping
+{
+  "properties": {
+    "customer_full_name" : {
+          "type" : "text",
+          "fielddata": true,
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+  }
+}
+```
+
+* 默认关闭, 可以通过 Mapping 设置打开. 修改设置后, 即时生生效, 无需重建索引
+
+* 其他字段类型不支持, 只支持对 Text 进行设定
+
+## 关闭 Doc Value
+
+```
+PUT test_keyword/_mapping
+{
+  "properties": {
+    "user_name":{
+      "type": "keyword",
+      "doc_values":false
+    }
+  }
+}
+```
+
+* 什么时候关闭: 明确不需要做排序以及聚合分析
+* 可以增加索引速度, 减少磁盘空间
+* 需要重建索引
+
 # 分页与遍历
+
+插入数据:
+
+```
+DELETE users
+
+POST users/_doc
+{"name":"user1","age":10}
+
+POST users/_doc
+{"name":"user2","age":11}
+
+
+POST users/_doc
+{"name":"user2","age":12}
+
+POST users/_doc
+{"name":"user2","age":13}
+
+POST users/_count
+```
+
+## From Size
+
+语法:
+
+```
+POST users/_search
+{
+    "from": 1, 
+    "size": 4,
+    "query": {
+        "match_all": {}
+    }
+}
+```
+
+缺点: 深度分页会有性能问题, 假设 From = 990, Size = 10, 那么每个 Coordinating Node 都会获取 1000 个文档再聚合结果, 页数越深, 占用内存越多, Elasticsearch 有一个设定, 默认**限定到 10000 个文档**.
+
+## Search After
+
+```
+POST users/_search
+{
+    "size": 1,
+    "query": {
+        "match_all": {}
+    },
+    "sort": [
+        {"age": "desc"} ,
+        {"_id": "asc"}    
+    ]
+}
+
+POST users/_search
+{
+    "size": 1,
+    "query": {
+        "match_all": {}
+    },
+    "search_after":
+        [
+          10,
+          "dF-ExnEBHozATh0Ori4u"],
+    "sort": [
+        {"age": "desc"} ,
+        {"_id": "asc"}    
+    ]
+}
+```
+
+* 能避免深度分页的问题
+  * 不能指定页数 (From)
+  * 只能往下翻
+* 第一步搜索需要指定 sort, 并且保证值是唯一的(可以通过加入 _id 保证唯一性)
+* 然后使用上一次,最后一个文档的 sort 值进行查询
+
+原理是通过唯一排序值定位, 将每次要处理的文档数都控制在 固定的数值
+
+## Scroll API
+
+```
+DELETE users
+POST users/_doc
+{"name":"user1","age":10}
+
+POST users/_doc
+{"name":"user2","age":20}
+
+POST users/_doc
+{"name":"user3","age":30}
+
+POST users/_doc
+{"name":"user4","age":40}
+
+POST /users/_search?scroll=5m
+{
+    "size": 1,
+    "query": {
+        "match_all" : {
+        }
+    }
+}
+
+
+POST users/_doc
+{"name":"user5","age":50}
+POST /_search/scroll
+{
+    "scroll" : "1m",
+    "scroll_id" : "DXF1ZXJ5QW5kRmV0Y2gBAAAAAAAAAWAWbWdoQXR2d3ZUd2kzSThwVTh4bVE0QQ=="
+}
+```
+
+* 创建一个**快照**, 有新的数据写入以后,无法被查到
+* 每次查询后,输入上一次的 Scroll Id
+
+## 不同的搜索类型和使用场景
+
+* Regular
+  * 需要实时获取顶部的部分文档, 例如查询最新的订单
+* Scroll
+  * 需要全部文档, 例如导出全部数据
+* Pagination
+  * From 和 Size
+  * 如果需要深度分页,则选用 Search After
 
