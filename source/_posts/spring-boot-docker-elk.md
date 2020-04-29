@@ -126,6 +126,14 @@ logging:
 * `%msg{nolookups}`: 输出的log日志, `{nolookups}` 表示忽略掉一些内置函数比如 `logger.info("Try ${date:YYYY-MM-dd}")`, 如果不加 `{nolookups}` 那么输出的日志会是这样的 `Try 2019-05-28`.
 * `%n`: 换行, 一般跟在 `%msg` 后面.
 * `%xEx` | `%xwEx`: 输出异常, 后者会在异常信息的开始与结束append空的一行, 与 `%ex` 的区别在于在每一行异常信息后面会追加jar包的信息.
+* `%clr`: 配置颜色, 比如 `%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{cyan}`
+  * `blue`: 蓝色
+  * `cyan`: 青色
+  * `faint`: 不知道什么颜色, 输出来是黑色
+  * `green`: 绿色
+  * `magenta`: 粉色
+  * `red`: 红色
+  * `yellow`: 黄色
 
 所以我们的pattern是这样的: `%d{yyyy-MM-dd HH:mm:ss.SSS}  | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx`.
 
@@ -1042,6 +1050,42 @@ proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
 ```
 
 后端获取第一个Ip. 
+
+## 服务注册IP问题
+
+一般安装了 Docker 会出现多网卡的情况, 在服务注册的时候会出现获取到的ip不准确的问题, 可以通过以下几种方式解决(可以混合使用)
+
+方式一, 忽略指定名称的网卡
+
+```yml
+spring:
+  cloud:
+    inetutils:
+      ignored-interfaces: 
+        - docker0
+        - veth.*
+```
+
+方式二, 使用正则表达式, 指定使用的网络地址
+
+```yml
+spring:
+  cloud:
+    inetutils:
+      preferred-networks: 
+        - 192.168
+        - 10.0
+```
+
+方式三, 只使用站点本地地址
+
+```yml
+
+spring:
+  cloud:
+    inetutils:
+      use-only-site-local-interfaces: true
+```
 
 ## Demo地址
 
