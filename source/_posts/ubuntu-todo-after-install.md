@@ -1595,6 +1595,12 @@ sudo rm -rf $HOME/.local/share/Trash/files/*
 
 ***[Text to ASCII Art Generator](http://patorjk.com/software/taag/#p=display&f=Slant&t=Composer)***
 
+## 其他 Ubuntu 衍生版
+
+* ***[Elementary OS](https://elementary.io/zh_CN/)***
+* ***[Linux Mint](https://www.linuxmint.com/)***
+* ***[Zorin OS](https://zorinos.com/)***
+
 # Finally
 
 > 参考: 
