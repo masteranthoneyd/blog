@@ -503,6 +503,10 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 选中部分外暗淡效果: Alt+鼠标右键单击
 
+### HighlightBracketPair
+
+这是个括号高亮插件.
+
 ## Jclasslib
 
 > 这是一个查看Java字节码的插件
