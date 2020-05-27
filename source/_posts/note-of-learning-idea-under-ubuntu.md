@@ -511,9 +511,25 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 选中部分外暗淡效果: Alt+鼠标右键单击
 
-### HighlightBracketPair
+## HighlightBracketPair
 
 这是个括号高亮插件.
+
+## Checkstyle
+
+`checks.xml`: *[https://github.com/ningg/checkstyle/blob/master/src/main/resources/google_checks.xml](https://github.com/ningg/checkstyle/blob/master/src/main/resources/google_checks.xml)*
+
+安装完以后在 Other Settings 中配置 Checkstyle:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-2-configure.png)
+
+利用 Checkstyle 进行 check: (3 种, 可以使用一种)
+
+- `Check Current file`
+- `Check All Modified file`
+- `Check Project`
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-3-usage.png)
 
 ## Jclasslib
 
