@@ -427,7 +427,7 @@ git merge upstream/master
 
 # 附录
 
-## git pull 时每次都要输入用户名和密码的解决办法
+## Git pull 时每次都要输入用户名和密码的解决办法
 
 如果我们git clone的下载代码的时候是连接的https://而不是git@git (ssh)的形式，当我们操作git pull/push到远程的时候，总是提示我们输入账号和密码才能操作成功，频繁的输入账号和密码会很麻烦。
 
@@ -438,6 +438,47 @@ git config --global credential.helper store
 ```
 
 然后你会在你本地生成一个文本，上边记录你的账号和密码。当然这些你可以不用关心。然后你使用上述的命令配置好之后，再操作一次git pull，然后它会提示你输入账号密码，这一次之后就不需要再次输入密码了。
+
+# Git 多平台统一换行符
+
+### 设置 git 全局参数
+
+git 中有三个参数于换行符有关:
+
+- `eol`: 设置工作目录中文件的换行符, 有三个值 lf, crlf 和 native(默认, 同操作系统)
+- `autocrlf` :
+  - `true` 表示检出是转换CRLF, 提交时转换为 LF
+  - `input` 表示检出是不转换, 提交时转换为 LF
+  - `false` 表示不做转换
+- `safecrlf` :
+  - `true` 表示不允许提交时包含不同换行符
+  - `warn` 则只在有不同换行符时警告
+  - `false` 则允许提价时有不同换行符存在
+
+配置方法:
+
+```
+<!--统一换行符为 lf-->
+git config --global core.eol lf
+<!--将自动转换关闭,避免转换失败不能不同进行提交-->
+git config --global core.autocrlf false
+<!--禁止混用 lf 和 crlf 两种换行符-->
+git config --global core.safecrlf true
+```
+
+### 增加配置文件 .gitattributes
+
+虽然通过设置了 git 全局参数解决了问题, 但是作为团队协作的话, 并不能保证所有人都正确配好了. git 提供了 `.gitattributes` 文件解决了这个问题, 在项目根目录新建 `.gitattributes` 文件, 添加一下内容:
+
+```
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text eol=lf
+复制代码
+```
+
+通过这种方式避免有人没有设置 `core.autocrlf` 参数, 并且将该文件加入版本控制中.
+
+另外根据需要 `.gitattributes` 文件可以在项目不同目录中创建, 而一些非文本文件可以设置为二进制文件, 不用考虑换行符问题.
 
 # 最后
 

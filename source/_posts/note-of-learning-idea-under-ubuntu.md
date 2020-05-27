@@ -156,6 +156,14 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
 
+## 导入 Google Code Style
+
+查看并下载: *[https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml](https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml)*
+
+导入:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/set-code-style.png)
+
 ## Maven 自动下载源码
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
