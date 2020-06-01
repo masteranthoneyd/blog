@@ -2044,3 +2044,335 @@ POST employees/_search
 
 参考: *[https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html)*
 
+# Pipeline 聚合分析
+
+概念: 支持对聚合分析的结果, 再次进行聚合分析.
+
+Pipeline 的分析结果会输出到原结果中, 根据位置的不同, 分为两类:
+
+* Sibling: 结果和现有分析结果同级
+  * Max, Min, Avg & Sum Bucket
+  * Stats, Extended Status Bucket
+  * Percentiles Bucket
+* Parent: 结果内嵌到现有的聚合分析结果之中
+  * Derivative (求导)
+  * Cumultive Sum (累计求和)
+  * Moving Function (滑动窗口)
+
+## Sibing Pipline 例子
+
+数据沿用上一小结的.
+
+对不同类型工作的, 平均工资, 求最大/平均/统计信息/百分位数的值:
+
+```
+POST employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    },
+    "min_salary_by_job": {
+      "min_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    },
+    "max_salary_by_job": {
+      "max_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    },
+    "avg_salary_by_job":{
+      "avg_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    },
+    "stats_salary_by_job":{
+      "stats_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    },
+    "percentiles_salary_by_job":{
+      "percentiles_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+```
+
+## Derivative 例子
+
+按照年龄, 对工资进行求导(看工资发展的趋势)/累计求和/:
+
+```
+POST employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "age": {
+      "histogram": {
+        "field": "age",
+        "min_doc_count": 1,
+        "interval": 1
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        },
+        "derivative_avg_salary":{
+          "derivative": {
+            "buckets_path": "avg_salary"
+          }
+        },
+        "cumulative_salary":{
+          "cumulative_sum": {
+            "buckets_path": "avg_salary"
+          }
+        },
+        "moving_avg_salary":{
+          "moving_fn": {
+            "buckets_path": "avg_salary",
+            "window":10,
+            "script": "MovingFunctions.min(values)"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# 聚合的作用范围以及排序
+
+聚合分析默认范围: query 的查询结果集
+
+同时 ES 还支持以下方式改变聚合的作用范围:
+
+* Filter
+* Post_Filter
+* Global
+
+## Filter
+
+下面的 older_person 的作用范围是 filter , 而 all_jobs 还是基于 query
+
+```
+#Filter
+POST employees/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 20
+      }
+    }
+  },
+  "aggs": {
+    "older_person": {
+      "filter": {
+        "range": {
+          "age": {
+            "from": 35
+          }
+        }
+      },
+      "aggs": {
+        "jobs": {
+          "terms": {
+            "field": "job.keyword"
+          }
+        }
+      }
+    },
+    "all_jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    }
+  }
+}
+```
+
+## Post_Filter
+
+一条语句, 找出所有的job类型. 还能找到聚合后符合条件的结果:
+
+> post_filter的作用和我们常用的filter是类似的, 但由于post_filter是在查询之后才会执行, 所以post_filter不具备filter对查询带来的好处(忽略评分/缓存等), 因此, 在普通的查询中不要用post_filter来替代filter.
+
+```
+POST employees/_search
+{
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    }
+  },
+  "post_filter": {
+    "match": {
+      "job.keyword": "Dev Manager"
+    }
+  }
+}
+```
+
+## Global
+
+global 无视 query, 针对全文档进行统计:
+
+```
+POST employees/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 40
+      }
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    },
+    "all": {
+      "global": {},
+      "aggs": {
+        "salary_avg": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## 排序
+
+```
+POST employees/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 20
+      }
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "_count": "asc"
+          },
+          {
+            "_key": "desc"
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+根据子聚合排序:
+
+```
+POST employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "avg_salary": "desc"
+          }
+        ]
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    }
+  }
+}
+
+POST employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "stats_salary.min": "desc"
+          }
+        ]
+      },
+      "aggs": {
+        "stats_salary": {
+          "stats": {
+            "field": "salary"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# 聚合的精准度
+
+在多分片环境下, 会导致聚合的精准度产生偏差, 解决方案有两个:
+
+1. 当数据量不大时, 设置 PrimaryShard 为 1, 实现准确性
+
+2. 调整 shard size, shard size 默认大小为 size * 1.5 +10
+
+   ```
+   GET my_flights/_search
+   {
+     "size": 0,
+     "aggs": {
+       "weather": {
+         "terms": {
+           "field": "OriginWeather",
+           "size": 1,
+           "shard_size": 10,
+           "show_term_doc_count_error": true
+         }
+       }
+     }
+   }
+   ```
+
+   
