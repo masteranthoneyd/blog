@@ -1640,5 +1640,20 @@ public class ShutdownController implements ApplicationContextAware, DisposableBe
 }
 ```
 
+# 优雅停机
+
+> Spring Boot 2.3.0 之后支持配置方式实现优雅停机
+
+通过配置:
+
+```yaml
+	server:
+	  shutdown: graceful  #开启优雅停机, 默认 IMMEDIATE 立刻停机
+	  
+	spring:
+	  lifecyle:
+	    timeout-per-shutdown-phase: 30s  # 最大等待 30 秒
+```
+
 
 
