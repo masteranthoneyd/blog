@@ -453,7 +453,9 @@ CONFIG GET dir
 
 # Spring Boot整合
 
-## 核心依赖
+## Lettuce
+
+### 核心依赖
 
 ```xml
 <dependency>
@@ -469,7 +471,7 @@ CONFIG GET dir
 
 * 使用连接池需要用到`commons-pool2`
 
-## 配置
+### 配置
 
 ```yaml
 spring:
@@ -490,6 +492,28 @@ spring:
     timeout: 10s
 ```
 
+## Redisson
+
+Redisson 中已经实现了 Spring redis data, 可直接使用:
+
+```xml
+<dependency>
+    <groupId>org.redisson</groupId>
+    <artifactId>redisson-spring-boot-starter</artifactId>
+    <version>3.13.0</version>
+</dependency>
+```
+
+可使用 Spring data redis 的配置, 或者自定义 redisson 配置:
+
+```
+spring.redis.redisson.config=classpath:redisson.yaml
+```
+
+然后可正常 autowire `RedisTemplate` 或者 `RedissonClient`, 包括 redisson 中的一些常用功能比如分布式锁.
+
+>  文档: *[https://github.com/redisson/redisson/wiki/Redisson%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D](https://github.com/redisson/redisson/wiki/Redisson项目介绍)*
+
 # 客户端序列化选择
 
 > ***[https://github.com/masteranthoneyd/serializer](https://github.com/masteranthoneyd/serializer)***
@@ -506,6 +530,84 @@ CPU: I7-8700
 
 * `Protostuff`不能直接序列化集合, 需要用包装类封装起来. 
 * `String`类型还是建议直接使用`StringRedisSerializer`, 速度最快. 
+
+Kryo 序列化示例:
+
+```java
+public class Kryo5Serializer implements RedisSerializer<CacheWrapper> {
+
+	public static final Kryo5Serializer INSTANCE = new Kryo5Serializer();
+
+	private final Pool<Kryo> kryoPool;
+	private final Pool<Input> inputPool;
+	private final Pool<Output> outputPool;
+
+	private Kryo5Serializer() {
+		this.kryoPool = new Pool<Kryo>(true, false, 1024) {
+			@Override
+			protected Kryo create() {
+				return createKryo();
+			}
+		};
+
+		this.inputPool = new Pool<Input>(true, false, 512) {
+			@Override
+			protected Input create() {
+				return new Input(8192);
+			}
+		};
+
+		this.outputPool = new Pool<Output>(true, false, 512) {
+			@Override
+			protected Output create() {
+				return new Output(8192, -1);
+			}
+		};
+	}
+
+	protected Kryo createKryo() {
+		Kryo kryo = new Kryo();
+		kryo.setRegistrationRequired(false);
+		kryo.setReferences(false);
+		kryo.addDefaultSerializer(Throwable.class, new JavaSerializer());
+		kryo.register(CacheWrapper.class);
+		return kryo;
+	}
+
+	@Override
+	public byte[] serialize(CacheWrapper cacheWrapper) throws SerializationException {
+		Kryo kryo = kryoPool.obtain();
+		Output output = outputPool.obtain();
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			output.setOutputStream(stream);
+			kryo.writeClassAndObject(output, cacheWrapper);
+			output.flush();
+			return stream.toByteArray();
+		} finally {
+			output.setOutputStream(null);
+			kryoPool.free(kryo);
+			outputPool.free(output);
+		}
+	}
+
+	@Override
+	public CacheWrapper deserialize(byte[] bytes) throws SerializationException {
+		Kryo kryo = kryoPool.obtain();
+		Input input = inputPool.obtain();
+		try {
+			input.setInputStream(new ByteArrayInputStream(bytes));
+			return (CacheWrapper) kryo.readClassAndObject(input);
+		} finally {
+			input.setInputStream(null);
+			kryoPool.free(kryo);
+			inputPool.free(input);
+		}
+	}
+}
+```
+
+
 
 # Spring监听Redis Keyspace Event
 
@@ -859,3 +961,12 @@ public final class DisruptorUtil {
 > Basically `expired` events **are generated when the Redis server deletes the key** and not when the time to live theoretically reaches the value of zero.
 
 上面是官方文档的原文, 在删除key的时候发送事件, 而删除key不是实时的, 而是后台逐步删除的, 所有可能会与TTL时间存在误差. 在客户端链接丢失期间（比如项目迭代发布版本）, 也是会丢失消息的. 
+
+# 分布式ID
+
+虽然 Redis 的 incr 命令可以做 分布式 id, 但是过于地依赖 Redis.
+其他方案:
+
+* 百度 Uid: ***[https://github.com/baidu/uid-generator](https://github.com/baidu/uid-generator)***
+* 美团 Leaf: ***[https://github.com/Meituan-Dianping/Leaf](https://github.com/Meituan-Dianping/Leaf)***
+* 滴滴 Tinyid: ***[https://github.com/didi/tinyid](https://github.com/didi/tinyid)***
