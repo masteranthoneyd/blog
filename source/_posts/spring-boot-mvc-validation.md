@@ -871,6 +871,107 @@ public class EnhanceWebMvcConfigurationSupport extends WebMvcConfigurationSuppor
 }
 ```
 
+## 跨域配置
+
+### Spring Mvc
+
+方式一: 在 Controller 的类或者方法上贴上 `@CrossOrigin`
+
+方式二: 上面的方式一需要每个类或者方法都加上, 有点麻烦, 可以使用 Spring 的 `CorsFilter`:
+
+```java
+@Bean
+public CorsFilter corsFilter() {
+	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	CorsConfiguration corsConfiguration = new CorsConfiguration();
+	corsConfiguration.addAllowedHeader("*");
+	corsConfiguration.addAllowedOrigin("*");
+	corsConfiguration.addAllowedMethod("*");
+	corsConfiguration.setAllowCredentials(true);
+	corsConfiguration.setMaxAge(Duration.ofHours(1));
+	source.registerCorsConfiguration("/**", corsConfiguration);
+	return new CorsFilter(source);
+}
+```
+
+### Spring Security
+
+```java
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .permitAll()
+                .and()
+                .httpBasic()
+                .and()
+                .cors()
+                .configurationSource(corsConfigurationSource())
+                .and()
+                .csrf()
+                .disable();
+    }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setMaxAge(Duration.ofHours(1));
+        source.registerCorsConfiguration("/**",configuration);
+        return source;
+    }
+}
+```
+
+### OAuth2
+
+集成了 OAth2 后, `/oauth/token` 会先发送一次 option 请求.
+
+```java
+@Configuration
+public class GlobalCorsConfiguration {
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
+    }
+}
+```
+
+然后在 SecurityConfig 中开启跨域支持
+
+```java
+@Configuration
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    ...
+    ...
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .requestMatchers().antMatchers(HttpMethod.OPTIONS, "/oauth/**")
+                .and()
+                .csrf().disable().formLogin()
+                .and()
+                .cors();
+    }
+}
+```
+
 # Validation
 
 ## 常用注解（大部分**JSR**中已有）

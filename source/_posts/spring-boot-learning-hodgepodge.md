@@ -839,6 +839,28 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-bean-process.webp)
 
+```
+实例化
+↓
+设置bean的Aware
+↓
+BeanPostProcessor.postProcessBeforeInitialization(Object bean, String beanName)
+↓
+InitializingBean.afterPorpertiesSet
+↓
+BeanPostProcessor.postProcessAfterInitialization(Object bean, String beanName)
+↓
+SmartInitializingSingleton.afterSingletonsInstantiated
+↓
+SmartLifecycle.start
+↓
+bean已经在spring容器的管理下，可以做我们想做的事
+↓
+SmartLifecycle.stop(Runnable callback)
+↓
+DisposableBean.destroy()
+```
+
 # 元注解与组合注解
 
 ## 元注解
