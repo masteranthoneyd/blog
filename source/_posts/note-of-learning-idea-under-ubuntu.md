@@ -156,14 +156,6 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
 
-## 导入 Google Code Style
-
-查看并下载: *[https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml](https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml)*
-
-导入:
-
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/set-code-style.png)
-
 ## Maven 自动下载源码
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
@@ -183,6 +175,69 @@ list = list.stream()
 ### Fix doc comment
 
 打开 Setting, Keymap -> Other -> Fix doc comment
+
+## 统一代码风格
+
+### 导入 Google Code Style
+
+查看并下载: *[https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml](https://github.com/ningg/styleguide/blob/gh-pages/intellij-java-google-style.xml)*
+
+导入:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/set-code-style.png)
+
+### 使用 editorconfig 与 gitattributes
+
+在项目根目录中加入 `.editorconfig` :
+
+```
+# http://editorconfig.org
+root = true
+
+# 空格替代Tab缩进在各种编辑工具下效果一致
+[*]
+indent_style = space
+indent_size = 4
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.java]
+indent_style = tab
+
+[*.{json,yml}]
+indent_size = 2
+
+[*.md]
+insert_final_newline = false
+trim_trailing_whitespace = false
+```
+
+在项目根目录中加入 `.gitattributes` :
+
+```
+# All text files should have the "lf" (Unix) line endings
+* text eol=lf
+# windows cmd shoud have the "crlf" (Win32) line endings
+*.cmd eol=crlf
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.java text
+*.js text
+*.css text
+*.html text
+*.properties text
+*.xml text
+*.yml text
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.jar binary
+*.ttf binary
+```
 
 # Keyboard shortcuts
 
