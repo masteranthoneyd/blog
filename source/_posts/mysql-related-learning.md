@@ -17,7 +17,7 @@ tags: [MySQL]
 
 ## 传统安装
 
-请见[*博主之前的一篇博文*](/2017/ubuntu-dev-environment-to-build/#%E5%AE%89%E8%A3%85MySQL%E4%BB%A5%E5%8F%8AGUI%E5%B7%A5%E5%85%B7)
+请见[*之前写的的一篇开发环境配置*](/2017/ubuntu-dev-environment-to-build/#%E5%AE%89%E8%A3%85MySQL%E4%BB%A5%E5%8F%8AGUI%E5%B7%A5%E5%85%B7)
 
 ## Docker版安装
 
@@ -123,54 +123,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 sudo apt install mycli
 ```
 
-使用: 
-
-```
-$ mycli --help
-Usage: mycli [OPTIONS] [DATABASE]
-
-  A MySQL terminal client with auto-completion and syntax highlighting.
-
-  Examples:
-    - mycli my_database
-    - mycli -u my_user -h my_host.com my_database
-    - mycli mysql://my_user@my_host.com:3306/my_database
-
-Options:
-  -h, --host TEXT               Host address of the database.
-  -P, --port INTEGER            Port number to use for connection. Honors
-                                $MYSQL_TCP_PORT.
-  -u, --user TEXT               User name to connect to the database.
-  -S, --socket TEXT             The socket file to use for connection.
-  -p, --password TEXT           Password to connect to the database.
-  --pass TEXT                   Password to connect to the database.
-  --ssl-ca PATH                 CA file in PEM format.
-  --ssl-capath TEXT             CA directory.
-  --ssl-cert PATH               X509 cert in PEM format.
-  --ssl-key PATH                X509 key in PEM format.
-  --ssl-cipher TEXT             SSL cipher to use.
-  --ssl-verify-server-cert      Verify server's "Common Name" in its cert
-                                against hostname used when connecting. This
-                                option is disabled by default.
-  -v, --version                 Output mycli's version.
-  -D, --database TEXT           Database to use.
-  -R, --prompt TEXT             Prompt format (Default: "\t \u@\h:\d> ").
-  -l, --logfile FILENAME        Log every query and its results to a file.
-  --defaults-group-suffix TEXT  Read MySQL config groups with the specified
-                                suffix.
-  --defaults-file PATH          Only read MySQL options from the given file.
-  --myclirc PATH                Location of myclirc file.
-  --auto-vertical-output        Automatically switch to vertical output mode
-                                if the result is wider than the terminal
-                                width.
-  -t, --table                   Display batch output in table format.
-  --csv                         Display batch output in CSV format.
-  --warn / --no-warn            Warn before running a destructive query.
-  --local-infile BOOLEAN        Enable/disable LOAD DATA LOCAL INFILE.
-  --login-path TEXT             Read this path from the login file.
-  -e, --execute TEXT            Execute command and quit.
-  --help                        Show this message and exit.
-```
+`mycli --help` 查看使用方法.
 
 ## Navicat Premium
 
@@ -212,6 +165,10 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
 ### 索引覆盖
 
 如果我们需要查询的是索引列索引或联合索引能覆盖的数据, 那么查询索引本身已经  "覆盖" 了需要的数据不再需要回表查询.
+
+### 索引下推
+
+索引下推优化(index condition pushdown)是在 MySQL 5.6 引入的: 可以在索引遍历过程中, 对索引中包含的字段先做判断, 直接过滤掉不满足条件的记录, 减少回表次数.
 
 ## 如何判断数据库索引是否生效
 
@@ -287,13 +244,15 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
 
 3. 对于**多列索引**, **不是使用的第一部分**, 则不会使用索引
 
-4. 如果列类型是**字符串**, 那一定要在条件中将数据使用**引号**引用起来, 否则不会使用索引
+4. 隐式转换, 比如列类型是**字符串**, 那一定要在条件中将数据使用**引号**引用起来, 否则不会使用索引
 
    ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain04.png)
 
-5. `like`的模糊查询以 `%` 开头, 索引失效, 索引 B+ 树中行数据**按照索引值排序**, 只能根据前缀进行比较.
+5. 可能由于字符集导致的索引失败, 连表查询中, 两个关联字段的字符集不一样会导致索引失效, 因为字符集不一样 MySQL 或使用函数将字符集改成一样的
 
-6. 应尽量**避免**在 `where` 子句中对字段进行**表达式操作**, 这将导致引擎放弃使用索引而进行全表扫描
+6. `like`的模糊查询以 `%` 开头, 索引失效, 索引 B+ 树中行数据**按照索引值排序**, 只能根据前缀进行比较.
+
+7. 应尽量**避免**在 `where` 子句中对字段进行**表达式操作**, 这将导致引擎放弃使用索引而进行全表扫描
 
    如: 
 
@@ -307,7 +266,7 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
    select id from t where num = 100*2；1
    ```
 
-7. 应尽量**避免**在 where 子句中对字段进行**函数操作**, 这将导致引擎放弃使用索引而进行全表扫描, 同样的原因, 索引保存的是索引列的原始值, 而不是经过函数计算后的值
+8. 应尽量**避免**在 where 子句中对字段进行**函数操作**, 这将导致引擎放弃使用索引而进行全表扫描, 同样的原因, 索引保存的是索引列的原始值, 而不是经过函数计算后的值
 
    例如: 
 
@@ -333,11 +292,11 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
    select id from t where createdate >= '2005-11-30' and createdate < '2005-12-1';
    ```
 
-8. 不要在 `where` 子句中的 `=` 左边进行函数、算术运算或其他表达式运算, 否则系统将可能无法正确使用索引
+9. 不要在 `where` 子句中的 `=` 左边进行函数、算术运算或其他表达式运算, 否则系统将可能无法正确使用索引
 
-9. 如果MySQL估计使用全表扫描要比使用索引快, 则不使用索引
+10. 如果MySQL估计使用全表扫描要比使用索引快, 则不使用索引
 
-10. 不适合键值较少的列（重复数据较多的列）
+11. 不适合键值较少的列（重复数据较多的列）
 
     > 假如索引列TYPE有5个键值, 如果有1万条数据, 那么 WHERE TYPE = 1将访问表中的2000个数据块. 再加上访问索引块, 一共要访问大于2000个的数据块. 如果全表扫描, 假设10条数据一个数据块, 那么只需访问1000个数据块, 既然全表扫描访问的数据块少一些, 肯定就不会利用索引了. 
 
