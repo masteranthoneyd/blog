@@ -1364,6 +1364,8 @@ Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `Dispatch
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-security/dao-authentication-password-check.png)
 
+登录成功后会执行 `AbstractAuthenticationProcessingFilter#successfulAuthentication` 将 `Authentication` 存到 `SecurityContextHolder` 中.
+
 到此, 认证的核心就是这样了.
 
 ### 核心配置
