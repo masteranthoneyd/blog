@@ -1314,3 +1314,245 @@ public class GlobalExceptionHandler {
 > 相关代码:
 >
 > ***[https://github.com/masteranthoneyd/spring-boot-learning](https://github.com/masteranthoneyd/spring-boot-learning)***
+
+# Authentication
+
+下面介绍两种关于登录认证的实现方案, 分别是基于 Spring Security, 以及基于 Spring Mvc 的 `HandlerInterceptor`.
+
+## 基于 Spring Security
+
+Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `DispatcherServlet` 之前触发.
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/security-filters.png)
+
+默认有哪些 Filter 可以看 `FilterComparator` 中的源码:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/filter-comparator.png)
+
+### 认证流程
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/core-service-Sequence.png)
+
+#### 登录拦截
+
+在 `FilterComparator` 中有一个 `UsernamePasswordAuthenticationFilter`, 继承了 `AbstractAuthenticationProcessingFilter`, 它就是我们登录时用到的 Filter:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/username-password-authentication-filter.png)
+
+* 可以看到, **默认情况下拦截 `/login` 端点的 POST 请求**, 当然, 可以通过配置改变这个 url.
+* 这里还有一个关键, 在 `attempAuthentication` 中, 用户名以及密码的参数是 `username` 以及 `password`, 并且是从 http parameter 中获取的, 如果要**支持 Json 格式的登录, 那就要重写这里**.
+* 将登录请求信息封装成 `Authentication` 的实现类, 这里是 `UsernamePasswordAuthenticationToken`, **然后交给 `AuthenticationManager` 进行下一步的认证**. 
+
+> 这一步相当与登录信息的提取以及封装.
+
+#### 认证
+
+认证通过 `AuthenticationManager` 进行的, 这是一个接口, 默认的实现类为 `ProviderManager`:
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/provider-manager.png)
+
+可以看到实现类 `ProviderManager` 中维护了一个 `List<AuthenticationProvider>` 的列表, 存放多种认证方式, 实际上这是委托者模式的应用(Delegate)
+
+> 核心的认证入口始终只有一个: `AuthenticationManager`, 不同的认证方式: 用户名 + 密码(`UsernamePasswordAuthenticationToken`)，邮箱 + 密码, 手机号码 + 密码登录则对应了三个 `AuthenticationProvider`. 在默认策略下, 只需要通过一个 `AuthenticationProvider` 的认证, 即可被认为是登录成功.
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/spring%20security%20architecture.png)
+
+一个最常用到的 `AuthenticationProvider` 实现类就是 `DaoAuthenticationProvider`, 里面比较重要的一个环节就是 `additionalAuthenticationChecks` (密码校验):
+
+*  通过 `UserDetailsService`  的实现类(需要用户自己实现)拿到 `UserDetails`
+* 将其中的 `password` 与 `UsernamePasswordAuthenticationToken` 中的 `credentials` 进行对比 
+
+![](https://cdn.yangbingdong.com/img/spring-boot-security/dao-authentication-password-check.png)
+
+到此, 认证的核心就是这样了.
+
+### 核心配置
+
+下面贴一个核心配置
+
+```java
+@Configuration
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    /**
+     * 自定义登录逻辑验证器
+     */
+    private final UserAuthenticationProvider userAuthenticationProvider;
+    /**
+     * 自定义未登录的处理器
+     */
+    private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
+    /**
+     * 自定义登录成功处理器
+     */
+    private final UserLoginSuccessHandler userLoginSuccessHandler;
+    /**
+     * 自定义登录失败处理器
+     */
+    private final UserLoginFailHandler userLoginFailHandler;
+    /**
+     * 自定义注销成功处理器
+     */
+    private final UserLogoutSuccessHandler userLogoutSuccessHandler;
+    /**
+     * 自定义暂无权限处理器
+     */
+    private final UserAccessDeniedHandler userAccessDeniedHandler;
+    /**
+     * 自定义权限解析
+     */
+    private final UserPermissionEvaluator permissionEvaluator;
+
+    /**
+     * 配置登录验证逻辑
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(userAuthenticationProvider);
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                // 不需要认证的 url
+                .antMatchers("/hello/**").permitAll()
+                // 静态资源不需要认证
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                // 其他的请求需要认证
+                .anyRequest()
+                .authenticated()
+            .and()
+                // 用户未登录处理
+                .httpBasic()
+                .authenticationEntryPoint(userAuthenticationEntryPoint)
+            .and()
+                // 关闭默认的登录配置 (UsernamePasswordAuthenticationFilter), 在下面配置自定义的登录 Filter(支持 json 登录)
+                .formLogin()
+            .disable()
+                .logout()
+                // 配置注销地址
+                .logoutUrl("/user/logout")
+                // 配置注销成功处理器
+                .logoutSuccessHandler(userLogoutSuccessHandler)
+            .and()
+                .exceptionHandling()
+                // 配置没有权限自定义处理类
+                .accessDeniedHandler(userAccessDeniedHandler)
+            .and()
+                // 开启跨域
+                .cors()
+                .configurationSource(corsConfigurationSource())
+            .and()
+                // 取消跨站请求伪造防护
+                .csrf()
+            .disable()
+                // jwt 无状态不需要 session
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+                .headers()
+                .cacheControl()
+                .disable()
+            .and()
+            // 自定义 Jwt 登录认证 Filter
+            .addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            // 自定义 Jwt 过滤器
+            .addFilterBefore(new JwtAuthenticationFilter(authenticationManagerBean()), JsonUsernamePasswordAuthenticationFilter.class);
+    }
+
+    /**
+     * 加密方式
+     */
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 自定义登录拦截器, 接收 json 登录信息
+     */
+    @Bean
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() throws Exception {
+        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter();
+        filter.setFilterProcessesUrl("/user/login");
+        filter.setAuthenticationSuccessHandler(userLoginSuccessHandler);
+        filter.setAuthenticationFailureHandler(userLoginFailHandler);
+        filter.setAuthenticationManager(authenticationManagerBean());
+        return filter;
+    }
+
+    /**
+     * 注入自定义 PermissionEvaluator
+     */
+    @Bean
+    public DefaultWebSecurityExpressionHandler userSecurityExpressionHandler(){
+        DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+        handler.setPermissionEvaluator(permissionEvaluator);
+        return handler;
+    }
+
+    /**
+     * 跨域配置
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(singletonList("*"));
+        configuration.setAllowedMethods(singletonList("*"));
+        configuration.setAllowedHeaders(singletonList("*"));
+        configuration.setMaxAge(Duration.ofHours(1));
+        source.registerCorsConfiguration("/**",configuration);
+        return source;
+    }
+
+    /**
+     * 共享 AuthenticationManager
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+}
+```
+
+更多源码查看: ***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-security](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-security)***
+
+## 基于 Spring Mvc 拦截器
+
+如果觉得 Spring Security 太重, 可以基于拦截器实现一个比较轻量级的校验, 核心思路就是在拦截器中校验 token:
+
+```java
+public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
+
+	private AuthorizationPreHandler authorizationPreHandler;
+
+	public AuthorizationInterceptor(AuthorizationPreHandler authorizationPreHandler) {
+		this.authorizationPreHandler = authorizationPreHandler;
+	}
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+		if (handler instanceof HandlerMethod) {
+			Method method = ((HandlerMethod) handler).getMethod();
+			if (method.isAnnotationPresent(IgnoreAuth.class)) {
+				return true;
+			}
+			authorizationPreHandler.preHandleAuth(request, response, method);
+		}
+		return true;
+	}
+
+}
+```
+
+这种实现可以更加灵活定义自己的权限逻辑.
+
+完整代码请看: ***[https://github.com/masteranthoneyd/alchemist/tree/master/auth](https://github.com/masteranthoneyd/alchemist/tree/master/auth)***
+
+## 权限设计
+
+![](https://cdn.yangbingdong.com/img/spring-auth/auth-design.jpg)
