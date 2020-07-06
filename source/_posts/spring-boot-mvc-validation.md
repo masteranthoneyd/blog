@@ -91,7 +91,7 @@ public class WebMvcMessageConvertConfig implements WebMvcConfigurer {
 
 **注意**:
 
-* SpringBoot 2.0.1版本中加载`WebMvcConfigurer`的顺序发生了变动，故需使用`converters.add(0, converter);`指定`FastJsonHttpMessageConverter`在converters内的顺序，否则在SpringBoot 2.0.1及之后的版本中将优先使用Jackson处理。详情：***[WebMvcConfigurer is overridden by WebMvcAutoConfiguration #12389](https://github.com/spring-projects/spring-boot/issues/12389)***
+* SpringBoot 2.0.1版本中加载`WebMvcConfigurer`的顺序发生了变动, 故需使用`converters.add(0, converter);`指定`FastJsonHttpMessageConverter`在converters内的顺序, 否则在SpringBoot 2.0.1及之后的版本中将优先使用Jackson处理。详情：***[WebMvcConfigurer is overridden by WebMvcAutoConfiguration #12389](https://github.com/spring-projects/spring-boot/issues/12389)***
 * 在`FastJsonHttpMessageConverter`之前插入一个`StringHttpMessageConverter`是为了在Controller层返回String类型不会再次被FastJson序列化.
 
 ### FastJson枚举映射
@@ -1267,9 +1267,9 @@ public class BarController {
 
 | 异常类型                                  | 描述                             |
 | ----------------------------------------- | -------------------------------- |
-| `ConstraintViolationException`            | 违反约束，javax扩展定义          |
-| `BindException`                           | 绑定失败，如表单对象参数违反约束 |
-| `MethodArgumentNotValidException`         | 参数无效，如JSON请求参数违反约束 |
+| `ConstraintViolationException`            | 违反约束, javax扩展定义          |
+| `BindException`                           | 绑定失败, 如表单对象参数违反约束 |
+| `MethodArgumentNotValidException`         | 参数无效, 如JSON请求参数违反约束 |
 | `MissingServletRequestParameterException` | 参数缺失                         |
 | `TypeMismatchException`                   | 参数类型不匹配                   |
 
@@ -1353,7 +1353,7 @@ Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `Dispatch
 
 可以看到实现类 `ProviderManager` 中维护了一个 `List<AuthenticationProvider>` 的列表, 存放多种认证方式, 实际上这是委托者模式的应用(Delegate)
 
-> 核心的认证入口始终只有一个: `AuthenticationManager`, 不同的认证方式: 用户名 + 密码(`UsernamePasswordAuthenticationToken`)，邮箱 + 密码, 手机号码 + 密码登录则对应了三个 `AuthenticationProvider`. 在默认策略下, 只需要通过一个 `AuthenticationProvider` 的认证, 即可被认为是登录成功.
+> 核心的认证入口始终只有一个: `AuthenticationManager`, 不同的认证方式: 用户名 + 密码(`UsernamePasswordAuthenticationToken`), 邮箱 + 密码, 手机号码 + 密码登录则对应了三个 `AuthenticationProvider`. 在默认策略下, 只需要通过一个 `AuthenticationProvider` 的认证, 即可被认为是登录成功.
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-security/spring%20security%20architecture.png)
 
@@ -1367,6 +1367,79 @@ Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `Dispatch
 登录成功后会执行 `AbstractAuthenticationProcessingFilter#successfulAuthentication` 将 `Authentication` 存到 `SecurityContextHolder` 中.
 
 到此, 认证的核心就是这样了.
+
+### 权限校验流程
+
+`FilterSecurityInterceptor` 是整个Security filter链中的最后一个, 也是最重要的一个, 它的主要功能就是判断认证成功的用户是否有权限访问接口, 其最主要的处理方法就是 调用父类（`AbstractSecurityInterceptor`）的 `super.beforeInvocation(fi)`, 我们来梳理下这个方法的处理流程：
+
+> - 通过 `obtainSecurityMetadataSource().getAttributes()` 获取 当前访问地址所需权限信息
+> - 通过 `authenticateIfRequired()` 获取当前访问用户的权限信息
+> - 通过 `accessDecisionManager.decide()` 使用 投票机制判权, 判权失败直接抛出 `AccessDeniedException` 异常
+
+```java
+protected InterceptorStatusToken beforeInvocation(Object object) {
+	       
+	    ......
+	    
+	    // 1 获取访问地址的权限信息 
+		Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource()
+				.getAttributes(object);
+
+		if (attributes == null || attributes.isEmpty()) {
+		
+		    ......
+		    
+			return null;
+		}
+
+        ......
+
+        // 2 获取当前访问用户权限信息
+		Authentication authenticated = authenticateIfRequired();
+
+	
+		try {
+		    // 3  默认调用AffirmativeBased.decide() 方法, 其内部 使用 AccessDecisionVoter 对象 进行投票机制判权, 判权失败直接抛出 AccessDeniedException 异常 
+			this.accessDecisionManager.decide(authenticated, object, attributes);
+		}
+		catch (AccessDeniedException accessDeniedException) {
+			publishEvent(new AuthorizationFailureEvent(object, attributes, authenticated,
+					accessDeniedException));
+
+			throw accessDeniedException;
+		}
+
+        ......
+        return new InterceptorStatusToken(SecurityContextHolder.getContext(), false,
+					attributes, object);
+	}
+```
+
+因此如果要动态鉴权, 可以从两方面入手:
+
+- 自定义`SecurityMetadataSource`, 实现从数据库加载 `ConfigAttribute`
+- 另外就是可以自定义 `accessDecisionManager`, 官方的 `UnanimousBased` 其实足够使用, 并且他是基于 `AccessDecisionVoter` 来实现权限认证的, 因此我们只需要自定义一个 `AccessDecisionVoter` 就可以了
+
+```java
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                    @Override
+                    public <O extends FilterSecurityInterceptor> O postProcess(O object) {
+                        object.setAccessDecisionManager(customUrlDecisionManager);
+                        object.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource);
+                        return object;
+                    }
+                })
+                .and()
+                ...
+    }
+}
+```
 
 ### 核心配置
 
@@ -1413,21 +1486,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(userAuthenticationProvider);
     }
+    
+    /**
+     * 静态资源不需要走过滤链
+     */
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring()
+           .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 // 不需要认证的 url
                 .antMatchers("/hello/**").permitAll()
-                // 静态资源不需要认证
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 // 其他的请求需要认证
                 .anyRequest()
                 .authenticated()
-            .and()
-                // 用户未登录处理
-                .httpBasic()
-                .authenticationEntryPoint(userAuthenticationEntryPoint)
             .and()
                 // 关闭默认的登录配置 (UsernamePasswordAuthenticationFilter), 在下面配置自定义的登录 Filter(支持 json 登录)
                 .formLogin()
@@ -1441,6 +1517,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 // 配置没有权限自定义处理类
                 .accessDeniedHandler(userAccessDeniedHandler)
+                .authenticationEntryPoint(userAuthenticationEntryPoint)
             .and()
                 // 开启跨域
                 .cors()
@@ -1457,6 +1534,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cacheControl()
                 .disable()
             .and()
+                .rememberMe()
+            .disable()
             // 自定义 Jwt 登录认证 Filter
             .addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             // 自定义 Jwt 过滤器
@@ -1523,6 +1602,73 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 更多源码查看: ***[https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-security](https://github.com/masteranthoneyd/spring-boot-learning/tree/master/spring-boot-security)***
 
+### 其他配置说明
+
+#### session
+
+> 上面的配置是基于 jwt 无状态的, 所以不需要 session, 如果使用, 可以通过下面配置实现一些额外的功能
+
+```java
+   http.sessionManagement()
+        // 登陆后使用新的 sessionId, 防止固定会话攻击
+    .sessionFixation().changeSessionId()
+     // 同时在线最大数量
+    .maximumSessions(1)
+     // 是否禁止新的登录
+    .maxSessionsPreventsLogin(false)
+```
+
+> 如果是自定义的用户, **需要重写 `equals` 以及 `hashcode` 方法**, 因为底层是通过一个 Map 存放 session 相关信息, 而 key 则是 principal 对象.
+>
+> 如果是覆盖了 `UsernamePasswordAuthenticationFilter`, 这些 session 配置需要在自定义的 Filter 重新配置.
+
+同时启用 session 提供一个 bean(因为 Spring security 的通过监听事件实现 session 销毁的):
+
+```java
+@Bean
+HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
+}
+```
+
+session 集群共享:
+
+第一步, 引入 redis:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-data-redis</artifactId>
+</dependency>
+```
+
+第二部, 配置 SessionRegistry:
+
+```java
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    FindByIndexNameSessionRepository sessionRepository;
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest()
+                ...
+                .sessionManagement()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
+                .sessionRegistry(sessionRegistry());
+    }
+    @Bean
+    SpringSessionBackedSessionRegistry sessionRegistry() {
+        return new SpringSessionBackedSessionRegistry(sessionRepository);
+    }
+}
+```
+
 ## 基于 Spring Mvc 拦截器
 
 如果觉得 Spring Security 太重, 可以基于拦截器实现一个比较轻量级的校验, 核心思路就是在拦截器中校验 token:
@@ -1557,4 +1703,11 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
 ## 权限设计
 
+主要核心逻辑还是 `用户-角色-权限`.
+
+在这基础上拓展出 `用户-用户组-角色` 以及 `权限-类型-具体权限`.
+
 ![](https://cdn.yangbingdong.com/img/spring-auth/auth-design.jpg)
+
+
+
