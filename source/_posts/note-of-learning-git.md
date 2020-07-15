@@ -398,6 +398,12 @@ git commit -m ":tada: Initialize Repo"
 
 ***[https://www.webfx.com/tools/emoji-cheat-sheet/](https://www.webfx.com/tools/emoji-cheat-sheet/)***
 
+# 美化你的 README
+
+***[https://github.com/kefranabg/readme-md-generator](https://github.com/kefranabg/readme-md-generator)***
+
+***[https://github.com/anuraghazra/github-readme-stats](https://github.com/anuraghazra/github-readme-stats)***
+
 # 同步更新Github Fork的项目
 
 1、`fork`项目并`clone`到本地

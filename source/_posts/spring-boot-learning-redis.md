@@ -171,7 +171,9 @@ OK
 
 ***[https://github.com/uglide/RedisDesktopManager](https://github.com/uglide/RedisDesktopManager)***
 
-***[https://rdbtools.com/](https://rdbtools.com/)***
+***[https://redislabs.com/redisinsight/](https://redislabs.com/redisinsight/)***
+
+***[https://github.com/diego3g/rocketredis](https://github.com/diego3g/rocketredis)***
 
 # Redis常用命令
 
