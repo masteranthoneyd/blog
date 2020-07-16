@@ -152,7 +152,7 @@ list = list.stream()
 
 ## Tab 键改为4个空格
 
-> 代码规范会要求编程时使用4个空格缩进而不是tab，因为不同编辑器下4个空格的宽度看起来是一致的，而tab则长短可能会不一致。
+> 代码规范会要求编程时使用4个空格缩进而不是tab, 因为不同编辑器下4个空格的宽度看起来是一致的, 而tab则长短可能会不一致。
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
 
@@ -335,7 +335,22 @@ trim_trailing_whitespace = false
 
 # Plugin
 
+## IDE Features Trainer
+
+IDEA 使用教程, 安装后在左上角会出现 Learn 的栏目, 可在其中进行学习.
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-learn.png)
+
+## RestfulToolkit
+
+提供 Restful 开发工具箱, 可通过 `Ctrl + Alt + N` 搜索 url 方法
+
+## Codota
+
+*[Codota](https://www.codota.com/)* 这个插件用于智能代码补全, 它基于数百万Java程序, 能够根据程序上下文提示补全代码
+
 ## Lombok
+
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件, 
 打开IDEA的Settings面板, 并选择Plugins选项, 然后点击 “Browse repositories..” 
 ![](https://cdn.yangbingdong.com/img/lombok/installLombok01.png)
@@ -452,7 +467,7 @@ Zookeeper UI, 支持删除操作
 
 ## K8s工具：Kubernetes
 
-参考 *[https://plugins.jetbrains.com/plugin/10485-kubernetes](https://plugins.jetbrains.com/plugin/10485-kubernetes)* 支持编辑 Kubernetes 资源文件，如下： 可以比较方便的查看yaml中的各项 placeholder 的默认值，且可以方便的链接到value位置。
+参考 *[https://plugins.jetbrains.com/plugin/10485-kubernetes](https://plugins.jetbrains.com/plugin/10485-kubernetes)* 支持编辑 Kubernetes 资源文件, 如下： 可以比较方便的查看yaml中的各项 placeholder 的默认值, 且可以方便的链接到value位置。
 
 ## GsonFormat
 
@@ -466,7 +481,7 @@ Zookeeper UI, 支持删除操作
 
 ## POJO to JSON
 
-为了测试需要，我们需要将简单 Java 领域对象转成 JSON 字符串方便用 postman 或者 curl 模拟数据。详细使用文档，参考：*[https://plugins.jetbrains.com/plugin/9686-pojo-to-json](https://plugins.jetbrains.com/plugin/9686-pojo-to-json)*
+为了测试需要, 我们需要将简单 Java 领域对象转成 JSON 字符串方便用 postman 或者 curl 模拟数据。详细使用文档, 参考：*[https://plugins.jetbrains.com/plugin/9686-pojo-to-json](https://plugins.jetbrains.com/plugin/9686-pojo-to-json)*
 
 ## CamelCase
 
@@ -525,12 +540,6 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
 
-## Nyan progress bar
-
-这个是彩虹版的进度条...
-
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/nyan-progress-bar.png)
-
 ## Background Image Plus
 
 这是一个设置背景图的插件
@@ -539,7 +548,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ## Translation
 
-详细使用文档，参考：***[https://github.com/YiiGuxing/TranslationPlugin](https://github.com/YiiGuxing/TranslationPlugin)***
+详细使用文档, 参考：***[https://github.com/YiiGuxing/TranslationPlugin](https://github.com/YiiGuxing/TranslationPlugin)***
 
 有道智云: ***[https://ai.youdao.com/](https://ai.youdao.com/)***
 
@@ -565,10 +574,6 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 高亮效果:  Ctrl+鼠标右键单击
 
 选中部分外暗淡效果: Alt+鼠标右键单击
-
-## HighlightBracketPair
-
-这是个括号高亮插件.
 
 ## Checkstyle
 
