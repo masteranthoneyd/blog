@@ -9,8 +9,8 @@ tags: [Ubuntu, IDE]
 > 公司里的大牛们用的IDE基本都是IDEA~~近墨者黑~~, 早就听闻IntelliJ IDEA这个大名, 只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=), 再不用就要被OUT了
 > 此篇把在Ubuntu下使用IDEA的学习经验记录下来(网上还是比较少资料解决Ubuntu下IDEA的问题Orz), 以便老了记性不好可以看一看...
 
-
 <!--more-->
+
 # Install
 博主采用***[Toolbox App](https://www.jetbrains.com/toolbox/app/)*** 方式安装. 
 这样的好处是我们不用关心更新问题, 每次有新版本它都会提示, 我们是需要点一下`Install`就可以了, 不需要关心升级后的配置. 
@@ -81,6 +81,7 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~, 而且使用Ubuntu�
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-font.png)
 
 ## 修改VM参数
+
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
 通过`Toolbox`可以简单地设置VM参数, 博主16G内存的主机的VM参数设置为
 ```
@@ -546,6 +547,10 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/background-image-plus.png)
 
+**在 2020+ 版本中已经自带设置背景功能**:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/setting-background-image.png)
+
 ## Translation
 
 详细使用文档, 参考：***[https://github.com/YiiGuxing/TranslationPlugin](https://github.com/YiiGuxing/TranslationPlugin)***
@@ -602,6 +607,26 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 > Java Object Layout, 查看Java对象大小的插件
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jol.png)
+
+# Theme
+
+## Cyan Light Theme
+
+***[https://plugins.jetbrains.com/plugin/12102-cyan-light-theme](https://plugins.jetbrains.com/plugin/12102-cyan-light-theme)*** 
+
+个人觉得比较舒适的主题, 清新, 没有多余的花里胡哨.
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-cyan.png)
+
+## Material Theme
+
+漂亮的主题插件, 内置了多种主题, 主题浏览: ***[https://www.material-theme.com/](https://www.material-theme.com/)***
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-oceanic.png)
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-github.png)
+
+配置说明: ***[Material Theme UI详解](https://blog.csdn.net/zyx1260168395/article/details/102928172)***
 
 # Skills
 
