@@ -171,6 +171,12 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-select-color.png)
 
+### 选中代码块的背景颜色
+
+Selection background:
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/selection-background-color.png)
+
 ## 修改快捷键
 
 ### Fix doc comment
@@ -627,6 +633,12 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-github.png)
 
 配置说明: ***[Material Theme UI详解](https://blog.csdn.net/zyx1260168395/article/details/102928172)***
+
+# Icons
+
+## Atom Material Icons
+
+![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/atom-material-icons.png)
 
 # Skills
 

@@ -1077,6 +1077,7 @@ sudo apt install google-chrome-stable
 | ***[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)*** | 油猴, 脚本网站: *[https://greasyfork.org/zh-CN](https://greasyfork.org/zh-CN)*, *[https://openuserjs.org/](https://openuserjs.org/)* |
 | ***[CrxMouse Chrome™ Gestures](https://chrome.google.com/webstore/detail/crxmouse-chrome-gestures/jlgkpaicikihijadgifklkbpdajbkhjo)*** | 高度可自定义的鼠标手势, 超级拖拽, 鼠标滚轮手势, 遥感手势, 提升工作效率 |
 | ***[掘金](https://chrome.google.com/webstore/detail/%E6%8E%98%E9%87%91/lecdifefmmfjnjjinhaennhdlmcaeeeb)*** | 为程序员、设计师、产品经理每日发现优质内容                   |
+| ***[Atom File Icons Web](https://chrome.google.com/webstore/detail/atom-file-icons-web/pljfkbaipkidhmaljaaakibigbcmmpnc)*** | 修改 Github 或者 Bitbucket 上面的图标                        |
 
 ## 截图
 
