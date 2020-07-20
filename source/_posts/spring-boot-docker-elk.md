@@ -126,7 +126,7 @@ logging:
 * `%msg{nolookups}`: 输出的log日志, `{nolookups}` 表示忽略掉一些内置函数比如 `logger.info("Try ${date:YYYY-MM-dd}")`, 如果不加 `{nolookups}` 那么输出的日志会是这样的 `Try 2019-05-28`.
 * `%n`: 换行, 一般跟在 `%msg` 后面.
 * `%xEx` | `%xwEx`: 输出异常, 后者会在异常信息的开始与结束append空的一行, 与 `%ex` 的区别在于在每一行异常信息后面会追加jar包的信息.
-* `%clr`: 配置颜色, 比如 `%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{cyan}`
+* `%clr`: 配置颜色, 比如 `%clr{字段}{颜色}`
   * `blue`: 蓝色
   * `cyan`: 青色
   * `faint`: 不知道什么颜色, 输出来是黑色

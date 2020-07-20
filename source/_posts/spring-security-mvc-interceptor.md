@@ -15,7 +15,7 @@ tags: [Java, Spring Boot, Spring, Spring Security]
 
 # Spring Security
 
-Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `DispatcherServlet` 之前触发.
+Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `DispatcherServlet` 之前触发. 普通的 Filter 称之为 Web Filter, 而 Spring Security 的 Filter 称之为 Security Filter:
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-security/security-filters.png)
 
@@ -394,6 +394,40 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		return true;
 	}
 
+}
+```
+
+将拦截器添加到 MVC 中:
+
+```java
+@ConditionalOnBean(AuthorizationPreHandler.class)
+public class AuthorizationInterceptorConfiguration {
+
+	@Bean
+	public AuthorizationInterceptor authorizationInterceptor(
+			ObjectProvider<AuthorizationPreHandler> authorizationHandlerObjectProvider) {
+		return new AuthorizationInterceptor(authorizationHandlerObjectProvider.getIfAvailable());
+	}
+
+	@Order(1)
+	@Bean
+	public AuthorizationMvcConfigure authorizationMvcConfigure(
+			ObjectProvider<AuthorizationInterceptor> authorizationInterceptorObjectProvider) {
+		return new AuthorizationMvcConfigure(authorizationInterceptorObjectProvider.getIfAvailable());
+	}
+}
+
+@RequiredArgsConstructor
+public class AuthorizationMvcConfigure implements WebMvcConfigurer {
+
+	private final AuthorizationInterceptor authorizationInterceptor;
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		if (Objects.nonNull(authorizationInterceptor)) {
+			registry.addInterceptor(authorizationInterceptor);
+		}
+	}
 }
 ```
 
