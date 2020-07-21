@@ -218,7 +218,7 @@ $cp /home/ubuntu/.bin/go14/bin/go-bindata ./bin
 
 然后直接`source ngrok-installation.sh`, 安装成功！
 
-# Docker搭建Ngrok
+# Docker 搭建 Ngrok
 
 > 安装Docker请看***[这里](/2017/docker-learning/)***
 
@@ -285,6 +285,86 @@ server {
 **注意**: 大概每个星期会产生100M的日志文件. 
 查年docker日志文件位置`docker inspect <id> | grep LogPath`
 查看大小`ls -lh /var/lib/docker/containers/<id>/<id>-json.log`
+
+# 自构 Docker 镜像
+
+>  最好是一台境外的服务器(下载速度快)
+
+`Dockerfile`:
+
+```
+FROM golang:1.14.6-alpine
+ADD build.sh /
+RUN apk add --no-cache git make openssl
+RUN git clone https://github.com/inconshreveable/ngrok.git --depth=1 /ngrok
+RUN sh /build.sh
+EXPOSE 8081
+VOLUME [ "/ngrok" ]
+CMD [ "/ngrok/bin/ngrokd"]
+```
+
+`build.sh`: 
+
+```
+export NGROK_DOMAIN="xxx.yangbingdong.com"
+cd /ngrok/
+openssl genrsa -out rootCA.key 2048
+openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=$NGROK_DOMAIN" -days 5000 -out rootCA.pem
+openssl genrsa -out device.key 2048
+openssl req -new -key device.key -subj "/CN=$NGROK_DOMAIN" -out device.csr
+openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000
+cp rootCA.pem assets/client/tls/ngrokroot.crt
+cp device.crt assets/server/tls/snakeoil.crt
+cp device.key assets/server/tls/snakeoil.key
+
+make release-server
+GOOS=linux GOARCH=386 make release-client
+GOOS=linux GOARCH=amd64 make release-client
+GOOS=windows GOARCH=386 make release-client
+GOOS=windows GOARCH=amd64 make release-client
+GOOS=darwin GOARCH=386 make release-client
+GOOS=darwin GOARCH=amd64 make release-client
+GOOS=linux GOARCH=arm make release-client
+```
+
+**注意, 需要把上面的 `NGROK_DOMAIN` 修改为你自己的域名**
+
+构建:
+
+```
+docker build -t ngrok .
+```
+
+运行:
+
+```
+docker run --name=ngrok -it  -p 8081:8081 -p 4443:4443  -d ngrok /ngrok/bin/ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8081"
+```
+
+拿到客户端:
+
+```
+docker cp ngrok:/ngrok/bin ./
+```
+
+```
+.
+├── darwin_386
+│   └── ngrok
+├── darwin_amd64
+│   └── ngrok
+├── go-bindata
+├── linux_386
+│   └── ngrok
+├── linux_arm
+│   └── ngrok
+├── ngrok
+├── ngrokd
+├── windows_386
+│   └── ngrok.exe
+└── windows_amd64
+    └── ngrok.exe
+```
 
 # Finally
 
