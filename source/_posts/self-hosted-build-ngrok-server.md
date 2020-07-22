@@ -142,55 +142,6 @@ Avg Conn Time                 0.00ms
 
 ```
 
-
-
-# Nginx添加server
-
-虽然可以访问, 但是带着端口就让人不舒服, 80端口又被Nginx占用, 那么可以用过Nginx反向代理Ngrok. 
-Nginx的配置一般在`/etc/nginx/conf.d`或者`/usr/local/nginx/conf.d`里面: 
-```
-#ngrok.yangbingdong.com.conf
-upstream ngrok {
-    server 127.0.0.1:8002;
-    keepalive 64;
-}
-
-server {
-    listen 80;
-    server_name *.ngrok.yangbingdong.com;
-    access_log /var/log/nginx/ngrok_access.log;
-    proxy_set_header "Host" $host:8002;
-    location / {
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host:8002;
-        proxy_pass_header Server;
-        proxy_redirect off;
-        proxy_pass  http://ngrok;
-
-    }
-    access_log off;
-    log_not_found off;
-}
-```
-
-
-重启Nginx: 
-```shell
-nginx -s reload 
-```
-# 维护脚本
-在网上看到的某大神写的维护脚本: 
-
-```shell
-wget https://gist.githubusercontent.com/IvanChou/1be8b15b1b41bf0ce2e9d939866bbfec/raw/1a2445599fe7fd706505a6e103a9dc60b4d3a0ed/ngrokd -O ngrokd
-
-##修改 脚本中的配置
-vi ngrokd
-
-chomd +x ngrokd
-sudo mv ngrokd /etc/init.d/ngrokd
-```
-
 # 常见错误
 在ngrok目录下执行如下命令, 编译ngrokd
 ```
@@ -253,35 +204,6 @@ bin/darwin_amd64/ngrok      osx客户端
 bin/windows_amd64/ngrok.exe windows客户端
 ```
 
-## Nginx Conf
-
-```
-server {
-     listen       80;
-     server_name  *.ngrok.yangbingdong.com;
-     location / {
-             proxy_redirect off;
-             proxy_set_header Host $host;
-             proxy_set_header X-Real-IP $remote_addr;
-             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-             proxy_pass http://172.17.0.1:8082;
-     }
- }
- server {
-     listen       443;
-     server_name  *.ngrok.yangbingdong.com;
-     location / {
-             proxy_redirect off;
-             proxy_set_header Host $host;
-             proxy_set_header X-Real-IP $remote_addr;
-             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-             proxy_pass http://172.17.0.1:4432;
-     }
- }
-```
-
-- `172.17.0.1`为内网ip
-
 **注意**: 大概每个星期会产生100M的日志文件. 
 查年docker日志文件位置`docker inspect <id> | grep LogPath`
 查看大小`ls -lh /var/lib/docker/containers/<id>/<id>-json.log`
@@ -338,7 +260,7 @@ docker build -t ngrok .
 运行:
 
 ```
-docker run --name=ngrok -it  -p 8081:8081 -p 4443:4443  -d ngrok /ngrok/bin/ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":8081"
+docker run --name=ngrok -it  -p 8081:80 -p 8082:8082 -p 4443:4443  -d yangbingdong/ngrok:stable /ngrok/bin/ngrokd -domain="ngrok.yangbingdong.com" -httpAddr=":80" -httpsAddr=":8082" -tunnelAddr=":4443"
 ```
 
 拿到客户端:
@@ -364,6 +286,52 @@ docker cp ngrok:/ngrok/bin ./
 │   └── ngrok.exe
 └── windows_amd64
     └── ngrok.exe
+```
+
+# 反向代理
+
+## Nginx
+
+```
+server {
+     listen       80;
+     server_name  *.ngrok.yangbingdong.com;
+     location / {
+             proxy_redirect off;
+             proxy_set_header Host $http_host:8081; #此处端口要跟 启动服务端 ngrok 时指定的端口一致
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_pass http://172.17.0.1:8081;
+     }
+ }
+ server {
+     listen       443;
+     server_name  *.ngrok.yangbingdong.com;
+     location / {
+             proxy_redirect off;
+             proxy_set_header Host $host;
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_pass http://172.17.0.1:4432;
+     }
+ }
+```
+
+- `172.17.0.1`为内网ip
+
+## Caddy
+
+`Caddyfile`:
+
+```
+http://*.ngrok.yangbingdong.com {
+    proxy / http://172.17.0.1:8081 {
+        header_upstream Host {host}:8081 #此处端口要跟 启动服务端 ngrok 时指定的端口一致
+        header_upstream X-Real-IP {remote}
+        header_upstream X-Forwarded-For {remote}
+        header_upstream X-Forwarded-Proto {scheme}
+    }
+}
 ```
 
 # Finally
