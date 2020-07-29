@@ -151,16 +151,23 @@ mvn -f pom_own.xml package
 
 ## 配置文件的生效顺序, 会对值进行覆盖
 
-1. `@TestPropertySource` 注解
-
-2. 命令行参数
-3. Java系统属性（`System.getProperties()`）
-4. 操作系统环境变量
-5. 只有在`random.*`里包含的属性会产生一个`RandomValuePropertySource`
-6. 在打包的jar外的应用程序配置文件（`application.properties`, 包含YAML和profile变量）
-7. 在打包的jar内的应用程序配置文件（`application.properties`, 包含YAML和profile变量）
-8. 在`@Configuration`类上的`@PropertySource`注解
-9. 默认属性（使用`SpringApplication.setDefaultProperties`指定）
+1. Devtools 全局配置：当 devtools 启用时，`$HOME/.config/spring-boot`
+2. 测试类中的 `@TestPropertySource`
+3. 测试中的 `properties` 属性：在 @SpringBootTest 和 用来测试特定片段的测试注解
+4. 命令行参数
+5. `SPRING_APPLICATION_JSON` 中的属性：内嵌在环境变量或系统属性中的 JSON
+6. `ServletConfig` 初始化参数
+7. `ServletContext` 初始化参数
+8. `java:comp/env` 中的 JNDI 属性
+9. Java 系统属性：`System.getProperties()`
+10. 操作系统环境变量
+11. 随机值（`RandomValuePropertySource`）：`random.*`属性
+12. jar 包**外**的指定 profile 配置文件：`application-{profile}.properties`
+13. jar 包**内**的指定 profile 配置文件：`application-{profile}.properties`
+14. jar 包**外**的默认配置文件：`application.properties`
+15. jar 包**内**的默认配置文件：`application.properties`
+16. 代码内的 `@PropertySource`注解：用于 `@Configuration` 类上
+17. 默认属性：通过设置 `SpringApplication.setDefaultProperties` 指定
 
 ## 配置随机值
 
@@ -343,8 +350,24 @@ spring:
 
 ### 启动时指定环境
 
+#### 通过命令行参数
+
+```
+java -jar myapp.jar --spring.profiles.active=dev
+```
+
+#### 通过 Java 系统参数
+
 ```shell
 java -Dspring.profiles.active=dev -jar myapp.jar
+```
+
+#### 通过OS环境变量
+
+Spring Boot 在启动时加载环境变量 `SPRING_PROFILES_ACTIVE` 并将其设置为配置文件:
+
+```
+export SPRING_PROFILES_ACTIVE=dev
 ```
 
 # 热部署
