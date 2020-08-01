@@ -6,7 +6,7 @@
 
 ## 默认配置文件加载顺序
 
-要获取 client, **必须先初始化配置文件(boot)**, 核心代码在 `org.frameworkset.elasticsearch.ElasticSearchHelper#init` 中.
+要获取 client, **必须先初始化配置文件(最终调用都是 `ElasticSearchConfigBoot#boot`)**, 核心代码在 `org.frameworkset.elasticsearch.ElasticSearchHelper#init` 中.
 
 * 可通过手动调用 `ElasticSearchBoot` 或者 `ElasticSearchConfigBoot` 的 `boot` 方法初始化配置
 
@@ -39,10 +39,65 @@
   * `application.properties`
   * `config/application.properties`
 
-# 获取 Client
+## 自定义配置文件
+
+eg: 读取 `resources` 文件下的 `elasticsearch.properties`:
 
 ```java
+ElasticSearchBoot.boot("elasticsearch.properties");
 ClientInterface restClient = ElasticSearchHelper.getRestClientUtil();
-String response = restClient.executeHttp("_cluster/state?pretty",ClientInterface.HTTP_GET);
+```
+
+> `ElasticSearchBoot.boot("elasticsearch.properties")` 将 `ElasticSearchPropertiesFilePlugin.elasticSearchConfigFiles` 改成 `elasticsearch.properties` 并调用 `ElasticSearchConfigBoot#boot`.
+
+## Spring Boot 中的配置加载
+
+添加 starter:
+
+```xml
+<dependency>
+    <groupId>com.bbossgroups.plugins</groupId>
+    <artifactId>bboss-elasticsearch-spring-boot-starter</artifactId>
+    <version>6.1.8</version>
+    <exclusions>
+        <exclusion>
+            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.slf4j</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+集成改 starter 后, 将读取 `spring.elasticsearch.bboss` 前缀的配置并加载 `BBossESStarter`, 具体请看: `BBossESAutoConfiguration`.
+
+最终构建出一个 `Map` 的配置对象并调用 `ElasticSearchBoot.boot`.
+
+## 配置文件示例
+
+***[https://esdoc.bbossgroups.com/#/spring-booter-with-bboss?id=_311-applicationproperties](https://esdoc.bbossgroups.com/#/spring-booter-with-bboss?id=_311-applicationproperties)***
+
+> 这些配置的含义, 可以参考文档:《*[高性能elasticsearch ORM开发库使用介绍](https://esdoc.bbossgroups.com/#/development)*》章节2进行了解
+
+# 获取 Client
+
+## 普通项目环境
+
+```java
+//创建加载配置文件的客户端工具，单实例多线程安全
+//Get a ConfigRestClientUtil instance
+ClientInterface clientUtil = ElasticSearchHelper.getConfigRestClientUtil("esmapper/demo.xml");
+//Build a RestClientUtil instance, single instance multi-thread security
+ClientInterface clientUtil = ElasticSearchHelper.getRestClientUtil() ;
+```
+
+## Spring Boot 项目环境
+
+```java
+@Autowired
+private BBossESStarter bbossESStarter;
+//Get a ConfigRestClientUtil instance to load configuration files, single instance multithreaded security
+ClientInterface clientUtil = bbossESStarter.getConfigRestClient(mappath);
+//Build a RestClientUtil instance, single instance multi-thread security
+ClientInterface clientUtil = bbossESStarter.getRestClient(); 
 ```
 

@@ -209,3 +209,24 @@ minikube docker-env       # 查看 Minikube 的 Docker 相关信息
   ```
   minikube stop
   ```
+
+# 无法拉去基础镜像问题
+
+问题:
+
+```
+Unable to find image 'gcr.io/k8s-minikube/kicbase...
+```
+
+解决方案:
+
+```
+docker pull anjone/kicbase
+
+minikube start --vm-driver=docker --base-image="anjone/kicbase" --image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers
+```
+
+* `--base-image="anjone/kicbase"` 使用我们pull回来的网友缓存的kicbase镜像，这个很关键
+
+* `--image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers` 使用阿里云的镜像，这个也很关键
+
