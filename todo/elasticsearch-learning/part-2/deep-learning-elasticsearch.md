@@ -2376,3 +2376,9 @@ POST employees/_search
    ```
 
    
+# 对象及 Nested 对象
+
+Elasticsearch 采用 **Denormalization**(反范式化设计), 与之对应的就是日常使用关系型数据库的 **Normalization**(范式化设计).
+
+反范式化一般采用扁平化处理, 不使用关联关系,而是在文档中保存冗余的数据拷贝, 缺点就是不适合在数据频繁修改的场景.
+
