@@ -2380,5 +2380,214 @@ POST employees/_search
 
 Elasticsearch 采用 **Denormalization**(反范式化设计), 与之对应的就是日常使用关系型数据库的 **Normalization**(范式化设计).
 
-反范式化一般采用扁平化处理, 不使用关联关系,而是在文档中保存冗余的数据拷贝, 缺点就是不适合在数据频繁修改的场景.
+反范式化一般采用扁平化处理, 不使用关联关系, 而是在文档中保存冗余的数据拷贝, 缺点就是**不适合在数据频繁修改**的场景.
+
+ES 处理处理关联关系主要有以下方式:
+
+* 对象类型
+* 嵌套对象(Nested Object)
+* 父子关联关系(Parant/Child)
+* 应用端关联
+
+## 对象类型
+
+```
+DELETE blog
+# 设置blog的 Mapping
+PUT /blog
+{
+  "mappings": {
+    "properties": {
+      "content": {
+        "type": "text"
+      },
+      "time": {
+        "type": "date"
+      },
+      "user": {
+        "properties": {
+          "city": {
+            "type": "text"
+          },
+          "userid": {
+            "type": "long"
+          },
+          "username": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# 插入一条 Blog 信息
+PUT blog/_doc/1
+{
+  "content":"I like Elasticsearch",
+  "time":"2019-01-01T00:00:00",
+  "user":{
+    "userid":1,
+    "username":"Jack",
+    "city":"Shanghai"
+  }
+}
+
+# 搜索
+POST blog/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"content": "Elasticsearch"}},
+        {"match": {"user.username": "Jack"}}
+      ]
+    }
+  }
+}
+```
+
+## 嵌套对象
+
+再来看这个例子:
+
+```
+DELETE my_movies
+
+# 电影的Mapping信息
+PUT my_movies
+{
+      "mappings" : {
+      "properties" : {
+        "actors" : {
+          "properties" : {
+            "first_name" : {
+              "type" : "keyword"
+            },
+            "last_name" : {
+              "type" : "keyword"
+            }
+          }
+        },
+        "title" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
+    }
+}
+
+
+# 写入一条电影信息
+POST my_movies/_doc/1
+{
+  "title":"Speed",
+  "actors":[
+    {
+      "first_name":"Keanu",
+      "last_name":"Reeves"
+    },
+    {
+      "first_name":"Dennis",
+      "last_name":"Hopper"
+    }
+
+  ]
+}
+
+# 查询电影信息
+POST my_movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"actors.first_name": "Keanu"}},
+        {"match": {"actors.last_name": "Hopper"}}
+      ]
+    }
+  }
+}
+```
+
+上面搜索一个不存在的名字, 但却可以搜索出来, 这是因为扁平化存储的原因:
+
+![](https://cdn.yangbingdong.com/img/elasticsearch/nested-object1.png)
+
+可以使用 Nested Data Type 解决上述问题:
+
+```
+DELETE my_movies
+# 创建 Nested 对象 Mapping
+PUT my_movies
+{
+      "mappings" : {
+      "properties" : {
+        "actors" : {
+          "type": "nested",
+          "properties" : {
+            "first_name" : {"type" : "keyword"},
+            "last_name" : {"type" : "keyword"}
+          }},
+        "title" : {
+          "type" : "text",
+          "fields" : {"keyword":{"type":"keyword","ignore_above":256}}
+        }
+      }
+    }
+}
+
+
+POST my_movies/_doc/1
+{
+  "title":"Speed",
+  "actors":[
+    {
+      "first_name":"Keanu",
+      "last_name":"Reeves"
+    },
+
+    {
+      "first_name":"Dennis",
+      "last_name":"Hopper"
+    }
+
+  ]
+}
+
+# Nested 查询
+POST my_movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"title": "Speed"}},
+        {
+          "nested": {
+            "path": "actors",
+            "query": {
+              "bool": {
+                "must": [
+                  {"match": {
+                    "actors.first_name": "Keanu"
+                  }},
+
+                  {"match": {
+                    "actors.last_name": "Hopper"
+                  }}
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
 

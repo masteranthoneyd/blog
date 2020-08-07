@@ -52,13 +52,13 @@ ClientInterface restClient = ElasticSearchHelper.getRestClientUtil();
 
 ## Spring Boot 中的配置加载
 
-添加 starter:
+添加 starter(与 Spring Boot 有**日志依赖冲突**, 注意移除):
 
 ```xml
 <dependency>
     <groupId>com.bbossgroups.plugins</groupId>
     <artifactId>bboss-elasticsearch-spring-boot-starter</artifactId>
-    <version>6.1.8</version>
+    <version>{最新版本}</version>
     <exclusions>
         <exclusion>
             <artifactId>slf4j-log4j12</artifactId>
@@ -100,4 +100,3 @@ ClientInterface clientUtil = bbossESStarter.getConfigRestClient(mappath);
 //Build a RestClientUtil instance, single instance multi-thread security
 ClientInterface clientUtil = bbossESStarter.getRestClient(); 
 ```
-
