@@ -2376,11 +2376,11 @@ POST employees/_search
    ```
 
    
-# 对象及 Nested 对象
+# 处理关系型数据
 
 Elasticsearch 采用 **Denormalization**(反范式化设计), 与之对应的就是日常使用关系型数据库的 **Normalization**(范式化设计).
 
-反范式化一般采用扁平化处理, 不使用关联关系, 而是在文档中保存冗余的数据拷贝, 缺点就是**不适合在数据频繁修改**的场景.
+反范式化一般采用**扁平化处理**, 不使用关联关系, 而是在文档中保存冗余的数据拷贝, 缺点就是**不适合在数据频繁修改**的场景.
 
 ES 处理处理关联关系主要有以下方式:
 
@@ -2591,3 +2591,38 @@ POST my_movies/_search
 }
 ```
 
+在内部, Nested 文档会被保存在两个 Lucene 文档中,在查询时做 Join 处理.
+
+Nested 对象的聚合查询语句也要特殊处理, 普通的聚合查询是查不到的:
+
+```
+# Nested Aggregation
+POST my_movies/_search
+{
+  "size": 0,
+  "aggs": {
+    "actors": {
+      "nested": {
+        "path": "actors"
+      },
+      "aggs": {
+        "actor_name": {
+          "terms": {
+            "field": "actors.first_name",
+            "size": 10
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## 父子文档
+
+对象和 Nested 对象的局限性: 每次**更新需要重新索引**整个对象(包括根对象和嵌套对象).
+
+儿父子文档, 类似数据库中的 JOIN, 通过**维护 Parent/ Child 的关系**(在 mapping 中体现), 从而分离两个对象:
+
+* 父文档和子文档是两个独立的文档
+* 更新父文档无需重新索引子文档, 子文档被添加, 更新或者删除也不会影响到父文档和其他的子文档
