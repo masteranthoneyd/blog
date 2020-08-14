@@ -379,7 +379,67 @@ public String menuCreateSample(@PathVariable String appid) throws WxErrorExcepti
 }
 ```
 
-# 注意
+# 微信支付
 
-* 配置的服务器 URL 不要拦截(登录拦截等)
+支付步骤:
+
+* 调用微信统一下单接口, 拿到 prepay_id
+* 根据不同端封装返回参数(小程序支付/JS-SDK支付/H5支付等)
+* 前端拉起微信支付
+* 用户支付
+* 支付成功回调
+
+相关文档:
+
+* ***[微信JSAPI支付业务流程](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_4)***
+* ***[统一下单](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1)***
+* ***[微信JS-SDK支付](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#58)***
+* ***[支付签名算法](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3)***
+
+## 注意事项
+
+**`timestamp` 驼峰命名问题**:
+
+微信公众号中的微信支付采用 JS-SDK, 文档中的 `timestamp` 中的 `s` 是**小写**, 而签名中需要时 `timeStamp`(`S` **大写**), 这一点文档中有说明, 需要注意:
+
+```
+wx.chooseWXPay({
+  timestamp: 0, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+  nonceStr: '', // 支付签名随机串，不长于 32 位
+  package: '', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+  signType: '', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+  paySign: '', // 支付签名
+  success: function (res) {
+    // 支付成功后的回调函数
+  }
+});
+```
+
+# 关注公众号后网站自动登录功能实现
+
+网页端的微信登录多数基于*[微信开放平台登录功能](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html)*, 这种方式需要申请开放平台, 比较麻烦.
+
+另外一种扫码登录方式只需要一个微信**服务号**就行, 大概流程是：
+
+* 点击微信登录, 网站自己弹出一个二维码
+* 扫描二维码后弹出公众号的关注界面
+* 只要一关注公众号网站自动登录, 第二次扫描登录的时候网站直接登录
+* 体验一下 *[「随便找的一个网站」](http://90sheji.com/)*, 这种扫码登录的方式有利于公众号推广
+
+主要的核心原理就是利用了 ***[带参数二维码](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)*** 以及 ***[接收事件推送](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html)***.
+
+所以实现方案大概如下:
+
+* 生成自定义场景值参数, 比如UUID字符串, 设置进 Redis 中, key 生成的字符串, value 为空字符串
+* 使用上面生成的随机字符串生成**临时带参数二维码**(`action_name=QR_STR_SCENE&scene_str={UUID}`)
+* 将二维码与 UUID 一同返回前端, 前端通过 UUID **轮询**登录状态
+* 用户扫描二维码, 会有以下两种情况:
+  * 如果用户还未关注公众号, 则用户可以关注公众号, 关注后微信会将带场景值关注事件推送给开发者.
+  * 如果用户已经关注公众号, 在用户扫描后会自动进入会话, 微信也会将带场景值扫描事件推送给开发者.
+* 根据扫码结果(微信回调拿到自定义字符串与 OpenId), 创建用户(已创建则跳过这步), 修改 Redis 中对应的值改为用户Id或者登录 Token
+* 前端轮训拿到了用户 Id 或者 Token, 完成登录.
+
+# 注意事项
+
+* 配置的服务器 URL 不要拦截(登录拦截等), 只支持 80 或 443 端口.
 * 微信消息可能会重复发送, 需要开发者自己确保幂等, 虽然 WxJava 已经带有消息去重逻辑, 但模式实现是单机版的, 所以如果是集群的服务器, 需要自己实现 `WxMessageDuplicateChecker`, 并配置到 `WxMpMessageRouter` 中.

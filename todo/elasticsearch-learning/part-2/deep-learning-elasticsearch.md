@@ -2042,7 +2042,48 @@ POST employees/_search
 
 ![](https://cdn.yangbingdong.com/img/elasticsearch/term-performer.png)
 
-参考: *[https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html)*
+参考: ***[tune-for-search-speed](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html)***
+
+## post_filter
+
+> ***[filter-search-results](https://www.elastic.co/guide/en/elasticsearch/reference/current/filter-search-results.html)***
+
+`post_filter` 作用: 聚合结果生成完毕后, 查询结果可以根据 post_filter 参数的设置而被再次过滤.
+
+> `post_filter` 的作用和我们常用的filter是类似的, 但由于 `post_filter` 是在查询之后才会执行, 所以 `post_filter` 不具备 `filter` 对查询带来的好处(忽略评分, 缓存等), 因此, **在普通的查询中不要用 `post_filter` 来替代 `filter`**.
+
+```
+GET /shirts/_search
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "term": { "brand": "gucci" } 
+      }
+    }
+  },
+  "aggs": {
+    "colors": {
+      "terms": { "field": "color" } 
+    },
+    "color_red": {
+      "filter": {
+        "term": { "color": "red" } 
+      },
+      "aggs": {
+        "models": {
+          "terms": { "field": "model" } 
+        }
+      }
+    }
+  },
+  "post_filter": { 
+    "term": { "color": "red" }
+  }
+}
+```
+
+
 
 # Pipeline 聚合分析
 
@@ -2378,6 +2419,8 @@ POST employees/_search
    
 # 处理关系型数据
 
+> 参考地址: ***[Joining queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/joining-queries.html)***
+
 Elasticsearch 采用 **Denormalization**(反范式化设计), 与之对应的就是日常使用关系型数据库的 **Normalization**(范式化设计).
 
 反范式化一般采用**扁平化处理**, 不使用关联关系, 而是在文档中保存冗余的数据拷贝, 缺点就是**不适合在数据频繁修改**的场景.
@@ -2576,7 +2619,6 @@ POST my_movies/_search
                   {"match": {
                     "actors.first_name": "Keanu"
                   }},
-
                   {"match": {
                     "actors.last_name": "Hopper"
                   }}
@@ -2622,11 +2664,164 @@ POST my_movies/_search
 
 对象和 Nested 对象的局限性: 每次**更新需要重新索引**整个对象(包括根对象和嵌套对象).
 
-儿父子文档, 类似数据库中的 JOIN, 通过**维护 Parent/ Child 的关系**(在 mapping 中体现), 从而分离两个对象:
+而父子文档, 类似数据库中的 JOIN, 通过**维护 Parent/ Child 的关系**(在 mapping 中体现), 从而分离两个对象:
 
 * 父文档和子文档是两个**独立**的文档
 * 更新父文档无需重新索引子文档, 子文档被添加, 更新或者删除也不会影响到父文档和其他的子文档
+* 父子文档字段定义在同一个 Mapping 中
 
 定义父子关系的几个步骤:
 
-* 
+* 设置 Mapping(关键是声明 `type` 为 `join` 的关联字段)
+* 索引父文档(指定自己为父文档)
+* 索引子文档(指定 为子文档, 并指定父文档, 指定 `routing` 为父文档 id)
+* 按需查询, `parent_id` / `has_child` / `has_parent` 查询
+
+```
+DELETE my_blogs
+
+# 设定 Parent/Child Mapping
+PUT my_blogs
+{
+  "settings": {
+    "number_of_shards": 2
+  },
+  "mappings": {
+    "properties": {
+      "blog_comments_relation": {
+        "type": "join",
+        "relations": {
+          "blog": "comment"
+        }
+      },
+      "content": {
+        "type": "text"
+      },
+      "title": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+
+
+#索引父文档
+PUT my_blogs/_doc/blog1
+{
+  "title":"Learning Elasticsearch",
+  "content":"learning ELK @ geektime",
+  "blog_comments_relation":{
+    "name":"blog"
+  }
+}
+
+#索引父文档
+PUT my_blogs/_doc/blog2
+{
+  "title":"Learning Hadoop",
+  "content":"learning Hadoop",
+    "blog_comments_relation":{
+    "name":"blog"
+  }
+}
+
+
+#索引子文档
+PUT my_blogs/_doc/comment1?routing=blog1
+{
+  "comment":"I am learning ELK",
+  "username":"Jack",
+  "blog_comments_relation":{
+    "name":"comment",
+    "parent":"blog1"
+  }
+}
+
+#索引子文档
+PUT my_blogs/_doc/comment2?routing=blog2
+{
+  "comment":"I like Hadoop!!!!!",
+  "username":"Jack",
+  "blog_comments_relation":{
+    "name":"comment",
+    "parent":"blog2"
+  }
+}
+
+#索引子文档
+PUT my_blogs/_doc/comment3?routing=blog2
+{
+  "comment":"Hello Hadoop",
+  "username":"Bob",
+  "blog_comments_relation":{
+    "name":"comment",
+    "parent":"blog2"
+  }
+}
+
+# 查询所有文档
+POST my_blogs/_search
+{
+
+}
+
+#根据父文档ID查看
+GET my_blogs/_doc/blog2
+
+# Parent Id 查询
+POST my_blogs/_search
+{
+  "query": {
+    "parent_id": {
+      "type": "comment",
+      "id": "blog2"
+    }
+  }
+}
+
+# Has Child 查询,返回父文档
+POST my_blogs/_search
+{
+  "query": {
+    "has_child": {
+      "type": "comment",
+      "query" : {
+                "match": {
+                    "username" : "Jack"
+                }
+            }
+    }
+  }
+}
+
+# Has Parent 查询，返回相关的子文档
+POST my_blogs/_search
+{
+  "query": {
+    "has_parent": {
+      "parent_type": "blog",
+      "query" : {
+                "match": {
+                    "title" : "Learning Hadoop"
+                }
+            }
+    }
+  }
+}
+
+#通过ID ，访问子文档
+GET my_blogs/_doc/comment3
+#通过ID和routing ，访问子文档
+GET my_blogs/_doc/comment3?routing=blog2
+
+#更新子文档
+PUT my_blogs/_doc/comment3?routing=blog2
+{
+    "comment": "Hello Hadoop??",
+    "blog_comments_relation": {
+      "name": "comment",
+      "parent": "blog2"
+    }
+}
+```
+
