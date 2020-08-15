@@ -1,5 +1,5 @@
 ---
-title: MySQL杂记
+title: MySQL 杂谈
 date: 2018-02-16 15:16:18
 categories: [MySQL]
 tags: [MySQL]
@@ -9,7 +9,7 @@ tags: [MySQL]
 
 # Preface
 
-> MySQL是什么就多说了. . . 
+> MySQL 是一款开源的关系型数据库, 也是使用最广泛的数据库之一, 作为开发人员, 很有必要理解以及学习 MySQL 的一些相关知识.
 
 <!--more-->
 
@@ -138,6 +138,14 @@ MySQL官方开源GUI
 下载地址: ***[https://dev.mysql.com/downloads/workbench/](https://dev.mysql.com/downloads/workbench/)***
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/MySQL%20Workbench_001.png)
+
+# 基础篇
+
+一条 SQL 语句的执行过程:
+
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-sql-execute-arch.png)
+
+> MySQL 8.0 以后已经缓存模块删除了.
 
 # 索引相关
 
@@ -303,16 +311,18 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
 
 > 参考: *[http://blog.csdn.net/xlgen157387/article/details/79572598](http://blog.csdn.net/xlgen157387/article/details/79572598)*
 
-# JSON相关
+# 其他
 
-## JSON支持
+## JSON相关
+
+### JSON支持
 
 * 在MySQL 5.7.8中, MySQL支持由RFC 7159定义的本地JSON数据类型, 它支持对JSON(JavaScript对象标记)文档中的数据进行有效访问.
 * MySQL会对DML JSON数据自动验证. 无效的DML JSON数据操作会产生错误.
 * 优化的存储格式. 存储在JSON列中的JSON文档转换为一种内部格式, 允许对Json元素进行快速读取访问.
 * MySQL Json类型支持通过虚拟列方式建立索引, 从而增加查询性能提升.
 
-### 函数语法
+#### 函数语法
 
 mysql在json类型中增加了一些json相关的函数 可以参考如下
 
@@ -348,11 +358,11 @@ mysql在json类型中增加了一些json相关的函数 可以参考如下
 
 常见的就是`JSON_EXTRACT()等`
 
-### 表结构
+#### 表结构
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain05.png)
 
-### 插入数据
+#### 插入数据
 
 ```
 INSERT INTO `user_json` VALUES (1, '{\"name\": \"yang\", \"address\": \"shenyang\"}');
@@ -367,7 +377,7 @@ INSERT INTO `user_json` VALUES (1, '{\"name\": \"yang\", \"address\": \"shenyang
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain06.png)
 
-### 查询
+#### 查询
 
 ```
 select * from user_json where json_extract(data,'$.name')='yang';
@@ -388,7 +398,7 @@ select  data->>'$.name' from user_json where data->'$.name'='yang';
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain09.png)
 
-## JSON如何建立索引
+### JSON如何建立索引
 
 json类型并不能建立索引, 但我们可以通过**虚拟列**来建立索引
 
@@ -417,88 +427,7 @@ alter table ApiLog add verb_url_hash varbinary(16) GENERATED ALWAYS AS (unhex(md
 alter table ApiLog add key (verb_url_hash);
 ```
 
-# MySQL存储引擎MyISAM与InnoDB区别
-
-## MySQL默认存储引擎的变迁
-
-在MySQL 5.1之前的版本中, 默认的搜索引擎是MyISAM, 从MySQL 5.5之后的版本中, 默认的搜索引擎变更为InnoDB. 
-
-## MyISAM与InnoDB存储引擎的主要特点
-
-MyISAM存储引擎的特点是: **表级锁**、**不支持事务和全文索引**, 适合一些CMS内容管理系统作为后台数据库使用, 但是使用大并发、重负荷生产系统上, **表锁结构的特性就显得力不从心**；
-
-以下是MySQL 5.7 MyISAM存储引擎的版本特性: 
-
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine01.png)
-
-InnoDB存储引擎的特点是: **行级锁**、**事务安全（ACID兼容）**、**支持外键**、不支持FULLTEXT类型的索引(5.6.4以后版本开始支持FULLTEXT类型的索引). InnoDB存储引擎提供了具有提交、回滚和崩溃恢复能力的事务安全存储引擎. InnoDB是**为处理巨大量时拥有最大性能而设计的**. 它的CPU效率可能是任何其他基于磁盘的关系数据库引擎所不能匹敌的. 
-
-以下是MySQL 5.7 InnoDB存储引擎的版本特性: 
-
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine02.png)
-
-*注意: * 
-InnoDB表的行锁也不是绝对的, 假如在执行一个SQL语句时MySQL不能确定要扫描的范围, InnoDB表同样会锁全表, 例如`update table set num=1 where name like “a%”`. 
-
-两种类型最主要的差别就是InnoDB支持事务处理与外键和行级锁. 而MyISAM不支持. 所以MyISAM往往就容易被人认为只适合在小项目中使用. 
-
-## MyISAM与InnoDB性能测试
-
-下边两张图是官方提供的MyISAM与InnoDB的压力测试结果
-
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine03.png)
-
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-engine04.png)
-
-可以看出, **随着CPU核数的增加**, **InnoDB的吞吐量反而越好**, 而MyISAM, 其吞吐量几乎没有什么变化, 显然, MyISAM的表锁定机制降低了读和写的吞吐量. 
-
-## 事务支持与否
-
-MyISAM是一种非事务性的引擎, 使得MyISAM引擎的MySQL可以提供高速存储和检索, 以及全文搜索能力, 适合数据仓库等查询频繁的应用；
-
-InnoDB是事务安全的；
-
-事务是一种高级的处理方式, 如在一些列增删改中只要哪个出错还可以回滚还原, 而MyISAM就不可以了. 
-
-## MyISAM与InnoDB构成上的区别
-
-（1）每个MyISAM在磁盘上存储成三个文件: 
-
-> 第一个文件的名字以表的名字开始, 扩展名指出文件类型, .frm文件存储表定义. 
-> 第二个文件是数据文件, 其扩展名为.MYD (MYData). 
-> 第三个文件是索引文件, 其扩展名是.MYI (MYIndex). 
-
-（2）基于磁盘的资源是InnoDB表空间数据文件和它的日志文件, InnoDB 表的 大小只受限于操作系统文件的大小, 一般为 2GB. 
-
-## MyISAM与InnoDB表锁和行锁的解释
-
-MySQL表级锁有两种模式: 表共享读锁（Table Read Lock）和表独占写锁（Table Write Lock）. 什么意思呢, 就是说对MyISAM表进行读操作时, 它不会阻塞其他用户对同一表的读请求, 但会阻塞对同一表的写操作；而对MyISAM表的写操作, 则会阻塞其他用户对同一表的读和写操作. 
-
-InnoDB行锁是通过给索引项加锁来实现的, 即**只有通过索引条件检索数据**, **InnoDB才使用行级锁**, **否则将使用表锁**！行级锁在每次获取锁和释放锁的操作需要消耗比表锁更多的资源. 在InnoDB两个事务发生死锁的时候, 会计算出每个事务影响的行数, 然后回滚行数少的那个事务. 当锁定的场景中不涉及Innodb的时候, InnoDB是检测不到的. 只能依靠锁定超时来解决. 
-
-## 是否保存数据库表中表的具体行数
-
-InnoDB 中不保存表的具体行数, 也就是说, 执行`select count(*) from table` 时, InnoDB要扫描一遍整个表来计算有多少行, 但是MyISAM只要简单的读出保存好的行数即可. 
-
-注意的是, 当`count(*)`语句包含`where`条件时, 两种表的操作是一样的. 也就是 上述“6”中介绍到的InnoDB使用表锁的一种情况. 
-
-## 如何选择
-
-MyISAM适合: 
-（1）做很多count 的计算； 
-（2）插入不频繁, 查询非常频繁, 如果执行大量的SELECT, MyISAM是更好的选择； 
-（3）没有事务. 
-
-InnoDB适合: 
-（1）可靠性要求比较高, 或者要求事务； 
-（2）表更新和查询都相当的频繁, 并且表锁定的机会比较大的情况指定数据引擎的创建； 
-（3）如果你的数据执行大量的INSERT或UPDATE, 出于性能方面的考虑, 应该使用InnoDB表； 
-（4）DELETE FROM table时, InnoDB不会重新建立表, 而是一行一行的 删除； 
-（5）LOAD TABLE FROM MASTER操作对InnoDB是不起作用的, 解决方法是首先把InnoDB表改成MyISAM表, 导入数据后再改成InnoDB表, 但是对于使用的额外的InnoDB特性（例如外键）的表不适用. 
-
-要注意, 创建每个表格的代码是相同的, 除了最后的 TYPE参数, 这一参数用来指定数据引擎. 
-
-## 其他区别
+### 其他区别
 
 1、对于AUTO_INCREMENT类型的字段, InnoDB中必须包含只有该字段的索引, 但是在MyISAM表中, 可以和其他字段一起建立联合索引. 
 
@@ -512,15 +441,15 @@ InnoDB适合:
 
 6、清空整个表时, InnoDB是一行一行的删除, 效率非常慢. MyISAM则会重建表. 
 
-# 通过SQL查看表信息
+## 通过SQL查看表信息
 
-## 查看创建表
+### 查看创建表
 
 ```sql
 SHOW CREATE TABLE test_table;
 ```
 
-## 查看表信息
+### 查看表信息
 
 ```sql
 SHOW TABLE STATUS WHERE NAME IN('test_table', 'person');
@@ -532,7 +461,7 @@ SHOW TABLE STATUS WHERE NAME IN('test_table', 'person');
 SELECT * FROM information_schema.tables WHERE table_schema='test_db' AND table_name='test_table';
 ```
 
-## 查看字段信息
+### 查看字段信息
 
 ```sql
 SHOW FULL FIELDS FROM `test_table`;
@@ -544,7 +473,7 @@ SHOW FULL FIELDS FROM `test_table`;
 SELECT * FROM information_schema.COLUMNS WHERE table_schema='test_db' AND table_name='test_table';
 ```
 
-## 查看表索引
+### 查看表索引
 
 ```sql
 SHOW INDEX FROM test_table;
@@ -552,11 +481,11 @@ SHOW INDEX FROM test_table;
 SHOW KEYS from test_table;
 ```
 
-# 备份数据与恢复
+## 备份数据与恢复
 
 从Navicat中导入导出数据是比较慢的, 我们可以通过 `mysqldump` (安装 `mysql-client` 后自带)备份.
 
-## mysqldump 备份
+### mysqldump 备份
 
 备份一个数据库:
 
@@ -596,7 +525,7 @@ mysqldump -P 3306 -h [ip_address] -u [uname] -p[pass] db_name > db_backup.sql
 mysqldump --single-transaction -P 3306 -h [ip_address] -u [uname] -p[pass] db_name > db_backup.sql
 ```
 
-## 恢复
+### 恢复
 
 恢复一个数据库:
 
@@ -610,10 +539,6 @@ mysql -h [host] -P [port] -u [uname] -p[pass] db_name < db_backup.sql
 mysql -h [host] -P [port] -u [uname] -p[pass] < db_backup_all.sql
 ```
 
-# 死锁排查
+## 死锁排查
 
 ***[解决死锁之路（终结篇）- 再见死锁](https://mp.weixin.qq.com/s/HT1tWfEPnigBO9fhML6y0w)***
-
-# Finally
-
-看到一片美团技术团队的博文非常好: ***[https://tech.meituan.com/mysql-index.html](https://tech.meituan.com/mysql-index.html)***

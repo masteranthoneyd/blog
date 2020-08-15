@@ -2432,6 +2432,8 @@ ES 处理处理关联关系主要有以下方式:
 * 父子关联关系(Parant/Child)
 * 应用端关联
 
+性能: 对象 > 嵌套 > 父子文档
+
 ## 对象类型
 
 ```
@@ -2674,8 +2676,8 @@ POST my_movies/_search
 
 * 设置 Mapping(关键是声明 `type` 为 `join` 的关联字段)
 * 索引父文档(指定自己为父文档)
-* 索引子文档(指定 为子文档, 并指定父文档, 指定 `routing` 为父文档 id)
-* 按需查询, `parent_id` / `has_child` / `has_parent` 查询
+* 索引子文档(指定自己为子文档, 并指定父文档id, **指定 `routing`** 为父文档 id(更新时也要指定 `routing`), 为了是它们存储在同一分片从而提高查询性能)
+* 按需查询, `parent_id`(返回子文档) / `has_child`(返回父文档) / `has_parent`(返回子文档) 查询
 
 ```
 DELETE my_blogs
@@ -2824,4 +2826,216 @@ PUT my_blogs/_doc/comment3?routing=blog2
     }
 }
 ```
+
+## inner_hits
+
+> ***[Retrieve inner hits](https://www.elastic.co/guide/en/elasticsearch/reference/current/inner-hits.html)***
+
+在 `nested`/ `has_child` / `has_parent` 查询中加上 inner_hits 可返回对应的命中文档:
+
+```
+"<query>" : {
+  "inner_hits" : {
+    <inner_hits_options>
+  }
+}
+```
+
+比如 `has_child` 在默认情况下只返回了父文档, 如果也要返回命中的子文档:
+
+```
+POST my_blogs/_search
+{
+  "query": {
+    "has_child": {
+      "type": "comment",
+      "query": {
+        "match": {
+          "username": "Jack"
+        }
+      },
+      "inner_hits": {}
+    }
+  }
+}
+```
+
+# 索引重建
+
+> ***[Reindex API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html)***
+>
+> ***[Update By Query API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html)***
+
+索引重建场景:
+
+* 修改 mapping(字段类型更改, 分词器及字典更新) 以及 setting(分片数量修改)
+
+ES 提供了两种重建索引的 API:
+
+* Reindex: 将一个索引数据搬到另外一个索引上(mapping 以及 setting 不会搬过去)
+  * 场景: 修改字段类型(需要先对新索引设置 mapping), 修改索引的主分片片数
+* Update By Query:  在现有的索引上重建
+  * 场景: 为字段新增子字段, 字段更换分词器, 或更新分词器词库.
+
+```
+DELETE blogs/
+
+# 写入文档
+PUT blogs/_doc/1
+{
+  "content":"Hadoop is cool",
+  "keyword":"hadoop"
+}
+
+# 查看 Mapping
+GET blogs/_mapping
+
+# 修改 Mapping，增加子字段，使用英文分词器
+PUT blogs/_mapping
+{
+      "properties" : {
+        "content" : {
+          "type" : "text",
+          "fields" : {
+            "english" : {
+              "type" : "text",
+              "analyzer":"english"
+            }
+          }
+        }
+      }
+    }
+
+
+# 写入文档
+PUT blogs/_doc/2
+{
+  "content":"Elasticsearch rocks",
+    "keyword":"elasticsearch"
+}
+
+# 查询新写入文档
+POST blogs/_search
+{
+  "query": {
+    "match": {
+      "content.english": "Elasticsearch"
+    }
+  }
+
+}
+
+# 查询 Mapping 变更前写入的文档
+POST blogs/_search
+{
+  "query": {
+    "match": {
+      "content.english": "Hadoop"
+    }
+  }
+}
+
+
+# Update所有文档
+POST blogs/_update_by_query
+{
+
+}
+
+# 查询之前写入的文档
+POST blogs/_search
+{
+  "query": {
+    "match": {
+      "content.english": "Hadoop"
+    }
+  }
+}
+
+
+# 查询
+GET blogs/_mapping
+
+PUT blogs/_mapping
+{
+        "properties" : {
+        "content" : {
+          "type" : "text",
+          "fields" : {
+            "english" : {
+              "type" : "text",
+              "analyzer" : "english"
+            }
+          }
+        },
+        "keyword" : {
+          "type" : "keyword"
+        }
+      }
+}
+
+DELETE blogs_fix
+
+# 创建新的索引并且设定新的Mapping
+PUT blogs_fix/
+{
+  "mappings": {
+        "properties" : {
+        "content" : {
+          "type" : "text",
+          "fields" : {
+            "english" : {
+              "type" : "text",
+              "analyzer" : "english"
+            }
+          }
+        },
+        "keyword" : {
+          "type" : "keyword"
+        }
+      }    
+  }
+}
+
+# Reindx API
+POST  _reindex
+{
+  "source": {
+    "index": "blogs"
+  },
+  "dest": {
+    "index": "blogs_fix"
+  }
+}
+
+GET  blogs_fix/_doc/1
+
+# 测试 Term Aggregation
+POST blogs_fix/_search
+{
+  "size": 0,
+  "aggs": {
+    "blog_keyword": {
+      "terms": {
+        "field": "keyword",
+        "size": 10
+      }
+    }
+  }
+}
+```
+
+# Ingest Pipeline 与 Painless Script
+
+应用场景: 对写入的数据进行拦截并处理后, 再写入, 类似 Logstash, 但是又无需 Logstash.
+
+参考文档:
+
+***[Ingest APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-apis.html)***
+
+***[Ingest Processors](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-processors.html)***
+
+***[How to use scripts](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html)***
+
+
 
