@@ -141,11 +141,32 @@ MySQL官方开源GUI
 
 # 基础篇
 
-一条 SQL 语句的执行过程:
+## SQL 执行过程
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-sql-execute-arch.png)
 
-> MySQL 8.0 以后已经缓存模块删除了.
+**MySQL 8.0 以后已经缓存模块删除了**.
+
+## 日志系统
+
+日志作用:
+
+* 降低 IO 成本(WAL, 也就是 Write-Ahead Logging)
+* crash-safe, 崩溃恢复
+* 数据恢复
+
+两种日志:
+
+* redo log(range 结构), 物理日志, 属于 InnoDb 特有
+* binlog, 逻辑日志, MySQL Server 层实现  
+
+redo log 与 binlog 的一致性通过二阶段提交来保证(比如 redo log 写 prepare 成功, binlog 写入失败, 则会滚)
+
+update 执行图:
+
+> `update T set c=c+1 where ID=2;`
+
+![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-update-processing.png)
 
 # 索引相关
 
