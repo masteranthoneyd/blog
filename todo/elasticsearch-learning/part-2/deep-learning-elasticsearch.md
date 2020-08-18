@@ -3037,5 +3037,94 @@ POST blogs_fix/_search
 
 ***[How to use scripts](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html)***
 
+# 数据建模
 
+![](https://cdn.yangbingdong.com/img/elasticsearch/mapping-design01.png)
+
+> 文档: ***[mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)***
+
+## Field data types
+
+* 字符串:
+  * `text`: 用于全文本字段, 文本会被 Analyzer 分词, **默认不支持聚合分析及排序**, 需要设置 `fielddata` 为 `true`.
+  * `keyword`: 用于不需要分词的文本, 适用于 Filter(精确匹配), Sorting 和 Aggregations.
+* 数值:
+  * 整形:  `byte` / `short` / `integer` / `long`
+  * 浮点型: `float` / `half_float` / `scaled_float` / `double`
+* 日期: `date`
+* 范围: `integer_range` / `long_range` /  `float_range` / `double_range` / `date_range`
+* 布尔: `boolean`
+* 复合类型:
+  * `object`
+  * `nested`: 嵌套文档
+* 数组: 没有定义专门的数组类型, 插入的时候传数组就是数组了, 但是数组里面的元素类型要相同.
+* 专有类型:
+  * `ip`
+  * `completion`
+  * `token_count`: 使用自字段记录 token 数量
+  * `join`: 父子文档
+
+## Mapping parameters
+
+* `enable`: 是否需要检索, 排序和聚合分析.
+* `index`: 是否需要检索.
+* `analyzer` / `search_analyzer`: 指定分词器, 后者用于指定搜索时的分词器
+* `norms`: 是否归一化数据, 对于**不需要算分的数据建议关闭**, `keyword` 类型默认为 `false`, `text` 默认为 `true`.
+* `index_options`: **针对 text 类型**, 控制倒排索引中包括哪些信息(`docs` / `freqs` / `positions` / `offsets`, 对于不太注重 `_score` / `highlighting` 的使用场景, 可以设为 `docs` 来**降低内存/磁盘资源消耗**.
+* `doc_value`: 建立正排索引, 排序和聚合需要用到正排索引, 不需要排序以及聚合的时候可以关闭(节省空间), 非 `text` 字段默认为 `true`.
+* `fielddata`: 针对 `text` 类型, 也是用于建立正排索引,  但数据是存在内存中, 而 `doc_value` 是基于硬盘, 所以现在来说 `fielddata` 基本不怎么受欢迎, 因为容易导致 OOM. 对于 `text` 字段, `fielddata` 默认为 `false`.
+* `eager_global_ordinals`: 更新频繁, 聚合查询频繁的 `keyword` 类型的字段建议设置为 `true`.
+* `store`: 是否专门存储字段, 默认为 `false`. 因为文档所有数据都被存储到 `_source` 字段, 除非你不想将文档存到 `_source` 字段(比如文档中有一个大字段), 这个时候可以将 `store` 设置为 `true`, `_source` 设置为 `false` 来达到存储指定字段的需求.
+* `coerce`: 是否强制装换类型, 默认为 `true`, 比如定义的类型为 `integer`, 但传过来的是字符转"5", 这时候 ES 会自动转换.
+* `ignore-malformed`: 当转换失败时是否抛出异常, 默认为 true.
+* `dynamic`: 是否动态判断字段类型, 默认为 `true`, `false` 表示忽略新字段, `strict`  检测到新字段则抛出异常.
+* `fields`: 指定子字段
+* `format`: 针对 `date` 类型, 指定自定义时间格式
+* `ignore_above`: 超过指定长度则不被索引
+* `null-value`: 对空数据指定默认值
+
+## 数据建模最佳实践
+
+* 如何构建索引: 将数据插入到一个新的 index, 拿到自动生成的 mapping, 再作调整
+
+* 精确的字段设计:
+
+  * 不需要检索, 排序和聚合分析? `enable` 设置为 `false`.
+  * 不需要排序与聚合? `doc_value` 设置为 `false`.
+  * 不需要索引? `index` 设置为 `false`.
+  * 不需要算分? `norms` 设置为 `false`(一般针对 `text` 类型而言, `keyword` 默认就为 `false`).
+
+  * 能不用 `text` 字段的场景就不要用, `keyword` 字段无论从索引, 搜索的性能还是空间的节省都比 `text` 优秀.
+
+* 优先考虑 Denormalization 设计: Object -> Nested -> Child/Parent
+
+* 避免设计过多的字段:
+
+  * 大量的字段会对集群的性能产生影响, 因为 mapping 信息保存在 Cluster State 中, 影响同步.
+  * 字段过多不易维护.
+  * 通过 `index.mapping.total_fields.limt` 设置字段最大上限, 默认为 1000.
+  * 如果真实数据有很多字段, 比如 cookie, 可以通过 nested 关系, 设计 key / value 字段化解, 缺点就是查询语句变复杂了.
+
+* 生产中尽量不要打开 `dynamic`, 建议使用 `strict`.
+
+* 避免使用正则查询, 性能不好.
+
+* 如果需要聚合的字段有空值, 可能会导致聚合查询的不准确, 通过 `null_value` 设计默认值.
+
+* 可以通过 `_meta` 自定义字段, 比如版本, 对应类等
+
+# 优化搜索速度
+
+> 官方原文: ***[tune-for-search-speed](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html)***
+
+以下是总结:
+
+* 将更多地内存交给 filesystem cache(至少一半)
+* 使用更快的硬盘
+* 优化建模, 避免使用 join 关系(内嵌以及父子文档)
+* 尽量不要查询太多的字段, 对于 `query_string` 与 `multi_match` 而言, 越多的字段搜索速度越慢. 可以考虑使用 `copy_to` 汇总到一个字段
+* 预索引数据, 如果 `range` 聚合总在一个固定的范围, 比如需要聚合 price 的值为10 到 100, 那么可以新增一个 `price_range` 的 `keyword`, 值为 `10-100`, 然后使用 term aggregations
+* `keyword` 类型的 `term` 查询要比数字类型的快, 如果没有用到 `range`, 可以考虑设置成 `keyword`
+* 避免使用脚本
+* `date` 类型可以四舍五入查询
 

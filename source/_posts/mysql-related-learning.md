@@ -157,16 +157,40 @@ MySQL官方开源GUI
 
 两种日志:
 
-* redo log(range 结构), 物理日志, 属于 InnoDb 特有
-* binlog, 逻辑日志, MySQL Server 层实现  
+* redo log(range 结构), **物理日志**, 属于 **InnoDb 特有**
+* binlog, **逻辑日志**, MySQL Server 层实现  
 
-redo log 与 binlog 的一致性通过二阶段提交来保证(比如 redo log 写 prepare 成功, binlog 写入失败, 则会滚)
+redo log 与 binlog 的一致性通过**二阶段提交**来保证(比如 redo log 写 prepare 成功, binlog 写入失败, 则会滚)
 
 update 执行图:
 
 > `update T set c=c+1 where ID=2;`
 
 ![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-update-processing.png)
+
+## 事务隔离
+
+多事务并行会有以下问题:
+
+* 脏读(dirty read)
+* 不可重复读(non-repeatable read)
+* 幻读(phantom read)
+
+SQL 标准的事务隔离级别包括:
+
+* 读未提交(read uncommitted)
+* 读提交(read committed)
+* 可重复读(repeatable read)
+* 串行化(serializable)
+
+事务隔离通过 MVCC 实现(undoLog + read-view), 使用到的三个字段: **isDelete**(是否删除字段) / **DB_TRX_ID**(事务字段) / **DB_ROLL_PTR**(回滚指针字段). 
+
+应该尽量避免长事务, 因为 undoLog 会占用大量空间.
+
+MVCC 两种读形式:
+
+- 快照读: 读取的只是当前事务的可见版本, 不用加锁.
+- 当前读: 读取的是当前版本, 比如 **特殊的读操作, 更新/插入/删除操作**.
 
 # 索引相关
 
@@ -462,15 +486,15 @@ alter table ApiLog add key (verb_url_hash);
 
 6、清空整个表时, InnoDB是一行一行的删除, 效率非常慢. MyISAM则会重建表. 
 
-## 通过SQL查看表信息
+## SQL 查看表信息
 
-### 查看创建表
+**查看创建表**
 
 ```sql
 SHOW CREATE TABLE test_table;
 ```
 
-### 查看表信息
+**查看表信息**
 
 ```sql
 SHOW TABLE STATUS WHERE NAME IN('test_table', 'person');
@@ -482,7 +506,7 @@ SHOW TABLE STATUS WHERE NAME IN('test_table', 'person');
 SELECT * FROM information_schema.tables WHERE table_schema='test_db' AND table_name='test_table';
 ```
 
-### 查看字段信息
+**查看字段信息**
 
 ```sql
 SHOW FULL FIELDS FROM `test_table`;
@@ -494,13 +518,29 @@ SHOW FULL FIELDS FROM `test_table`;
 SELECT * FROM information_schema.COLUMNS WHERE table_schema='test_db' AND table_name='test_table';
 ```
 
-### 查看表索引
+**查看表索引**
 
 ```sql
 SHOW INDEX FROM test_table;
 -- 或者
 SHOW KEYS from test_table;
 ```
+
+## 实用语句
+
+**查看事务隔离级别:**
+
+```sql
+show variables like 'transaction_isolation'
+```
+
+**查看长事务:**
+
+```sql
+select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
+```
+
+
 
 ## 备份数据与恢复
 
