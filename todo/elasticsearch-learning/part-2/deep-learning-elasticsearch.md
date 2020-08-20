@@ -3088,7 +3088,7 @@ POST blogs_fix/_search
 * 数组: 没有定义专门的数组类型, 插入的时候传数组就是数组了, 但是数组里面的元素类型要相同.
 * 专有类型:
   * `ip`
-  * `completion`
+  * `completion`: 搜索提示特殊结构
   * `token_count`: 使用自字段记录 token 数量
   * `join`: 父子文档
 
@@ -3139,7 +3139,7 @@ POST blogs_fix/_search
 
 # 搜索选择
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/search-method-choose.png)
+![](https://cdn.yangbingdong.com/img/elasticsearch/search-method-choose01.png)
 
 # 性能优化
 
