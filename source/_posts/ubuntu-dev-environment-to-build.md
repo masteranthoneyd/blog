@@ -94,7 +94,7 @@ sudo ln -s jdk* jdk
 ```
 sudo vi /etc/profile.d/jdk.sh
 ```
-***环境变量的配置内容如下: ***
+**环境变量的配置内容如下: **
 
 1. 设置一个名为`JAVA_HOME`的变量, 并且使用`export`命令导出为环境变量, 如果不使用 `export` , 仅在当前`shell`里面有效
 ```
@@ -115,30 +115,47 @@ javac -version
 ```
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/javaVersion.png)
 
-# Scala环境
+# Scala
 
-更上面安装JDK类似
-
-1、去 *[官网](http://www.scala-lang.org/download/)* 下载最新地SDK
+* 下载 ***[官方 SDK](http://www.scala-lang.org/download/)***
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
 
-2、解压到 `/usr/local` 目录, 并创建软链接为 `scala` 
+* 解压到 `/usr/local` 目录, 并创建软链接为 `scala` 
 
-3、在 `/etc/profile.d` 目录下创建 `scala.sh` , 输入以下信息: 
+* 在 `/etc/profile.d` 目录下创建 `scala.sh` , 内容如下: 
 
 ```
 export SCALA_HOME=/usr/local/scala
 export PATH=$PATH:$SCALA_HOME/bin
 ```
 
-4、查看是否安装成功
+* 查看是否安装成功
+
 ```
 source /etc/profile.d/scala.sh
 scala -version
 ```
 
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
+
+# Groovy
+
+* 下载 ***[官方 SDK](http://www.groovy-lang.org/download.html)***
+* 解压到 `/usr/local` 目录下, 并创建 `groovy` 软连接
+* 在 `/etc/profile.d` 目录下创建 `groovy.sh`, 内容如下:
+
+```bash
+export GROOVY_HOME=/usr/local/groovy
+export PATH=$PATH:$GROOVY_HOME/bin
+```
+
+* 验证:
+
+```bash
+source /etc/profile.d/groovy.sh
+groovy -v
+```
 
 # Golang
 
@@ -238,13 +255,8 @@ MyEclipse安装请看: ***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-
 新公司好多大牛, 用的都是IDEA, 于是乎“近墨者黑”, 那么既然有机会跟大牛接触, 我也开始真正意义上的学习IDEA了
 
 ### 安装
-进过查阅, 我选择官方的盒子下载: ***[http://www.jetbrains.com/toolbox/app/?fromMenu](http://www.jetbrains.com/toolbox/app/?fromMenu)***
-优点是可以自动更新
+通过官方提供的 ***[Toolbox App](http://www.jetbrains.com/toolbox/app)*** 进行安装, 可以很方便地进行版本管理:
 ![](https://cdn.yangbingdong.com/img/javaDevEnv/idea.png)
-
-### 激活
-
-博主使用授权服务器, 可以自己搭建, 详情请看 ***[这里](/2017/note-of-learning-idea-under-ubuntu/#License)***
 
 ### 部署Tomcat
 
@@ -809,7 +821,7 @@ sudo apt install python-pip
 
 `docker-compose.yml`:
 
-```
+```yaml
 version: '3'
 services:
   kafka1:
@@ -914,25 +926,10 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --boots
 
 ***[https://github.com/DeemOpen/zkui](https://github.com/DeemOpen/zkui)***
 
-# 搭建ngrok配置
+# Ngrok
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/ngrok_p1.jpg)
->ngrok 是一个反向代理, 通过在公共的端点和本地运行的 Web 服务器之间建立一个安全的通道. ngrok 可捕获和分析所有通道上的流量, 便于后期分析和重放. 可以被使用来进行微信借口的本地调试. 在ngrok被墙之后, 我们需要通过ngrok开源的源码自行搭建ngrok服务. 
+请看 ***[这里](/2017/self-hosted-build-ngrok-server/)***
 
-参考地址: ***[Ubuntu下配置安装ngrok](http://blog.csdn.net/cloume/article/details/51209493)***
-搞了一上午, 服务运行起来了, 客户端也运行起来了, 浏览器就是访问不到！！
-不知道是不是因为个人电脑没有域名所以才访问不到, 日后再深究. 
-无奈, 还好互联网开源精神无处不在, 某大神搭建的ngrok: 
-***[http://www.qydev.com/](http://www.qydev.com/)***
-客户端和教程都在里面哦. 
-
-**Update:**Ngrok已搭建成功～ , 记录于***[self-hosted-build-ngrok-server](/2017/self-hosted-build-ngrok-server/)***
-
-
-<p id="div-border-left-purple">**其他tunnel的代理服务器**: 
-***[natapp.cn](http://natapp.cn)***
-***[www.ngrok.cc](http://www.ngrok.cc)***
-</p>
 
 
 [^1]: IDEA 全称IntelliJ IDEA, 是java语言开发的集成环境, IntelliJ在业界被公认为最好的java开发工具之一, 尤其在智能代码助手、代码自动提示、重构、J2EE支持、Ant、JUnit、CVS整合、代码审查、 创新的GUI设计等方面的功能可以说是超常的. IDEA是JetBrains公司的产品, 这家公司总部位于捷克共和国的首都布拉格, 开发人员以严谨著称的东欧程序员为主
