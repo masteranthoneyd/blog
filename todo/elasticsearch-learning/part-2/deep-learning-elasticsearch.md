@@ -1112,7 +1112,7 @@ POST movies-latest/_search
 }
 ```
 
-# 综合排序:Function Score Query 优化算分
+# Function Score Query 优化算分
 
 Function Score Query 可以在查询结束后, 对每一个匹配的文档进行一系列的重新算分, 根据新生成的分数进行排序.
 
@@ -3172,3 +3172,234 @@ POST blogs_fix/_search
 * 对于 PB 级别数据, 建议使用模板+Rollover+Curator动态创建索引.
 * 建议分片数 = 索引大小/分片大小经验值(30GB, 官方建议一个分片大小应该在20到40GB)
 * 如果对实时性要求不高, 可适量增加 `refresh_interval`(默认是1s)
+
+# IK 分词器使用
+
+> ***[https://github.com/medcl/elasticsearch-analysis-ik](https://github.com/medcl/elasticsearch-analysis-ik)***
+
+## 安装
+
+直接安装:
+
+```
+{ES_HOME}/bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.4.2/elasticsearch-analysis-ik-7.4.2.zip
+```
+
+或者直接集成到镜像中:
+
+```dockerfile
+FROM elasticsearch:7.4.2
+MAINTAINER yangbingdong <yangbingdong1994@gmail.com>
+ARG TZ
+ENV TZ=${TZ:-"Asia/Shanghai"}
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.4.2/elasticsearch-analysis-ik-7.4.2.zip \
+  && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.4.2/elasticsearch-analysis-pinyin-7.4.2.zip \
+  && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch https://github.com/medcl/elasticsearch-analysis-stconvert/releases/download/v7.4.2/elasticsearch-analysis-stconvert-7.4.2.zip \
+  && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+```
+
+## 自定义词典
+
+修改 `${ES_HOME}/config/analysis-ik/IKAnalyzer.cfg.xml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>IK Analyzer 扩展配置</comment>
+    <!--用户可以在这里配置自己的扩展字典 -->
+    <entry key="ext_dict">custom/mydict.dic;extra_main.dic</entry>
+    <!--用户可以在这里配置自己的扩展停止词字典-->
+    <entry key="ext_stopwords">extra_stopword.dic</entry>
+    <!--用户可以在这里配置远程扩展字典 -->
+    <entry key="remote_ext_dict">words_location</entry>
+    <!--用户可以在这里配置远程扩展停止词字典-->
+    <entry key="remote_ext_stopwords">words_location</entry>
+</properties>
+```
+
+如果用的是 Docker 方式, 可以直接挂载进去:
+
+```yaml
+version: '3'
+services:
+  elk-elasticsearch:
+    image: yangbingdong/elasticsearch-ik-pinyin:7.4.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./data:/usr/share/elasticsearch/data
+      - ./config/IKAnalyzer.cfg.xml:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
+      - ./config/mydict.dic:/usr/share/elasticsearch/config/analysis-ik/custom/mydict.dic
+    networks:
+      backend:
+        aliases:
+          - elasticsearch
+
+# docker network create -d=overlay --attachable backend
+# docker network create --opt encrypted -d=overlay --attachable --subnet 10.10.0.0/16 backend
+networks:
+  backend:
+    external:
+      name: backend
+```
+
+## 同义词
+
+主要通过 token filter 实现: `synonym` 或者 `synonym_graph`.
+
+在进行同义词搜索时, 有如下的几种方案:
+
+- 在建立索引时 (indexing), 通过 analyzer 建立 synonyms 的反向索引
+- 在 query 时，通过 search analyzer 对查询的词建立 synonyms
+- 在 indexing 及 query 时，同时建立反向索引中的 synonym 及在 query 时为查询的词建立 synonyms (对精度有一定影响)
+
+```
+DELETE /s-test
+PUT /s-test
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "analysis": {
+      "filter": {
+        "graph_synonyms": {
+          "type": "synonym_graph",
+          "synonyms": [
+            "土豆,洋芋,马铃薯"
+          ]
+        }
+      },
+      "analyzer": {
+        "my_ik_max_word": {
+          "type": "custom",
+          "tokenizer": "ik_max_word",
+          "filter": ["graph_synonyms"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "my_ik_max_word"
+      }
+    }
+  }
+}
+
+POST /s-test/_doc/1
+{
+  "title": "我要吃土豆"
+}
+
+POST /s-test/_search
+{
+  "query": {
+    "match": {
+      "author": "马铃薯和土豆"
+    }
+  }
+}
+
+GET /s-test/_termvectors/1?fields=title
+```
+
+另外, 同义词还可以通过 `synonyms_path` 指定(`synonyms_path` 的位置是以ES的 `config` 开始算的). 例如同义词文件在 `${ES_HOME}/config/analysis/synonyms.txt`, 则 `synonyms_path` 为 `analysis/synonyms.txt`.
+
+同义词文件示例:
+
+```
+# 当expand=true时, 只要匹配到以下任意一个 token, 都会变成下面三个 token
+# 当expand=false时, 则匹配到下面任意一个, 转换成第一个
+土豆,洋芋,马铃薯
+
+# 匹配到左边任意一个, 转换为右边
+# 这样写会忽略expand参数
+洋芋,马铃薯 => 土豆
+```
+
+## 拼音
+
+> ***[https://github.com/medcl/elasticsearch-analysis-pinyin](https://github.com/medcl/elasticsearch-analysis-pinyin)***
+
+```
+PUT /s-test
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "analysis": {
+      "filter": {
+        "my_pinyin": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "keep_separate_first_letter": false,
+          "limit_first_letter_length": 16,
+          "keep_full_pinyin": true,
+          "keep_joined_full_pinyin": false,
+          "keep_none_chinese": true,
+          "keep_none_chinese_together": true,
+          "keep_none_chinese_in_first_letter": true,
+          "keep_none_chinese_in_joined_full_pinyin": false,
+          "none_chinese_pinyin_tokenize": true,
+          "keep_original": false,
+          "lowercase": true,
+          "trim_whitespace": true,
+          "remove_duplicated_term": false,
+          "ignore_pinyin_offset": true
+        }
+      },
+      "analyzer": {
+        "ik_smart_pinyin": {
+          "type": "custom",
+          "tokenizer": "ik_smart",
+          "filter": [
+            "my_pinyin"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "fields": {
+          "pinyin": {
+            "type": "text",
+            "analyzer": "ik_smart_pinyin"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
