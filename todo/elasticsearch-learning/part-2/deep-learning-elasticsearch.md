@@ -3177,6 +3177,8 @@ POST blogs_fix/_search
 
 > ***[https://github.com/medcl/elasticsearch-analysis-ik](https://github.com/medcl/elasticsearch-analysis-ik)***
 
+![](https://cdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
+
 ## 安装
 
 直接安装:
@@ -3343,6 +3345,7 @@ GET /s-test/_termvectors/1?fields=title
 > ***[https://github.com/medcl/elasticsearch-analysis-pinyin](https://github.com/medcl/elasticsearch-analysis-pinyin)***
 
 ```
+DELETE /s-test
 PUT /s-test
 {
   "settings": {
@@ -3363,7 +3366,7 @@ PUT /s-test
           "keep_none_chinese_together": true,
           "keep_none_chinese_in_first_letter": true,
           "keep_none_chinese_in_joined_full_pinyin": false,
-          "none_chinese_pinyin_tokenize": true,
+          "none_chinese_pinyin_tokenize": false,
           "keep_original": false,
           "lowercase": true,
           "trim_whitespace": true,
@@ -3372,7 +3375,7 @@ PUT /s-test
         }
       },
       "analyzer": {
-        "ik_smart_pinyin": {
+        "my_pinyin": {
           "type": "custom",
           "tokenizer": "ik_smart",
           "filter": [
@@ -3394,12 +3397,91 @@ PUT /s-test
         "fields": {
           "pinyin": {
             "type": "text",
-            "analyzer": "ik_smart_pinyin"
+            "analyzer": "my_pinyin",
+            "search_analyzer": "pinyin"
           }
         }
       }
     }
   }
 }
+
+POST /s-test/_analyze
+{
+  "field": "name.pinyin",
+  "text": "Iphone手机"
+}
+
+POST /s-test/_doc/1
+{
+  "name": "IPhone 苹果手机"
+}
+
+POST /s-test/_search
+{
+  "query": {
+    "multi_match": {
+      "fields": ["name", "name.pinyin"],
+      "query": "shouji",
+      "type": "most_fields"
+    }
+  }
+}
 ```
+
+拼音分词器这里有个小问题, 当字段有非中文的时候, 比如 IPhone 手机, 默认情况下, 是会将 IPhone 拆分成单个字母, 如果想要保留非中文, 可以将 `none_chinese_pinyin_tokenize` 设置成 `false`. 但是这样又会导致搜索的时候输入拼音时, 导致拼音不会被分词, 这种情况下可以将 `search_analyzer` 设置为 `pinyin`.
+
+可以在程序中做这样的处理, 输入的字符串中有非中文时, 将非中文放到 `pinyin` 字段搜索(通过正则提取).
+
+## 繁体转简体
+
+>  ***[https://github.com/medcl/elasticsearch-analysis-stconvert](https://github.com/medcl/elasticsearch-analysis-stconvert)***
+
+```
+DELETE /s-test
+PUT /s-test
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "analysis": {
+      "char_filter": {
+        "tsconvert": {
+          "type": "stconvert",
+          "convert_type": "t2s"
+        }
+      },
+      "analyzer": {
+        "my_ik_smart": {
+          "type": "custom",
+          "char_filter": "tsconvert",
+          "tokenizer": "ik_smart"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "ts": {
+        "type": "text",
+        "analyzer": "my_ik_smart"
+      }
+    }
+  }
+}
+
+POST /s-test/_analyze
+{
+  "field": "ts",
+  "text": "國際手机"
+}
+```
+
+# Suggestion
 
