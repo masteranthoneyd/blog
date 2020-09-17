@@ -10,7 +10,11 @@
 * `ReplicationController`(rc) / `ReplicationSet`(rs): 用来部署, 升级 Pod.
 * `Deployment`(deploy): 可以看做升级版的 RC, 在 RC 级基础上增加了事件和状态查看, 回滚, 版本记录, 暂停和启动等功能.
 * `DaemonSet`(ds) / `StatefulSet`(sts): `DaemonSet` 会在每个 Kubernetes 节点都启动一个 `Pod`. StatefulSet 表示有状态的服务, Pod 的名称的形式为`<statefulset name>-<ordinal index>`, 可参考 Nacos 的部署.
-* `Service`(svc): 提供一组 `Pod` 的访问, 服务间的访问一般就是通过 `Service` 来实现的, 默认类型为 `ClusterIP`(提供一个虚拟ip), 其他类型还有 `NodePort`(直接占用节点的端口, 提供外部访问的一种方式)等.
+* `Service`(svc): 提供一组 `Pod` 的访问, 服务间的访问一般就是通过 `Service` 来实现的, 类型有4种
+  * `ClusterIP`(默认): 仅仅使用一个集群内部的地址, 这也是默认值, 使用该类型, 意味着, Service 只能在集群内部被访问. `clusterIP` 参数设置为 `None` 就是一个 Headless Service 了.
+  * `NodePort`: 在集群内部的每个节点上, 都开放这个服务. 可以在任意的 NodePort 地址上访问到这个服务
+  * `LoadBalancer`: 这是当 Kubernetes 部署到公有云上时才会使用到的选项, 是向云提供商申请一个负载均衡器, 将流量转发到已经以 NodePort 形式开放的 Service 上. 
+  * `ExternalName`: `ExternalName`实际上是将 Service 导向一个外部的服务, 这个外部的服务有自己的域名, 只是在 Kubernetes 内部为其创建一个内部域名, 并 cname 至这个外部的域名. 
 * `Ingress`(ing): 对集群中服务的外部访问进行管理, 典型的访问方式是 HTTP, 可以提供负载均衡, SSL 终结和基于名称的虚拟托管.
 * `ConfigMap`(cm) / `Secret`: 配置存储, 后者提供加密功能.
 * `Job` / `CronJob`(cj): 任务, 前者为执行一次, 后者加上了时间调度.
@@ -27,7 +31,7 @@ Service 默认生成 ClusterIP(VIP) 来访问 Pod, 实际应用中通过写死 C
 域名格式:
 
 - 普通的 Service: 会生成 `serviceName.namespace.svc.cluster.local` 的域名, 会解析到 Service 对应的 ClusterIP 上, 在 Pod 之间的调用可以简写成 `serviceName.namespace`, 如果处于同一个命名空间下面, 甚至可以只写成 `serviceName` 即可访问.
-- **Headless Service**：无头服务, 就是把 ClusterIP 设置为 None 的, 会被解析为指定 Pod 的 IP 列表, 同样还可以通过 `podname.servicename.namespace.svc.cluster.local` 访问到具体的某一个 Pod.
+- **Headless Service**: 无头服务, 就是把 ClusterIP 设置为 None 的, 会被解析为指定 Pod 的 IP 列表, 同样还可以通过 `podname.servicename.namespace.svc.cluster.local` 访问到具体的某一个 Pod.
 
 # 服务映射
 
@@ -267,7 +271,7 @@ spec:
     image: gcr.io/google_containers/pause:2.0
 ```
 
-# 污点和容忍(Taints和Tolerations)
+## 污点和容忍(Taints和Tolerations)
 
 与 NodeAffinity 相反, Taint 让 Node 拒绝 Pod 的运行. Taint 需要与 Toleration 配合使用, 让 Pod 避开那些不合适的 Node.
 
@@ -275,7 +279,7 @@ spec:
 
 ```
 kubectl taint node [node] key=value[effect]
-其中[effect] 可取值： [ NoSchedule | PreferNoSchedule | NoExecute ]
+其中[effect] 可取值:  [ NoSchedule | PreferNoSchedule | NoExecute ]
 NoSchedule : 一定不能被调度
 PreferNoSchedule: 尽量不要调度
 NoExecute: 不仅不会调度, 还会驱逐Node上已有的Pod
@@ -286,7 +290,7 @@ kubectl taint node 10.3.1.16 test=16:NoSchedule
 
 在 Node上设置一个或多个 Taint 后, 除非 Pod 明确声明能够容忍这些"污点", 否则无法在这些 Node 上运行.
 
-Toleration 设置为可以容忍具有该 Taint 的 Node, 使得 Pod 能够被调度到 node1 上：
+Toleration 设置为可以容忍具有该 Taint 的 Node, 使得 Pod 能够被调度到 node1 上: 
 
 ```yaml
 apiVersion: v1
@@ -305,6 +309,225 @@ spec:
 ```
 
 > 更多参考这里: ***[https://www.cnblogs.com/breezey/p/9101677.html](https://www.cnblogs.com/breezey/p/9101677.html)***
+
+# 数据挂载
+
+Kubernetes 提供了众多 Volume 类型, 包括emptyDir / hostPath / nfs / glusterfs / cephfs / ceph rbd等。具体可以参考[***官方文档***](https://kubernetes.io/docs/concepts/storage/volumes/), 这里列举常用的几种.
+
+## emptyDir
+
+这是一个临时文件夹, Pod 销毁就删除:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - image: test-webserver
+    name: test-container
+    volumeMounts:
+    - name: cache-volume
+      mountPath: /cache
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+## hostPath
+
+在 Pod 运行节点创建的文件夹, 缺点是, Pod 是动态的, 而 hostPath 是静态的(跟着 node 走):
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - image: test-webserver
+    name: test-container
+    volumeMounts:
+    - name: test-volume
+      mountPath: /www
+  volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+```
+
+# ConfigMap & Secret
+
+通常一个应用多多少少都会有一些配置, 而对于不同环境的配置是不一样的, 这时候就需要将配置与应用隔离.
+
+Kubernetes 提供了 ConfigMap 以及 Secret 这样的方案提供给我们. Secret 相当于加密版的 ConfigMap, 存储的是 Base64 编码后的值.
+
+## 创建
+
+推荐使用 yaml 文件创建 ConfigMap:
+
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cm-demo
+  namespace: default
+data:
+  data.1: hello
+  data.2: world
+  config: |
+    property.1=value-1
+    property.2=value-2
+    property.3=value-3
+```
+
+Secret:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: YWRtaW4zMjE=
+```
+
+> username 与 password 是经过 Base64 处理后的字符串
+
+## 使用
+
+通过环境变量方式:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testcm1-pod
+spec:
+  containers:
+    - name: testcm1
+      image: busybox
+      command: [ "/bin/sh", "-c", "echo $(DB_HOST) $(DB_PORT)" ]
+      env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cm-demo3
+              key: db.host
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: cm-demo3
+              key: db.port
+      envFrom:
+        - configMapRef:
+            name: cm-demo1
+```
+
+通过挂载方式(ConfigMap 中的 key 为文件名, value 为文件内容):
+
+```yaml
+apiVersion: v1
+data:
+  redis.conf: |
+    host=127.0.0.1
+    port=6379
+kind: ConfigMap
+metadata:
+  name: cm-demo2
+  namespace: default
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testcm3-pod
+spec:
+  containers:
+    - name: testcm3
+      image: busybox
+      command: [ "/bin/sh", "-c", "cat /etc/config/redis.conf" ]
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: cm-demo2
+```
+
+也可以指定挂载某一个 key:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testcm3-pod
+spec:
+  containers:
+    - name: testcm3
+      image: busybox
+      command: [ "/bin/sh", "-c", "cat /etc/config/path/to/redis.conf" ]
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: cm-demo2
+        items:
+        - key: redis.conf
+          path: path/to/redis.conf
+```
+
+Secret 用法类似, 只需要将 `configMapKeyRef` 替换成 `secretKeyRef`.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret1-pod
+spec:
+  containers:
+  - name: secret1
+    image: busybox
+    command: [ "/bin/sh", "-c", "env" ]
+    env:
+    - name: USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: mysecret
+          key: username
+    - name: PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysecret
+          key: password
+```
+
+## 差异与注意点
+
+相同点: 
+
+- key/value 的形式
+- 属于某个特定的 namespace
+- 可以导出到环境变量
+- 可以通过目录/文件形式挂载
+- 通过 volume 挂载的配置信息均可热更新
+
+不同点: 
+
+- Secret 可以被 ServerAccount 关联
+- Secret 可以存储 docker register 的鉴权信息, 用在 ImagePullSecret 参数中, 用于拉取私有仓库的镜像
+- Secret 支持 Base64 加密
+- Secret 分为 `kubernetes.io/service-account-token`, `kubernetes.io/dockerconfigjson`, `Opaque` 三种类型而 Configmap 不区分类型
+
+ConfigMap需要注意:
+
+* ConfigMap 必须在 Pod 之前创建
+* 只有与当前 ConfigMap 在同一个 namespace 内的 pod 才能使用这个 ConfigMap, 换句话说, ConfigMap 不能跨命名空间调用
 
 # k8s 常用命令
 
@@ -376,9 +599,9 @@ kubectl -n <NANESPACE> rollout undo deployment <DEPLOYMENT_NAME> --to-revision=2
 kubectl autoscale deployment <DEPLOYMENT_NAME> --cpu-percent=50 --min=1 --max=10
 ```
 
-# YAML 资源文件
+# YAML 声明示例
 
-Deloyment:
+## Deloyment
 
 ```yaml
 apiVersion: apps/v1  #指定api版本, 此值必须在kubectl apiversion中
@@ -510,7 +733,7 @@ spec:  #specification of the resource content 指定该资源的内容
                 path: a.conf
 ```
 
-Service:
+## Service
 
 ```yaml
 apiVersion: v1
@@ -525,6 +748,23 @@ spec:
     targetPort: 80  # 容器暴露的端口
   selector:  # 标签选择器 
     app: nginx
+```
+
+## HPA
+
+```yaml
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache
+  namespace: default
+spec:
+  maxReplicas: 10
+  minReplicas: 4
+  scaleTargetRef:
+    kind: Deployment
+    name: nginx-demo
+  targetCPUUtilizationPercentage: 90
 ```
 
 # 阿里云 K8S
@@ -563,7 +803,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 **Zsh**:
 
-在`~/.zshrc`添加以下代码：
+在`~/.zshrc`添加以下代码: 
 
 ```
 if [ $commands[kubectl] ]; then
@@ -573,7 +813,7 @@ fi
 
 **Oh-My-Zsh**:
 
-如果是使用`Oh-My-Zsh`, 在`~/.zshrc`中, 找到`source $ZSH/oh-my-zsh.sh`这一行, 在这行**下面**添加(否则不生效)：
+如果是使用`Oh-My-Zsh`, 在`~/.zshrc`中, 找到`source $ZSH/oh-my-zsh.sh`这一行, 在这行**下面**添加(否则不生效): 
 
 ```
 source <(kubectl completion zsh)
