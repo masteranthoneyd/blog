@@ -9,7 +9,8 @@
 * `Pod`(po): 最小的调度单位, 一般一个 `Pod` 对应一个或两个(**Sidecar 模式**) Container. 一般不直接管理, 而是通过下面的 `Deployment` 管理.
 * `ReplicationController`(rc) / `ReplicationSet`(rs): 用来部署, 升级 Pod.
 * `Deployment`(deploy): 可以看做升级版的 RC, 在 RC 级基础上增加了事件和状态查看, 回滚, 版本记录, 暂停和启动等功能.
-* `DaemonSet`(ds) / `StatefulSet`(sts): `DaemonSet` 会在每个 Kubernetes 节点都启动一个 `Pod`. StatefulSet 表示有状态的服务, Pod 的名称的形式为`<statefulset name>-<ordinal index>`, 可参考 Nacos 的部署.
+* `DaemonSet`(ds): `DaemonSet` 会在每个 Kubernetes 节点都启动一个 `Pod`, 可以理解为节点的守护进程, 适用于日志收集, 监控 Agent 等. 
+* `StatefulSet`(sts): `StatefulSet` 表示有状态的服务, Pod 的名称的形式为`<statefulset name>-<ordinal index>`, 可参考 Nacos 的部署.
 * `Service`(svc): 提供一组 `Pod` 的访问, 服务间的访问一般就是通过 `Service` 来实现的, 类型有4种
   * `ClusterIP`(默认): 仅仅使用一个集群内部的地址, 这也是默认值, 使用该类型, 意味着, Service 只能在集群内部被访问. `clusterIP` 参数设置为 `None` 就是一个 Headless Service 了.
   * `NodePort`: 在集群内部的每个节点上, 都开放这个服务. 可以在任意的 NodePort 地址上访问到这个服务
@@ -77,7 +78,7 @@ subsets:
 
 ## 暴露服务
 
-暴露服务有多种方式: `NodePort`, `Ingress`, `LoadBalance` 等, 这里介绍前两种
+暴露服务有多种方式: `NodePort`, `Ingress`, `LoadBalance`, `port-forward` 等, 这里介绍前两种
 
 ### NodePort 方式
 
@@ -310,53 +311,6 @@ spec:
 
 > 更多参考这里: ***[https://www.cnblogs.com/breezey/p/9101677.html](https://www.cnblogs.com/breezey/p/9101677.html)***
 
-# 数据挂载
-
-Kubernetes 提供了众多 Volume 类型, 包括emptyDir / hostPath / nfs / glusterfs / cephfs / ceph rbd等。具体可以参考[***官方文档***](https://kubernetes.io/docs/concepts/storage/volumes/), 这里列举常用的几种.
-
-## emptyDir
-
-这是一个临时文件夹, Pod 销毁就删除:
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: test-pod
-spec:
-  containers:
-  - image: test-webserver
-    name: test-container
-    volumeMounts:
-    - name: cache-volume
-      mountPath: /cache
-  volumes:
-  - name: cache-volume
-    emptyDir: {}
-```
-
-## hostPath
-
-在 Pod 运行节点创建的文件夹, 缺点是, Pod 是动态的, 而 hostPath 是静态的(跟着 node 走):
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: test-pod
-spec:
-  containers:
-  - image: test-webserver
-    name: test-container
-    volumeMounts:
-    - name: test-volume
-      mountPath: /www
-  volumes:
-  - name: test-volume
-    hostPath:
-      path: /data
-```
-
 # ConfigMap & Secret
 
 通常一个应用多多少少都会有一些配置, 而对于不同环境的配置是不一样的, 这时候就需要将配置与应用隔离.
@@ -529,7 +483,80 @@ ConfigMap需要注意:
 * ConfigMap 必须在 Pod 之前创建
 * 只有与当前 ConfigMap 在同一个 namespace 内的 pod 才能使用这个 ConfigMap, 换句话说, ConfigMap 不能跨命名空间调用
 
-# k8s 常用命令
+# 数据挂载
+
+Kubernetes 提供了众多 Volume 类型, 包括 `emptyDir` / `hostPath` / `nfs` / `glusterfs` / `cephfs` / `ceph rbd` 等。具体可以参考[***官方文档***](https://kubernetes.io/docs/concepts/storage/volumes/), 这里列举常用的几种.
+
+## emptyDir
+
+这是一个临时文件夹, Pod 销毁就删除:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - image: test-webserver
+    name: test-container
+    volumeMounts:
+    - name: cache-volume
+      mountPath: /cache
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+## hostPath
+
+在 Pod 运行节点创建的文件夹, 缺点是, Pod 是动态的, 而 `hostPath` 是静态的(跟着 node 走):
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - image: test-webserver
+    name: test-container
+    volumeMounts:
+    - name: test-volume
+      mountPath: /www
+  volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+```
+
+## PV & PVC
+
+PV 是对共享存储资源的一种抽象, 实现方式常见的有 `Ceph`, `GlusterFS`, `NFS` 等.
+
+PVC 则是用户存储的一种消耗 PV 的声明, 用户不需要关心具体的存储实现, 只需要直接使用 PVC 就行.
+
+PV: 
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  pv1
+spec:
+  capacity: 
+    storage: 1Gi # 存储空间设置
+  accessModes: # 访问模式, 其他还有 ReadOnlyMany(只读权限, 可以被多个节点挂载), ReadWriteMany(读写权限, 可以被多个节点挂载)
+  - ReadWriteOnce # 读写权限, 但是只能被单个节点挂载
+  persistentVolumeReclaimPolicy: Recycle # 回收策略, Retain(保留, 需要人工删除), Recycle(回收)
+  nfs:
+    path: /data/k8s
+    server: 10.151.30.57
+```
+
+
+
+# Kubernetes 常用命令
 
 **查看资源以及资源简写**:
 
@@ -601,6 +628,129 @@ kubectl autoscale deployment <DEPLOYMENT_NAME> --cpu-percent=50 --min=1 --max=10
 
 # YAML 声明示例
 
+## Pod
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: <APP_NAME>
+  labels: # 标签
+    app: <APP_NAME>
+  annotations: # 注解
+    armsPilotAutoEnable: "on"
+    armsPilotCreateAppName: <APP_NAME>
+spec:
+  affinity: # 亲和性调度
+    podAntiAffinity: # 反亲和性, 一个节点上运行了某个 pod, 那么我们的 pod 则希望被调度到其他节点上去
+      requiredDuringSchedulingIgnoredDuringExecution: # 硬策略, 必须满足, 与之对应是preferredDuringSchedulingIgnoredDuringExecution
+        - labelSelector: #  标签选择, 下面的意思是如果 pod 中有标签为 app=busybox-pod 的实例, 就不在本节点创建了
+            matchExpressions:
+              - key: "app"
+                operator: In
+                values:
+                  - busybox-pod
+          topologyKey: kubernetes.io/hostname
+  tolerations: # 容忍度
+    - key: "key"
+      operator: "Equal"
+      value: "value"
+      effect: "NoSchedule"
+  restartPolicy: Always  #表明该容器一直运行, 默认k8s的策略, 在此容器退出后, 会立即创建一个相同的容器
+  nodeSelector: #节点选择, 先给主机打标签kubectl label nodes kube-node1 zone=node1
+    zone: node1
+    kubernetes.io/hostname: dev-a
+  terminationGracePeriodSeconds: 30  # 优雅终止宽限期, 默认30秒
+  initContainers: # 初始化容器, 执行完初始化容器才会启动下面的 containers
+    - name: init-myservice
+      image: busybox
+      command: [ 'sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;' ]
+  containers:
+    - name: <APP_NAME>  # 容器名称
+      image: <IMAGE>  # 镜像
+      imagePullPolicy: Always  # 每次启动时检查和更新（从registery）images的策略, 三个选择Always()/Never/IfNotPresent
+      ports: # 端口配置
+        - name: http # 端口配置名称, 在 Service -> target port 可以指定端口或者使用该名称
+          containerPort: 8080  #容器开发对外的端口
+          protocol: TCP  #端口协议, 支持TCP和UDP, 默认TCP
+      lifecycle: # 生命周期管理
+        postStart: # 容器创建后立即执行
+          exec:
+            command: [ "/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message" ]
+        preStop: # 容器终止之前立即被调用
+          exec:
+            command: [ "/usr/bin/curl","-X","POST", "http://localhost:8081/actuator/shutdown" ]
+      livenessProbe: # pod存活检查, 失败的pod将从k8s中终止并启动新的pod
+        httpGet: # 通过httpget检查健康, 返回200-399之间, 则认为容器正常
+          path: /actuator/health
+          port: 8081
+          scheme: HTTP
+        initialDelaySeconds: 60  #表明第一次检测在容器启动后多长时间后开始, 默认0秒
+        timeoutSeconds: 10  #检测的超时时间, 默认1秒
+        periodSeconds: 15  #检查间隔时间, 默认10秒
+      readinessProbe: # pod就绪探测, 当pod中所有容器就绪后, 流量才会进来, 否则将从 service 中移除
+        httpGet:
+          path: /actuator/health
+          port: 8081
+          scheme: HTTP
+        initialDelaySeconds: 60
+        timeoutSeconds: 10
+        periodSeconds: 15
+      resources: # 资源限制管理
+        requests: # 容器运行时, 最低资源需求, 也就是说最少需要多少资源容器才能正常运行
+          cpu: 100m  # CPU资源(核数), 两种方式, 浮点数或者是整数+m, 0.1=100m, 最少值为0.001核(1m)
+          memory: 1536Mi  # 内存使用量
+        limits: #资源限制
+          cpu: 100m
+          memory: 2000Mi
+      env: #指定容器中的环境变量
+        - name: JAVA_OPTS
+          value: "-Xmx1g -Xms1g"
+        - name: SPRING_PROFILES_ACTIVE
+          value: "test"
+        - name: SERVER_PORT
+          value: "8080"
+        - name: MANAGEMENT_SERVER_PORT
+          value: "8081"
+        - name: DB_HOST
+          valueFrom: # 从 configMap 中读取变量
+            configMapKeyRef:
+              name: cm-demo3
+              key: db.host
+      command: [ 'sh' ]  #启动容器的运行命令 将覆盖容器中的Entrypoint, 对应Dockefile中的ENTRYPOINT
+      args: #启动容器的命令参数, 对应Dockerfile中CMD参数
+        - --spring.devtools.add-properties=false
+        - --management.endpoints.web.exposure.include=*
+        - --management.endpoint.shutdown.enabled=true
+        - --management.endpoint.configprops.enabled=true
+        - --management.endpoint.health.enabled=true
+        - --management.endpoint.info.enabled=true
+        - --management.endpoint.metrics.enabled=true
+        - --spring.cloud.nacos.config.enabled=true
+        - --spring.cloud.nacos.server-addr=nacos-headless.infra.svc.cluster.local:8848
+        - --spring.cloud.nacos.config.file-extension=yaml
+        - --spring.cloud.nacos.config.namespace=test
+      volumeMounts: #挂载持久存储卷
+        - name: volume  #挂载设备的名字, 与volumes[*].name 需要对应
+          mountPath: /etc/config  #挂载到容器的某个路径下
+          subPath: special.html  # 指定所引用的卷内的子路径, 而不是其根路径
+          readOnly: false  # 是否只读, 默认为 false
+  volumes: # 定义一组挂载设备
+    - name: nginx-pvc
+      persistentVolumeClaim:
+        claimName: nginx-pvc
+    - name: host-volume
+      hostPath:
+        path: /opt  # 挂载设备类型为hostPath, 路径为宿主机下的/opt,这里设备类型支持很多种
+        type: DirectoryOrCreate
+    - name: configMap-volume
+      configMap: # 类型为configMap的存储卷, 挂载预定义的configMap对象到容器内部
+        name: nginx-cm
+        items:
+          - key: a.conf
+            path: a.conf
+```
+
 ## Deloyment
 
 ```yaml
@@ -629,108 +779,11 @@ spec:  #specification of the resource content 指定该资源的内容
   template:
     metadata:
       labels:
-        app: user-center
-        version: v1.0
-        release: RELEASE-NAME
-    spec:
-      affinity:  # 亲和性调度
-        podAntiAffinity:  # 反亲和性, 一个节点上运行了某个 pod, 那么我们的 pod 则希望被调度到其他节点上去
-          requiredDuringSchedulingIgnoredDuringExecution:   # 硬策略, 必须满足, 与之对应是preferredDuringSchedulingIgnoredDuringExecution 
-          - labelSelector:  #  标签选择, 下面的意思是如果 pod 中有标签为 app=busybox-pod 的实例, 就不在本节点创建了
-              matchExpressions:
-              - key: "app"
-                operator: In
-                values:
-                - busybox-pod
-            topologyKey: kubernetes.io/hostname
-      restartPolicy: Always  #表明该容器一直运行, 默认k8s的策略, 在此容器退出后, 会立即创建一个相同的容器
-      nodeSelector:  #节点选择, 先给主机打标签kubectl label nodes kube-node1 zone=node1
-        zone: node1
+        app: <APP_NAME>
+    spec: # 下面配置参考 Pod
+      ...
       containers:
-        - name: <CONTAINER_NAME>  # 容器名称
-          image: <IMAGE>  # 镜像
-          ports:  # 端口配置
-            - name: http
-              containerPort: 8080  #容器开发对外的端口
-              protocol: TCP  #端口协议, 支持TCP和UDP, 默认TCP
-          imagePullPolicy: Always  # 每次启动时检查和更新（从registery）images的策略, 三个选择Always()/Never/IfNotPresent
-          lifecycle:  # 生命周期管理  
-            postStart:  # 容器创建后立即执行
-              exec:
-                command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
-            preStop:  # 容器终止之前立即被调用
-              exec:
-                command: ["/usr/bin/curl","-X","POST", "http://localhost:8081/actuator/shutdown"]
-          terminationGracePeriodSeconds: 30  # 优雅终止宽限期, 默认30秒
-          livenessProbe:  # pod存活检查, 失败的pod将从k8s中终止并启动新的pod 
-            httpGet:  # 通过httpget检查健康, 返回200-399之间, 则认为容器正常
-              path: /actuator/health
-              port: 8081
-              scheme: HTTP
-            initialDelaySeconds: 60  #表明第一次检测在容器启动后多长时间后开始, 默认0秒
-            timeoutSeconds: 10  #检测的超时时间, 默认1秒
-            periodSeconds: 15  #检查间隔时间, 默认10秒
-          readinessProbe:  # pod就绪探测, 当pod中所有容器就绪后, 流量才会进来, 否则将从 service 中移除
-            httpGet:
-              path: /actuator/health
-              port: 8081
-              scheme: HTTP
-            initialDelaySeconds: 60
-            timeoutSeconds: 10
-            periodSeconds: 15
-          resources:  # 资源管理 
-            requests:  # 容器运行时, 最低资源需求, 也就是说最少需要多少资源容器才能正常运行
-              cpu: 100m  # CPU资源(核数), 两种方式, 浮点数或者是整数+m, 0.1=100m, 最少值为0.001核(1m) 
-              memory: 1536Mi  # 内存使用量
-            limits: #资源限制   
-              cpu: 0.5
-              memory: 2000Mi
-          env:  #指定容器中的环境变量
-          - name: JAVA_OPTS
-            value: "-Xmx1g -Xms1g"
-          - name: SPRING_PROFILES_ACTIVE
-            value: "test"
-          - name: SERVER_PORT
-            value: "8080"
-          - name: MANAGEMENT_SERVER_PORT
-            value:  "8081"
-          - name: DB_HOST
-            valueFrom:  # 从 configMap 中读取变量
-              configMapKeyRef:
-                name: cm-demo3
-                key: db.host
-          command: ['sh']  #启动容器的运行命令 将覆盖容器中的Entrypoint, 对应Dockefile中的ENTRYPOINT 
-          args:  #启动容器的命令参数, 对应Dockerfile中CMD参数
-          - --spring.devtools.add-properties=false
-          - --management.endpoints.web.exposure.include=*
-          - --management.endpoint.shutdown.enabled=true
-          - --management.endpoint.configprops.enabled=true
-          - --management.endpoint.health.enabled=true
-          - --management.endpoint.info.enabled=true
-          - --management.endpoint.metrics.enabled=true
-          - --spring.cloud.nacos.config.enabled=true
-          - --spring.cloud.nacos.server-addr=nacos-headless.infra.svc.cluster.local:8848
-          - --spring.cloud.nacos.config.file-extension=yaml
-          - --spring.cloud.nacos.config.namespace=test
-          volumeMounts:  #挂载持久存储卷
-          - name: volume  #挂载设备的名字, 与volumes[*].name 需要对应
-            mountPath: /etc/config  #挂载到容器的某个路径下
-            subPath: special.html  # 指定所引用的卷内的子路径, 而不是其根路径
-            readOnly: false  # 是否只读, 默认为 false 
-        volumes:  # 定义一组挂载设备
-        - name: nginx-pvc
-          persistentVolumeClaim:
-            claimName: nginx-pvc
-        - name: host-volume
-          hostPath:
-            path: /opt  # 挂载设备类型为hostPath, 路径为宿主机下的/opt,这里设备类型支持很多种
-            type: DirectoryOrCreate
-        - name: configMap-volume
-          configMap:  # 类型为configMap的存储卷, 挂载预定义的configMap对象到容器内部
-            name: nginx-cm
-            items:
-              - key: a.conf
-                path: a.conf
+      ...
 ```
 
 ## Service
@@ -759,12 +812,43 @@ metadata:
   name: php-apache
   namespace: default
 spec:
-  maxReplicas: 10
-  minReplicas: 4
+  maxReplicas: 10  # 最大扩容数
+  minReplicas: 4  # 最小扩容数
   scaleTargetRef:
     kind: Deployment
     name: nginx-demo
-  targetCPUUtilizationPercentage: 90
+  targetCPUUtilizationPercentage: 90  # 目标 Pod 所有副本自身的 CPU 利用率的平均值超过90%后触发扩容
+```
+
+## Daemonset
+
+`template` 语法与 `Deployment` 类似, 不同在于滚动升级策略, `.spec.updateStrategy.type` 指定:
+
+* `OnDelete`: 更新配置后, 只有手动删除 DaemonSet Pod 才会创建新的.
+* `RollingUpdate`: 更新后自动删除并创建 Pod.
+
+其他设置:
+
+* `.spec.updateStrategy.rollingUpdate.maxUnavailable`: 默认值为1.
+* `.spec.minReadySeconds`: 默认为0, 用于指定认为 DaemoSet Pod 启动可用所需的最小的秒数.
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: test-ds
+  namespace: kube-system
+  labels:
+    tier: node
+    app: test
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      ...
+  template:
+    ...
 ```
 
 # 阿里云 K8S
@@ -868,6 +952,13 @@ df -h | grep aliyun
 ```
 umount /mnt
 ```
+
+# Kubernetes 学习环境
+
+* Minikube
+* k3s
+* Kind
+* Docker Desktop Kubernetes
 
 # 其他
 
