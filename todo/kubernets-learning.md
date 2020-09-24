@@ -532,29 +532,117 @@ spec:
 
 ## PV & PVC
 
-PV 是对共享存储资源的一种抽象, 实现方式常见的有 `Ceph`, `GlusterFS`, `NFS` 等.
-
-PVC 则是用户存储的一种消耗 PV 的声明, 用户不需要关心具体的存储实现, 只需要直接使用 PVC 就行.
-
-PV: 
+PV: 是对共享存储资源的一种抽象, 实现方式常见的有 `Ceph`, `GlusterFS`, `NFS` 等.
 
 ```yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name:  pv1
+  labels:
+    app: nfs
 spec:
   capacity: 
     storage: 1Gi # 存储空间设置
   accessModes: # 访问模式, 其他还有 ReadOnlyMany(只读权限, 可以被多个节点挂载), ReadWriteMany(读写权限, 可以被多个节点挂载)
   - ReadWriteOnce # 读写权限, 但是只能被单个节点挂载
-  persistentVolumeReclaimPolicy: Recycle # 回收策略, Retain(保留, 需要人工删除), Recycle(回收)
+  persistentVolumeReclaimPolicy: Recycle # 回收策略, Retain(保留, 需要人工删除), Recycle(回收), Delete
   nfs:
     path: /data/k8s
     server: 10.151.30.57
 ```
 
+PVC: 则是用户存储的一种消耗 PV 的声明, 用户不需要关心具体的存储实现, 只需要直接使用 PVC 就行.
 
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  selector:
+    matchLabels:
+      app: nfs
+```
+
+## StorageClass
+
+`StorageClass` 可以自动帮我们创建 PV, 我们只需要声明 PVC. 创建的 PV 以 `${namespace}-${pvcName}-${pvName}` 的形式存在 NFS 的共享目录中.
+
+要使用 `StorageClass`, 我们需要先创建自动配置程序, 又叫 `Provisioner`, 怎么创建可以参考 ***[https://github.com/kubernetes-retired/external-storage/tree/master/nfs-client](https://github.com/kubernetes-retired/external-storage/tree/master/nfs-client)***.
+
+创建 `StorageClass`:
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  namespace: test
+  name: course-nfs-storage
+provisioner: fuseim.pri/ifs  # 对应 Provisioner 中的 PROVISIONER_NAME 参数
+```
+
+使用 `StorageClass`:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "course-nfs-storage" # 对应上面声明的 name
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+```
+
+或者通过 Pod PVC 模板自动创建 PVC:
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nfs-web
+spec:
+  serviceName: "nginx"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nfs-web
+  template:
+    metadata:
+      labels:
+        app: nfs-web
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+      annotations:
+        volume.beta.kubernetes.io/storage-class: course-nfs-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+```
 
 # Kubernetes 常用命令
 

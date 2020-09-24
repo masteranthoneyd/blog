@@ -16,7 +16,7 @@ tags: [Java, Design Pattern]
 
 # Design Pattern
 
-在[软件工程](https://zh.wikipedia.org/wiki/%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B)中, **设计模式**（design pattern）是对[软件设计](https://zh.wikipedia.org/wiki/%E8%BB%9F%E4%BB%B6%E8%A8%AD%E8%A8%88)中普遍存在（反复出现）的各种问题, 所提出的解决方案. 这个术语是由[埃里希·伽玛](https://zh.wikipedia.org/wiki/%E5%9F%83%E9%87%8C%E5%B8%8C%C2%B7%E4%BC%BD%E7%91%AA)（Erich Gamma）等人在1990年代从[建筑设计](https://zh.wikipedia.org/wiki/%E5%BB%BA%E7%AD%91%E8%AE%BE%E8%AE%A1)领域引入到[计算机科学](https://zh.wikipedia.org/wiki/%E8%A8%88%E7%AE%97%E6%A9%9F%E7%A7%91%E5%AD%B8)的. 
+在[软件工程](https://zh.wikipedia.org/wiki/%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B)中, **设计模式**(design pattern)是对[软件设计](https://zh.wikipedia.org/wiki/%E8%BB%9F%E4%BB%B6%E8%A8%AD%E8%A8%88)中普遍存在(反复出现)的各种问题, 所提出的解决方案. 这个术语是由[埃里希·伽玛](https://zh.wikipedia.org/wiki/%E5%9F%83%E9%87%8C%E5%B8%8C%C2%B7%E4%BC%BD%E7%91%AA)(Erich Gamma)等人在1990年代从[建筑设计](https://zh.wikipedia.org/wiki/%E5%BB%BA%E7%AD%91%E8%AE%BE%E8%AE%A1)领域引入到[计算机科学](https://zh.wikipedia.org/wiki/%E8%A8%88%E7%AE%97%E6%A9%9F%E7%A7%91%E5%AD%B8)的. 
 
 设计模式并不直接用来完成[代码](https://zh.wikipedia.org/wiki/%E7%A8%8B%E5%BC%8F%E7%A2%BC)的编写, 而是描述在各种不同情况下, 要怎么解决问题的一种方案. [面向对象](https://zh.wikipedia.org/wiki/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1)设计模式通常以[类别](https://zh.wikipedia.org/wiki/%E9%A1%9E%E5%88%A5)或[对象](https://zh.wikipedia.org/wiki/%E7%89%A9%E4%BB%B6_(%E9%9B%BB%E8%85%A6%E7%A7%91%E5%AD%B8))来描述其中的关系和相互作用, 但不涉及用来完成应用程序的特定类别或对象. 设计模式能使不稳定依赖于相对稳定, 具体依赖于相对抽象, 避免会引起麻烦的紧耦合, 以增强软件设计面对并适应变化的能力.   ——来自维基百科
 
@@ -52,7 +52,7 @@ tags: [Java, Design Pattern]
 
 > Software entities (modules, classes, functions, etc.) should be open for extension, but closed for modification.
 
-开闭原则（`Open-Closed Principle`,OCP）: 是指软件实体（类, 模块, 函数等等）应该**可以扩展**, 但是**不可修改**. 
+开闭原则(`Open-Closed Principle`,OCP): 是指软件实体(类, 模块, 函数等等)应该**可以扩展**, 但是**不可修改**. 
 
 **如何理解对扩展开放, 对修改关闭**?
 
@@ -66,24 +66,29 @@ tags: [Java, Design Pattern]
 我们要时刻具备扩展意识, 抽象意识, 封装意识. 在写代码的时候, 我们要多花点时间思考一下, 这段代码未来可能有哪些需求变更, 如何设计代码结构, 事先留好扩展点, 以便在未来需求变更的时候, 在不改动代码整体结构, 做到最小代码改动的情况下, 将新的代码灵活地插入到扩展点上. 
 
 ### 里氏替换原则
-里氏替换原则（`Liskov Substitution Principle`,LSP）: 所有引用父类的地方必须**能够透明的使用子类的对象**. 即子类型必须能够替换掉它们的父类型. 
 
-里氏替换原则告诉我们, 在软件中将一个基类对象替换成它的子类对象, 程序将不会产生任何错误和异常, **反过来则不成立**, 如果一个软件实体使用的是一个子类对象的话, 那么它不一定能够使用基类对象. 因此在程序中尽量使用基类类型来对对象进行定义, 而在运行时再确定其子类类型, 用子类对象来替换父类对象. 同时, 里氏代换原则是实现开闭原则的重要方式之一. 
+> If S is a subtype of T, then objects of type T may be replaced with objects of type S, without breaking the program. 
+>
+> Functions that use pointers of references to base classes must be able to use objects of derived classes without knowing it. 
+
+里氏替换原则(`Liskov Substitution Principle`,LSP): 子类对象(object of subtype/derived class)能够替换程序(program)中父类对象(object of base/parent class)出现的任何地方, 并且保证原来程序的逻辑行为(behavior)不变及正确性不被破坏. 
+
+与多态的区别: 多态是面向对象的一大特性, 而里氏替换原则是设计原则. LSP 更关注的是对象行为, 用来指导继承关系中子类该如何设计, 子类的设计要保证在替换父类的时候, 不改变原有程序的逻辑及不破坏原有程序的正确性, 举个例子就是父类定义了一个方法, 不存在则返回 null, 子类重写(多态)了这个方法, 不存在则抛出异常, 这就违反了里氏替换原则.
 
 ### 依赖倒置原则
-依赖倒置原则（`Dependency Inversion Principle`,DIP）: 抽象不应该依赖细节, 细节应该依赖于抽象. 即应该**针对接口编程**, 而不是针对实现编程. 
+依赖倒置原则(`Dependency Inversion Principle`,DIP): 抽象不应该依赖细节, 细节应该依赖于抽象. 即应该**针对接口编程**, 而不是针对实现编程. 
 
 在大多数情况下, 我们会同时使用开闭原则, 里氏代换原则和依赖倒转原则, 开闭原则是目标, 里氏代换原则是基础, 依赖倒转原则是手段. 
 
 ### 接口隔离原则
-接口隔离原则（`Interface Segregation Principle`,ISP）: 使用专门的接口, 而不使用单一的总接口, 即客户端不应该依赖那些它不需要的接口. 
+接口隔离原则(`Interface Segregation Principle`,ISP): 使用专门的接口, 而不使用单一的总接口, 即客户端不应该依赖那些它不需要的接口. 
 
 根据接口隔离原则, 当一个接口太大时, 我们需要将它分割成一些更细小的接口, 使用该接口的客户端仅需知道与之相关的方法即可. 每一个接口应该承担一种相对独立的角色, 不干不该干的事, 该干的事都要干. 
 
 ### 迪米特法则
-迪米特法则（`Law of Demeter`,LoD）: 一个软件实体应当尽可能少地与其它实体发生相互作用. 
+迪米特法则(`Law of Demeter`,LoD): 一个软件实体应当尽可能少地与其它实体发生相互作用. 
 
-迪米特法则又称为**最少知识原则**（`LeastKnowledge Principle`,LIP）. 
+迪米特法则又称为**最少知识原则**(`LeastKnowledge Principle`,LIP). 
 如果一个系统符合迪米特法则, 那么当其中某一个模块发生修改时, 就会尽量少地影响其他模块, 扩展会相对容易, 这是对软件实体之间通信的限制, 迪米特法则要求限制软件实体之间通信的宽度和深度. 迪米特法则可降低系统的耦合度, 使类与类之间保持松散的耦合关系. 
 
 ## 三大类型
@@ -183,7 +188,7 @@ UML类的符号是一个被划分成三块的方框: 类名, 属性, 和操作. 
 ### 显示interface
 在staruml中, interface默认是以一个圆圈显示的(尴尬了)..., 但好在可以设置成想要的样子. 
 
-1. 添加一个圆圈（interface）之后, 右键或选择菜单栏中的Format
+1. 添加一个圆圈(interface)之后, 右键或选择菜单栏中的Format
 2. 选择Stereotype Display -> Label, 这样矩形就显示出来了
 3. 同样是Format, 然后把Suppress Operations取消掉, 这样操作就可以显示出来了
 
