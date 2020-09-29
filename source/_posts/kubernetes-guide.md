@@ -1,4 +1,19 @@
+---
+title: Kuberbetes 常用概念及操作
+date: 2020-07-29 14:54:13
+categories: [Docker]
+tags: [Docker, Kubernetes, K8S]
+---
+
+
+
 ![](https://cdn.yangbingdong.com/img/k8s-learning/kubernetes-learning-banner.png)
+
+# Preface
+
+> K8S(Kubernetes) 现在来说也不是什么新鲜的词了, 或许小公司玩得比较少, 自己也一直没有实操的机会. 幸会近来公司也开始使用 K8S, 有机会将学习过的东西在生产上实践一遍.
+
+<!--more-->
 
 # Kubernetes 常用资源
 
