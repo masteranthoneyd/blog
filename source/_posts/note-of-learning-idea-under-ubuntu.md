@@ -614,6 +614,12 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jol.png)
 
+## VisualVM Launcher
+
+启动 Java 应用时启动 VisualVM 查看堆占用等情况.
+
+> 需要 *[下载 Visualvm](https://visualvm.github.io/download.html)* 并在 IDEA 中配置启动路径.
+
 # Theme
 
 ## Cyan Light Theme
