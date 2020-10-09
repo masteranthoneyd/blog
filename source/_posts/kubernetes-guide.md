@@ -1069,7 +1069,7 @@ umount /mnt
 
 ***[Helm 之 Chart 模板](https://chenyongjun.vip/articles/136)***
 
-***[[Helm templates 中的语法](https://www.cnblogs.com/klvchen/p/13606311.html)](https://www.cnblogs.com/klvchen/p/13606311.html)***
+***[Helm templates 中的语法](https://www.cnblogs.com/klvchen/p/13606311.html)***
 
 # 实战
 
