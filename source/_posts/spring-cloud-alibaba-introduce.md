@@ -76,7 +76,7 @@ Spring Cloud Alibaba 包含组件:
 
 # Nacos 分布式配置
 
-> Nacos 获取以及启动方式: ***[Nacos 官网](https://nacos.io/zh-cn/docs/quick-start.html?spm=a2ck6.20206201.0.0.671e1fd6rGzuF0)***
+> Nacos 获取以及启动方式: ***[Nacos 官网](https://nacos.io/zh-cn/docs/quick-start.html)***
 >
 > Spring Cloud Nacos Config 文档: ***[https://github.com/alibaba/spring-cloud-alibaba/wiki/Nacos-config](https://github.com/alibaba/spring-cloud-alibaba/wiki/Nacos-config)***
 

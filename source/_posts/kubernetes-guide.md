@@ -960,23 +960,29 @@ spec:
 
 ### 准备工作
 
-购买一台2核4G的最低配置的CentOS(可选偏远地区有优惠, 比如华北3), 安装 **docker**
+购买一台2核4G的最低配置的CentOS(可选偏远地区有优惠, 比如华北3), 并且安装 **docker**.
 
 #### 安装 kubectl
 
   ```
-  cat <<EOF > /etc/yum.repos.d/kubernetes.repo
-  [kubernetes]
-  name=Kubernetes
-  baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
-  enabled=1
-  gpgcheck=1
-  repo_gpgcheck=1
-  gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-  EOF
-  
-  yum install -y kubectl
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+
+yum install -y kubectl
   ```
+
+错误 `_get_comp_words_by_ref: command not found` 解决:
+
+```
+yum install -y bash-completion
+```
 
 其他系统安装(Ubuntu):
 
