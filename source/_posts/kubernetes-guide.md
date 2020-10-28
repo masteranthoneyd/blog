@@ -963,6 +963,229 @@ spec:
 
 # Helm
 
+## Helm 安装
+
+下载最新 ***[release](https://github.com/helm/helm/releases)***, 这里以 3.3.4 为例:
+
+```
+tar -zxvf helm-v3.3.4-linux-amd64.tar.gz
+mv linux-amd64/helm /usr/local/bin/helm
+
+helm version
+```
+
+## 安装私有仓库 Chartmuseum
+
+> 如果创建的 Kubernetes 集群子节点没有访问外网能力, 那么可以在其他服务器 pull 镜像再 tag 成并推送到镜像服务, 比如下面的 `registry-vpc.cn-zhangjiakou.aliyuncs.com/yangbingdong/chartmuseum:latest`
+
+先创建仓库目录并赋权, 否则上传 charts 会报 ` permission denied`:
+
+```
+mkdir -p /data/charts && cd /data/ && chmod 777 charts
+```
+
+`deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chartmuseum
+  name: chartmuseum
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chartmuseum
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: chartmuseum
+    spec:
+      containers:
+      - image: registry-vpc.cn-zhangjiakou.aliyuncs.com/yangbingdong/chartmuseum:latest
+        name: chartmuseum
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: DEBUG
+          value: "1"
+        - name: STORAGE
+          value: local
+        - name: STORAGE_LOCAL_ROOTDIR
+          value: /charts
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /charts
+          name: charts-volume
+      nodeSelector:
+        kubernetes.io/hostname: cn-zhangjiakou.192.168.0.245
+      volumes:
+      - name: charts-volume
+        hostPath:
+          path: /data/charts
+          type: DirectoryOrCreate
+      restartPolicy: Always
+```
+
+`service.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chartmuseum
+  namespace: kube-system
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: chartmuseum
+```
+
+`ingress.yaml`:
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chartmuseum
+  namespace: kube-system
+spec:
+  rules:
+  - host: charts.yangbingdong.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: chartmuseum
+          servicePort: 8080
+```
+
+修改 `/etc/hosts`, 解析域名:
+
+```
+${Kubernetes Ingress 外网ip} charts.yangbingdong.com
+```
+
+重启网络:
+
+```
+/etc/init.d/network restart
+```
+
+验证:
+
+```
+curl charts.yangbingdong.com
+```
+
+## 简单验证以及使用
+
+### 创建 charts
+
+```
+helm create hello-helm
+```
+
+初始化的目录结构:
+
+```
+├── charts
+├── Chart.yaml
+├── templates
+│   ├── deployment.yaml
+│   ├── _helpers.tpl
+│   ├── hpa.yaml
+│   ├── ingress.yaml
+│   ├── NOTES.txt
+│   ├── serviceaccount.yaml
+│   ├── service.yaml
+│   └── tests
+│       └── test-connection.yaml
+└── values.yaml
+```
+
+### 校验 chart
+
+```
+helm lint ./hello-helm
+```
+
+输出:
+
+```
+==> Linting ./hello-helm
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+```
+
+### 查看模板生成的 yaml
+
+```
+helm template -f global.yaml  ./hello-helm
+```
+
+* `-f` 指定自定义 kv 配置, 也可以通过 `--set k=v` 指定
+
+### 安装 charts
+
+```
+helm install ./hello-helm --generate-name
+
+# 指定自定义 value
+helm install -f myvalue.yaml ./hello-helm --generate-name
+```
+
+### 查看已安装的 chart
+
+```
+helm list
+```
+
+### 卸载 chart
+
+需要拿到上面 `helm list` 中的 `name`
+
+```
+helm unstall ${name}
+```
+
+### 打包 chart
+
+```
+helm package ./hello-helm
+```
+
+### 上传到 Chartmuseum 并查看
+
+```
+curl --data-binary "@hello-helm-0.1.0.tgz" http://charts.yangbingdong.com/api/charts
+
+# 更新
+helm repo update
+
+# 查看
+helm search repo
+```
+
 语法参考:
 
 ***[Helm 之 Chart 模板](https://chenyongjun.vip/articles/136)***
