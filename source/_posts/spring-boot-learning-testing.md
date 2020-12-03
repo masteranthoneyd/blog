@@ -292,6 +292,168 @@ public void addDesc() {
 
 ***[https://github.com/joel-costigliola/assertj-examples](https://github.com/joel-costigliola/assertj-examples)***
 
+# Mockito
+
+Mockito 并不是单独使用的, 通常与其他测试框架一起出现, 用于生成模拟对象, 辅助完成一些场景的测试.
+
+比如方法中需要以来一些第三方服务, 那么测试的时候不可能真的去调用第三方, 这时候就可以了 Mock 这个调用, 返回一个假定的结果.
+
+引入:
+
+```xml
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
+    <version>3.1.0</version>
+    <scope>test</scope>
+</dependency>
+```
+
+## 简单示例
+
+```java
+@Test
+public void simpleMockTest() {
+    // Mock 构建 Mock 对象
+    List<String> mockList = mock(List.class);
+
+    // Stub 设置方法调用的预期返回
+    when(mockList.get(0)).thenReturn("666");
+
+    // assert 返回值是否和预期一样
+    String result = mockList.get(0);
+    Assert.assertEquals("666", result);
+    
+    // verify 验证方法被调用
+    verify(mockList, times(1)).get(0);
+    verify(mockList).get(anyInt());
+    verify(mockList, atLeastOnce()).get(ArgumentMatchers.any(Integer.class));
+}
+```
+
+总的来说也就几步, Mock -> Stub -> Assert -> Verify
+
+## Mock 初始化
+
+有两种方式初始化.
+
+普通方法:
+
+```
+List<String> mockList = mock(List.class);
+```
+
+通过注解:
+
+```java
+public class Tester {
+
+  @InjectMocks
+  private ListService listService;
+  
+  @Mock
+  private List<String> list;
+  
+  @Before
+  public void init() {
+    MockitoAnnotations.initMocks(this); 
+  }
+}
+```
+
+`@Mock` 注解与上面的 `mock(List.class)` 作用一样, `@InjectMocks` 可以自动注入标记`@Mock`, `@Spy` 等注解的属性值.
+
+## Stub
+
+设定返回值:
+
+```
+when(mock.someMethod()).thenReturn(value1).thenReturn(value2);  
+when(mock.someMethod()).thenReturn(value1, value2);  
+```
+
+另外一种写法 `doReturn`, 主要用于 `spy` 对象的情况下:
+
+```
+doReturn(value1).doReturn(value2).when(mock).someMethod();  
+
+// void 方法
+doNothing().when(mock).someMethod();
+```
+
+预设返回值:
+
+```
+when(mock.someMethod()).thenThrow(new RuntimeException());
+
+// void 方法
+doThrow(new RuntimeException()).when(mock).someMethod();
+```
+
+**注意:** 在 Mockito3 中, stub 的方法必须要被调用到, 否则会抛出 `UnsupportedStubbingException`, 可以使用 `Mockito.lenient().when()` 或者在类或方法加上注解 `@MockitoSettings(strictness = Strictness.LENIENT)` 避免该问题.
+
+## Verify
+
+```java
+@Test
+public void verifyTestTest() {
+    List<String> mock = mock(List.class);
+    List<String> mock2 = mock(List.class);
+    when(mock.get(0)).thenReturn("Hello");
+    when(mock.get(1)).thenReturn("World");
+    mock.get(0);
+    mock.get(1);
+    // 验证指定方法被调用一次
+    verify(mock).get(0);
+    // 验证指定方法没有被调用
+    verify(mock, never()).get(3);
+    // 验证get方法在100毫秒内被调用两次
+    verify(mock, timeout(100).times(2)).get(anyInt());
+
+    // 通过验证方法的执行顺序
+    InOrder inOrder = inOrder(mock, mock2);
+    inOrder.verify(mock).get(0);
+    inOrder.verify(mock).get(1);
+    inOrder.verify(mock2, never()).get(1);
+
+    // 查询多余的方法调用 mock所有调用的方法都已经被验证
+    verifyNoMoreInteractions(mock);
+    // 查询没有交互的mock对象
+    verifyNoInteractions(mock2);
+
+    // 创建ArgumentCaptor（参数捕获器）用于捕获方法参数进行验证
+    ArgumentCaptor<Integer> argument = ArgumentCaptor.forClass(Integer.class);
+    // 该方法被调用多次 只能捕捉到最后一次参数
+    verify(mock, times(2)).get(argument.capture());
+    Integer value = argument.getValue();
+    Assert.assertEquals(value, new Integer(1));
+}
+```
+
+# Hamcrest
+
+核心: anything, describedAs,is
+
+逻辑: allOf, anyOf, not
+
+对象: equalTo, hasToString, instanceOf, isCompatibleType, notNullValue, nullValue, sameInstance
+
+Beans: hasProperty
+
+集合: array, hasEntry, hasKey, hasValue, hasItem, hasItems, hasItemInArray
+
+数字: closeTo, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo
+
+字符: equalToIgnoringCase, equalToIgnoringWhiteSpace, containsString, endsWith, startsWith
+
+ex:
+
+```
+assertThat(Long.valueOf(1), instanceOf(Integer.class));
+// shortcut for instanceOf
+assertThat(Long.valueOf(1), isA(Integer.class));
+```
+
 # JMH基准测试
 
 > JMH 是一个由 OpenJDK/Oracle 里面那群开发了 Java 编译器的大牛们所开发的 Micro Benchmark Framework . 何谓 Micro Benchmark 呢？简单地说就是在 **method** 层面上的 benchmark, 精度可以精确到微秒级. 可以看出 JMH 主要使用在当你已经找出了热点函数, 而需要对热点函数进行进一步的优化时, 就可以使用 JMH 对优化的效果进行定量的分析. 

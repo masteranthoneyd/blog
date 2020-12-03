@@ -293,7 +293,15 @@ scheme: Muse
 
 # 其他主题推荐
 
-***[Material-X](https://xaoxuu.com/wiki/material-x/)***
+***[hexo-theme-butterfly](https://github.com/jerryc127/hexo-theme-butterfly)***
+
+***[hexo-theme-matery](https://github.com/blinkfox/hexo-theme-matery)***
+
+一些图片选择资源:
+
+***[https://wallroom.io/](https://wallroom.io/)*** (适用于Banner)
+
+***[https://www.pexels.com/zh-cn/](https://www.pexels.com/zh-cn/)*** (适用于文章图)
 
 # 注册Github和Coding并分别创建Pages
 

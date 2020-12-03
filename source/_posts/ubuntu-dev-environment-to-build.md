@@ -926,6 +926,58 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --boots
 
 ***[https://github.com/DeemOpen/zkui](https://github.com/DeemOpen/zkui)***
 
+# Rinetd
+
+Rinetd 是一个端口转发工具, 安装:
+
+```
+sudo apt install rinetd -y
+```
+
+配置文件 `/etc/rinetd.conf`:
+
+```
+#
+# this is the configuration file for rinetd, the internet redirection server
+#
+# you may specify global allow and deny rules here
+# only ip addresses are matched, hostnames cannot be specified here
+# the wildcards you may use are * and ?
+#
+# allow 192.168.2.*
+# deny 192.168.2.1?
+
+
+#
+# forwarding rules come here
+#
+# you may specify allow and deny rules after a specific forwarding rule
+# to apply to only that forwarding rule
+#
+# bindadress    bindport  connectaddress  connectport
+
+
+# logging information
+logfile /var/log/rinetd.log
+
+# uncomment the following line if you want web-server style logfile format
+# logcommon
+#绑定IP # 源端口号 # 目标地址 # 目标端口号
+0.0.0.0 80 0.0.0.0 8080
+```
+
+操作:
+
+```
+sudo service rinetd [force-reload|reload|restart|start|stop]
+```
+
+应用场景之一: 手机APP调试
+
+1. 将手机 wifi 代理设置为本地 rinetd 配置的端口, 比如上面的 80
+2. 将服务起到 8080 端口即可
+3. 修改 DNS 解析, 比如 APP 请求的地址是 api.xxx.com, 则将这个域名解析到本地, 并重启网络 `sudo /etc/init.d/networking restart`
+
 # Ngrok
 
 请看 ***[这里](/2017/self-hosted-build-ngrok-server/)***

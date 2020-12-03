@@ -20,7 +20,7 @@ tags: [Java, Design Pattern]
 
 设计模式并不直接用来完成[代码](https://zh.wikipedia.org/wiki/%E7%A8%8B%E5%BC%8F%E7%A2%BC)的编写, 而是描述在各种不同情况下, 要怎么解决问题的一种方案. [面向对象](https://zh.wikipedia.org/wiki/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1)设计模式通常以[类别](https://zh.wikipedia.org/wiki/%E9%A1%9E%E5%88%A5)或[对象](https://zh.wikipedia.org/wiki/%E7%89%A9%E4%BB%B6_(%E9%9B%BB%E8%85%A6%E7%A7%91%E5%AD%B8))来描述其中的关系和相互作用, 但不涉及用来完成应用程序的特定类别或对象. 设计模式能使不稳定依赖于相对稳定, 具体依赖于相对抽象, 避免会引起麻烦的紧耦合, 以增强软件设计面对并适应变化的能力.   ——来自维基百科
 
-## 六大原则. 
+## 设计原则 
 
 ### 单一职责原则
 
@@ -30,7 +30,13 @@ tags: [Java, Design Pattern]
 
 **理解**:
 
-一个类只负责完成一个职责或者功能. 不要设计大而全的类, 要设计粒度小, 功能单一的类. 单一职责原则是为了实现代码高内聚, 低耦合, 提高代码的复用性, 可读性, 可维护性.
+一个类只负责完成一个职责或者功能. 不要设计大而全的类, 要设计粒度小, 功能单一的类. 单一职责原则是为了实现代码**高内聚**, **低耦合**, 提高代码的复用性, 可读性, 可维护性.
+
+> 高内聚跟低耦合是从两个角度的不同描述:
+>
+> 高内聚从功能性来说, 将功能性高度相关的内容分开, 则降低了内聚性.
+>
+> 低耦合从功能无关性来说, 将不相关功能的内容聚合在一起, 就提高了耦合性.
 
 **如何判断是否足够单一**?
 
@@ -52,18 +58,116 @@ tags: [Java, Design Pattern]
 
 > Software entities (modules, classes, functions, etc.) should be open for extension, but closed for modification.
 
-开闭原则(`Open-Closed Principle`,OCP): 是指软件实体(类, 模块, 函数等等)应该**可以扩展**, 但是**不可修改**. 
+开闭原则(`Open-Closed Principle`, OCP): 是指软件实体(类, 模块, 函数等等)应该**可以扩展**, **而非修改已有代码**.
 
 **如何理解对扩展开放, 对修改关闭**?
 
 添加一个新的功能, 应该是通过在已有代码基础上扩展代码(新增模块/类/方法/属性等), 而非修改已有代码(修改模块/类/方法/属性等)的方式来完成. 关于定义, 我们有两点要注意:
 
-* 第一点是, 开闭原则并不是说完全杜绝修改, 而是以最小的修改代码的代价来完成新功能的开发. 
+* 第一点是, 开闭原则并不是说完全杜绝修改, 而是以**最小的修改代码的代价**来完成新功能的开发. 
 * 第二点是, 同样的代码改动, 在粗代码粒度下, 可能被认定为"修改"; 在细代码粒度下, 可能又被认定为"扩展". 
 
 **如何做**?
 
 我们要时刻具备扩展意识, 抽象意识, 封装意识. 在写代码的时候, 我们要多花点时间思考一下, 这段代码未来可能有哪些需求变更, 如何设计代码结构, 事先留好扩展点, 以便在未来需求变更的时候, 在不改动代码整体结构, 做到最小代码改动的情况下, 将新的代码灵活地插入到扩展点上. 
+
+举个栗子, 有这么个需求, 要求处理两种消息类型A与B, 初期是这么写的:
+
+```java
+public class MessageHandlerV1 {
+
+    public void handle(String message) {
+        if ("A".equals(message)) {
+            handleSceneA(message);
+        }
+        if ("B".equals(message)) {
+            handleSceneB(message);
+        }
+    }
+
+    protected void handleSceneA(String a) {
+        System.out.println(a);
+    }
+
+    protected void handleSceneB(String b) {
+        System.out.println(b);
+    }
+}
+```
+
+后期需要支持类型C的消息, 那么需要改动 `handle` 方法:
+
+```java
+public void handle(String message) {
+    if ("A".equals(message)) {
+        handleSceneA(message);
+    }
+    if ("B".equals(message)) {
+        handleSceneB(message);
+    }
+    if ("C".equals(message)) {
+        handleSceneC(message);
+    }
+}
+```
+
+这样就违背了 ocp 了, 而且 Test Case 也要修改, 比较麻烦.
+
+可以稍微改造一下, 让扩展变得科学一点:
+
+```java
+public interface MessageHandler {
+
+    String supportMessage();
+
+    void handle(String s);
+}
+
+public class MessageHandlerA implements MessageHandler {
+    @Override
+    public String supportMessage() {
+        return "A";
+    }
+
+    @Override
+    public void handle(String s) {
+        System.out.println(s);
+    }
+}
+
+public class MessageHandlerManager {
+
+    private final List<MessageHandler> messageHandlers = new ArrayList<>();
+
+    public void addHandler(MessageHandler messageHandler) {
+        messageHandlers.add(messageHandler);
+    }
+
+    public void handle(String type, String message) {
+        for (MessageHandler messageHandler : messageHandlers) {
+            if (messageHandler.supportMessage().equals(type)) {
+                messageHandler.handle(message);
+            }
+        }
+    }
+}
+```
+
+将 `handle` 逻辑抽象成接口, 同时增加 `supportMessage` 方法, 实现方返回自己支持的消息类型. 那么这时候要扩展支持C类型的消息只需要新增一个 Handler 的实现即可:
+
+```java
+public class MessageHandlerC implements MessageHandler {
+    @Override
+    public String supportMessage() {
+        return "C";
+    }
+
+    @Override
+    public void handle(String s) {
+        System.out.println(s);
+    }
+}
+```
 
 ### 里氏替换原则
 
@@ -75,18 +179,25 @@ tags: [Java, Design Pattern]
 
 与多态的区别: 多态是面向对象的一大特性, 而里氏替换原则是设计原则. LSP 更关注的是对象行为, 用来指导继承关系中子类该如何设计, 子类的设计要保证在替换父类的时候, 不改变原有程序的逻辑及不破坏原有程序的正确性, 举个例子就是父类定义了一个方法, 不存在则返回 null, 子类重写(多态)了这个方法, 不存在则抛出异常, 这就违反了里氏替换原则.
 
-### 依赖倒置原则
+> PS: ***[Liskov](https://en.wikipedia.org/wiki/Barbara_Liskov)*** 是美国历史上第一个女计算机博士, 曾获得过**图灵奖**.
+
+### 接口隔离原则
 
 > Clients should not be forced to depend upon interfaces that they do not use.
 
-依赖倒置原则(`Dependency Inversion Principle`,DIP): 抽象不应该依赖细节, 细节应该依赖于抽象. 即应该**针对接口编程**, 而不是针对实现编程. 
-
-在大多数情况下, 我们会同时使用开闭原则, 里氏代换原则和依赖倒转原则, 开闭原则是目标, 里氏代换原则是基础, 依赖倒转原则是手段. 
-
-### 接口隔离原则
 接口隔离原则(`Interface Segregation Principle`,ISP): 使用专门的接口, 而不使用单一的总接口, 即客户端不应该依赖那些它不需要的接口. 
 
 根据接口隔离原则, 当一个接口太大时, 我们需要将它分割成一些更细小的接口, 使用该接口的客户端仅需知道与之相关的方法即可. 每一个接口应该承担一种相对独立的角色, 不干不该干的事, 该干的事都要干. 
+
+### 依赖倒置原则
+
+> High-level modules shouldn’t depend on low-level modules. Both modules should depend on abstractions. In addition, abstractions shouldn’t depend on details. Details depend on abstractions.
+
+依赖倒置原则(`Dependency Inversion Principle`,DIP): 抽象不应该依赖细节, 细节应该依赖于抽象. 即应该**针对接口编程**, 而不是针对实现编程. 
+
+看起来这个原则跟多态类似, 但实际上, 多态是 JAVA 语言的特性, DIP 是指导思想. 而且 DIP 强调的是 **Design By Contract**, 即契约编程. 这个契约包括函数的功能定义, 入参出参以及异常输出等行为, 子类替换了父类不能改变这些行为. 
+
+举个例子就是, 一个函数, 对输入的数字不做校验, 而子类则校验数字不能小于零, 这样就改了父类原有的行为, 违反了 DIP.
 
 ### 迪米特法则
 迪米特法则(`Law of Demeter`,LoD): 一个软件实体应当尽可能少地与其它实体发生相互作用. 
