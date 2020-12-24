@@ -174,12 +174,57 @@ public class MessageHandlerC implements MessageHandler {
 > If S is a subtype of T, then objects of type T may be replaced with objects of type S, without breaking the program. 
 >
 > Functions that use pointers of references to base classes must be able to use objects of derived classes without knowing it. 
+>
+> PS: ***[Liskov](https://en.wikipedia.org/wiki/Barbara_Liskov)*** 是美国历史上第一个女计算机博士, 曾获得过**图灵奖**.
 
 里氏替换原则(`Liskov Substitution Principle`,LSP): 子类对象(object of subtype/derived class)能够替换程序(program)中父类对象(object of base/parent class)出现的任何地方, 并且保证原来程序的逻辑行为(behavior)不变及正确性不被破坏. 
 
 与多态的区别: 多态是面向对象的一大特性, 而里氏替换原则是设计原则. LSP 更关注的是对象行为, 用来指导继承关系中子类该如何设计, 子类的设计要保证在替换父类的时候, 不改变原有程序的逻辑及不破坏原有程序的正确性, 举个例子就是父类定义了一个方法, 不存在则返回 null, 子类重写(多态)了这个方法, 不存在则抛出异常, 这就违反了里氏替换原则.
 
-> PS: ***[Liskov](https://en.wikipedia.org/wiki/Barbara_Liskov)*** 是美国历史上第一个女计算机博士, 曾获得过**图灵奖**.
+举个例子, 有个 `Echo` 类, 打印输入的内容:
+
+```java
+public class Echo {
+    public void echo(String s) {
+        System.out.println(s);
+    }
+}
+```
+
+这时候对这个类做一个增强, 打印字符串后, 上报字符串到监控系统:
+
+```java
+public class PositiveEcho extends Echo {
+
+    @Override
+    public void echo(String s) {
+        super.echo(s);
+        metrics(s);
+    }
+
+    private void metrics(String s) {
+        
+    }
+
+}
+```
+
+这个并没有改变原有的行为, 但是看一下下面这个实现, 如果输入的空对象, 那么抛出一个异常:
+
+```java
+public class NegativeEcho extends Echo {
+    
+    @Override
+    public void echo(String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("Input string must not be null");
+        }
+        System.out.println(s);
+    }
+}
+```
+
+原来的 `Echo` 类并没有这个限制, 如果替换成了 `NegativeEcho`, 那么输出空对象将会报错, 这改变了原有的行为, 所以不符合里氏替换原则.
 
 ### 接口隔离原则
 
