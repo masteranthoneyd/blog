@@ -14,7 +14,7 @@
 </div> --!>
 
 <div class="theme-info">
-  <a target="_blank" href="http://www.miibeian.gov.cn/" rel="nofollow" style="color:#555;">粤ICP备18135202号-1</a>  
+  <a target="_blank" href="https://beian.miit.gov.cn/" rel="nofollow" style="color:#555;">粤ICP备18135202号-1</a>
 </div>
 
 
