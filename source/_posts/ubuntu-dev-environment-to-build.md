@@ -926,6 +926,8 @@ docker exec -it ${CONTAINER_ID} /opt/kafka/bin/kafka-console-consumer.sh --boots
 
 ***[https://github.com/DeemOpen/zkui](https://github.com/DeemOpen/zkui)***
 
+***[https://github.com/elkozmon/zoonavigator](https://github.com/elkozmon/zoonavigator)***
+
 # Rinetd
 
 Rinetd 是一个端口转发工具, 安装:

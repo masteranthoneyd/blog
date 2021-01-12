@@ -234,17 +234,321 @@ public class NegativeEcho extends Echo {
 
 根据接口隔离原则, 当一个接口太大时, 我们需要将它分割成一些更细小的接口, 使用该接口的客户端仅需知道与之相关的方法即可. 每一个接口应该承担一种相对独立的角色, 不干不该干的事, 该干的事都要干. 
 
+这获取跟 SRP 有点类似, 但 SRP 注重的是模块, 类, 接口的设计, 而 ISP **更加侧重于接口的设计**, 而且角度不一样, 判断的标准是调用者, 如果调用者只用到一部分的接口, 那么这个接口设计就不够单一.
+
+比如有两个配置类:
+
+```java
+public class RabbitConfig {
+    private String host;
+    private String port;
+}
+
+public class RedisConfig {
+    private String host;
+    private String port;
+}
+```
+
+这是需要加一个新功能, 在不重启系统的情况下热更配置, 那么可以定义一个 `Scheduler`, 以及 `Hofixer`, `Schedule` 周期性地调用 `Hotfixer`:
+
+```java
+public class RabbitConfig implements Hotfixer {
+    private String host;
+    private String port;
+
+    @Override
+    public void update() {
+        System.out.println("Update RabbitConfig");
+    }
+}
+
+public class RedisConfig implements Hotfixer {
+    private String host;
+    private String port;
+
+    @Override
+    public void update() {
+        System.out.println("Update RedisConfig");
+    }
+}
+
+public class HotfixerScheduler {
+
+    public ScheduledExecutorService scheduledExecutorService;
+    public Hotfixer hotfixer;
+    public long initDelay;
+    public long period;
+    public volatile boolean destroyed = false;
+
+    public HotfixerScheduler(Hotfixer hotfixer, long initDelay, long period) {
+        this.hotfixer = hotfixer;
+        this.initDelay = initDelay;
+        this.period = period;
+        init();
+    }
+
+    private void init() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public void runHotfix() {
+        scheduledExecutorService.scheduleAtFixedRate(() -> hotfixer.update(), initDelay, period, TimeUnit.MILLISECONDS);
+    }
+
+    public void shutdown() {
+        if (destroyed) {
+            return;
+        }
+        scheduledExecutorService.shutdown();
+        destroyed = true;
+    }
+    
+}
+```
+
+```java
+public static void main(String[] args) {
+    Hotfixer hotfixer = new RabbitConfig("127.0.0.1", "6379");
+    HotfixerScheduler hotfixerScheduler = new HotfixerScheduler(hotfixer, 100L, 100L);
+    hotfixerScheduler.runHotfix();
+}
+```
+
+上面简单实现了热更的功能, 这时候又来了个新需求, 提供一个接口查看 Redis 的配置, 但是又不能暴露 Rabbit 的配置, 将上面代码稍加改造:
+
+```java
+public interface Viewer {
+    String outputJson();
+}
+
+public class RedisConfig implements Hotfixer, Viewer {
+    private String host;
+    private String port;
+
+    public RedisConfig(String host, String port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    @Override
+    public void update() {
+        System.out.println("Update RedisConfig");
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    @Override
+    public String outputJson() {
+        return JSONObject.toJSONString(this);
+    }
+}
+
+public class SimpleHttpServer extends AbstractVerticle {
+
+    private final Map<String, Consumer<RoutingContext>> map = new HashMap<>(16);
+    private int port;
+
+    public SimpleHttpServer(int port) {
+        this.port = port;
+    }
+
+    @Override
+    public void start() {
+        Router router = Router.router(vertx);
+        router.route("/:path").handler(this::handlePath);
+
+        HttpServer httpServer = vertx.createHttpServer();
+        httpServer.requestHandler(router).listen(port, listenResult -> {
+            if (listenResult.failed()) {
+                System.out.println("Could not start HTTP server");
+                listenResult.cause().printStackTrace();
+            } else {
+                System.out.println("Server started");
+            }
+        });
+    }
+
+    private void handlePath(RoutingContext ctx) {
+        String path = ctx.pathParam("path");
+        Consumer<RoutingContext> consumer = map.get(path);
+        if (consumer == null) {
+            ctx.response().setStatusCode(404).end("Not Found");
+            return;
+        }
+        consumer.accept(ctx);
+    }
+
+    public void regist(String path, Viewer viewer) {
+        map.put(path, ctx -> out(ctx, viewer.outputJson()));
+    }
+
+
+    private void out(RoutingContext ctx, String msg) {
+        ctx.response()
+           .putHeader("Content-Type", "text/plain; charset=utf-8")
+           .end(msg);
+    }
+
+    public void close() {
+        vertx.close();
+    }
+}
+```
+
+```java
+public static void main(String[] args) {
+    Viewer redisViewer = new RedisConfig("127.0.0.1", "6379");
+    SimpleHttpServer httpServer = new SimpleHttpServer(8080);
+    httpServer.regist("redis", redisViewer);
+    Vertx.vertx().deployVerticle(httpServer);
+}
+```
+
+这样就简单实现了配置查看的功能, `SimpleHttpServer` 只依赖了 `Viewer` 接口, 没有依赖 `Hotfixer`, 大家各司其职, 这符合接口隔离原则.
+
+加入定义一个大而全的接口, 那么其他实现类就多了很多没必要的代码, 影响可读性.
+
 ### 依赖倒置原则
 
 > High-level modules shouldn’t depend on low-level modules. Both modules should depend on abstractions. In addition, abstractions shouldn’t depend on details. Details depend on abstractions.
 
 依赖倒置原则(`Dependency Inversion Principle`,DIP): 抽象不应该依赖细节, 细节应该依赖于抽象. 即应该**针对接口编程**, 而不是针对实现编程. 
 
-看起来这个原则跟多态类似, 但实际上, 多态是 JAVA 语言的特性, DIP 是指导思想. 而且 DIP 强调的是 **Design By Contract**, 即契约编程. 这个契约包括函数的功能定义, 入参出参以及异常输出等行为, 子类替换了父类不能改变这些行为. 
+看起来这个原则跟多态类似, 但实际上, 多态是 JAVA 语言的特性, DIP 是指导思想. 而且 DIP 强调的是 **Design By Contract**, 即契约编程. 这个契约包括函数的功能定义, 入参出参以及异常输出等行为, 子类替换了父类不能改变这些行为.
 
-举个例子就是, 一个函数, 对输入的数字不做校验, 而子类则校验数字不能小于零, 这样就改了父类原有的行为, 违反了 DIP.
+先来捋清一些概念, **IOC**(Inversion Of Control, 控制反转), 这里先不要跟 Spring IoC 联想在一起.
+
+```java
+public class BeforeIoc {
+    public void doTest() {
+        if (test()) {
+            System.out.println("doTest");
+        } else {
+            System.out.println("No doTest");
+        }
+    }
+
+    private boolean test() {
+        return false;
+    }
+
+    public static void main(String[] args) {
+        BeforeIoc beforeIoc = new BeforeIoc();
+        beforeIoc.doTest();
+    }
+}
+```
+
+上面的所有方法由程序员控制, 下面来修改一下:
+
+```java
+public abstract class AfterIoc {
+    public void doTest() {
+        if (test()) {
+            System.out.println("doTest");
+        } else {
+            System.out.println("No doTest");
+        }
+    }
+
+    protected abstract boolean test();
+
+    static class MyAfterIoc extends AfterIoc {
+
+        @Override
+        protected boolean test() {
+            return false;
+        }
+    }
+
+    static class IocRunner {
+        private List<AfterIoc> iocList = new ArrayList<>();
+
+        public void registerIoc(AfterIoc afterIoc) {
+            iocList.add(afterIoc);
+        }
+
+        public void run() {
+            iocList.forEach(AfterIoc::doTest);
+        }
+    }
+
+    public static void main(String[] args) {
+        IocRunner iocRunner = new IocRunner();
+        iocRunner.registerIoc(new MyAfterIoc());
+        iocRunner.run();
+    }
+}
+```
+
+将主流程抽出来, 留下一个 `test` 扩展点, 调用者将自己的业务写在扩展点中, 剩下的交给框架, 这样就完成了流程的控制从程序员反转到了框架.
+
+所以, 控制反转并不是一种具体的实现技巧, 而是一个比较笼统的设计思想, 一般用来指导框架层面的设计.
+
+接下来是 **DI**(Dependency Injection, 依赖注入) 与 **DI Framewaork**.
+
+```java
+public class DiDemo {
+
+    public final NameSupplier nameSupplier;
+
+    public DiDemo(NameSupplier nameSupplier) {
+        this.nameSupplier = nameSupplier;
+    }
+
+    public void printName() {
+        System.out.println(nameSupplier.getName());
+    }
+
+    interface NameSupplier {
+        String getName();
+    }
+
+    static class MyNameSupplier implements NameSupplier {
+
+        @Override
+        public String getName() {
+            return "yangbingdong";
+        }
+    }
+
+    public static void main(String[] args) {
+        NameSupplier nameSupplier = new MyNameSupplier();
+        DiDemo diDemo = new DiDemo(nameSupplier);
+        diDemo.printName();
+    }
+}
+```
+
+通过构造器等方式将构建好的对象传递进来, 可以灵活地替换实现类, 提高了代码的灵活度, 这就是依赖注入.
+
+而依赖注入框架则是像 Spring, Google Guice 等提供了依赖注入功能的框架.
+
+DIP 其实与控制反转类似, 是指导框架层面的设计, 只不过 DIP 更为抽象一点.
+
+### KISS原则与YAGNI原则
+
+KISS原则: Keep It Simple and Stupid.
+
+如何写出 KISS 原则的代码:
+
+1. 不要使用一些同事看不懂的代码
+2. 不要重复造轮子, 尽量复用工具类
+3. 不要过度优化
+
+还有一点, 如果在 code review 的时候, 大部分同时都看不懂, 那么也许写的代码不满足 KISS 原则.
+
+YAGNI 原则: You Ain’t Gonna Need It. 你不会需要它. 总结来讲就是目前不要过度设计, 比如不要设计不需要的接口, 不要依赖不需要的依赖等.
 
 ### 迪米特法则
+
 迪米特法则(`Law of Demeter`,LoD): 一个软件实体应当尽可能少地与其它实体发生相互作用. 
 
 迪米特法则又称为**最少知识原则**(`LeastKnowledge Principle`,LIP). 
