@@ -22,7 +22,7 @@ tags: [Java, Design Pattern]
 
 ## 设计原则 
 
-### 单一职责原则
+### 单一职责原则(SRP)
 
 > A class or module should have a single responsibility.
 
@@ -54,7 +54,7 @@ tags: [Java, Design Pattern]
 
 单一职责原则通过避免设计大而全的类, 避免将不相关的功能耦合在一起, 来提高类的内聚性. 同时, 类职责单一, 类依赖的和被依赖的其他类也会变少, 减少了代码的耦合性, 以此来实现代码的高内聚, 低耦合. 但是, 如果拆分得过细, 实际上会适得其反, 反倒会降低内聚性, 也会影响代码的可维护性. 
 
-### 开闭原则
+### 开闭原则(OCP)
 
 > Software entities (modules, classes, functions, etc.) should be open for extension, but closed for modification.
 
@@ -169,7 +169,7 @@ public class MessageHandlerC implements MessageHandler {
 }
 ```
 
-### 里氏替换原则
+### 里氏替换原则(LSP)
 
 > If S is a subtype of T, then objects of type T may be replaced with objects of type S, without breaking the program. 
 >
@@ -226,7 +226,7 @@ public class NegativeEcho extends Echo {
 
 原来的 `Echo` 类并没有这个限制, 如果替换成了 `NegativeEcho`, 那么输出空对象将会报错, 这改变了原有的行为, 所以不符合里氏替换原则.
 
-### 接口隔离原则
+### 接口隔离原则(ISP)
 
 > Clients should not be forced to depend upon interfaces that they do not use.
 
@@ -415,7 +415,7 @@ public static void main(String[] args) {
 
 加入定义一个大而全的接口, 那么其他实现类就多了很多没必要的代码, 影响可读性.
 
-### 依赖倒置原则
+### 依赖倒置原则(DIP)
 
 > High-level modules shouldn’t depend on low-level modules. Both modules should depend on abstractions. In addition, abstractions shouldn’t depend on details. Details depend on abstractions.
 
@@ -547,9 +547,9 @@ KISS原则: Keep It Simple and Stupid.
 
 YAGNI 原则: You Ain’t Gonna Need It. 你不会需要它. 总结来讲就是目前不要过度设计, 比如不要设计不需要的接口, 不要依赖不需要的依赖等.
 
-### 迪米特法则
+### 迪米特法则(LOD)
 
-迪米特法则(`Law of Demeter`,LoD): 一个软件实体应当尽可能少地与其它实体发生相互作用. 
+迪米特法则(`Law of Demeter`,LOD): 一个软件实体应当尽可能少地与其它实体发生相互作用. 
 
 迪米特法则又称为**最少知识原则**(`LeastKnowledge Principle`,LIP). 
 如果一个系统符合迪米特法则, 那么当其中某一个模块发生修改时, 就会尽量少地影响其他模块, 扩展会相对容易, 这是对软件实体之间通信的限制, 迪米特法则要求限制软件实体之间通信的宽度和深度. 迪米特法则可降低系统的耦合度, 使类与类之间保持松散的耦合关系. 
@@ -618,8 +618,12 @@ YAGNI 原则: You Ain’t Gonna Need It. 你不会需要它. 总结来讲就是�
 
 　　4, 模式已熟记于心, 已忘其形, 深知其意, 达到无剑胜有剑的境界, 恭喜你, 万剑归宗已练成！！！
 
+## 设计模式参考
+
+***[https://java-design-patterns.com/](https://java-design-patterns.com/)***
 
 # UML
+
 UML中有九种建模的图标, 即: 
 **用例图**, **类图**, **对象图**, **顺序图**, **协作图**, **状态图**, **活动图**, **组件图**, **配置图**
 

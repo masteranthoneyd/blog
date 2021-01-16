@@ -157,22 +157,22 @@ source /etc/profile.d/groovy.sh
 groovy -v
 ```
 
-# Golang
+# Go
 
-**安装**:
+下载最新的 Go 的二进制 Release: ***[https://golang.org/dl/](https://golang.org/dl/)***
 
-```
-# apt 安装
-sudo apt install golang
-
-# snap 安装
-sudo snap install go --classic
-```
-
-**查看版本**:
+解压:
 
 ```
-go version
+sudo tar -C /usr/local -xzf go1.15.6.linux-amd64.tar.gz
+```
+
+添加变量:
+
+```
+sudo tee /etc/profile.d/go.sh <<- EOF
+export PATH=$PATH:/usr/local/go/bin
+EOF
 ```
 
 **智能补全**:
@@ -183,13 +183,19 @@ go version
 plugins=(... golang)
 ```
 
-**环境变量配置**:
+**添加 pkg 代理**
+
+单次生效:
 
 ```
-sudo tee /etc/profile.d/go.sh <<- EOF
-export GOPATH=${HOME}/go
-export PATH=\$GOPATH/bin:\$PATH
-EOF
+export GO111MODULE="on"
+go env -w GOPROXY="https://goproxy.io,direct"
+```
+
+永久生效, 在 `/etc/profile.d/go.sh` 追加:
+
+```
+export GOPROXY=https://goproxy.io
 ```
 
 运行Hello world:
