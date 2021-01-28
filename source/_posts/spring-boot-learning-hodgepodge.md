@@ -147,6 +147,14 @@ mvn -f pom_own.xml package
 * `executable`: 打包出来的Jar包是否可执行, 设置为true打包是会有额外的脚本使得Jar包可直接执行.
 * `goal:repackage`: 默认的 goal, 将 Spring Boot 再次打包成可执行的Jar
 
+## 升级 pom 版本
+
+```
+mvn versions:set -DnewVersion=0.0.2-SNAPSHOT
+mvn versions:update-child-modules
+mvn versions:commit
+```
+
 # 配置文件: Properties 和 YAML
 
 ## 配置文件的生效顺序, 会对值进行覆盖

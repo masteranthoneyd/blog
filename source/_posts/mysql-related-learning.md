@@ -612,3 +612,11 @@ mysql -h [host] -P [port] -u [uname] -p[pass] < db_backup_all.sql
 ## 死锁排查
 
 ***[解决死锁之路（终结篇）- 再见死锁](https://mp.weixin.qq.com/s/HT1tWfEPnigBO9fhML6y0w)***
+
+# SQL 优化系列文章
+
+***[https://www.cnblogs.com/youzhibing/category/1501214.html](https://www.cnblogs.com/youzhibing/category/1501214.html)***
+
+# Explain 思维导图
+
+别的大神总结的: ***[MySQL优化正餐之_EXPLAIN执行计划](https://www.processon.com/special/template/5d4fe8f4e4b04399f5a0303e#map)***
