@@ -470,6 +470,10 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 插件地址: ***[https://github.com/alibaba/p3c](https://github.com/alibaba/p3c)***
 文档: ***[https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md](https://github.com/alibaba/p3c/blob/master/idea-plugin/README_cn.md)***
 
+## Arthas Idea
+
+***[arthas-idea-plugin](https://github.com/WangJi92/arthas-idea-plugin)*** 可以结合 IDEA 生成多种 arthas 命令.
+
 ## FindBugs
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/find-bug.png)
 装完之后右键最下面会多出一个`FindBugs`的选项

@@ -335,8 +335,6 @@ public void simpleMockTest() {
 
 ## Mock 初始化
 
-有两种方式初始化.
-
 普通方法:
 
 ```
@@ -1132,3 +1130,7 @@ public class ContiPerfTest {
 测试结果除了会在控制台显示之外, 还会生成一个结果文件`target/contiperf-report/index.html`
 
 ![](https://cdn.yangbingdong.com/img/spring-boot-learning/contiperf-report.jpg)
+
+# Finally
+
+> TDD: ***[https://blog.csdn.net/taoofdev/category_9941778.html](https://blog.csdn.net/taoofdev/category_9941778.html)***
