@@ -112,6 +112,10 @@ list = list.stream()
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
 
+## 修改代码注释位置
+
+按 Ctrl + / 可以注释掉代码, 但是默认的行为是在一行的开始位置添加注释符号, 想要设置成在代码前面添加注释符, 可以修改 Editor -> Code Style -> Java -> Code Generation, 将 `Line comment at first column` 取消.
+
 ## Maven 自动下载源码
 
 ![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
@@ -294,6 +298,10 @@ trim_trailing_whitespace = false
 | **Ctrl+Alt+P**       | 提取为方法参数            |
 | **Ctrl+Shift+Alt+P** | 提取为函数式参数           |
 | **Ctrl+Alt+Shift+T** | 重构一切               |
+
+## 其他修改
+
+* Ctrl + D 默认是对选中复制, 并且粘贴的位置是追加在原来的未知之后, 打开 Keymap, 找到 Duplicate Entire Line 并设置为 Ctrl + D, 之前的快捷键可以移除掉了.
 
 # Plugin
 
