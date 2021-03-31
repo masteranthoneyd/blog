@@ -759,6 +759,8 @@ EOF
 > IDEA真的智能到没朋友...
 > 如果喜欢IDEA这款软件, 并且有经济能力的, 请付费购买~
 
+***[IDEA 使用指南](https://github.com/judasn/IntelliJ-IDEA-Tutorial)***
+
 
 
 
