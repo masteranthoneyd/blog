@@ -844,6 +844,10 @@ Configure>>  Addon  >>Advanced>>Classic
 
 再次重启. 
 
+## 跨平台终端工具 Tabby
+
+***[https://tabby.sh/](https://tabby.sh/)***
+
 ## Deepin Wine For Ubuntu
 
 这个项目是 Deepin-wine 环境的 Ubuntu 移植版, 可以在 Ubuntu 上运行 Tim, 微信, 网易云音乐, 百度云网盘, 迅雷等 Windows 软件: ***[https://github.com/wszqkzqk/deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)***
