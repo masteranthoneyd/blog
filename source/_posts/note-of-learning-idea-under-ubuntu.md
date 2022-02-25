@@ -611,6 +611,13 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 配置说明: ***[Material Theme UI详解](https://blog.csdn.net/zyx1260168395/article/details/102928172)***
 
+
+## SequencePlugin
+
+可以在 IDEA 中根据类自动生成时序流程图
+
+***[https://vanco.github.io/SequencePlugin/](https://vanco.github.io/SequencePlugin/)***
+
 # Icons
 
 ## Atom Material Icons
