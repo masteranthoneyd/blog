@@ -186,7 +186,18 @@ Registry Mirrors:
  https://vioqnt8w.mirror.aliyuncs.com/
 ```
 
+## Windows 安装 Docker
+
+参考: ***[https://smartide.cn/zh/docs/install/docker-install-windows/](https://smartide.cn/zh/docs/install/docker-install-windows/)***
+
+如果在安装 wsl 出现 `参考的对象类型不支持尝试的操作` 错误，在 Powershell 执行以下命令并重启:
+
+```
+netsh winsock reset
+```
+
 # 镜像的相关操作
+
 ## 获取
 [**Docker Hub**](https://hub.docker.com/explore/) 上有大量的高质量的镜像可以用, 我们可以通过以下的方式获取镜像: 
 ```

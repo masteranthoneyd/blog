@@ -452,6 +452,18 @@ assertThat(Long.valueOf(1), instanceOf(Integer.class));
 assertThat(Long.valueOf(1), isA(Integer.class));
 ```
 
+# 生成随机实体工具类
+
+***[easy-random](https://github.com/j-easy/easy-random)***
+
+***[jmockdata](https://github.com/jsonzou/jmockdata)***
+
+***[java-faket](https://github.com/DiUS/java-faker)***
+
+# 自动生成 Unit Test 插件
+
+***[TestMe](https://plugins.jetbrains.com/plugin/9471-testme)***
+
 # JMH基准测试
 
 > JMH 是一个由 OpenJDK/Oracle 里面那群开发了 Java 编译器的大牛们所开发的 Micro Benchmark Framework . 何谓 Micro Benchmark 呢？简单地说就是在 **method** 层面上的 benchmark, 精度可以精确到微秒级. 可以看出 JMH 主要使用在当你已经找出了热点函数, 而需要对热点函数进行进一步的优化时, 就可以使用 JMH 对优化的效果进行定量的分析. 
@@ -1035,101 +1047,7 @@ mvn gatling:execute
 >
 > 官方教程: *[https://gatling.io/docs/current/advanced_tutorial/](https://gatling.io/docs/current/advanced_tutorial/)*
 
-# ContPerf
 
-ContiPerf是一个轻量级的**测试**工具, 基于**JUnit**4 开发, 可用于**接口**级的**性能测试**, 快速压测. 
-
-引入依赖:
-
-```xml
-<!-- 性能测试 -->
-<dependency>
-    <groupId>org.databene</groupId>
-    <artifactId>contiperf</artifactId>
-    <scope>test</scope>
-    <version>2.1.0</version>
-</dependency>
-```
-
-## ContiPerf介绍
-
-可以指定在线程数量和执行次数, 通过限制最大时间和平均执行时间来进行效率测试, 一个简单的例子如下: 
-
-```java
-public class ContiPerfTest { 
-    @Rule 
-    public ContiPerfRule i = new ContiPerfRule(); 
-   
-    @Test 
-    @PerfTest(invocations = 1000, threads = 40) 
-    @Required(max = 1200, average = 250, totalTime = 60000) 
-    publicvoidtest1() throwsException { 
-        Thread.sleep(200); 
-    } 
-}
-```
-
-使用`@Rule`注释激活ContiPerf, 通过`@Test`指定测试方法, `@PerfTest`指定调用次数和线程数量, `@Required`指定性能要求（每次执行的最长时间, 平均时间, 总时间等）. 
-
-也可以通过对类指定`@PerfTest`和`@Required`, 表示类中方法的默认设置, 如下: 
-
-```java
-@PerfTest(invocations = 1000, threads = 40) 
-@Required(max = 1200, average = 250, totalTime = 60000) 
-public class ContiPerfTest { 
-    @Rule 
-    public ContiPerfRule i = new ContiPerfRule(); 
-   
-    @Test 
-    public void test1() throws Exception { 
-        Thread.sleep(200); 
-    } 
-}
-```
-
-## 主要参数介绍
-
-1）PerfTest参数
-
-`@PerfTest(invocations = 300)`: 执行300次, 和线程数量无关, 默认值为1, 表示执行1次；
-
-`@PerfTest(threads=30)`: 并发执行30个线程, 默认值为1个线程；
-
-`@PerfTest(duration = 20000)`: 重复地执行测试至少执行20s. 
-
-三个属性可以组合使用, 其中`Threads`必须和其他两个属性组合才能生效. 当`Invocations`和`Duration`都有指定时, 以执行次数多的为准. 
-
-　　例, `@PerfTest(invocations = 300, threads = 2, duration = 100)`, 如果执行方法300次的时候执行时间还没到100ms, 则继续执行到满足执行时间等于100ms, 如果执行到50次的时候已经100ms了, 则会继续执行之100次. 
-
-　　如果你不想让测试连续不间断的跑完, 可以通过注释设置等待时间, 例, `@PerfTest(invocations = 1000, threads = 10, timer = RandomTimer.class, timerParams = { 30, 80 })` , 每执行完一次会等待30~80ms然后才会执行下一次调用. 
-
-　　在开多线程进行并发压测的时候, 如果一下子达到最大进程数有些系统可能会受不了, ContiPerf还提供了“预热”功能, 例, `@PerfTest(threads = 10, duration = 60000, rampUp = 1000)` , 启动时会先起一个线程, 然后每个1000ms起一线程, 到9000ms时10个线程同时执行, 那么这个测试实际执行了69s, 如果只想衡量全力压测的结果, 那么可以在注释中加入warmUp, 即`@PerfTest(threads = 10, duration = 60000, rampUp = 1000, warmUp = 9000)` , 那么统计结果的时候会去掉预热的9s. 
-
-2）Required参数
-
-`@Required(throughput = 20)`: 要求每秒至少执行20个测试；
-
-`@Required(average = 50)`: 要求平均执行时间不超过50ms；
-
-`@Required(median = 45)`: 要求所有执行的50%不超过45ms； 
-
-`@Required(max = 2000)`: 要求没有测试超过2s；
-
-`@Required(totalTime = 5000)`: 要求总的执行时间不超过5s；
-
-`@Required(percentile90 = 3000)`: 要求90%的测试不超过3s；
-
-`@Required(percentile95 = 5000)`: 要求95%的测试不超过5s； 
-
-`@Required(percentile99 = 10000)`: 要求99%的测试不超过10s; 
-
-`@Required(percentiles = "66:200,96:500")`: 要求66%的测试不超过200ms, 96%的测试不超过500ms. 
-
-## 测试结果
-
-测试结果除了会在控制台显示之外, 还会生成一个结果文件`target/contiperf-report/index.html`
-
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/contiperf-report.jpg)
 
 # Finally
 
