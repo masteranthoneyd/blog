@@ -186,7 +186,7 @@ yangbingdong.com, :80 {
         rotate_compress
     }
     git {
-        repo https://github.com/masteranthoneyd/masteranthoneyd.github.io.git
+        repo https://ghproxy.com/https://github.com/masteranthoneyd/masteranthoneyd.github.io.git
         branch master
         clone_args --recursive
         pull_args --allow-unrelated-histories
@@ -195,6 +195,8 @@ yangbingdong.com, :80 {
     }
 }
 ```
+
+**注意**: repo 的地址前面加了 `https://ghproxy.com/` 是因为国内的 ECS 访问 Github 有时候会有问题, 所以采用了代理.
 
 Docker启动:
 
