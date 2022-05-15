@@ -5,10 +5,10 @@
 - 指的是基于你引入的 Jar 包(一般称之为 starter), 对 SpringBoot 应用进行自动配置
 - 改特性为 Spring Boot 框架的**开箱即用**提供了基础支撑
 
-与**自动装配**的区别:
-
-* 自动配置: Auto-Configuration
-* 自动装配: Autowire, 针对的是 Spring 中的依赖注入
+> 与**自动装配**的区别:
+>
+> * 自动配置: Auto-Configuration
+> * 自动装配: Autowire, 针对的是 Spring 中的依赖注入
 
 # 为什么会有 SpringBoot
 
@@ -44,7 +44,7 @@ public class AppLauncher {
 
 1. 引入依赖:
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -53,7 +53,7 @@ public class AppLauncher {
 
 2. 配置 redis 服务器:
 
-```
+```yaml
 spring:
   redis:
     host: 127.0.0.1
@@ -63,7 +63,7 @@ spring:
 
 3. 代码中直接使用:
 
-```
+```java
 @Autowired
 private StringRedisTemplate strRedisTmp;
 
@@ -95,7 +95,7 @@ Spring Bean 的 metadata 都存放在一个叫做  `BeanDefinition` 的类里面
 
  创建 `application-context.xml` 文件, 在里面加入： 
 
-```
+```xml
 <!-- 通过属性注入 -->
 <bean id="taxCalculator" class="util.TaxCalculator">
     <property name="rate" value="0.1"/>
@@ -109,7 +109,7 @@ Spring Bean 的 metadata 都存放在一个叫做  `BeanDefinition` 的类里面
 
 测试:
 
-```
+```java
 public class TaxCalculatorTest {
     @Test
     public void test(){
@@ -124,11 +124,10 @@ public class TaxCalculatorTest {
 
 后来, 为了简化 xml 的配置, 出现了通过 JavaConfig 的方式进行配置.  想要成为 JavaConfig 类, 需要使用`@Configuration` 注解.
 
-```
+```java
 @Configuration
 @ComponentScan
 public class TaxCalculatorConfiguration {
-
     @Bean
     public TaxCalculator taxCalculator(){
         return new TaxCalculator(0.1);
@@ -138,7 +137,7 @@ public class TaxCalculatorConfiguration {
 
 测试:
 
-```
+```java
 public class TaxCalculatorTest {
     @Test
     public void test(){
@@ -159,11 +158,111 @@ public class TaxCalculatorTest {
 * `spring-mvc.xml`
 * `web.xml`
 
- 有了这些模板, 我们只需要点点点, 再改一改, 就能用了.  这样做确实很好. 可是对于越来越成型的项目体系. 我们每次都搞一些重复动作, 是会厌烦的, 而且面对这么多xml配置文件, 我太难了. 
+ 有了这些模板, 我们只需要点点点, 再改一改, 就能用了.  这样做确实很好. 可是对于越来越成型的项目体系. 我们每次都搞一些**重复动作**, 是会厌烦的, 而且面对这么多xml配置文件, 我太难了. 
 
-于是, 有人产生了这种想法:  我一个配置文件都不想写, 程序还能照样跑, 我只关心有我需要的组件就可以了, 我只需要关注我的目标就可以了, **我想打开一个工程之后可以1秒进入开发状态, 而不是花3小时写完配置文件(2.5小时找bug)** 希望有个东西帮我把开始之前的准备工作全做了, 即那些套路化的配置, 这样在我接完水之后回来就可以直接进行开发。.
+于是, 有人产生了这种想法:  我一个配置文件都不想写, 程序还能照样跑, 我只关心有我需要的组件就可以了, 我只需要关注我的目标就可以了, **我想打开一个工程之后可以1秒进入开发状态, 而不是花3小时写完配置文件(2.5小时找bug)** 希望有个东西帮我把开始之前的准备工作全做了, 即那些**套路化(有规律)的配置**, 这样在我接完水之后回来就可以直接进行开发.
+
+## JavaConfig 拓展: @Import
+
+`@Import` 也是 Spring 框架的一个注解, 它的作用是**提供了一种显式地从其他地方加载配置类的方式**, 这样可以避免使用性能较差的组件扫描(`@ComponentScan`).
+
+`@Import` 支持通过下面三种方式导入:
+
+* 普通的Bean或配置类, 可以理解为一个加了 `@Component` 或 `@Configuration` 注解的类
+* 实现了  `ImportBeanDefinitionRegistrar` 接口的类
+* 实现了  `ImportSelector` 接口的类 
+
+```Java
+@Import(ConfigA.class)
+@Import(AImportBeanDefinitionRegister.class)
+@Import(AImportSelector.class)
+@Configuration
+public XxxConfiguraion {
+    ...
+}
+
+public class ConfigA {
+  @Bean
+  pubic A a() {
+    return new A();
+  }
+}
+
+public class AImportBeanDefinitionRegister implements ImportBeanDefinitionRegistrar {
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+        RootBeanDefinition aDef = new RootBeanDefinition(A.class);
+        registry.registerBeanDefinition("a", aDef);
+    }
+}
+
+public class AImportSelector implements ImportSelector {
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        return new String[]{"config.ConfigA"};
+    }
+}
+```
+
+#  MyEnableAutoConfig
+
+有了 `@Import` 的基础之后, 我们可以利用这个特性来实现我们自己的自动配置了~
+
+```java
+public class TaxCalculatorTest {
+    @Test
+    public void test(){
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(MyAutoConfig.class);
+        TaxCalculator taxCalculator = ctx.getBean(TaxCalculator.class);
+        System.out.println(taxCalculator.calc(100));
+    }
+}
+```
+
+点进 `MyAutoConfig.class`:
+
+```java
+@Configuration
+@MyEnableAutoConfig
+public class MyAutoConfig {
+    // bean 都去哪了
+}
+```
+
+让我们继续进入 `MyEnableAutoConfig.class` 一探究竟:
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import(MyImportSelector.class)   
+public @interface MyEnableAutoConfig {
+}
+```
+
+原来是使用了 `@Import`, 进入`MyImportSelector.class`:
+
+```java
+public class MyImportSelector implements ImportSelector {
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        return new String[]{"com.xxx.TaxCalculatorConfiguration"};
+    }
+}
 
 
+@Configuration
+public class TaxCalculatorConfiguration {
+    @Bean
+    public TaxCalculator taxCalculator(){
+        return new TaxCalculator(0.1);
+    }
+}
+```
+
+emmm... 饶了一大圈, 还是加载了这个配置文件.
+
+总结一下流程:
 
 
 
