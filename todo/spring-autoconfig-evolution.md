@@ -93,7 +93,7 @@ Spring Bean 的 metadata 都存放在一个叫做  `BeanDefinition` 的类里面
 
 在 Spring 刚发布的时候, 那时候还是使用 xml 配置 bean 的.
 
- 创建 `application-context.xml` 文件, 在里面加入： 
+ 创建 `beans.xml` 文件, 在里面加入： 
 
 ```xml
 <!-- 通过属性注入 -->
@@ -113,7 +113,7 @@ Spring Bean 的 metadata 都存放在一个叫做  `BeanDefinition` 的类里面
 public class TaxCalculatorTest {
     @Test
     public void test(){
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
         TaxCalculator taxCalculator = ctx.getBean("taxCalculator", TaxCalculator.class);
         System.out.println(taxCalculator.calc(100));
     }
@@ -212,35 +212,35 @@ public class AImportSelector implements ImportSelector {
 public class TaxCalculatorTest {
     @Test
     public void test(){
-        ApplicationContext ctx = new AnnotationConfigApplicationContext(MyAutoConfig.class);
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(MyAutoConfiguration.class);
         TaxCalculator taxCalculator = ctx.getBean(TaxCalculator.class);
         System.out.println(taxCalculator.calc(100));
     }
 }
 ```
 
-点进 `MyAutoConfig.class`:
+点进 `MyAutoConfiguration`:
 
 ```java
 @Configuration
 @MyEnableAutoConfig
-public class MyAutoConfig {
+public class MyAutoConfiguration {
     // bean 都去哪了
 }
 ```
 
-让我们继续进入 `MyEnableAutoConfig.class` 一探究竟:
+让我们继续进入 `MyEnableAutoConfiguration` 一探究竟:
 
 ```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(MyImportSelector.class)   
-public @interface MyEnableAutoConfig {
+public @interface MyEnableAutoConfiguration {
 }
 ```
 
-原来是使用了 `@Import`, 进入`MyImportSelector.class`:
+原来是使用了 `@Import`, 进入`MyImportSelector`:
 
 ```java
 public class MyImportSelector implements ImportSelector {
@@ -249,7 +249,6 @@ public class MyImportSelector implements ImportSelector {
         return new String[]{"com.xxx.TaxCalculatorConfiguration"};
     }
 }
-
 
 @Configuration
 public class TaxCalculatorConfiguration {
