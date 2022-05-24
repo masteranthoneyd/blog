@@ -1,5 +1,32 @@
 # SpringBoot 自动配置原理
 
+# Spring 的前世今生
+
+早在  2002  年, J2EE 与 EJB 大行其道  很多知名公司都是采用此技术方案进行项目开发. J2EE 是什么? J2EE 其实是一套标准规范, 里面有一堆技术的集合体, 包括 EJB, JDBC 等:
+![]( https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/ejb-collection.png )
+
+然而 EJB 的实现是一个非常笨重的 Java 组件:
+
+* 它将 JavaBean 集中式的管理并且通过 RMI 进行调用, 性能不高, 如果调用方与 EJB 服务不在一个局域网, 后果很可怕
+* 它只能只能运行在 JBoss, WebLogic 等大型收费的服务器上
+
+在这时候有一位小伙子认为并不是所有的项目都需要 EJB 这种重量级框架,  应该会有一种更好的方案来解决这个问题, 并且 在2001年10月写了一本书《Expert One-on-One J2EE》 , 指出了 J2EE 和 EJB 框架的主要缺陷,  提出了一个**基于普通  Java 类和依赖注入**的更简单的解决方案.
+
+书中展示了如何在不使用 EJB 的情况下构建高质量, 可扩展的在线座位预留系统. 根据这些内容, 他编写了一个叫  **interface21** 的框架, 这就是 Spring 的前身, 在 2004 年 3 月 发布 1.0 版本, 后来被 VMWare 收购了, 而这位 Spring 的作者叫  Rod Johnson.
+
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-author-rod-johnson.png)
+
+> 从上面 J2EE 的图中可以看出来, Spring 并不是要代替 J2EE, 而是在 J2EE 只上的框架, 为 J2EE 一些组件提供轻量级的集成能力, 与 J2EE 相辅相成.
+
+
+
+# Spring 是什么
+
+* 刚开始是 IoC 容器(低侵入, 控制反转)
+* 后来是一个平台
+
+
+
 # 什么是 SpringBoot 自动配置/Auto-Configuration
 
 - 指的是基于你引入的 Jar 包(一般称之为 starter), 对 SpringBoot 应用进行自动配置
