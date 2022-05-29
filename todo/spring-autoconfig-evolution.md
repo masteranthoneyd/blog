@@ -28,11 +28,13 @@ Spring 在 2004 年 3 月 发布 1.0 版本, 而这位 Spring 的作者叫  Rod 
 
 # Spring 是什么?
 
-早期, Spring 是一个**轻量级**, 非入侵式(无需实现Spring的特定接口)的**控制反转** (IoC) 和面向切面 (AOP) 的框架. 发展到如今, Spring 已经是一个非常强大的平台了.
+早期, Spring 是一个**轻量级**, 非入侵式(无需实现Spring的特定接口)的**控制反转** (IoC) 和面向切面 (AOP) 的框架. 发展到如今, Spring 已经是一个非常强大, 整合了众多能力的平台了.
 
 ![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-timer-shaft.png)
 
- Spring 特性:
+ ![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-overview.png)
+
+Spring 特性:
 
 ![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-feature.png)
 
@@ -53,6 +55,82 @@ Java 是面向对象的编程语言, 一个个实例对象相互合作组成了�
  **DI**(Dependency Injection, 依赖注入)：指的是容器在实例化对象的时候把它依赖的类注入给它, IoC 思想的实现.
 
 IoC 的有点显而易见,  最主要的是两个字**解耦**, 硬编码会造成对象间的过度耦合, 使用 IoC 之后, 我们可以**不用关心对象间的依赖**, 专心开发应用就行.
+
+# 为什么会有 SpringBoot
+
+有了 Spring, 可以很轻松通过 IoC/DI 管理项目中的 Bean, 那为什么还会有 SpringBoot呢? 
+
+其实 SpringBoot 的出现是为了**简化** Spring 集成的项目(还有一些常用的第三方类库)的配置, 在原本的 Spring 集成的项目中(比如 spring-web, spring-data-jdbc 等), 无论是基于注解的配置还是基于 xml 的配置, 你都需要进行很多的配置才能正常使用.
+
+比如 spring-web, 如果不使用 SpringBoot, 你需要:
+
+1. 添加所需要的依赖, `spring-webmvc` 和 `javax.servlet-api` 共两个
+2. 继承`AbstractAnnotationConfigDispatcherServletInitializer`类, 重写它的 `getRootConfigClasses`, `getServletConfigClasses` 和 `getServletMappings` 方法
+3. 创建一个 `WebConfig` 类配置你需要的 Bean, 并在上面加上 `@Configuration`, `@EnableWebMvc`,
+   还有 `@ComponentScan` 注解
+4. 写 Controller 类, 上面加上 `@Controller` 和 `@RequestMapping` 注解
+5. 把你的项目打包成 war（记得把依赖也打包到lib目录）, 配置 Servlet 容器(比如 Tomcat), 启动 Servlet 容器, 部署 war 到Servlet 容器
+6. 如果你需要配置一些 SpringMVC 的东西, 比如视图解析器 , 消息转换器等, 你需要新建一个类实现 `WebMvcConfigurer` 接口, 然后根据重写接口里面的方法, 然后在类上面加上 `@Configuration` 和`@EnableWebMvc` 注解
+7. 如果你需要改变 Servlet 容器的服务端口, **只能去改变外部**的 Servlet 容器的配置, 无法在项目的代码或者配置文件里面实现
+
+而用 SpringBoot, 你只需要:
+
+1. 添加所需要的依赖, spring-boot-starter-web, 就这一个就行
+2. 写Controller类, 在上面加上`Controller`和`@RequestMapping`注解
+3. 创建一个类(或者直接在 Controller 类上面)写一个启动(main)方法, 比如
+
+```java
+@SpringBootApplication
+public class AppLauncher {
+    public static void main(String[] args) {
+        SpringApplication.run(AppLauncher.class, args);
+    }
+}
+```
+
+又如 spring-data-redis:
+
+1. 引入依赖:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+2. 配置 redis 服务器:
+
+```yaml
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+```
+
+3. 代码中直接使用:
+
+```java
+@Autowired
+private StringRedisTemplate strRedisTmp;
+
+...
+
+String someVal = strRedisTmp.get(someKey);
+```
+
+SpringBoot 倡导的理念: **约定** > **配置** > **编码**
+
+# 什么是 SpringBoot 自动配置/Auto-Configuration
+
+- 指的是基于你引入的 Jar 包(一般称之为 starter), 对 SpringBoot 应用进行自动配置
+- 改特性为 Spring Boot 框架的**开箱即用**提供了基础支撑
+
+> 与**自动装配**的区别:
+>
+> * 自动配置: Auto-Configuration
+> * 自动装配: Autowire, 针对的是 Spring 中的依赖注入
 
 # Spring 配置 Bean 的方式
 
@@ -135,7 +213,7 @@ public class TaxCalculatorTest {
 
 ## JavaConfig 拓展: @Import
 
-`@Import` 也是 Spring 框架的一个注解, 它的作用是**提供了一种显式地从其他地方加载配置类的方式**, 这样可以避免使用性能较差的组件扫描(`@ComponentScan`).
+`@Import` 也是 Spring 框架的一个注解, 它的作用是**提供了一种显式地从其他地方加载配置类的方式**, 这样可以避免使用**性能较差**的组件扫描(`@ComponentScan`).
 
 `@Import` 支持通过下面三种方式导入:
 
@@ -180,23 +258,30 @@ public class AImportSelector implements ImportSelector {
 有了 `@Import` 的基础之后, 我们可以利用这个特性来实现我们自己的自动配置了~
 
 ```java
-public class TaxCalculatorTest {
-    @Test
-    public void test(){
-        ApplicationContext ctx = new AnnotationConfigApplicationContext(MyAutoConfiguration.class);
-        TaxCalculator taxCalculator = ctx.getBean(TaxCalculator.class);
-        System.out.println(taxCalculator.calc(100));
+@MySpringBootApplication
+public class ApplicationLauncher {
+    public static void main(String[] args) {
+        MySpringApplicationRunner.run(ApplicationLauncher.class);
+    }
+}
+
+public class MySpringApplicationRunner {
+    public static ApplicationContext run(Class<?> mainClass) {
+        return new AnnotationConfigApplicationContext(mainClass);
     }
 }
 ```
 
-点进 `MyAutoConfiguration`:
+`@MySpringBootApplication`:
 
 ```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Configuration
-@MyEnableAutoConfig
-public class MyAutoConfiguration {
-    // bean 都去哪了
+@MyEnableConfiguration
+@ComponentScan
+public @interface MySpringBootApplication {
 }
 ```
 
@@ -217,106 +302,175 @@ public @interface MyEnableAutoConfiguration {
 public class MyImportSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        return new String[]{"com.xxx.TaxCalculatorConfiguration"};
+        return new String[]{"com.xxx.ExpressionEvaluatorConfiguration"};
     }
 }
 
 @Configuration
-public class TaxCalculatorConfiguration {
+public class ExpressionEvaluatorConfiguration {
     @Bean
-    public TaxCalculator taxCalculator(){
-        return new TaxCalculator(0.1);
+    public ExpressionEvaluator ExpressionEvaluator(){
+        return new InfixExpressionEvaluator();
     }
 }
 ```
 
-emmm... 饶了一大圈, 还是加载了这个配置文件.
+emmm... 饶了一大圈, 还是加载了一个配置文件.
 
 总结一下流程:
 
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/myautoconfig-flow.png)
 
+但这里, 已经基本得到了自动配置的能力, 但还不是特别的方便, 如果加一个配置或修改一个配置, 需要改动源码, 我们需要遵循**开闭原则**. 
 
+将其改造一下, 继续偷懒, 在不改配置类的情况下, 能够动态增加配置类, 那么有什么优雅的方式可以做到呢? 我们可以参考 **Java SPI 机制**(比如 JDBC Driver, Dubbo), 定义一个 properties 文件, 所有的配置类信息以字符串形式放在里面, 启动时读取里面的配置信息并进行加载.
 
-
-
-
-# 什么是 SpringBoot 自动配置/Auto-Configuration
-
-- 指的是基于你引入的 Jar 包(一般称之为 starter), 对 SpringBoot 应用进行自动配置
-- 改特性为 Spring Boot 框架的**开箱即用**提供了基础支撑
-
-> 与**自动装配**的区别:
->
-> * 自动配置: Auto-Configuration
-> * 自动装配: Autowire, 针对的是 Spring 中的依赖注入
-
-# 为什么会有 SpringBoot
-
- SpringBoot 的出现是为了**简化** Spring 集成的项目(还有一些常用的第三方类库)的配置, 在原本的 Spring 集成的项目中(比如 spring-web, spring-data-jdbc 等), 无论是基于注解的配置还是基于 xml 的配置, 你都需要进行很多的配置才能正常使用.
-
-比如 spring-web, 如果不使用 SpringBoot, 你需要:
-
-1. 添加所需要的依赖, `spring-webmvc` 和 `javax.servlet-api` 共两个
-2. 继承`AbstractAnnotationConfigDispatcherServletInitializer`类, 重写它的 `getRootConfigClasses`, `getServletConfigClasses` 和 `getServletMappings` 方法
-3. 创建一个 `WebConfig` 类配置你需要的 Bean, 并在上面加上 `@Configuration`, `@EnableWebMvc`,
-   还有 `@ComponentScan` 注解
-4. 写 Controller 类, 上面加上 `@Controller` 和 `@RequestMapping` 注解
-5. 把你的项目打包成 war（记得把依赖也打包到lib目录）, 配置 Servlet 容器(比如 Tomcat), 启动 Servlet 容器, 部署 war 到Servlet 容器
-6. 如果你需要配置一些 SpringMVC 的东西, 比如视图解析器 , 消息转换器等, 你需要新建一个类实现 `WebMvcConfigurer` 接口, 然后根据重写接口里面的方法, 然后在类上面加上 `@Configuration` 和`@EnableWebMvc` 注解
-7. 如果你需要改变 Servlet 容器的服务端口, **只能去改变外部**的 Servlet 容器的配置, 无法在项目的代码或者配置文件里面实现
-
-而用 SpringBoot, 你只需要:
-
-1. 添加所需要的依赖, spring-boot-starter-web, 就这一个就行
-2. 写Controller类, 在上面加上`Controller`和`@RequestMapping`注解
-3. 创建一个类(或者直接在 Controller 类上面)写一个启动(main)方法, 比如
+升级版 `MyImportSelector` -> `MyImportSelectorPlus` 会是这样的:
 
 ```java
-@SpringBootApplication
-public class AppLauncher {
-    public static void main(String[] args) {
-        SpringApplication.run(AppLauncher.class, args);
+public class MyImportSelectorPlus implements ImportSelector {
+
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        Properties properties = MyConfigLoader.loadConfig("/META-INF/load-config.properties");
+        String strings = (String) properties.get(MyEnableConfiguration.class.getName());
+        return new String[]{strings};
+    }
+}
+
+public final class MyConfigLoader {
+    public static Properties loadConfig(String path) {
+        Properties properties = new Properties();
+        try (InputStream sin = MyConfigLoader.class.getResourceAsStream(path)) {
+            properties.load(sin);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return properties;
     }
 }
 ```
 
-又如 spring-data-redis:
+ 至此, 无论是添加或者删除组件, 无非是在配置文件中加上或者删除一行的问题了.
 
-1. 引入依赖:
+# SpringBoot 自动配置源码分析
 
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
-```
+## SpringBoot 运行简化流程
 
-2. 配置 redis 服务器:
+一切的入口都在 `SpringApplication.run(...);`
 
-```yaml
-spring:
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    password: 123456
-```
+> 看了上面的轻量级实现, ``SpringApplication.run(...)` 为什么要传入一个 mainClass 应该心里有数了吧.
 
-3. 代码中直接使用:
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-autoconfiguration-simple-flow.png)
+
+其中 processConfigurationClasses 简化逻辑如下:
+
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/process-configuration-classes.png)
+
+这是一个递归的过程:
+
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/recursively-import-configuration-classes.png)
+
+## @SpringBootApplication
+
+SpringBoot 应用还需要在启动类上贴上 `@SpringBootApplication` 这个注解:
 
 ```java
-@Autowired
-private StringRedisTemplate strRedisTmp;
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+    ...
+}
 
-...
 
-String someVal = strRedisTmp.get(someKey);
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Configuration
+@Indexed
+public @interface SpringBootConfiguration {
+    ...
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage
+@Import(AutoConfigurationImportSelector.class)
+public @interface EnableAutoConfiguration {
+    ...
+}
 ```
 
-SpringBoot 倡导的理念: **约定** > **配置** > **编码**
+![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-application-annnotation.png)
 
-# 进阶: AutoConfigurationImportSelector 是如何被加载的
+SpringBoot 配置自动加载的原理其实就是上面的 MyEnableAutoConfig 是一样的, 通过 import 注解导入 `ImportSelector` 接口的实现, 而 SpringBoot 这里用的是 `AutoConfigurationImportSelector`:
+
+```java
+public class AutoConfigurationImportSelector implements DeferredImportSelector {
+	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+		...
+		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		...
+		return new AutoConfigurationEntry(configurations, exclusions);
+	}
+    
+	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(EnableAutoConfiguration.class,
+				getBeanClassLoader());
+		...
+		return configurations;
+	}
+		
+}
+```
+
+这里面用到了 `SpringFactoriesLoader.loadFactoryNames`, 在 `SpringFactoriesLoader` 里面就定义了配置自动加载的目录文件:
+
+```java
+public final class SpringFactoriesLoader {
+
+	/**
+	 * The location to look for factories.
+	 * <p>Can be present in multiple JAR files.
+	 */
+	public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
+    
+}
+```
+
+那么还剩下一个 `@AutoConfigurationPackage` 是做什么的, 网上有一些文章说是它的作用是包扫描, 这个是错误的, 它的作用其实在源码中已经告诉了我们:
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Import(AutoConfigurationPackages.Registrar.class)
+public @interface AutoConfigurationPackage {
+  ...
+}
 
 
+/**
+ * Class for storing auto-configuration packages for reference later (e.g. by JPA entity
+ * scanner).
+ *
+ * @author Phillip Webb
+ * @author Dave Syer
+ * @author Oliver Gierke
+ * @since 1.0.0
+ */
+public abstract class AutoConfigurationPackages {
+    ...
+}
+```
 
-
-
+> 
