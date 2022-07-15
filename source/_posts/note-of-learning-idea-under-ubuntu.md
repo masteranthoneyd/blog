@@ -457,6 +457,10 @@ Zookeeper UI, 支持删除操作
 
 下划线转驼峰插件, 安装好之后可通过快捷键 `Shift+Alt+U` 更换驼峰.
 
+## GenerateAllSetter
+
+生成 POJO 变量的 set 方法
+
 ## Grep Console
 
 参考：*[https://plugins.jetbrains.com/plugin/7125-grep-console](https://plugins.jetbrains.com/plugin/7125-grep-console)*
