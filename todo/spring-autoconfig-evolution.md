@@ -1,6 +1,6 @@
 # 手把手实现一个 Lite SpringBoot
 
-> 从 SQL Boy, 到 CRUD Boy, 再到 Spring Boy, 当今的 Java 项目基本都离不开 Spring,  这也可以看出 Spring 在 Java 世界里举足轻重的作用.
+> 从 SQL Boy, 到 CRUD Boy, 再到 Spring Boy, 可以看出当今的 Java 项目基本都离不开 Spring,  这也可以看出 Spring 在 Java 世界里举足轻重的作用.
 
 # Spring 的前世今生
 
@@ -221,7 +221,7 @@ public class TaxCalculatorTest {
 * 实现了  `ImportBeanDefinitionRegistrar` 接口的类
 * 实现了  `ImportSelector` 接口的类 
 
-```Java
+```java
 @Import(ConfigA.class)
 @Import(AImportBeanDefinitionRegister.class)
 @Import(AImportSelector.class)
