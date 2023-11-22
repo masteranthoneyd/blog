@@ -13,7 +13,7 @@
 
 以下是两个静态网站生成工具排行参考的链接:
 
-*  [***Static Site Generators - Top Open Source SSGs***](https://jamstack.org/generators/) 
+*  [***Static Site Generators - Top Open Source SSGs***](https://jamstack.org/generators/)
 *  [***Static Site Generator - Ranking - OSS Insight***](https://ossinsight.io/collections/static-site-generator/)
 
 人气比较高的几个:
@@ -24,7 +24,7 @@
 
 我之前博客用的就是 Hexo 来生成的,  这类框架对于简单生成一个博客还是挺方便的, 编写 Markdown 文档, 配置主体, 执行相应命令就能生成静态 html 文件, 然后可以通过直接放到服务器上通过反向代理访问.
 
-虽然上手容易操作简单, 但是想要实现一些额外的功能可能往往需要第三方的**集成**, 比如评论, 搜索等, 毕竟框架生成的只是静态页面, 不具备**服务端功能**. 
+虽然上手容易操作简单, 但是想要实现一些额外的功能可能往往需要第三方的**集成**, 比如评论, 搜索等, 毕竟框架生成的只是静态页面, 不具备**服务端功能**.
 
 很久之前(在我刚开始写博客的时候)我就考虑过需要的是一个比较整体, 功能比较完善的博客系统, 当时就有注意到 ***[Halo](https://docs.halo.run/)***, 只不过大概出于以下两点考虑并没有采取该框架:
 
@@ -39,7 +39,7 @@
 
 # 简介
 
-***[Halo](https://docs.halo.run/)*** [ˈheɪloʊ], 强大易用的开源建站工具. 
+***[Halo](https://docs.halo.run/)*** [ˈheɪloʊ], 强大易用的开源建站工具.
 
 Doc:  ***[https://docs.halo.run](https://docs.halo.run)***
 
@@ -51,7 +51,7 @@ Requirements:
 
 > Windows Docker Desktop 很方便~
 
-本地运行: 
+本地运行:
 
 ```
 docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.10
@@ -59,14 +59,14 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo
 
 访问 localhost:8080 即可访问后台.
 
-工作目录: 
+工作目录:
 
-- `db`: 存放 H2 Database 的物理文件, 如果你使用其他数据库, 那么不会存在这个目录. 
-- `themes`: 里面包含用户所安装的主题. 
-- `plugins`: 里面包含用户所安装的插件. 
-- `attachments`: 附件目录. 
-- `logs`: 运行日志目录. 
-- `application.yaml`: 配置文件. 
+- `db`: 存放 H2 Database 的物理文件, 如果你使用其他数据库, 那么不会存在这个目录.
+- `themes`: 里面包含用户所安装的主题.
+- `plugins`: 里面包含用户所安装的插件.
+- `attachments`: 附件目录.
+- `logs`: 运行日志目录.
+- `application.yaml`: 配置文件.
 
 # 安装 Halo
 
@@ -82,7 +82,7 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo
 dnf update
 ```
 
-安装 Docker, Docker Compose, 设置镜像加速: 
+安装 Docker, Docker Compose, 设置镜像加速:
 
 ```
 dnf config-manager --add-repo=https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && \
@@ -98,13 +98,14 @@ systemctl daemon-reload && \
 systemctl restart docker
 ```
 
-## 通过 Docker Compose 安装 Halo
+## 通过 Docker Compose 部署生产级别 Halo
 
-创建工作目录 halo, cd 进去, 并添加 `docker-compose.yaml`:
+创建工作目录, 添加并运行 `docker-compose.yaml`:
 
 ```
 cd ~ && \
-mkdir halo && cd halo && \
+mkdir halo && \ 
+cd halo && \
 tee /root/halo/docker-compose.yaml <<- EOF
 version: "3"
 
@@ -131,11 +132,11 @@ services:
     command:
       - --spring.r2dbc.url=r2dbc:pool:mysql://halodb:3306/halo
       - --spring.r2dbc.username=root
-      # MySQL 的密码，请保证与下方 MYSQL_ROOT_PASSWORD 的变量值一致。
-      - --spring.r2dbc.password=123qwe
+      # MySQL 的密码, 请保证与下方 MYSQL_ROOT_PASSWORD 的变量值一致。
+      - --spring.r2dbc.password=lifeissucks
       - --spring.sql.init.platform=mysql
-      # 外部访问地址，请根据实际需要修改
-      - --halo.external-url=http://localhost:8090/
+      # 外部访问地址, 请根据实际需要修改
+      - --halo.external-url=https://blog.yangbingdong.com
 
   halodb:
     image: mysql:8.1.0
@@ -159,8 +160,8 @@ services:
       retries: 5
       start_period: 30s
     environment:
-      # 请修改此密码，并对应修改上方 Halo 服务的 SPRING_R2DBC_PASSWORD 变量值
-      - MYSQL_ROOT_PASSWORD=123qwe
+      # 请修改此密码, 并对应修改上方 Halo 服务的 SPRING_R2DBC_PASSWORD 变量值
+      - MYSQL_ROOT_PASSWORD=lifeissucks
       - MYSQL_DATABASE=halo
 
 networks:
@@ -168,21 +169,25 @@ networks:
 EOF
 ```
 
+* **注意**: `--halo.external-url` 填写成自己的域名
+
 启动:
 
 ```
 docker-compose up -d
 ```
 
+不出意外访问 `ip:port` 可以进入系统, 初次打开创建用户设置密码, 之后就可以正常登录了, 默认界面大概长酱紫:
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/63e63023eeab86e55d6de087ce089770-f7b8ff.png)
+
 # Nginx Proxy Manager: 配置反向代理
 
-上面已经启动了 Halo, 不出意外可以使用 `ip:port` 进行访问, 但一般来说都是会通过域名来访问博客的吧, 所以需要配置一个反向代理.
-
-***[Nginx Proxy Manager](https://nginxproxymanager.com/)*** 就是一个 Nginx 的代理管理器, 它最大的特点是**简单方便**. 即使是没有 Nginx 基础, 也能轻松地用它来完成反向代理的操作, 而且因为**自带面板**, 操作极其简单, 非常适合配合 docker 搭建的应用使用. Nginx Proxy Manager 后台还可以一**键申请 SSL 证书**, 并且会**自动续期**, 方便省心.
+一般来说都是会通过域名来访问博客的吧, 所以需要配置一个反向代理, 比较著名以及常用的反向代理就是 Nginx 了, 而 ***[Nginx Proxy Manager](https://nginxproxymanager.com/)*** 是一个基于 Nginx 的代理管理器, 它最大的特点是**简单方便**. 即使是没有 Nginx 基础, 也能轻松地用它来完成反向代理的操作, 而且因为**自带面板**, 操作极其简单, 非常适合配合 Docker 搭建的应用使用. Nginx Proxy Manager 后台还可以一**键申请 SSL 证书**, 并且会**自动续期**, 方便省心.
 
 > 这里假设你已经有了一个域名, 并且降域名解析到了服务器.
 >
-> 在 ECS 中默认情况下 80 跟 443 端口应该是关闭的, 记得先打开.
+> 在 ECS 中默认情况下 80 跟 443 端口应该是关闭的, 记得先打开, 另外 81 端口也要先打开, 因为 NPM 后台用的就是这个端口.
 
 ## 部署
 
@@ -200,8 +205,8 @@ services:
       - '81:81'              # 可以把冒号左边的 81 端口修改成你服务器上没有被占用的端口
       - '443:443'            # 不建议修改端口
     volumes:
-      - ./data:/data         # 点号表示当前文件夹，冒号左边的意思是在当前文件夹下创建一个 data 目录，用于存放数据，如果不存在的话，会自动创建
-      - ./letsencrypt:/etc/letsencrypt  # 点号表示当前文件夹，冒号左边的意思是在当前文件夹下创建一个 letsencrypt 目录，用于存放证书，如果不存在的话，会自动创建
+      - ./data:/data         # 点号表示当前文件夹, 冒号左边的意思是在当前文件夹下创建一个 data 目录, 用于存放数据, 如果不存在的话, 会自动创建
+      - ./letsencrypt:/etc/letsencrypt  # 点号表示当前文件夹, 冒号左边的意思是在当前文件夹下创建一个 letsencrypt 目录, 用于存放证书, 如果不存在的话, 会自动创建
 EOF
 ```
 
@@ -211,19 +216,69 @@ EOF
 docker-compose up -d
 ```
 
+没有意外的话这时候访问服务器外网 `ip:81` 或者 `域名:81` 的域名即可打开 NPM 后台, 默认用户名: ` admin@example.com ` 密码: `changeme`
+
+第一次登陆会提示更改用户名和密码, 建议修改一个复杂一点的密码.
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/1cca93f5e7b82cb70254443962f2930d-a43588.png)
+
 ## 配置
 
-浏览器输入 服务器ip:81 即可访问,  默认登陆的用户名: `admin@example.com` 密码: `changeme`, 第一次访问会要求修改邮箱密码.
+进入首页后, 点击  `Proxy Hosts` ->  `Add Proxy Host`, 配置大概如图所示
 
-进入首页后, 点击  `Proxy Hosts` ->  `Add Proxy Host` 
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/54b034c85691b9cb13a033a277410fff-132c0f.png)
+
+- `Domain Names` : 填我们 Halo 网站的域名, 首先记得做好 DNS 解析, 把域名绑定到我们的服务器的 IP 上
+- `Scheme` : 默认 `http` 即可, 除非你有自签名证书
+- `Forward Hostname/IP` : 填入服务器的 IP, 或者 Docker 容器内部的 IP(如果 NPM 和 Halo 搭建在同一台服务器上的话)
+    - Docker 内部 ip 可通过 ` ip addr show docker0 ` 命令查看
+- `Forward Port`: 填入 Halo 映射出的端口, 这边默认是 `8090`
+- `Cache Assets` : 缓存, 可以选择打开
+- `Block Common Exploits`:  阻止常见的漏洞, 可以选择打开
+- `Websockets Support` : WS 支持, 可以选择打开
+- `Access List`:  这个是 NPM 自带的一个限制访问功能
+
+
+
+一键申请 SSL 证书:
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/4f5d12bed307f361a95592a7c4b46ff4-667c85.png)
+
+* 证书三个月自动续费
+
+配置完成之后就可以通过域名访问博客啦~届时也可以选择将 NPM 后台隐藏起来, 比如将 81 端口不开放, 毕竟这玩意配置完之后基本也不会怎么变.
+
+也可以选择给 NPM 加个域名解析并配置 SSL, 我就是这么玩的:
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/635dd120caa83ab36025fccd5cda43da-4427d8.png)
 
 # OSS + CND 存储博客图片
 
-图片一般来说应该是不怎么会变得, 那么使用 CDN 去访问博客图片会比直接访问 OSS 实惠.
+Halo 自带一个附件功能, 虽然可以上传图片, 但是其不建议把文章里面的图片也放上去, 建议存放到 OSS 中, 外加一个 CDN. 因为图片一般来说应该是不怎么会变的, 那么使用 CDN 去访问博客图片会比直接访问 OSS **实惠**, 并且通过 CDN 访问 OSS, 那么 OSS 的 Bucket 就不需要公开, 一定程度上起到保护作用.
 
->  推荐组合使用流量包: CDN静态HTTPS请求包, CDN下行流量（中国内地）, 对象存储OSS资源包（包月）-标准存储包（中国内地）
+详细操作可以参考官网的最佳实践: [***CDN加速图文和视频类网站***](https://help.aliyun.com/zh/cdn/use-cases/accelerate-content-delivery-for-infographic-and-video-websites)
 
-https://help.aliyun.com/zh/cdn/use-cases/accelerate-content-delivery-for-infographic-and-video-websites
+如果需要证书, 可以直接到阿里云数字证书管理服务中**申请免费证书**, 每年可以申请**20**个:
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/23cae7ac2ce4543d5aa8febfa379906f-c01ee8.png)
+
+
+
+**推荐组合使用流量包**:
+
+* CDN静态HTTPS请求包
+* CDN下行流量（中国内地）
+* 对象存储OSS资源包（包月）-标准存储包（中国内地）
+
+
+
+# 安全分析
+
+https://github.com/chaitin/xray
+
+# 其他建议
+
+* 为确保可移植性, 最好使用 Markdown 格式编写文章, 方便以后想切换底层博客框架的时候文章不会那么难迁移.
 
 https://github.com/Molunerfinn/PicGo
 
