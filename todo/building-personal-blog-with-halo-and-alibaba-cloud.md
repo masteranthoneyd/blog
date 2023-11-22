@@ -1,10 +1,12 @@
 # 基于阿里云搭建 Halo 个人博客
 
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/9071e42eab7b13178362c8d6a22abdc1-a72fe6.jpg)
+
 # 前言
 
 构建一个博客大概可以分成两个纬度:
 
-* 构建工具, 或者说是生成工具
+* 构建工具, 或者说是生成工具, 需要考虑它的易操作性, 生态等因素
 * 云平台, 用于部署以及运维博客
 
 > 当然你也可以通过平台能力托管一个, 比如  WordPress.
@@ -231,7 +233,7 @@ docker-compose up -d
 - `Domain Names` : 填我们 Halo 网站的域名, 首先记得做好 DNS 解析, 把域名绑定到我们的服务器的 IP 上
 - `Scheme` : 默认 `http` 即可, 除非你有自签名证书
 - `Forward Hostname/IP` : 填入服务器的 IP, 或者 Docker 容器内部的 IP(如果 NPM 和 Halo 搭建在同一台服务器上的话)
-    - Docker 内部 ip 可通过 ` ip addr show docker0 ` 命令查看
+  - Docker 内部 ip 可通过 ` ip addr show docker0 ` 命令查看
 - `Forward Port`: 填入 Halo 映射出的端口, 这边默认是 `8090`
 - `Cache Assets` : 缓存, 可以选择打开
 - `Block Common Exploits`:  阻止常见的漏洞, 可以选择打开
@@ -248,7 +250,7 @@ docker-compose up -d
 
 配置完成之后就可以通过域名访问博客啦~届时也可以选择将 NPM 后台隐藏起来, 比如将 81 端口不开放, 毕竟这玩意配置完之后基本也不会怎么变.
 
-也可以选择给 NPM 加个域名解析并配置 SSL, 我就是这么玩的:
+也可以选择给 NPM 加个域名解析并配置 SSL, 比如我就是这么玩的:
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/635dd120caa83ab36025fccd5cda43da-4427d8.png)
 
@@ -256,13 +258,13 @@ docker-compose up -d
 
 Halo 自带一个附件功能, 虽然可以上传图片, 但是其不建议把文章里面的图片也放上去, 建议存放到 OSS 中, 外加一个 CDN. 因为图片一般来说应该是不怎么会变的, 那么使用 CDN 去访问博客图片会比直接访问 OSS **实惠**, 并且通过 CDN 访问 OSS, 那么 OSS 的 Bucket 就不需要公开, 一定程度上起到保护作用.
 
-详细操作可以参考官网的最佳实践: [***CDN加速图文和视频类网站***](https://help.aliyun.com/zh/cdn/use-cases/accelerate-content-delivery-for-infographic-and-video-websites)
+详细操作可以参考官网的最佳实践: [***CDN加速图文和视频类网站***](https://help.aliyun.com/zh/cdn/use-cases/accelerate-content-delivery-for-infographic-and-video-websites), 大致流程如下图所示:
 
-如果需要证书, 可以直接到阿里云数字证书管理服务中**申请免费证书**, 每年可以申请**20**个:
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/f89be11c850e282f799a2e4d7c31352d-2dc09c.png)
+
+如果需要证书(比如 CDN 开启 SSL), 可以直接到[***阿里云数字证书管理服务***](https://yundun.console.aliyun.com/?p=cas#/overview/cn-hangzhou)中**申请免费证书**, 每年可以申请**20**个:
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/23cae7ac2ce4543d5aa8febfa379906f-c01ee8.png)
-
-
 
 **推荐组合使用流量包**:
 
@@ -270,18 +272,49 @@ Halo 自带一个附件功能, 虽然可以上传图片, 但是其不建议把�
 * CDN下行流量（中国内地）
 * 对象存储OSS资源包（包月）-标准存储包（中国内地）
 
+# 安全相关
 
+## 服务器安全建议
 
-# 安全分析
+* 关闭 root 用户账号密码登录, 阿里云 ECS 默认就是关闭的
+* 使用证书登录
+
+## 安全分析
 
 https://github.com/chaitin/xray
+
+# 技巧篇
+
+## PicGo 加速图片上传动作
+
+文章中的图片存放在 OSS 中, 如果不借助额外工具, 那么整个过成大概是这样的:
+
+1. 截图
+2. 重命名图片文件, 最好带个**随机字符**, 以免更换图片但文件名还是一样导致 CDN 拿到的还是**缓存**
+3. 图片压缩(可选), 如果图片几兆那么大, 压缩一下可以**节省** OSS 存储
+4. 打开 OSS 对应文件夹路径, 我一般习惯以文章英文名字作为存储该文章相关图片的文件夹名字
+5. 点击上传, 复制路径
+6. 在 Markdown 中粘贴图片链接, 并且修改成 CDN 的域名
+
+好家伙, 一顿操作猛如虎, 耗费两三分钟就为了上传一张图. 而 [***PicGo***](https://github.com/Molunerfinn/PicGo) 刚好就是一个用于快速上传图片并获取图片 URL 链接的工具, 不仅支持众多 OSS 平台, 还有丰富的插件提供.
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/5bfa8030fb1a581339cdf8f4764f6583-3c8bae.png)
+
+复制图片后快捷键 `Ctrl+Shift+P` 直接上传到 OSS 并且生成 Markdown 格式图片链接在粘贴板上, 直接 `Ctrl+V` 就能完成操作, 相比原始的操作, 时间直接**优化了 90%**!!
+另外再推荐两款插件:
+
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/166f21147cb1d7fe3cea830d85bc1984-2e0afa.png)
+
+* [***picgo-plugin-rename-file***](https://github.com/liuwave/picgo-plugin-rename-file): 可修改上传路径, 比如基于当前图片所在的文件夹路径作为 OSS 存放该图片的路径; 添加时间戳; 添加 MD5 或者随机字符
+  * 这是我的配置: `image/{localFolder:1}/{hash}-{rand:6}`
+* [***picgo-plugin-squoosh***](https://github.com/JolyneAnasui/picgo-plugin-squoosh): 上传前压缩图片
+  * 注意, 这个插件里还带了 MD5 重命名的功能, 如果用了其他重命名插件比如上面的 `picgo-plugin-rename-file` 就不要开启这个重命名的选项
+* 其他插件请参考: [***Awesome-PicGo***](https://github.com/PicGo/Awesome-PicGo)
 
 # 其他建议
 
 * 为确保可移植性, 最好使用 Markdown 格式编写文章, 方便以后想切换底层博客框架的时候文章不会那么难迁移.
 
-https://github.com/Molunerfinn/PicGo
+# TODO
 
-https://github.com/liuwave/picgo-plugin-rename-file
-
-https://github.com/JolyneAnasui/picgo-plugin-squoosh
+* Halo, MySQL, NPM 分别使用不用的 docker-compose, 并且使用相同的 external-network
