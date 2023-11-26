@@ -104,7 +104,7 @@ POST /products/_search
 * 特点
   * 会将输入进行分词, 然后每个词项进行底层的查询, 最终合并结果, 并为每个文档生成一个算分.
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/match-query-processing.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/match-query-processing.png)
 
 例子:
 
@@ -367,9 +367,9 @@ POST movies/_search
 * 打分的本质是排序, 需要把最符合用户需求文档排在前面, ES 5 之前, 默认的相关性算分
   采用 **TF-IDF**(Term Frequency-Inverse Document Frequency), 现在采用 **BM 25**(Best Match, 貌似是经过 25 次迭代调整之后得出的算法, 它也是基于 TF-IDF 进化来的).
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/es-tf-idf.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/es-tf-idf.png)
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/es-bm-25.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/es-bm-25.png)
 
 ## Boosting Query
 
@@ -652,7 +652,7 @@ POST news/_search
 
 ## Dis Max Query
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/dis-max-query-case.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/dis-max-query-case.png)
 
 先来看一个例子:
 
@@ -685,7 +685,7 @@ POST /blogs/_search
 
 我们期望是优先展示第二个文档, 因为目测文档二条件更为符合, 但结果却是:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/dis-max-query-result.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/dis-max-query-result.png)
 
 这是因为 bool should 算分策略导致的:
 
@@ -866,14 +866,14 @@ GET /titles/_search
  对于某些实体,例如人名, 地址, 图书信息. 需要在多个字段中确定信息, 单个字段只能作为整体
 的一部分, 希望在任何这些列出的字段中找到尽可能多的词.
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields01.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields01.png)
 
 * 无法使用用 Operator
 * 可以用 copy_to 解决, 但是需要额外的存储空间
 
 使用跨字段搜索:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields02.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/multi-match-cross-fields02.png)
 
 * 支持使用用 Operator
 * 与 copy_to,  相比, 其中一个优势就是它可以在搜索时为单个字段提升权重
@@ -1171,7 +1171,7 @@ POST /blogs/_search
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/function-score-factor.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/function-score-factor.png)
 
 `boost_mode` 可选:
 
@@ -1473,7 +1473,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 # 文档的存储
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-document-process.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/index-document-process.png)
 
 * 文档会存储在具体的某个主分片和副本分片上: 例如文档1, 会存储在 P0 和 R0 分片上
 * 文档路由算法: `shard = hash(_routing) % number_of_primary_shards`
@@ -1501,7 +1501,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 ## Lucene Index
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/index-lifecycle.png)
 
 * 在 Lucene 中, 单个倒排索引文件被称为 Segment, 多个 Segment 汇总在一起, 称为 Lucene的 Index
 * 当有新文档写入时,会生成新 Segment, 查询时会同时查询所有 Segments, 并且对结果汇总, Lucene 中有一个文件, 用来记录所有 Segments 信息, 叫做 Commit Point
@@ -1509,7 +1509,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 ## Refresh
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-refresh.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/index-lifecycle-refresh.png)
 
 * 将 Index buffer 写入 Segment 的过程叫 Refresh, Refresh 不执行 fsync 操作
 * Refresh 频率: 默认 1 秒发生一次,可通过 `index.refresh_interval` 配置. Refresh 后, 数据就可以被搜索到了, 这也是为什么Elasticsearch 被称为近实时搜索
@@ -1517,7 +1517,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 ## Transaction Log
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-transaction-log.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/index-lifecycle-transaction-log.png)
 
 * Segment 写入磁盘的过程**相对耗时**, 借助文件系统缓存, Refresh 时, 先将Segment 写入缓存以**开放查询**
 * 为了保证数据不会丢失, 所以在 Index 文档时, 同时写 Transaction Log, 高版本开始, Transaction Log 默认落盘, 每个分片有一个 Transaction Log
@@ -1525,7 +1525,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 ## Flush
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/index-lifecycle-flush.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/index-lifecycle-flush.png)
 
 * 调用 Refresh, Index Buffer 清空
 * 调用 fsync, 将缓存中的 Segments写入磁盘
@@ -1545,7 +1545,7 @@ GET /users,cluster1:users,cluster2:users/_search
 
 Elasticsearch 的搜索分为两个阶段: Query & Fetch
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/elasticsearch-query-and-fetch.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/elasticsearch-query-and-fetch.png)
 
 ## Query 阶段
 
@@ -1775,7 +1775,7 @@ POST /_search/scroll
 
 基本语法:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/aggregation-syntax.png )
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/aggregation-syntax.png )
 
 数据准备:
 
@@ -2068,7 +2068,7 @@ POST employees/_search
 
 应用场景: 对字段需要频繁地调用 aggregation, 并且写入也比较频繁.
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/term-performer.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/term-performer.png)
 
 参考: ***[tune-for-search-speed](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html)***
 
@@ -2590,7 +2590,7 @@ POST my_movies/_search
 
 上面搜索一个不存在的名字, 但却可以搜索出来, 这是因为扁平化存储的原因:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/nested-object1.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/nested-object1.png)
 
 可以使用 Nested Data Type 解决上述问题:
 

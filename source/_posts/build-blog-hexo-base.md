@@ -4,7 +4,7 @@ date: 2017-01-15 20:44:05
 categories: Hexo
 tags: [Hexo, Node.js, Github, Coding, Git]
 ---
-![](https://cdn.yangbingdong.com/img/build-hexo/hexoGoverment.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/hexoGoverment.png)
 
 # 前言
 搭建此博客的动机以及好处在此就不多谈了, 之前已经表达过, 详情请看*[Start My Blog Trip — Power By Hexo](/2017/hello-world/)*
@@ -84,7 +84,7 @@ npm安装, 一条命令即可解决
 ```
 curl http://npmjs.org/install.sh | sudo sh
 ```
-![](https://cdn.yangbingdong.com/img/build-hexo/version.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/version.png)
 
 博主安装Node.js遇到的问题就是多次安装了不同版本的Node.js, 有的是安装在用户变量上, 有的是系统变量, 所以每次用的时候都要切换到root用户, 就算赋权 `sudo chmod 777 file` 都没有用, 所以折腾了很久才把Node.js完全卸载, 再重新安装
 
@@ -96,7 +96,7 @@ sudo apt-get install git
 **windows**下就直接到*[Git官网](https://git-scm.com/download/win)* 下载安装即可
 
 然后终端执行 `git --version` 查看是否安装成功
-![](https://cdn.yangbingdong.com/img/build-hexo/git-version.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/git-version.png)
 
 
 # 安装Hexo
@@ -195,9 +195,9 @@ npm install  # 安装依赖包
 hexo g # 等同于hexo generate, 生成静态文件
 hexo s # 等同于hexo server, 在本地服务器运行
 ```
-![](https://cdn.yangbingdong.com/img/build-hexo/buildCmd.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/buildCmd.png)
 之后打开浏览器并输入IP地址 `http://localhost:4000/` 查看, 效果如下
-![](https://cdn.yangbingdong.com/img/build-hexo/helloWorld.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/helloWorld.png)
 
 ## 新建文章与页面
 ```
@@ -244,13 +244,13 @@ post_asset_folder: true
 
 ### 方式三
 使用*[七牛云储存](http://www.qiniu.com/)*, 因为Github跟Coding项目容量有限, 而且Github的主机在国外, 访问速度较慢, 把图片放在国内的图床上是个更好的选择, 免费用户实名审核之后, 新建空间, 专门用来放置博客上引用的资源, 进入空间后点击「内容管理」, 再点击「上传」
-![](https://cdn.yangbingdong.com/uploadImg.png)
+![](https://oldcdn.yangbingdong.com/uploadImg.png)
 
 上传完成之后点击关闭回到管理页面, 选中刚上传的图片, 最右边的操作点击复制链接即可
-![](https://cdn.yangbingdong.com/img/build-hexo/copyUrl.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/copyUrl.png)
 然后在博文中通过地址引用
 ```
-![](图片地址如: https://cdn.yangbingdong.com/img/build-hexo/copyUrl.png)
+![](图片地址如: https://oldcdn.yangbingdong.com/img/build-hexo/copyUrl.png)
 ```
 
 ## 简单的命令
@@ -267,7 +267,7 @@ hexo d # 等于hexo deploy # 部署, 可与hexo g合并为 hexo d -g
 
 # 安装主题（以NexT为例）
 更多主题请看***[知乎专栏](https://www.zhihu.com/question/24422335)***
-![](https://cdn.yangbingdong.com/img/build-hexo/scheme.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/scheme.png)
 ## 复制主题
 Hexo 安装主题的方式非常简单, 只需要将主题文件拷贝至站点目录的 `themes` 目录下, 然后修改下配置文件即可
 在这我们使用git克隆最新版
@@ -319,9 +319,9 @@ scheme: Muse
 
 ### 创建Repository(Github Pages)
 Repository相当于一个仓库, 用来放置你的代码文件. 首先, 登陆进入*[Github](https://github.com/)*, 选择首页中的 `New repository` 按钮
-![](https://cdn.yangbingdong.com/img/build-hexo/newRepo.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/newRepo.png)
 创建时, 只需要填写Repository name即可, 可以顺便创建README文件, 就是红色那个钩, 当然这个名字的格式必须为`{user_name}.github.io`, 其中`{user_name}`**必须**与你的用户名一样, 这是github pages的**特殊命名规范**, 如下图请忽视红色警告, 那是因为博主已经有了一个pages项目
-![](https://cdn.yangbingdong.com/img/build-hexo/createRepo.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/createRepo.png)
 
 ## Coding
 ### 注册Coding帐号
@@ -329,9 +329,9 @@ Repository相当于一个仓库, 用来放置你的代码文件. 首先, 登陆�
 ### 创建项目(Coding Pages)
 Coding Pages请看 *[Coding Pages](https://coding.net/help/doc/pages/index.html)*
 注册之后进入主页, 点击项目, 点击**+**, 项目名为你的用户名
-![](https://cdn.yangbingdong.com/img/build-hexo/createCoding.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/createCoding.png)
 查看Pages 服务是否开启: 点击项目 -> 代码 -> Pages 服务, 若没有开启则点开启
-![](https://cdn.yangbingdong.com/img/build-hexo/codingPage.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/codingPage.png)
 
 
 # 配置SSH与Git
@@ -344,10 +344,10 @@ ssh-keygen -t rsa -C your_email@youremail.com
 后面的 `your_email@youremail.com` 改为你的邮箱, 之后会要求确认路径和输入密码, 我们这使用默认的一路回车就行. 成功的话会在~/下生成 `.ssh` 文件夹, 进去, 打开 `id_rsa.pub`, 复制里面的key, 粗暴点就是 Ctrl+a 然后 Ctrl+c
 ## 添加SSH Key
 首先是Github, 登录Github, 右上角 头像 -> `Settings` —> `SSH nd GPG keys` —> `New SSH key` . 把公钥粘贴到key中, 填好title并点击 `Add SSH key`
-![](https://cdn.yangbingdong.com/img/build-hexo/githubSSH.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/githubSSH.png)
 
 至于Coding, 登录进入主页, 点击 `账户` —> `SSH公钥` —> 输入key再点击 `添加`
-![](https://cdn.yangbingdong.com/img/build-hexo/codingSSH.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/codingSSH.png)
 
 ## 验证成功与否
 验证github
@@ -392,7 +392,7 @@ hexo g
 hexo d
 ```
 稍等片刻, 可能会由于环境、网络等原因, 部署的时间会有偏差, 有的人快有的慢
-![](https://cdn.yangbingdong.com/img/build-hexo/deploy.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/deploy.png)
 部署完成后可在浏览器输入 `yourName.github.io` 或者 `yourName.coding.me` 都可以浏览到一个属于自己的博客了 ～
 
 # 绑定自定义域名开启Https
@@ -404,7 +404,7 @@ hexo d
 
 在代码中找到Pages服务: 
 
-![](https://cdn.yangbingdong.com/img/build-hexo/coding-encrypt.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/coding-encrypt.png)
 
 要注意的是需要**按照提示添加CHAME记录**, 比如博主的是`ookamiantd.coding.me`, 检验成功后才可绑定成功. 
 
@@ -413,11 +413,11 @@ hexo d
 * 跟Coding一样, 需要添加CHAME记录, 记录值为对应的Pages域名, 比如博主的是`masteranthoneyd.github.io`
 * 除此之外还需要在网站根目录添加一个CHAME文件, 内容为你的自定义域名
 
-![](https://cdn.yangbingdong.com/img/build-hexo/github-encccrypt.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/github-encccrypt.png)
 
 效果图: 
 
-![](https://cdn.yangbingdong.com/img/build-hexo/green-lock.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/green-lock.png)
 
 至此, 境内外的小绿锁都开启了. 
 

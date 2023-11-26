@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot, AssertJ, JMH, Gatling, ContPerf]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-testing/java-testing.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-testing/java-testing.png)
 
 # Preface
 
@@ -858,7 +858,7 @@ JMHSample_08_DeadCode.measureRight    avgt    5  2.587 ± 0.081  ns/op
 
 ## Gatling 简介
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/gatling-logo.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/gatling-logo.png)
 
 Gatling 是一个功能强大的负载测试工具. 它是为易用性、可维护性和高性能而设计的. 
 
@@ -872,13 +872,13 @@ Gatling 是一个功能强大的负载测试工具. 它是为易用性、可维�
 
 1、进入 *[下载页面](https://gatling.io/download/)* 下载最新版本
 2、解压并进入 `$GATLING_HOME/bin` (`$GATLING_HOME`为解压目录), 运行`recorder.sh`
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/recorder1.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/recorder1.png)
 
 * 上图监听8000端口（若被占用请更换端口）, 需要在浏览器设置代理, 以FireFox为例: 
-  ![](https://cdn.yangbingdong.com/img/spring-boot-learning/firefox-proxy.jpg)
+  ![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/firefox-proxy.jpg)
 
 * `Output folder`为Scala脚本输出路径, 例如设置为 `/home/ybd/data/application/gatling-charts-highcharts-bundle-2.3.0/user-files/simulations`, 会在该路经下面生成一个`RecordedSimulation.scala`的文件（上面指定的Class Name）: 
-  ![](https://cdn.yangbingdong.com/img/spring-boot-learning/scala-script-location.jpg)
+  ![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/scala-script-location.jpg)
 
 
 3、点击`record`并在Firefox进行相应操作, 然后点击`Stop`, 会生成类似下面的脚本: 
@@ -913,9 +913,9 @@ class BasicSimulation extends Simulation {
 
 4、然后运行 `$GATLING_HOME/bin/gatling.sh`, 选择 `[0] RecordedSimulation`, 随后的几个选项直接回车即可生成测试结果: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/terminal-gatling-test1.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/terminal-gatling-test1.jpg)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/terminal-gatling-test2.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/terminal-gatling-test2.jpg)
 
 注意看上图最下面那一行, 就是生成测试结果的入口. 
 
@@ -925,13 +925,13 @@ class BasicSimulation extends Simulation {
 
 1、首先安装Scala插件: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/scala-plugin.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/scala-plugin.jpg)
 
 2、安装 scala SDK: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/add-scala-sdk02.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/add-scala-sdk02.jpg)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/add-scala-sdk01.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/add-scala-sdk01.jpg)
 
 3、编写测试脚本
 
@@ -1006,21 +1006,21 @@ class ApiGatlingSimulationTest extends Simulation {
 ```shell
 mvn gatling:execute
 ```
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/idea-gatling-test.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/idea-gatling-test.jpg)
 
 我们打开结果中的`index.html`: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/gatling-test-result1.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/gatling-test-result1.jpg)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/gatling-test-result2.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/gatling-test-result2.jpg)
 
 ## 遇到问题
 
 途中出现了以下错误
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/gatling-error1.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/gatling-error1.jpg)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/gatling-error2.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/gatling-error2.jpg)
 
 这是由于**使用了Log4J2**, 把Gatling自带的Logback排除了（同一个项目）, 把`<exclusions>`这一段注释掉就没问题了: 
 

@@ -5,7 +5,7 @@ categories: [Programming, Java, Design Pattern]
 tags: [Java, Design Pattern]
 ---
 
-![](https://cdn.yangbingdong.com/img/design-pattern/design-pattern-creation.jpg)
+![](https://oldcdn.yangbingdong.com/img/design-pattern/design-pattern-creation.jpg)
 
 # Preface
 
@@ -21,7 +21,7 @@ tags: [Java, Design Pattern]
 
 
 
-![](https://cdn.yangbingdong.com/img/design-pattern-creational/singleton.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-creational/singleton.png)
 
 这么说吧, 一个城市只能有一个市长, 每当需要他的时候他总会出现, 并且每次都是同一个人. 总不能一个城市有两个市长吧？
 那么单例模式就是保证一个类只有一个实例化对象, 并提供一个全局访问入口. 
@@ -308,7 +308,7 @@ class Runtime {
 
 # Simple Factory Pattern
 
-![](https://cdn.yangbingdong.com/img/design-pattern-creational/simple-factory.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-creational/simple-factory.png)
 
 简单工厂模式又被称为**静态工厂方法模式**, 由**一个**工厂类根据传入的参数, 动态决定应该创建哪一个产品类（这些产品类继承自一个父类或接口）的实例. 
 
@@ -440,7 +440,7 @@ java.text.NumberFormat - getInstance(Locale inLocale)
 
 # Factory Method
 
-![](https://cdn.yangbingdong.com/img/design-pattern-creational/factory-method.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-creational/factory-method.png)
 
 工厂方法模式, 又称工厂模式、多态工厂模式和虚拟构造器模式, 通过定义工厂父类负责定义创建对象的公共接口, 而子类则负责生成具体的对象. 就是一个工厂生产一个专一产品. 
 
@@ -524,7 +524,7 @@ I'm woman!
 
 # Abstract Factory
 
-![](https://cdn.yangbingdong.com/img/design-pattern-creational/abstract-factory.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-creational/abstract-factory.png)
 
 抽象工厂模式为创建一组对象提供了一种解决方案. 与工厂方法模式相比, 抽象工厂模式中的具体工厂不只是创建一种产品, 它负责创建一族产品. 比如AMD工厂负责生产AMD全家桶, Intel工厂负责生产Intel全家桶. 
 

@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring, Spring Boot]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
 
 # Preface
 
@@ -31,7 +31,7 @@ tags: [Java, Spring, Spring Boot]
 
 ## 父工程
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/parent.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/parent.png)
 
 *[https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml](https://github.com/masteranthoneyd/spring-boot-learning/blob/master/spring-boot-parent/pom.xml)*
 
@@ -70,7 +70,7 @@ tags: [Java, Spring, Spring Boot]
 
 打包之后会发现有**两个**jar, 一个是本身的代码, 一个是集成了Spring Boot的可运行jar: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/repackage.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/repackage.png)
 
 ## 打包依赖了Spring Boot的工具库
 
@@ -445,11 +445,11 @@ spring.devtools.remote.secret-header-name=X-AUTH-TOKEN # HTTP header used to tra
 
 （1）**File-Settings-Compiler-Build Project automatically**
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools01.png)
 
 （2）**ctrl + shift + alt + /,选择Registry,勾上 Compiler autoMake allow when app running**
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-devtools02.png)
 
 OK了, 重启一下项目, 然后改一下类里面的内容, IDEA就会自动去make了. 
 
@@ -468,11 +468,11 @@ OK了, 重启一下项目, 然后改一下类里面的内容, IDEA就会自动�
 
 Tomcat:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/tomcat-gatling-test.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/tomcat-gatling-test.jpg)
 
 Undertow:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/undertow-gatling-test.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/undertow-gatling-test.jpg)
 
 显然Undertow的吞吐量要比Tomcat高
 
@@ -868,7 +868,7 @@ public class ProdSyncLayerApplication implements ApplicationRunner,CommandLineRu
 
 # Spring Bean生命周期
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-bean-process.webp)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-bean-process.webp)
 
 ```
 实例化
@@ -989,7 +989,7 @@ public class ExampleController {
 
 **引入依赖程序将自动启用AOP**, 只要引入了AOP依赖后, 默认已经增加了`@EnableAspectJAutoProxy`, 并且默认启用**Cglib**代理: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-cglib-default.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-cglib-default.png)
 
 ## AOP顺序
 
@@ -1064,7 +1064,7 @@ public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
 
 看一下有哪些方法重载: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-reg-bean.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-reg-bean.png)
 
 注入`GenericWebApplicationContext`: 
 
@@ -1178,7 +1178,7 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 
 这个注解实现的功能已经比较底层了, 调试看看上面的register方法什么会被调用: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code.png)
 
 调用参数中的`packageNames`数组中仅包含一个值: `com.example.demo`, 也就是项目的root package名. 
 
@@ -1196,7 +1196,7 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 
 它的类图如下所示: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-code02.png)
 
 可以发现它除了实现几个Aware类接口外, 最关键的就是实现了`DeferredImportSelector`(继承自`ImportSelector`)接口. 
 

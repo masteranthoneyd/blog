@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Blockchain, Java]
 ---
 
-![](https://cdn.yangbingdong.com/img/blockchain/blockchain.jpg)
+![](https://oldcdn.yangbingdong.com/img/blockchain/blockchain.jpg)
 
 # Preface
 
@@ -76,7 +76,7 @@ tags: [Blockchain, Java]
 
 大体就长这样: 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain01.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain01.webp)
 
 是不是很熟悉, 链表. 
 
@@ -210,7 +210,7 @@ public static void main(String[] args) {
 
 输出结果如下: 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain02.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain02.webp)
 
 *`hash`值是不一样的, 因为每个`block`的时间戳不同. *
 
@@ -234,7 +234,7 @@ public static void main(String[] args) {
 
 现在看起来就比较紧凑了, 也像个区块链的样子了: 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain03.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain03.webp)
 
 ## **检查区块链的完整性**
 
@@ -394,7 +394,7 @@ public class Block {
 
 执行main, 输出如下: 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain04.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain04.webp)
 
 挖掘每一个块都需要一些时间, 大概3秒钟. 你可以调整难度, 看看是如何影响挖矿时间的. 
 
@@ -444,7 +444,7 @@ public class Block {
 
 在加密货币（crypto-currencies）中, 货币所有权被作为交易（transaction）在区块链上进行转移, 参与者有一个收发资金的地址. 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain5.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain5.webp)
 
 好, 现在让我们创建一个钱包（Wallet）来持有`pubkey`和`private key`: 
 
@@ -468,7 +468,7 @@ public class Wallet {
 
 可以与其他人共享这个公钥, 来接受支付. 我们的私钥是用来签署（`sign`）我们的交易（`transaction`）, 所以除了私钥（`private key`）的所有者, 没有人可以花我们的钱. 用户将不得不对自己的私钥保密！我们还将公钥与交易（`transaction`）一起发送, 它可以用来验证我们的签名是否有效, 并且数据没有被篡改. 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain06.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain06.webp)
 
 *私钥用于对我们不希望被篡改的数据进行签名. 公钥用于验证签名. *
 
@@ -678,7 +678,7 @@ public class NoobChain {
 
 输出:
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain07.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain07.webp)
 
 嗯, 签名验证是`true`, 符合期望. 
 
@@ -803,7 +803,7 @@ public boolean processTransaction() {
 
 重要的是, 在最后, 我们从UTXO的列表中删除`input`, 这意味着交易输出只能作为一个输入使用一次…而且必须使用完整的输入值, 因为发送方要将“更改”返回给自己. 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain08.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain08.webp)
 
 红色箭头是输出. 请注意, 绿色输入是对以前输出的引用. 
 
@@ -1161,7 +1161,7 @@ public class ImportChain {
 
 运行结果: 
 
-![img](https://cdn.yangbingdong.com/img/blockchain/blockchain09.webp)
+![img](https://oldcdn.yangbingdong.com/img/blockchain/blockchain09.webp)
 
 > 代码链接: ***[https://github.com/importsource/blockchain-samples-transaction/tree/master](https://github.com/importsource/blockchain-samples-transaction/tree/master)***
 > 

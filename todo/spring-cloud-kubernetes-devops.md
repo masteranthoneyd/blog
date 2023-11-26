@@ -113,7 +113,7 @@ spring:
       ddl-auto: update
 ```
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/nacos.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/nacos.png)
 
 # Spring Boot Actuator
 
@@ -282,7 +282,7 @@ ADD $PROJECT_NAME /app.jar
 
 执行 `mvn package` 后:
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/mvn-package-render-dockerfile.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/mvn-package-render-dockerfile.png)
 
 ### 构建并推送
 
@@ -452,7 +452,7 @@ services:
       API_ENDPOINT: 'http://192.168.0.55:8080'
 ```
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/simple-verify.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/simple-verify.png)
 
 # 部署到 Kubernetes 中
 
@@ -764,7 +764,7 @@ spec:
 
 访问域名
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/site-k8s-verify.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/site-k8s-verify.png)
 
 # 使用 Helm 部署应用
 
@@ -1124,7 +1124,7 @@ helm install -f global.yaml -n prod polls/ --generate-name
 
 # 使用 Argocd 实践 GitOps
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/argocd.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/argocd.png)
 
 ## Argocd 安装
 
@@ -1137,7 +1137,7 @@ vi install.yaml
 - --insecure
 ```
 
-![](https://cdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/argocd-install.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-spring-cloud-ci-cd/argocd-install.png)
 
 安装:
 

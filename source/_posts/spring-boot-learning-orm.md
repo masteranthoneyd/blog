@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-data-learning.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-data-learning.png)
 
 # Preface
 
@@ -636,19 +636,19 @@ spring:
 
 Spring事务的核心部分在 `TransactionInterceptor#invoke`, `TransactionInterceptor` 继承了 `TransactionAspectSupport`, `TransactionAspectSupport` 使用 `AbstractPlatformTransactionManager` 的实现类操作事务. `AbstractPlatformTransactionManager` 中的 `processCommit` 以及  `processRollback` 中的几个节点会调用到 `TransactionSynchronizationUtils` 中的一些方法: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx01.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx02.png)
 
 这些被trigger的类就是 `TransactionSynchronization` 的实现类.
 
 `TransactionSynchronizationUtils` 通过 `TransactionSynchronizationManager#getSynchronizations` 来获取 `TransactionSynchronization` 列表, 而 `TransactionSynchronizationManager` 是通过 `ThreadLocal` 来管理这些类的:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx03.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx03.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx04.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx04.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
 
 示例:
 
@@ -851,11 +851,11 @@ public class UserTransactionEventListener {
 
 通过上面的 `TransactionSynchronizationManager` 可以发现定义了很多 `ThreadLocal`:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx05.png)
 
 可以看到变量中有一个 `actualTransactionActive` 以及 `currentTransactionReadOnly`, 通过这两个变量可以判断当前是否在事务当中, Spring很多代码中也是通过这个来判断的, 比如 `RedisConnectionUtils#isActualNonReadonlyTransactionActive` :
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/spring-tx06.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/spring-tx06.png)
 
 # 对象映射
 

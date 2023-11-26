@@ -5,7 +5,7 @@ categories: Java
 tags: [Java, Weixin]
 ---
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-banner.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-banner.png)
 
 # Preface
 
@@ -97,17 +97,17 @@ public class WxController {
 
 进入微信公众号平台, 在左边最下面找到**开发** -> **基本配置**:
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting-bar.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting-bar.png)
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting.png)
 
 点击修改配置, 并填入 URL:
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting-server.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-setting-server.png)
 
 点击提交, 此时微信会发送 GET 请求到服务器:
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-server-verify.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-server-verify.png)
 
 至此, 自己的服务器已接入微信公众号平台.
 
@@ -115,7 +115,7 @@ public class WxController {
 
 接收微信的推送事件需要将服务器配置**启用**, 否则会无法收到事件推送.
 
-![](https://cdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-enable-server.png)
+![](https://oldcdn.yangbingdong.com/img/weixin-dev/weixin-mp-dev-enable-server.png)
 
 ## 配置白名单
 

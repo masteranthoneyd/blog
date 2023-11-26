@@ -4,7 +4,7 @@ date: 2017-02-21 23:07:34
 categories: Hexo
 tags: [Hexo, Node.js, Github, Coding, Git]
 ---
-![](https://cdn.yangbingdong.com/img/build-hexo/next.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/next.png)
 # 前言
 好久没更新了, 因为懒- -
 前面介绍了Hexo的一些基本搭建→***[基于Hexo+github+coding搭建个人博客——基础篇(从菜鸟到放弃)](/2017/build-blog-hexo-base/)***
@@ -19,12 +19,12 @@ tags: [Hexo, Node.js, Github, Coding, Git]
 
 # 高度定制优化篇
 ## 集成Mod分享组件
-![](https://cdn.yangbingdong.com/img/build-hexo/share-mod.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/share-mod.png)
 
 Step1、获取 AppKey
 在 *[Mob](http://www.mob.com/)* 注册账号后, 点击头像进入后台, 选择 `shareSDK` 添加一个 `Web应用`: 
 
-![](https://cdn.yangbingdong.com/img/build-hexo/mod-share.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/mod-share.png)
 
 Step2、在**主题配置文件**中添加配置: 
 ```
@@ -283,7 +283,7 @@ var disqus = {
 
 ## NexT启用Disqus-Proxy 不翻墙也能使用Disqus
 
-![](https://cdn.yangbingdong.com/img/disqus-proxy/disqus-proxy.png)
+![](https://oldcdn.yangbingdong.com/img/disqus-proxy/disqus-proxy.png)
 
 > 多说于2017.06.01停止了服务, 不得不选择其他的第三方评论服务, 试了一下国内的服务发现不是麻烦（例如需要备案）就是不靠谱或者界面不炫酷（装X嫌疑...）
 >
@@ -298,10 +298,10 @@ var disqus = {
 
 ### Get Api-secret 
 `api-secret` 需要你在 ***[Disqus Api](https://disqus.com/api/applications/)*** 的官方网站上开启 **API** 权限, 申请成功后会得到这个秘钥. 
-![](https://cdn.yangbingdong.com/img/disqus-proxy/disqus-api-applcation.png)
+![](https://oldcdn.yangbingdong.com/img/disqus-proxy/disqus-api-applcation.png)
 
 并且需要在后台的 `Settings` => `Community` 里开启访客评论: 
-![](https://cdn.yangbingdong.com/img/disqus-proxy/disqus-admin-setting.png)
+![](https://oldcdn.yangbingdong.com/img/disqus-proxy/disqus-admin-setting.png)
 
 ### Deploy Disqus-Proxy
 
@@ -448,9 +448,9 @@ image_minifier:
 ### Show
 
 这是翻墙状态: 
-![](https://cdn.yangbingdong.com/img/disqus-proxy/comment02.png)
+![](https://oldcdn.yangbingdong.com/img/disqus-proxy/comment02.png)
 这是`disqus_proxy`: 
-![](https://cdn.yangbingdong.com/img/disqus-proxy/comment01.png)
+![](https://oldcdn.yangbingdong.com/img/disqus-proxy/comment01.png)
 
 ## 修改文章页宽
 
@@ -656,7 +656,7 @@ canvas_nest: true
 
 ## 鼠标点击爆炸特效
 
-![](https://cdn.yangbingdong.com/img/build-hexo/hexo-next-click-boom.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/hexo-next-click-boom.png)
 
 在 `themes/next/source/js/src` 新建js文件 `fireworks.js`:
 
@@ -889,10 +889,10 @@ npm install hexo-wordcount --save
 ## 修改footer
 
 修改之后的样子大概是这样的: 
-![](https://cdn.yangbingdong.com/img/build-hexo/result.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/result.png)
 
 1、找到 `\themes\next\layout\partials\`下面的`footer.swig`文件, 打开会发现, 如下图的语句: 
-![](https://cdn.yangbingdong.com/img/build-hexo/footer.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/footer.png)
 
 - 第一个框 是下面侧栏的“日期❤ XXX”
   如果想像我一样加东西, 一定要在双大括号外面写. 如: `xxx{{config.author}}`,当然你要是想改彻底可以变量都删掉, 看个人意愿. 
@@ -903,7 +903,7 @@ npm install hexo-wordcount --save
 
 2、接下来, 处理剩余的中文信息. 找到这个地方`\themes\next\languages\` 下面的语言文件zh-Hans.yml（这里以中文为例, 有的习惯用英文的配置文件, 道理一样, 找对应位置即可）
 打开之后, 如图: 
-![](https://cdn.yangbingdong.com/img/build-hexo/languages.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/languages.png)
 
 ## 给博客添加吉祥物
 
@@ -911,7 +911,7 @@ npm install hexo-wordcount --save
 
 效果图: 
 
-![](https://cdn.yangbingdong.com/img/build-hexo/hexo-helper-live2d.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/hexo-helper-live2d.png)
 
 安装依赖: 
 
@@ -1045,14 +1045,14 @@ document.addEventListener('visibilitychange', function () {
 ## 定位元素
 用谷歌或者火狐浏览器打开博客页面, 按下F12进入调试
 先点击定位按钮, 然后选择元素, 然后在定位出来的样式进行修改, 调到自己喜欢的样子, 就像这样↓
-![](https://cdn.yangbingdong.com/img/build-hexo/yemiantiaoshi.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/yemiantiaoshi.png)
 
 ## 添加到样式文件
 打开`themes/next/source/css/_custom/custom.styl`, 把调试好的样式加进去, 保存后`Ctrl+F5`就能看到效果了, 前提是在本地运行的, 下面列出博主的一些自定义样式: 
 ```css
 // Custom styles.
 // 页面头部背景
-.header {  background:url(https://cdn.yangbingdong.com/img/header/header_background.jpg);}
+.header {  background:url(https://oldcdn.yangbingdong.com/img/header/header_background.jpg);}
 
 // 子标题
 .site-subtitle{ font-size: 15px; color: white; }
@@ -1581,9 +1581,9 @@ hexo d -g
 3. 完成验证
 
 就像这样↓
-![](https://cdn.yangbingdong.com/img/build-hexo/DNSjiexi.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/DNSjiexi.png)
 
-![](https://cdn.yangbingdong.com/img/build-hexo/baiduyanzheng.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/baiduyanzheng.png)
 
 ## 添加并提交sitemap
 安装hexo的`sitemap`网站地图生成插件:
@@ -1603,10 +1603,10 @@ baidusitemap:
 ```
 配置成功后, 会生成`sitemap.xml`和`baidusitemap.xml`, 前者适合提交给**谷歌搜素引擎**, 后者适合提交**百度搜索引擎**. 
 百度sitemap提交如下↓
-![](https://cdn.yangbingdong.com/img/build-hexo/sitemap.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/sitemap.png)
 
 验证成功之后就可以开始推送了, 这里说一下, Google的收录真的快的不要不要的, 第二天就能搜得到, 百度就不想说了, 不知道要等到猴年马月
-![](https://cdn.yangbingdong.com/img/build-hexo/GoogleSearch.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/GoogleSearch.png)
 
 ## 主动推送
 安装主动推送插件: 
@@ -1622,7 +1622,7 @@ baidu_url_submit:
   path: baidu_urls.txt ## 文本文档的地址, 新链接会保存在此文本文档里
 ```
 至于上面提到的`your_token`可在百度站长如下位置找到↓
-![](https://cdn.yangbingdong.com/img/build-hexo/baidutoken.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/baidutoken.png)
 其次, 记得查看`站点配置文件`中url的值, 必须包含是百度站长平台注册的域名（一般有www）, 比如:
 ```
 url: http://www.ookamiantd.top
@@ -1669,7 +1669,7 @@ Sitemap: http://blog.tangxiaozhu.com/sitemap.xml
 Sitemap: http://blog.tangxiaozhu.com/baidusitemap.xml
 ```
 然后到百度站长更新一下, 就像这样↓
-![](https://cdn.yangbingdong.com/img/build-hexo/robots.png)
+![](https://oldcdn.yangbingdong.com/img/build-hexo/robots.png)
 
 ## 修改文章链接
 hexo默认的文章链接形式为`domain/year/month/day/postname`, 默认就是一个四级`url`, 并且可能造成`url`过长, 对搜索引擎是十分不友好的, 我们可以改成`domain/postname`的形式. 编辑`站点配置文件`文件, 修改其中的`permalink`字段为`permalink: :title.html`即可. 

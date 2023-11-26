@@ -1,4 +1,4 @@
-![](https://cdn.yangbingdong.com/img%2Felasticsearch%2Fillustration-elasticsearch-heart.png)
+![](https://oldcdn.yangbingdong.com/img%2Felasticsearch%2Fillustration-elasticsearch-heart.png)
 
 > ***[Elasticsearch核心技术与实战](https://time.geekbang.org/course/intro/197)*** 笔记
 >
@@ -246,7 +246,7 @@ ENV https_proxy=
 
 ### 文档(Document)
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/elastcsearch-perspective.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/elastcsearch-perspective.png)
 
 * Elasticsearch 是**面向文档**的, 可理解为关系型数据库中的一行数据.
 * **JSON** 格式, 由字段组成, 每个字段都有对应**类型**(字符串/数值/布尔/日期/二进制/范围类型), 字段类型可以自己指定或者通过 Elasticsearch 自动推算.
@@ -254,7 +254,7 @@ ENV https_proxy=
 
 ### 元数据
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/meta-data.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/meta-data.png)
 
 元数据是用于标注文档的相关信息
 
@@ -267,7 +267,7 @@ ENV https_proxy=
 
 ### 索引
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/concept-of-index.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/concept-of-index.png)
 
 索引(Index)是文档的容器, 是一类文档的结合.
 
@@ -326,7 +326,7 @@ GET /_cat/indices?v&s=docs.count:desc
 
 ### 分片
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/concept-of-shard.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/concept-of-shard.png)
 
 分片又分为**主分片**(Primary Shard)以及**副本分片**(Replica Shard).
 
@@ -336,13 +336,13 @@ GET /_cat/indices?v&s=docs.count:desc
 * 副本分片: 解决数据的高可用问题, 是主分片的拷贝.
   * 副本分片数可以动态调整
   * 增加副本数, 可以一定程度提高服务的可用性(读取的吞吐)
-  * 需要集群具备故障转移的能力, 必须将索引的副本分片数设置为 1![](https://cdn.yangbingdong.com/img/elasticsearch/get-cluster-health.png)
+  * 需要集群具备故障转移的能力, 必须将索引的副本分片数设置为 1![](https://oldcdn.yangbingdong.com/img/elasticsearch/get-cluster-health.png)
 
 ### 脑裂问题
 
 Split-Brain, 分布式系统的经典网络问题, 当出现网络问题, 一个节点和其他节点无法连接:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/splite-brain.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/splite-brain.png)
 
 如何避免: 7.0 之前通过设置quorum(仲裁),只有在 Master eligible 节点数大于 quorum 时,才能
 进行选举
@@ -439,11 +439,11 @@ POST kibana_sample_data_ecommerce/_msearch
 
 ## 倒排索引入门
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/concept-inverted-index.png)
 
 正排索引与倒排索引:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index02.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/concept-inverted-index02.png)
 
 倒排索引分为两个部分:
 
@@ -457,7 +457,7 @@ POST kibana_sample_data_ecommerce/_msearch
 
 一个例子- Elasticsearch:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/concept-inverted-index03.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/concept-inverted-index03.png)
 
 > 每个 JSON 文档中的每个字段, 又有自己的倒排索引
 >
@@ -475,7 +475,7 @@ POST kibana_sample_data_ecommerce/_msearch
 * Tokenizer: 按照规则切分单词
 * Token Filter: 将切分的单词进行加工, 小写, 删除 stopwords, 增加同义词等)
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
 
 *[Elasticsearch 内置分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html)*:
 
@@ -552,15 +552,15 @@ Elasticsearch Search API 提供了 URI Search 以及 Request Body Search. 两者
 
 URI Search:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/uri-search-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/uri-search-demo.png)
 
 Request Body Search:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/request-body-search-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/request-body-search-demo.png)
 
 Response:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/search-response-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/search-response-demo.png)
 
 ## QueryDSL介绍
 
@@ -862,7 +862,7 @@ PUT my_index
 * Exact Value(精确值, 不会被分词): 包括数字/日期/具体的一个字符串(比如 Apple Store), 对应 ES 中的 keyword
 * Full Text(全文本, 默认会分词): 对应 ES 中的 text
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/exact-value-vs-full-value.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/exact-value-vs-full-value.png)
 
 ### 自定义分词器
 
@@ -1100,7 +1100,7 @@ GET my_index/_search?q=full_name:John
 
 什么是***[聚合](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)***? 那就是对数据进行一个分析统计.
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/aggs-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/aggs-demo.png)
 
 聚合主要分为四类:
 
@@ -1109,15 +1109,15 @@ GET my_index/_search?q=full_name:John
 * Pipeline Aggregation: 对其他的聚合结果进行二次聚合
 * Matrix Aggregation: 支持对多个字段的操作并提供一个结果矩阵
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-and-matrix.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/bucket-and-matrix.png)
 
 一个 Bucket 的例子:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/bucket-demo.png)
 
 支持嵌套:
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/bucket-nest-demo.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/bucket-nest-demo.png)
 
 ```
 #按照目的地进行分桶统计

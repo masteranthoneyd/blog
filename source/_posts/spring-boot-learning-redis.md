@@ -7,7 +7,7 @@ tags: [Redis, Spring Boot]
 
 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-redis/redis-logo.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-redis/redis-logo.png)
 
 # Preface
 
@@ -451,7 +451,7 @@ CONFIG GET dir
 
 效果图: 
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/rdr.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/rdr.png)
 
 # Spring Boot整合
 
@@ -528,7 +528,7 @@ CPU: I7-8700
 
 内存: 32G 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-redis/serialize-performance.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-redis/serialize-performance.png)
 
 * `Protostuff`不能直接序列化集合, 需要用包装类封装起来. 
 * `String`类型还是建议直接使用`StringRedisSerializer`, 速度最快. 
@@ -945,7 +945,7 @@ public final class DisruptorUtil {
 
 效果图: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-redis/redis-key-expire-disruptor.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-redis/redis-key-expire-disruptor.png)
 
 ## 缺点
 

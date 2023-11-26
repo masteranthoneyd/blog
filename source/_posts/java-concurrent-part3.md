@@ -6,7 +6,7 @@ tags: [Java, Concurrent]
 ---
 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part3-banner2.jpg)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-part3-banner2.jpg)
 
 # Preface
 
@@ -87,7 +87,7 @@ while (i.hasNext())
 
 上面提到的同步容器都是基于 `synchronized` 来实现的, 因此性能不高, 因此 Java 在 1.5 及之后版本提供了性能更高的容器, 我们一般称为并发容器. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-container01.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-container01.png)
 
 ### List
 
@@ -95,7 +95,7 @@ List 里面只有一个实现类就是 `CopyOnWriteArrayList`. CopyOnWrite, 顾�
 
 如果在遍历 `CopyOnWriteArrayList` 的同时, 还有一个写操作, `CopyOnWriteArrayList` 会将 array 复制一份, 然后在新复制处理的数组上执行增加元素的操作, 执行完之后再将 array 指向这个新的数组. 读写是可以并行的, 遍历操作一直都是基于原 array 执行, 而写操作则是基于新 array 进行:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-copyonwritelist.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-copyonwritelist.png)
 
 使用 `CopyOnWriteArrayList` 需要注意的“坑”主要有两个方面. 
 
@@ -108,7 +108,7 @@ Map 接口的两个实现是 `ConcurrentHashMap` 和 `ConcurrentSkipListMap`, �
 
 使用 `ConcurrentHashMap` 和 `ConcurrentSkipListMap` 需要注意的地方是, 它们的 key 和 value 都不能为空, 否则会抛出 `NullPointerException` 这个运行时异常, 因为在多线程环境下, 调用 `get(KEY)` 拿到的 null 值无法判断是设置进去的 null 还是被别的线程删除了.
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-map.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-map.png)
 
 `ConcurrentSkipListMap` 里面的 `SkipList` 本身就是一种数据结构, 中文一般都翻译为“跳表”, 以空间换时间. 跳表插入、删除、查询操作平均的时间复杂度是 `O(log n)`, 理论上和并发线程数没有关系, 所以在并发度非常高的情况下, 若对 `ConcurrentHashMap` 的性能还不满意, 可以尝试一下 `ConcurrentSkipListMap`. 
 
@@ -124,11 +124,11 @@ Java 并发包里面 Queue 这类并发容器是最复杂的, 你可以从以下
 
 第一, **单端阻塞队列**: 其实现有 `ArrayBlockingQueue`、`LinkedBlockingQueue`、`SynchronousQueue`、`LinkedTransferQueue`、`PriorityBlockingQueue` 和 `DelayQueue`. 内部一般会持有一个队列, 这个队列可以是数组(其实现是 `ArrayBlockingQueue`)也可以是链表(其实现是 `LinkedBlockingQueue`); 甚至还可以不持有队列(其实现是 `SynchronousQueue`), 此时生产者线程的入队操作必须等待消费者线程的出队操作. 而 `LinkedTransferQueue` 融合 `LinkedBlockingQueue` 和 `SynchronousQueue` 的功能, 性能比 `LinkedBlockingQueue` 更好; `PriorityBlockingQueue` 支持按照优先级出队; `DelayQueue` 支持延时出队. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-queue01.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-queue01.png)
 
 第二, **双端阻塞队列**: 其实现是 `LinkedBlockingDeque`. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-queue02.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-queue02.png)
 
 第三, **单端非阻塞队列**: 其实现是 `ConcurrentLinkedQueue`. 
 
@@ -144,7 +144,7 @@ CAS 指令包含 3 个参数: 共享变量的内存地址 A、用于比较的值
 
 Java SDK 并发包里提供的原子类内容很丰富, 我们可以将它们分为五个类别: **原子化的基本数据类型**、**原子化的对象引用类型**、**原子化数组**、**原子化对象属性更新器**和**原子化的累加器**. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-atomic-family.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-atomic-family.png)
 
 ## 原子化的基本数据类型
 

@@ -5,7 +5,7 @@ categories: [Programming, Java, Concurrent]
 tags: [Java, Concurrent]
 ---
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-lock-condition-banner.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-lock-condition-banner.png)
 
 # Preface
 
@@ -207,7 +207,7 @@ public class BlockedQueue<T>{
 
 **一个计数器, 一个等待队列, 三个方法. **
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-semaphore-module.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-semaphore-module.png)
 
 * `init()`: 设置计数器的初始值. 
 * `down()`: 计数器的值减 1; 如果此时计数器的值小于 0, 则当前线程将被阻塞, 否则当前线程可以继续执行. 
@@ -542,7 +542,7 @@ useThreadMemoryVarables();              // 使用线程本地堆栈里面的数�
 
 举个例子就是做一个对账功能, 首先查询订单, 然后查询派送单, 之后对比订单和派送单, 将差异写入差异库:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch01.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch01.png)
 
 抽象代码如下:
 
@@ -561,11 +561,11 @@ while(存在未对账订单){
 
 执行流程是这样的:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch02.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch02.png)
 
 其实 `getPOrders()` 与 `getDOrders()` 是可以并行执行的:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch03.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch03.png)
 
 这时候可以使用 `CountDownLatch` 来实现:
 
@@ -626,15 +626,15 @@ while(存在未对账订单){
 
 想一想, 还能再优化吗? 我们将 `getPOrders()` 和 `getDOrders()` 这两个查询操作并行了, 但这两个查询操作和对账操作 `check()`、`save()` 之间还是串行的. 很显然, 这两个查询操作和对账操作也是可以并行的, 也就是说, 在执行对账操作的时候, 可以同时去执行下一轮的查询操作:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch04.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch04.png)
 
 两次查询操作能够和对账操作并行, 对账操作还依赖查询操作的结果, 这明显有点生产者 - 消费者的意思. 那么需要两个队列, 并且两个队列的元素之间还有对应关系:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch05.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch05.png)
 
 但线程 T1 和线程 T2 的工作要步调一致, 不能一个跑得太快, 一个跑得太慢, 只有这样才能做到各自生产完 1 条数据的时候, 通知线程 T3. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch06.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-countdownlatch06.png)
 
 这时候 `CyclicBarrier` 就派上用场了:
 

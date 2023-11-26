@@ -1,6 +1,6 @@
 # 数据建模
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/mapping-design01.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/mapping-design01.png)
 
 > 文档: ***[mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)***
 
@@ -169,7 +169,7 @@ PUT /blogs_index/
 
 # 搜索选择
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/search-method-choose01.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/search-method-choose01.png)
 
 # 性能优化
 
@@ -207,7 +207,7 @@ PUT /blogs_index/
 
 > ***[https://github.com/medcl/elasticsearch-analysis-ik](https://github.com/medcl/elasticsearch-analysis-ik)***
 
-![](https://cdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
+![](https://oldcdn.yangbingdong.com/img/elasticsearch/analyzer-component.png)
 
 ## 安装
 

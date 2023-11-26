@@ -4,7 +4,7 @@ date: 2017-01-20 11:31:22
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu,IDE,JDK,Tomcat]
 ---
-![](https://cdn.yangbingdong.com/img/javaDevEnv/maxresdefault.jpg)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/maxresdefault.jpg)
 
 # 前言
 
@@ -113,13 +113,13 @@ source /etc/profile.d/jdk.sh
 java -version
 javac -version
 ```
-![](https://cdn.yangbingdong.com/img/javaDevEnv/javaVersion.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/javaVersion.png)
 
 # Scala
 
 * 下载 ***[官方 SDK](http://www.scala-lang.org/download/)***
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/scala-download.jpg)
 
 * 解压到 `/usr/local` 目录, 并创建软链接为 `scala` 
 
@@ -137,7 +137,7 @@ source /etc/profile.d/scala.sh
 scala -version
 ```
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/source-scala.jpg)
 
 # Groovy
 
@@ -262,7 +262,7 @@ MyEclipse安装请看: ***[Ubuntu16.04下MyEclipse安装与破解](/2017/ubuntu-
 
 ### 安装
 通过官方提供的 ***[Toolbox App](http://www.jetbrains.com/toolbox/app)*** 进行安装, 可以很方便地进行版本管理:
-![](https://cdn.yangbingdong.com/img/javaDevEnv/idea.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/idea.png)
 
 ### 部署Tomcat
 
@@ -303,7 +303,7 @@ sudo apt-get install mysql-client
 mysql -h 127.0.0.1 -P 3306 -u root -p
 ```
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/mysqlStartup.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/mysqlStartup.png)
 
 ## 手动折腾安装
 
@@ -463,7 +463,7 @@ Query OK, 0 rows affected (0.01 sec)
 
 ### 如果登录mysql出现以下错误
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/mysql-problom.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/mysql-problom.png)
 **则可能配置未加载或服务未启动, 请重启系统, 然后启动mysql服务**
 ```
 sudo service mysql start
@@ -503,7 +503,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 这个一个智能补全并且高亮语法的终端客户端 ***[mycli](https://github.com/dbcli/mycli)***
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
 
 安装: 
 
@@ -639,7 +639,7 @@ Options:
 
 9. 如果不出意外, 你会得到一个看似用Base64编码的激活码. 直接复制它, 并把它粘贴到Navicat的`手动激活`窗口, 最后点`激活`按钮. 如果没什么意外的话应该能成功激活. 
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
 #### 创建快捷方式
 
@@ -749,7 +749,7 @@ sudo apt-get install -y mongodb-org
 ```
 mongo -version
 ```
-![](https://cdn.yangbingdong.com/img/mongodb/mongodb-version.png)
+![](https://oldcdn.yangbingdong.com/img/mongodb/mongodb-version.png)
 
 启动、重新启动和关闭mongodb命令:
 ```
@@ -810,7 +810,7 @@ docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 --restart=always rabbi
 
 浏览器打开`localhost:15673`, 默认帐号密码都是`guest`
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/rabbitmq.png)
 
 集群: [https://www.jianshu.com/p/624871c646b9](https://www.jianshu.com/p/624871c646b9)
 

@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-logo.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/jpa-logo.png)
 
 # Preface
 
@@ -15,7 +15,7 @@ tags: [Java, Spring Boot]
 
 # 结构图
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-struct.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/jpa-struct.png)
 
 # 配置
 
@@ -92,7 +92,7 @@ public Iterable<User> getAllUsersWithSort() {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/simple-jpa-repository-method.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/simple-jpa-repository-method.png)
 
 `JpaRepository` 的默认实现类是 `SimpleJpaRepository`, 可以看到提供了大部分通用的方法.
 
@@ -116,9 +116,9 @@ public Iterable<User> getAllUsersWithSort() {
 
 Spring Data 中有一套自己的方法命名查询规范, 一般是前缀 find…By、read…By、query…By、count…By 和 get…By等, `org.springframework.data.repository.query.parser.PartTree`:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/part-tree-class.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/part-tree-class.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/subject-class.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/subject-class.png)
 
 Ex:
 
@@ -278,7 +278,7 @@ for (Method method : queryMethods) {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/spring-boot-orm/jpa-defining-query-method-processing.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-orm/jpa-defining-query-method-processing.png)
 
 # 注解查询
 
@@ -1422,9 +1422,9 @@ utf8mb4 = 4 byte = 1 character
 
 使用AttributeConverter转换JSON字符串时，Hibernate执行insert之后再执行update
 
-![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-dirty01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-data/jpa-dirty01.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-data/jpa-dirty02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-data/jpa-dirty02.png)
 
 如上图，这是利用AOP实现的操作日志记录，使用`AttributeConverter`与Fastjson实现`ReqReceiveData`转换成JSON字符串，可以看到在执行insert之后接着执行了一次update，那是因为JSON字符串字段顺序居然发生了变化！
 

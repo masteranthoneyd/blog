@@ -1,6 +1,6 @@
 > 处理消息丢失问题
 
-![](https://cdn.yangbingdong.com/img/messagenoloss/message-no-loss.png)
+![](https://oldcdn.yangbingdong.com/img/messagenoloss/message-no-loss.png)
 
 防止消息丢失的套路大体流程:
 

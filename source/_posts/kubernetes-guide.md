@@ -7,7 +7,7 @@ tags: [Docker, Kubernetes, K8S]
 
 
 
-![](https://cdn.yangbingdong.com/img/k8s-learning/kubernetes-learning-banner.png)
+![](https://oldcdn.yangbingdong.com/img/k8s-learning/kubernetes-learning-banner.png)
 
 # Preface
 

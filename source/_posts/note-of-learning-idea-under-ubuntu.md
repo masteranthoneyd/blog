@@ -4,7 +4,7 @@ date: 2017-04-17 18:00:00
 categories: IDE
 tags: [Ubuntu, IDE]
 ---
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea2.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea2.png)
 # Preface
 > 公司里的大牛们用的IDE基本都是IDEA~~近墨者黑~~, 早就听闻IntelliJ IDEA这个大名, 只不过当初比较菜鸟还不会用(...虽然现在也还是个菜鸟=.=), 再不用就要被OUT了
 > 此篇把在Ubuntu下使用IDEA的学习经验记录下来(网上还是比较少资料解决Ubuntu下IDEA的问题Orz), 以便老了记性不好可以看一看...
@@ -16,28 +16,28 @@ tags: [Ubuntu, IDE]
 这样的好处是我们不用关心更新问题, 每次有新版本它都会提示, 我们是需要点一下`Install`就可以了, 不需要关心升级后的配置. 
 还有一个好处是可以管理其他的IntelliJ软件（虽然博主只用他们的IDEA = =）...
 安装的时候注意**配置安装路径**: 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-path.png)
 
 # Personal Setting
 
 博主的常用配置: 
 一般会选择打开项目时最外层的窗口打开`setting`, 对全局生效. 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting.png)
 
 ## 文件修改后, 设置左边目录出现颜色变化
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/version-control-change.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/version-control-change.png)
 
 ## 如果只有一行方法的代码默认要展开, 去掉这个勾
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/one-line-methods.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/one-line-methods.png)
 
 ## 修改字体和字号
 Ubuntu下默认的字体还是让人看了有点~~不爽~~, 而且使用Ubuntu默认的字体工具栏可能会出现乱码. 
 下面三个地方, 分别是窗口字体, 代码字体和控制台字体: 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-font.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-font.png)
 
 ## 修改VM参数
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-vm-setting.png)
 通过`Toolbox`可以简单地设置VM参数, 博主16G内存的主机的VM参数设置为
 ```
 -Xms512m
@@ -45,36 +45,36 @@ Ubuntu下默认的字体还是让人看了有点~~不爽~~, 而且使用Ubuntu�
 -XX:ReservedCodeCacheSize=500m
 ```
 ## 设置代码不区分大小写
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-comlpetion.png)
 
 ## 禁止 import *
 IDEA默认检测到有5个相同包就会自动`import *`, 其实没必要, 需要哪个就`import`哪个. 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/import-optimizing.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/import-optimizing.png)
 
 ## 设置不自动打开上一次最后关闭的项目
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/system-setting01.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/system-setting01.png)
 
 ## Postfix Completion
 这个本来就是默认开启的
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/postfix-completion.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/postfix-completion.png)
 
 ## 可生成SreializableID
 在 `setting>Editor>Inspections>Java>Serializtion Issues>`:
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/ger-serializtion.png)
 钩上之后在需要生成的类上`Alt+Enter`就会出现了. 
 
 ## 关闭代码拖拽功能
 一不小心手抖就改了代码...禁用！
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/dorp-function.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/dorp-function.png)
 
 ## 显示内存使用情况
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/show-memory.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/show-memory.png)
 点击内存信息展示的那个条可以进行部分的内存回收
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/menory.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/menory.png)
 
 
 ## 优化 Java 注释
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-optimize.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-optimize.png)
 
 ## 优化方法链
 在Java8中特别是使用Stream API, ex: 
@@ -83,9 +83,9 @@ list.stream().filter(func).distinct().skip(num).limit(num).map(func).peek(func).
 ```
 写成一行太长了！！
 勾上这个选项idea将自动帮我们优化: 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/code-style-method-chain.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/method-chain.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/method-chain.png)
 
 > 钩上 `Align when multiline` 可对其方法链
 
@@ -100,17 +100,17 @@ list = list.stream()
 
 ## 多线程自动编译
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/auto-compile.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/auto-compile.png)
 
 ## 设置统一编译JDK版本（关闭module JDK）
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-close-module-jdk.png)
 
 ## Tab 键改为4个空格
 
 > 代码规范会要求编程时使用4个空格缩进而不是tab, 因为不同编辑器下4个空格的宽度看起来是一致的, 而tab则长短可能会不一致。
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/tab-setting.png)
 
 ## 修改代码注释位置
 
@@ -118,23 +118,23 @@ list = list.stream()
 
 ## Maven 自动下载源码
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-auto-download-source.png)
 
 ## 自定义代码颜色
 
 ### 方法参数
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-prameter-color.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-prameter-color.png)
 
 ### 选择变量显示使用地方
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-select-color.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-change-select-color.png)
 
 ### 选中代码块的背景颜色
 
 Selection background:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/selection-background-color.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/selection-background-color.png)
 
 ## 修改快捷键
 
@@ -150,7 +150,7 @@ Selection background:
 
 导入:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/set-code-style.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/set-code-style.png)
 
 ### 使用 editorconfig 与 gitattributes
 
@@ -309,7 +309,7 @@ trim_trailing_whitespace = false
 
 IDEA 使用教程, 安装后在左上角会出现 Learn 的栏目, 可在其中进行学习.
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-learn.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-learn.png)
 
 ## RestfulToolkit
 
@@ -323,13 +323,13 @@ IDEA 使用教程, 安装后在左上角会出现 Learn 的栏目, 可在其中�
 
 1.首先在IDEA里面安装使用lombok编写简略风格代码的插件, 
 打开IDEA的Settings面板, 并选择Plugins选项, 然后点击 “Browse repositories..” 
-![](https://cdn.yangbingdong.com/img/lombok/installLombok01.png)
+![](https://oldcdn.yangbingdong.com/img/lombok/installLombok01.png)
 在输入框输入”lombok”, 得到搜索结果, 选择第二个, 点击安装, 然后安装提示重启IDEA, 安装成功; 
-![](https://cdn.yangbingdong.com/img/lombok/installLombok02.png)
+![](https://oldcdn.yangbingdong.com/img/lombok/installLombok02.png)
 
  还需要在IDEA中开启支持: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/annotation-support.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/annotation-support.png)
 
 2.在自己的项目里添加lombok的编译支持(maven项目),在pom文件里面添加如下
 indenpence
@@ -421,19 +421,19 @@ indenpence
 
 可以通过IDEA链接Docker API, 前提是开启了Docker API
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration01.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration01.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration02.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration02.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration03.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/docker-integration03.png)
 
 ## Zookeeper
 
 Zookeeper UI, 支持删除操作
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin1.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin1.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/zookeeper-plugin2.png)
 
 ## K8s工具：Kubernetes
 
@@ -443,11 +443,11 @@ Zookeeper UI, 支持删除操作
 
 复制一段JSON格式字符串
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format01.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format01.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format02.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format02.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format03.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/gson-format03.png)
 
 ## POJO to JSON
 
@@ -469,7 +469,7 @@ Zookeeper UI, 支持删除操作
 
 可以直接从Mapper文件跳转到xml: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/free-mybatis.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/free-mybatis.png)
 
 ## MyBatisCodeHelper-Pro
 
@@ -487,7 +487,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 ***[arthas-idea-plugin](https://github.com/WangJi92/arthas-idea-plugin)*** 可以结合 IDEA 生成多种 arthas 命令.
 
 ## FindBugs
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/find-bug.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/find-bug.png)
 装完之后右键最下面会多出一个`FindBugs`的选项
 
 ## Maven Helper
@@ -496,19 +496,19 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 安装之后, 打开`pom.xml`文件, 会看到多了一个Dependency Analyzer的面板, 点击可以进入分析面板: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper01.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper01.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper02.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper02.png)
 
 另外, 右键项目也会多两个Maven的bar: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper03.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper03.png)
 
 ## Statistic
 
 这个插件可以统计代码数量: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper04.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/maven-helper04.png)
 
 ## Stackoverflow
 
@@ -516,17 +516,17 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 重启后随便选中内容右键就可以看到
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-stackoverflow.png)
 
 ## Background Image Plus
 
 这是一个设置背景图的插件
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/background-image-plus.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/background-image-plus.png)
 
 **在 2020+ 版本中已经自带设置背景功能**:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/setting-background-image.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/setting-background-image.png)
 
 ## Translation
 
@@ -543,7 +543,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 它可以将测试名转化成一个句子, 一目了然地显示测试的内容. 这意味着当你在注视任何类的时候, Enso 都会展示其说明文档. 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-enso.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/plugin-enso.png)
 
 ## Rainbow Brackets
 
@@ -551,7 +551,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 这个可以实现配对括号相同颜色, 并且实现选中区域代码高亮的功能, 对增强写代码的有趣性和排错等都有一些帮助。
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/with-material-theme-ui.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/with-material-theme-ui.png)
 
 高亮效果:  Ctrl+鼠标右键单击
 
@@ -567,7 +567,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 安装完以后在 Other Settings 中配置 Checkstyle:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-2-configure.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-2-configure.png)
 
 利用 Checkstyle 进行 check: (3 种, 可以使用一种)
 
@@ -575,19 +575,19 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 - `Check All Modified file`
 - `Check Project`
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-3-usage.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/check-style-config-3-usage.png)
 
 ## Jclasslib
 
 > 这是一个查看Java字节码的插件
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jclasslib.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jclasslib.png)
 
 ## JOL
 
 > Java Object Layout, 查看Java对象大小的插件
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jol.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-plugin-jol.png)
 
 ## VisualVM Launcher
 
@@ -603,15 +603,15 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 个人觉得比较舒适的主题, 清新, 没有多余的花里胡哨.
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-cyan.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-cyan.png)
 
 ## Material Theme
 
 漂亮的主题插件, 内置了多种主题, 主题浏览: ***[https://www.material-theme.com/](https://www.material-theme.com/)***
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-oceanic.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-oceanic.png)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-github.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/theme-material-github.png)
 
 配置说明: ***[Material Theme UI详解](https://blog.csdn.net/zyx1260168395/article/details/102928172)***
 
@@ -626,7 +626,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 ## Atom Material Icons
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/atom-material-icons.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/atom-material-icons.png)
 
 # Skills
 
@@ -638,7 +638,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 若`Alt+V`没有设置快捷键, 可在`Keymap`中设置: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/keymap-view.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/keymap-view.png)
 
 退出: 使用`ALT+V`弹出view视图, 然后选择`Exit Presentation Mode` 即可. 
 
@@ -646,25 +646,25 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 如果使用`IDEA`在编写`JSON`字符串的时候, 然后要一个一个`\`去转义双引号的话, 就实在太不应该了, 又烦又容易出错. 在`IDEA`可以使用`Inject language`帮我们自动转义双引号. 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language.png)
 
 然后搜索`json`: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json.png)
 
 选择完后. 鼠标焦点自动会定位在双引号里面, 这个时候你再次使用`alt+enter`就可以看到 :
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-new.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-new.png)
 
 选中`Edit JSON Fragment`并回车, 就可以看到编辑`JSON`文件的视图了:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-result.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/inject-language-json-edit-result.png)
 
 ## 使用快捷键移动分割线
 
 有时候想要拖拉项目视图的分割线: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/project-view-hide.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/project-view-hide.png)
 
 可以先`alt+1`把鼠标焦点定位到`project`视图里, 然后直接使用`ctrl+shift+左右箭头`来移动分割线. 
 
@@ -674,7 +674,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 使用`alt+F1`, 弹出`Select in`视图, 然后选择`Project View`中的`Project`, 回车, 就可以立刻定位到类的位置了. 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/locate-project.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/locate-project.png)
 
 使用`esc`或者`F4`跳回代码. 
 
@@ -682,7 +682,7 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 变量后输入`.not`或者`.nn`: 
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/edit-notnull.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/edit-notnull.png)
 
 更多模板可查看设置中的`Postfix Completion`. 
 
@@ -690,15 +690,15 @@ Crack: ***[https://github.com/pengzhile/MyBatisCodeHelper-Pro-Crack](https://git
 
 使用`Ctrl + w`选中区域后按下`Ctrl + Shift + t`:
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/try-catch.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/try-catch.png)
 
 # VM Options
 
 可以通过ToolBox或IDEA选项里面设置
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption1.jpg)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption1.jpg)
 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/vmoption2.jpg)
 
 优化参数(32G内存): 
 
@@ -764,14 +764,14 @@ EOF
 
 **目前发现的快捷键冲突: **
 1、`Ctrl+Alt+方向`, 直接到系统设置里面改: 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-setting-keyboard.png)
 
 2、安装了搜狗之后, 按`Ctrl+Alt+B`会启动虚拟键盘, 所以在输入法里面打开Fcitx设置, 在附加组件里面, 点击高级, 再把虚拟键盘的选项去掉: 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/idea-sougou-conflict.png)
 然后注销或重启电脑. 
 
 3、`Ctrl+Alt+S`, 这个在键盘设置里面找了很久, 原来这玩意在输入法设置里面, 点开输入法全局配置, 把**显示高级选项**钩上, 就会看到很多快捷键, 我都把它们干掉了. 
-![](https://cdn.yangbingdong.com/img/learning-idea-under-ubuntu/shurufa.png)
+![](https://oldcdn.yangbingdong.com/img/learning-idea-under-ubuntu/shurufa.png)
 
 
 # Finally

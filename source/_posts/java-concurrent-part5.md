@@ -5,7 +5,7 @@ categories: [Programming, Java, Concurrent]
 tags: [Java, Concurrent]
 ---
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part5-banner.jpg)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-part5-banner.jpg)
 
 # Preface
 
@@ -23,7 +23,7 @@ Java 中非常经典的例子就是 `String`、`Integer`、`Long` 以及 `Double
 
 但是 `String` 中有一些方法类似 `replace()` 这种操作这种操作是怎么实现的? 很简单, **对象不可变那就返回一个新的对象**. 那是不是有点浪费内存呢? 确实会的, 但是可以通过一种**享元模式(Flyweight Pattern)**来使这个消耗减小. Java 语言里面 `Long`、`Integer`、`Short`、`Byte` 等这些基本数据类型的包装类都用到了享元模式, **享元模式本质上其实就是一个对象池**:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part5-long-cache.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-part5-long-cache.png)
 
 之前有提过, 基本上所有的基础类型的包装类都不适合做锁, 因为这些类基本都使用了享元模式, 看上去是私有, 但实际上可能是公共的, 以下就是错误示范:
 
@@ -124,7 +124,7 @@ Copy-on-Write 是一项非常通用的技术方案，在很多领域都有着广
 
 `ThreadLocal` 基本原理如下:
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-threadlocal.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-threadlocal.png)
 
 ```java
 class Thread {
@@ -169,7 +169,7 @@ class ThreadLocal<T>{
 
 假设有这么一个场景, 服务调用是通过MQ来调用的, 比如需要Web端请求一个文件, 服务A发送MessageA, 服务B消费MessageA并发送MessageB, 但是A消费MessageB是异步的,   但是对于Web端来说这个请求是同步的.
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-guarded-suspension.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-guarded-suspension.png)
 
 伪代码如下:
 
@@ -204,7 +204,7 @@ Respond handleWebReq(){
 
 下图就是 Guarded Suspension 模式的结构图，非常简单，一个对象 `GuardedObject`，内部有一个成员变量——受保护的对象，以及两个成员方法——`get(Predicate p)`和`onChanged(T obj)`方法。
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-guarded-suspension-struct.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-guarded-suspension-struct.png)
 
 ```java
 class GuardedObject<T>{
@@ -385,11 +385,11 @@ Java 语言的 Thread 类中曾经提供了一个 `stop()` 方法，用来终止
 
 前辈们经过认真对比分析，已经总结出了一套成熟的方案，叫做**两阶段终止模式**。顾名思义，就是将终止过程分成两个阶段，其中第一个阶段主要是线程 T1 向线程 T2**发送终止指令**，而第二阶段则是线程 T2**响应终止指令**。
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-two-phase-terminal.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-two-phase-terminal.png)
 
 在 Java 中我们可以使用 Thread 提供的 interrupt() 以及自定义标志位来实现, 举个例子: 实际工作中，有些监控系统需要动态地采集一些数据，一般都是监控系统发送采集指令给被监控系统的监控代理，监控代理接收到指令之后，从监控目标收集数据，然后回传给监控系统，详细过程如下图所示。出于对性能的考虑（有些监控项对系统性能影响很大，所以不能一直持续监控），动态采集功能一般都会有终止操作。
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-two-phase-terminal2.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-two-phase-terminal2.png)
 
 ```java
 class Proxy {

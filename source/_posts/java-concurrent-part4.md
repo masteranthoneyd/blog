@@ -8,7 +8,7 @@ tags: [Java, Concurrent]
 
 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part4-banner-min.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-part4-banner-min.png)
 
 # Preface
 
@@ -221,7 +221,7 @@ Integer result = futureTask.get();
 
 先来举个烧茶的例子, 首先需要先完成分工方案，在下面的程序中，我们分了 3 个任务：任务 1 负责洗水壶、烧开水，任务 2 负责洗茶壶、洗茶杯和拿茶叶，任务 3 负责泡茶。其中任务 3 要等待任务 1 和任务 2 都完成后才能开始。
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-part4-tea-process.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-part4-tea-process.png)
 
 使用 `CompletableFuture` 完成:
 

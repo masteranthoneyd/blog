@@ -1,6 +1,6 @@
 # Web 安全
 
-![](https://cdn.yangbingdong.com/img/web-security/web-security.png)
+![](https://oldcdn.yangbingdong.com/img/web-security/web-security.png)
 
 ## 业务逻辑漏洞
 

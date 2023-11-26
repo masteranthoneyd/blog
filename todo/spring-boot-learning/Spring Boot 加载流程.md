@@ -131,11 +131,11 @@ com.example.CustomServletContainerInitializer
 
 Spring 是也是通过 SPI 机制去加载 Servlet 的，寻找 `ServletContainerInitializer` 的实现类会发现有一个 `SpringServletContainerInitializer` 的类，查看使用处就会发现 SPI 支持：
 
-![](https://cdn.yangbingdong.com/img/spring-boot-loading/spring-servlet-spi.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-loading/spring-servlet-spi.png)
 
 `SpringServletContainerInitializer` 中委托 `WebApplicationInitializer` 这个类初始化 web 环境，看一下实现类：
 
-![](https://cdn.yangbingdong.com/img/spring-boot-loading/web-application-initializer-implement.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-loading/web-application-initializer-implement.png)
 
 `AbstractDispatcherServletInitializer#registerDispatcherServlet` 便是无 `web.xml` 前提下创建 `dispatcherServlet` 的关键代码。
 
@@ -194,7 +194,7 @@ public FilterRegistrationBean helloWorldFilter() {
 
 `RegistrationBean` 是 Spring Boot 中广泛应用的一个注册类，负责把 `servlet`，`filter`，`listener` 给容器化，使他们被 Spring 托管，并且完成自身对 Web 容器的注册。这种注册方式也值得推崇。
 
-![](https://cdn.yangbingdong.com/img/spring-boot-loading/registration-bean-implement.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-loading/registration-bean-implement.png)
 
 它的几个实现类作用分别是：帮助容器注册 filter，servlet，listener，最后的 `DelegatingFilterProxyRegistrationBean` 使用的不多，但熟悉 SpringSecurity 的朋友不会感到陌生，`SpringSecurityFilterChain` 就是通过这个代理类来调用的。
 
@@ -204,7 +204,7 @@ Spring Boot 由于使用了内嵌容器，可通过JAR包方式直接使用`java
 
 `ServletContextInitializer` 是 `org.springframework.boot.web.servlet.ServletContextInitializer`，后者 `ServletContainerInitializer` 是 `javax.servlet.ServletContainerInitializer`，上面提到 `RegistrationBean` 实现了 `ServletContextInitializer` 接口，最终通过 `TomcatStarter` 加载到Web容器。
 
-![](https://cdn.yangbingdong.com/img/spring-boot-loading/tomcat-starter.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-loading/tomcat-starter.png)
 
 但上面并没有 `RegistrationBean`，只有这三个类，其中两个匿名的，`ServletWebServerApplicationContext`  这个类看起来比较核心，但不是这个类，是这个类的内部类。
 

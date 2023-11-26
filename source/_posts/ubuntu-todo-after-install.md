@@ -4,7 +4,7 @@ date: 2017-01-12 23:04:36
 categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
-![](https://cdn.yangbingdong.com/img/individuation/ubuntu-desktop.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/ubuntu-desktop.png)
 # 前言
 >  时间已经来到了9102年, 当初的***[Ubuntu 18.04 LTS](https://www.ubuntu.com/download/desktop)*** 版本已经回归GNOME环境, 各种主题优化教程也层出不穷了, 说明 Ubuntu 的使用人群也渐渐增加...
 >
@@ -112,7 +112,7 @@ sudo dd if=ubuntu-16.04-desktop-amd64.iso of=/dev/sdc bs=1M
 
 更换最佳源服务器, 打开 **软件和更新**（这里可以选择阿里的, 或者点击右边的 选择最佳服务器）: 
 
-![](https://cdn.yangbingdong.com/img/individuation/source-server.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/source-server.png)
 
 ## 更新
 
@@ -440,9 +440,9 @@ sudo apt install -y la-capitaine-cursor-theme
 
 先上图...
 
-![](https://cdn.yangbingdong.com/img/gnome/desktop1.png)
+![](https://oldcdn.yangbingdong.com/img/gnome/desktop1.png)
 
-![](https://cdn.yangbingdong.com/img/gnome/desktop2.png)
+![](https://oldcdn.yangbingdong.com/img/gnome/desktop2.png)
 
 ### Chrome Gnome Shell
 
@@ -460,9 +460,9 @@ sudo apt install chrome-gnome-shell
 
 **[Dash To Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)**: 虽然Ubuntu18已经有了一个Dock, 但定制性不强. 这个Dock插件提供了很多选项定制, 个人比较喜欢的一个选项就是隔离工作区. 
 
-![](https://cdn.yangbingdong.com/img/gnome/dock02.png)
+![](https://oldcdn.yangbingdong.com/img/gnome/dock02.png)
 
-![](https://cdn.yangbingdong.com/img/gnome/dock01.png)
+![](https://oldcdn.yangbingdong.com/img/gnome/dock01.png)
 
 ### Topicons Plus
 
@@ -493,7 +493,7 @@ hardcode-tray --conversion-tool Inkscape
 
 **[User Themes](https://extensions.gnome.org/extension/19/user-themes/)** 可以使用shell-theme: 
 
-![](https://cdn.yangbingdong.com/img/individuation/user-themes.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/user-themes.png)
 
 ### Other
 
@@ -559,11 +559,11 @@ plugins=( [plugins...] zsh-syntax-highlighting)
 ### 调色
 
 最后, 修改以下配色, 会让你的终端样式看起来更舒服, 在终端任意地方右键, 进入配置文件(`profile`)->外观配置(`profile Preferences`), 弹出如下界面, 进入`colors`一栏:
-![](https://cdn.yangbingdong.com/img/individuation/zsh02.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/zsh02.png)
 
 
 其中, 文字和背景采用系统主题, 透明度设为10%, 下面的`palette`样式采用`Tango`, 这样一通设置后, 效果如下: 
-![](https://cdn.yangbingdong.com/img/individuation/screenfetch.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/screenfetch.png)
 
 **推荐配色**: 
 
@@ -611,7 +611,7 @@ sudo apt install fonts-wqy-microhei fonts-wqy-zenhei
 
 博主推荐 ***[Grub-theme-vimix](https://www.gnome-look.org/p/1009236/)***  ***[Blur grub](https://www.gnome-look.org/p/1220920/)*** 或者 [***fallout-grub-theme***](https://github.com/shvchk/fallout-grub-theme)
 
-![](https://cdn.yangbingdong.com/img/gnome/stylish.png)
+![](https://oldcdn.yangbingdong.com/img/gnome/stylish.png)
 
 根据提示下载源码执行安装脚本即可. 
 
@@ -751,9 +751,9 @@ sudo apt install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plu
 
 效果:
 
-![](https://cdn.yangbingdong.com/img/gnome/dynamic-desktop.gif)
+![](https://oldcdn.yangbingdong.com/img/gnome/dynamic-desktop.gif)
 
-附动画: ***[https://cdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip](https://cdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip)***
+附动画: ***[https://oldcdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip](https://oldcdn.yangbingdong.com/resource/desktop/%E5%96%84%E9%80%B8.zip)***
 
 ## 壁纸推荐
 
@@ -961,7 +961,7 @@ sudo apt install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils virt-manage
 
 Dash里打开virt-manager:
 
-![](https://cdn.yangbingdong.com/img/individuation/kvm-manager.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/kvm-manager.png)
 
 
 
@@ -998,7 +998,7 @@ whereis SecureCRT
 sudo perl securecrt_linux_crack.pl /usr/bin/SecureCRT
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/securecrt-crack.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/securecrt-crack.png)
 
 然后按照提示手动输入License即可
 
@@ -1170,7 +1170,7 @@ sudo aria2c --conf-path=/etc/aria2/aria2.conf -D
 
 #### 通过 Docker 搭建 Aria2 以及 AriaNg Web UI
 
-![](https://cdn.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
+![](https://oldcdn.yangbingdong.com/img/individuation/aria2-ariaNg.jpg)
 
 > 博主选择使用Docker
 
@@ -1283,7 +1283,7 @@ services:
     restart: always
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/h5ai.jpg)
+![](https://oldcdn.yangbingdong.com/img/individuation/h5ai.jpg)
 
 1. 查看文件h5ai： *[http://localhost:8000](http://localhost:8000/)*
 2. AriaNg： *[http://localhost:8000/aria2/](http://localhost:8000/aria2/)* 注意地址后面一定要带`/` 
@@ -1323,8 +1323,8 @@ services:
 
 3、打开百度云盘网页版, 勾选需要下载的文件, 在上方会出现导出下载地选项, 通过设置可以修改RCP地址
 
-![](https://cdn.yangbingdong.com/img/individuation/baiduexporter1.jpg)
-![](https://cdn.yangbingdong.com/img/individuation/baiduexporter2.jpg)
+![](https://oldcdn.yangbingdong.com/img/individuation/baiduexporter1.jpg)
+![](https://oldcdn.yangbingdong.com/img/individuation/baiduexporter2.jpg)
 
 ### BaiduPCS-Go
 
@@ -1373,7 +1373,7 @@ sudo add-apt-repository -y ppa:teejee2008/ppa
 sudo apt install -y timeshift
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/time-shift.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/time-shift.png)
 
 ## Albert
 
@@ -1432,7 +1432,7 @@ sudo apt install -y charles-proxy
 
 下载链接: ***[https://launchpad.net/i-nex/+download](https://launchpad.net/i-nex/+download)***
 
-![](https://cdn.yangbingdong.com/img/individuation/I-Nex%20-%20CPU_001.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/I-Nex%20-%20CPU_001.png)
 
 ### Hardinfo
 
@@ -1440,7 +1440,7 @@ sudo apt install -y charles-proxy
 sudo apt install hardinfo -y
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/System%20Information_002.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/System%20Information_002.png)
 
 # 其他设置篇
 
@@ -1485,7 +1485,7 @@ gnome-session-properties
 sudo apt install screenfetch
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/screenfetch.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/screenfetch.png)
 
 ### edex-ui
 
@@ -1493,7 +1493,7 @@ sudo apt install screenfetch
 
 在Release页面中下载AppImage运行即可:
 
-![](https://cdn.yangbingdong.com/img/individuation/eDEX-UI.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/eDEX-UI.png)
 
 ### 终端高逼格屏保
 
@@ -1502,7 +1502,7 @@ sudo apt install cmatrix
 cmatrix -b
 ```
 
-![](https://cdn.yangbingdong.com/img/individuation/cmatrix.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/cmatrix.png)
 
 够骚气. . . 
 
@@ -1525,7 +1525,7 @@ sudo apt install -f
 ```
 
 然后通过`sudo tickeys`来打开 (sudo tickeys -c 打开CLI版本)
-![](https://cdn.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
+![](https://oldcdn.yangbingdong.com/img/individuation/tickeys_v0.2.5.png)
 
 # 附录
 

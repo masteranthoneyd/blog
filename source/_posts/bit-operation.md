@@ -5,7 +5,7 @@ categories: [Programming, Algorithms]
 tags: [Java, Algorithms]
 ---
 
-![](https://cdn.yangbingdong.com/img/bit-operation/bit-operation-banner.jpg)
+![](https://oldcdn.yangbingdong.com/img/bit-operation/bit-operation-banner.jpg)
 
 # Preface
 

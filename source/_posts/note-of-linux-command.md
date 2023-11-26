@@ -5,7 +5,7 @@ categories: [OperatingSystem,Ubuntu]
 tags: [Ubuntu]
 ---
 
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/ubuntu-logo.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/ubuntu-logo.png)
 
 # Preface
 
@@ -232,7 +232,7 @@ sudo ufw reload
 # 用户与用户组相关
 
 ## 添加用户useradd
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/command-useradd.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/command-useradd.png)
 
 ex: 
 创建`ybd`用户并且加入`ybd`用户组并且创建用户目录: 
@@ -253,14 +253,14 @@ passwd ybd
 
 ## 修改用户usermod
 
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/command-usermod.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/command-usermod.png)
 
 ## 添加用户组groupadd
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/command-groupadd.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/command-groupadd.png)
 
 
 ## 修改用户组
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/command-groupmod.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/command-groupmod.png)
 
 ex:将test组的名子改成test2
 ```
@@ -1090,7 +1090,7 @@ echo "test test " > /var/test_boot_up.log
 
 ## apt-get update无法下载
 
-![](https://cdn.yangbingdong.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
+![](https://oldcdn.yangbingdong.com/img/node-of-ubuntu-command/apt-get-update-fail.png)
 
 出现类似情况, 可以找到`/etc/apt/sources.list.d`目录, 删除对应的`.list`文件即可.
 

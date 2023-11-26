@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, Disruptor]
 ---
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/Models.png)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/Models.png)
 
 # Preface
 
@@ -89,7 +89,7 @@ CAS操作比单线程无锁慢了1个数量级；有锁且多线程并发的情�
 
 #### 锁
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/lock.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/lock.png)
 
 采取加锁的方式, 默认线程会冲突, 访问数据时, 先加上锁再访问, 访问之后再解锁. 通过锁界定一个临界区, 同时只有一个线程进入. 如上图所示, `Thread2`访问`Entry`的时候, 加了锁, `Thread1`就不能再执行访问`Entry`的代码, 从而保证线程安全. 
 
@@ -119,7 +119,7 @@ public boolean offer(E e) {
 
 通过原子变量可以实现线程安全. 执行某个任务的时候, 先假定不会有冲突, 若不发生冲突, 则直接执行成功；当发生冲突的时候, 则执行失败, 回滚再重新操作, 直到不发生冲突. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/cas.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/cas.png)
 
 如图所示, `Thread1`和`Thread2`都要把`Entry`加1. 若不加锁, 也不使用CAS, 有可能`Thread1`取到了`myValue=1`, `Thread2`也取到了`myValue=1`, 然后相加, `Entry`中的`value`值为2. 这与预期不相符, 我们预期的是`Entry`的值经过两次相加后等于3. 
 
@@ -165,7 +165,7 @@ public final boolean compareAndSet(int expect, int update) {
 
 下图是计算的基本结构. L1、L2、L3分别表示一级缓存、二级缓存、三级缓存, 越靠近CPU的缓存, 速度越快, 容量也越小. 所以L1缓存很小但很快, 并且紧靠着在使用它的CPU内核；L2大一些, 也慢一些, 并且仍然只能被一个单独的CPU核使用；L3更大、更慢, 并且被单个插槽上的所有CPU核共享；最后是主存, 由全部插槽上的所有CPU核共享. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/computer.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/computer.png)
 
 当CPU执行运算的时候, 它先去L1查找所需的数据、再去L2、然后是L3, 如果最后这些缓存中都没有, 所需的数据就要去主内存拿. 走得越远, 运算耗费的时间就越长. 所以如果你在做一些很频繁的事, 你要尽量确保数据在L1缓存中. 
 
@@ -243,7 +243,7 @@ Loop times:65ms
 
 这三个变量很容易放到一个缓存行中, 但是之间修改没有太多的关联. 所以每次修改, 都会使之前缓存的数据失效, 从而不能完全达到共享的效果. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/falseSharing.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/falseSharing.png)
 
 如上图所示, 当生产者线程`put`一个元素到`ArrayBlockingQueue`时, `putIndex`会修改, 从而导致消费者线程的缓存中的缓存行无效, 需要从主存中重新读取. 
 
@@ -365,7 +365,7 @@ Disruptor通过以下设计来解决队列速度慢的问题:
 2. 若是有m个元素可以写入, 则返回**最大的序列号**. 这儿主要判断是否会覆盖未读的元素；
 3. 若是返回的正确, 则生产者开始写入元素. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/singleWriter.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/singleWriter.png)
 图5 单个生产者生产过程示意图
 
 ## 多个生产者
@@ -390,7 +390,7 @@ Disruptor通过以下设计来解决队列速度慢的问题:
 
 然后, 消费者读取下标从3到6共计4个元素. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/multWriterReader.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/multWriterReader.png)
 
 ### 写数据
 
@@ -404,7 +404,7 @@ Disruptor通过以下设计来解决队列速度慢的问题:
 
 `Writer1`写入下标3位置的元素, 同时把`available Buffer`相应位置置位, 标记已经写入成功, 往后移一位, 开始写下标4位置的元素. `Writer2`同样的方式. 最终都写入完成. 
 
-![img](https://cdn.yangbingdong.com/img/disruptor-learning/multWriterWrite.png)
+![img](https://oldcdn.yangbingdong.com/img/disruptor-learning/multWriterWrite.png)
 
 防止不同生产者对同一段空间写入的代码, 如下所示: 
 
@@ -736,7 +736,7 @@ public void singleProducerLongEventUseTranslatorsTest() throws InterruptedExcept
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/simple-test01.jpg)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/simple-test01.jpg)
 
 java8版: 
 
@@ -764,7 +764,7 @@ public void singleProducerLongEventJava8Test() {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/simple-test02.jpg)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/simple-test02.jpg)
 
 ### 多生产者, 单消费者
 
@@ -812,7 +812,7 @@ private void produce(Disruptor<LongEvent> disruptor, LongEventProducerWithTransl
 
 ### 一个及以上生产者, 多个消费者
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/dsl1.png)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/dsl1.png)
 
 先处理完c1和c2才处理c3: 
 
@@ -839,13 +839,13 @@ public void multiCustomerOneProducerTest() throws InterruptedException {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/multi-test1.jpg)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/multi-test1.jpg)
 
 从上图结果可以看出来c1和c2的顺序是不确定的, c3总是在最后. 
 
 
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/dsl2.png)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/dsl2.png)
 
 如图, 消费者1b消费时, 必须保证消费者1a已经完成对该消息的消费；消费者2b消费时, 必须保证消费者2a已经完成对该消息的消费；消费者c3消费时, 必须保证消费者1b和2b已经完成对该消息的消费. 
 
@@ -877,7 +877,7 @@ public void multiCustomerOneProducerTest2() throws InterruptedException {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/multi-test2.jpg)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/multi-test2.jpg)
 
 再来一个复杂点的: 
 
@@ -912,7 +912,7 @@ public void multiCustomerOneProducerTest3() throws InterruptedException {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/disruptor-learning/multi-test3.jpg)
+![](https://oldcdn.yangbingdong.com/img/disruptor-learning/multi-test3.jpg)
 
 ## 异常处理
 

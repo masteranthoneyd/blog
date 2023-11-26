@@ -5,7 +5,7 @@ categories: [MySQL]
 tags: [MySQL]
 ---
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/MySQL.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/MySQL.png)
 
 # Preface
 
@@ -64,7 +64,7 @@ collation-server = utf8mb4_unicode_ci
 
 虽然启动成功, 但发现MySQL实例是关闭的, 在启动日志中发现这一条信息
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-warning.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mysql-warning.png)
 
 大概意思是**权限全局可写**, 任何一个用户都可以写. MySQL担心这种文件**被其他用户恶意修改**, 所以**忽略**掉这个配置文件. 
 
@@ -115,7 +115,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 
 这个一个智能补全并且高亮语法的终端客户端 ***[mycli](https://github.com/dbcli/mycli)***
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mycli.gif)
 
 安装: 
 
@@ -129,7 +129,7 @@ sudo apt install mycli
 
 安装以及破解在***[另一篇博文](/2017/ubuntu-dev-environment-to-build/#Navicat-Premium)***里面. 
 
-![](https://cdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
+![](https://oldcdn.yangbingdong.com/img/javaDevEnv/navicat12.png)
 
 ## Workbench
 
@@ -137,13 +137,13 @@ MySQL官方开源GUI
 
 下载地址: ***[https://dev.mysql.com/downloads/workbench/](https://dev.mysql.com/downloads/workbench/)***
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/MySQL%20Workbench_001.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/MySQL%20Workbench_001.png)
 
 # 基础篇
 
 ## SQL 执行过程
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-sql-execute-arch.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mysql-sql-execute-arch.png)
 
 **MySQL 8.0 以后已经缓存模块删除了**.
 
@@ -166,7 +166,7 @@ update 执行图:
 
 > `update T set c=c+1 where ID=2;`
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-update-processing.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mysql-update-processing.png)
 
 ## 事务隔离
 
@@ -216,7 +216,7 @@ B+ Tree 的几个特征:
 * 非叶子节点分为不同层次, 通过分层来降低每一层的搜索量
 * 所有节点**按照索引键大小排序**, 构成一个双向链表, 加速范围查找
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/mysql-b-plus-tree.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/mysql-b-plus-tree.png)
 
 B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚簇索引.由于数据在物理上只会保存一份, **所以包含实际数据的聚簇索引只能有一个**.
 
@@ -238,15 +238,15 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
 
 表结构: 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain01.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain01.png)
 
 不使用索引: 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain02.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain02.png)
 
 使用索引: 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain03.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain03.png)
 
 可以看到, 使用`explain`显示了很多列, 各个关键字的含义如下: 
 
@@ -308,7 +308,7 @@ B+ 树, 既可以保存实际数据, 也可以加速数据搜索, 这就是聚�
 
 4. 隐式转换, 比如列类型是**字符串**, 那一定要在条件中将数据使用**引号**引用起来, 否则不会使用索引
 
-   ![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain04.png)
+   ![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain04.png)
 
 5. 可能由于字符集导致的索引失败, 连表查询中, 两个关联字段的字符集不一样会导致索引失效, 因为字符集不一样 MySQL 或使用函数将字符集改成一样的
 
@@ -414,7 +414,7 @@ mysql在json类型中增加了一些json相关的函数 可以参考如下
 
 #### 表结构
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain05.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain05.png)
 
 #### 插入数据
 
@@ -425,11 +425,11 @@ INSERT INTO `user_json` VALUES (1, '{\"name\": \"yang\", \"address\": \"shenyang
 
 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain07.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain07.png)
 
 **JSON校验**: 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain06.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain06.png)
 
 #### 查询
 
@@ -441,7 +441,7 @@ select data->'$.name' from user_json where data->'$.name'='yang';
 
 发现结果集是带有双引号的: 
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain08.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain08.png)
 
 如果想要去除双引号一般来说我们这样:
 
@@ -450,7 +450,7 @@ select JSON_UNQUOTE(json_extract(data,'$.name'))from user_json where json_extrac
 select  data->>'$.name' from user_json where data->'$.name'='yang';
 ```
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain09.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain09.png)
 
 ### JSON如何建立索引
 
@@ -462,9 +462,9 @@ ALTER TABLE user_json ADD COLUMN `virtual_name` varchar(20) GENERATED ALWAYS AS 
 ALTER TABLE user_json ADD KEY (virtual_name);
 ```
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain10.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain10.png)
 
-![](https://cdn.yangbingdong.com/img/mysql-related-learning/idx-explain11.png)
+![](https://oldcdn.yangbingdong.com/img/mysql-related-learning/idx-explain11.png)
 
 可以看到索引起作用了~
 

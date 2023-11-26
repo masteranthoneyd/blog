@@ -5,7 +5,7 @@ categories: [VPS]
 tags: [VPS, ShadowSocks, V2Ray, Trojan]
 password: admin123
 ---
-![](https://cdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
+![](https://oldcdn.yangbingdong.com/img/vps/whats-shadowsocks-04.png)
 # Preface
 > 作为一名开发人员, 日常离不开 Google, 那么在这之前, 必须要先学会如何代理.
 >
@@ -392,15 +392,15 @@ services:
 
 ### 设置代理地址
 安装好插件会自动跳到设置选项, 有提示你可以跳过. 左边新建情景模式-选择代理服务器-比如命名为shadowProxy（叫什么无所谓）其他默认之后创建, 之后在代理协议选择 SOCKS5, 地址为`127.0.0.1`,端口默认`1080` . 然后保存即应用选项. 
-![](https://cdn.yangbingdong.com/img/vps/proxy.png)
-![](https://cdn.yangbingdong.com/img/vps/proxy01.png)
+![](https://oldcdn.yangbingdong.com/img/vps/proxy.png)
+![](https://oldcdn.yangbingdong.com/img/vps/proxy01.png)
 
 ### 设置自动切换
 接着点击自动切换 ( Auto switch）上面的不用管, 在按照规则列表匹配请求后面选择刚才新建的SS, 默认情景模式选择直接连接. 点击应用选项保存. 再往下规则列表设置选择`AutoProxy` 然后将 *https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt* 填进去, 点击下面的立即更新情景模式, 会有提示更新成功！
-![](https://cdn.yangbingdong.com/img/vps/proxy03.png)
+![](https://oldcdn.yangbingdong.com/img/vps/proxy03.png)
 
 点击浏览器右上角的 SwitchyOmega 图标, 下面选择自动切换, 然后打开 ***[google.com](https://www.google.com/)*** 试试, 其他的就不在这贴图了. 
-![](https://cdn.yangbingdong.com/img/vps/proxy04.png)
+![](https://oldcdn.yangbingdong.com/img/vps/proxy04.png)
 
 ## GenPAC全局代理
 如果不想每个浏览器都要设置代理, 可以通过GenPAC实现全局代理. 
@@ -493,11 +493,11 @@ sudo apt install privoxy
 
 找到`4.1. listen-address`这一节, 确认监听的端口号, 如果有内网地址可以监听 `0.0.0.0:8118`. 
 
-![](https://cdn.yangbingdong.com/img/vps/privoxy-config01.png)
+![](https://oldcdn.yangbingdong.com/img/vps/privoxy-config01.png)
 
 找到`5.2. forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t`这一节, 加上如下配置, 注意最后的点号. 
 
-![](https://cdn.yangbingdong.com/img/vps/privoxy-config02.png)
+![](https://oldcdn.yangbingdong.com/img/vps/privoxy-config02.png)
 
 重启一下Privoxy
 
@@ -540,7 +540,7 @@ wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-
 
 谷歌开发的TCP加速外挂, 目前已集成到最新的Linux内核. 
 **[Linode](https://www.linode.com/)** 不能直接命令更换内核, 需要到管理后台设置: 
-![](https://cdn.yangbingdong.com/img/docker-shadowsocks/change-kernel.png)
+![](https://oldcdn.yangbingdong.com/img/docker-shadowsocks/change-kernel.png)
 
 安装完重启后输入
 

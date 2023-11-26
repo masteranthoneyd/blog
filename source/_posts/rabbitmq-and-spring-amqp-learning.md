@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, Spring Boot, Spring Cloud, RabbitMQ]
 ---
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/spring-rabbitmq-banner.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/spring-rabbitmq-banner.png)
 
 # Preface
 
@@ -142,7 +142,7 @@ public class ConnectionUtil {
 
 运行结果:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/basic-single-send-and-receive.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/basic-single-send-and-receive.png)
 
 ## Connection
 
@@ -335,13 +335,13 @@ public Queue delayQueue() {
 
 第二个参数指的是是否开启持久化:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/queue-constructor01.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/queue-constructor01.png)
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/queue-constructor02.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/queue-constructor02.png)
 
 ExChange 指定持久化也一样:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/exchange-constructor.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/exchange-constructor.png)
 
 ## Spring Cloud Stream
 
@@ -583,11 +583,11 @@ spring.cloud.stream.rabbit.bindings.<channelName>.consumer.auto-bind-dlq=true
 
 当消息消费失败后, 消息会原封不动地转发到 `error-topic.test.dlq` 这个死信队列中.
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq01.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq01.png)
 
 点击进入死信队列, 可以使用 `Get Message` 查看消息, `Move message` 可以将消息移动到原先的队列中继续消费.
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq02.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq02.png)
 
 **设置死信队列消息过期时间**:
 
@@ -603,7 +603,7 @@ spring.cloud.stream.rabbit.bindings.<channelName>.consumer.dlq-ttl=10000
 spring.cloud.stream.rabbit.bindings.<channelName>.consumer.republish-to-dlq=true
 ```
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq03.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/rabbit-error-dlq03.png)
 
 # 重新入队
 
@@ -663,7 +663,7 @@ RabbitMQ的延迟队列可以通过**死信队列**来实现, 但这种方式显
 
 这里使用Docker部署, `rabbitmq_delayed_message_exchange`插件需要到 ***[官网下载](https://www.rabbitmq.com/community-plugins.html)***.
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-x-delay-plugin.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-x-delay-plugin.png)
 
 Dockerfile:
 
@@ -792,9 +792,9 @@ public class XDelaySender extends SpringBootRabbitmqApplicationTests {
 
 运行结果, 可以看到发送与接受之间差了5秒:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/stream-rabbit-delay01.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/stream-rabbit-delay01.png)
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/stream-rabbit-delay02.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/stream-rabbit-delay02.png)
 
 ### Spring AMQP
 
@@ -883,9 +883,9 @@ public class RabbitConsumer {
 
 这个可以通过RabbitMQ的管理页面查看:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/x-dalay-admin01.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/x-dalay-admin01.png)
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/x-dalay-admin02.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/x-dalay-admin02.png)
 
 # 独占队列
 
@@ -969,7 +969,7 @@ public ListenerContainerCustomizer customListenerContainerCustomizer() {
 
 启用了独占模式的队列中, 可以看到这个:
 
-![](https://cdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-exclusive.png)
+![](https://oldcdn.yangbingdong.com/img/rabbitmq-learning/rabbitmq-exclusive.png)
 
 # 附录
 

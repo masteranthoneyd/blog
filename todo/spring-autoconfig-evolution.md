@@ -7,7 +7,7 @@
 早在  2002  年, J2EE 与 EJB 大行其道 , 很多知名公司都是采用此技术方案进行项目开发. 那么 J2EE 是什么? 
 
 J2EE 其实是一套标准规范, 里面有一堆技术的集合体, 包括 EJB, JDBC 等:
-![]( https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/ejb-collection.png )
+![]( https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/ejb-collection.png )
 
 然而 EJB 的实现是一个**非常笨重**的 Java 组件:
 
@@ -20,7 +20,7 @@ J2EE 其实是一套标准规范, 里面有一堆技术的集合体, 包括 EJB,
 
 Spring 在 2004 年 3 月 发布 1.0 版本, 而这位 Spring 的作者叫  Rod Johnson.
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-author-rod-johnson.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-author-rod-johnson.png)
 
 > 从上面 J2EE 的图中可以看出来, Spring 并不是要代替 J2EE, 而是在 J2EE 只上的框架, 为 J2EE 一些组件提供轻量级的集成能力, 与 J2EE 相辅相成.
 >
@@ -30,13 +30,13 @@ Spring 在 2004 年 3 月 发布 1.0 版本, 而这位 Spring 的作者叫  Rod 
 
 早期, Spring 是一个**轻量级**, 非入侵式(无需实现Spring的特定接口)的**控制反转** (IoC) 和面向切面 (AOP) 的框架. 发展到如今, Spring 已经是一个非常强大, 整合了众多能力的平台了.
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-timer-shaft.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-timer-shaft.png)
 
- ![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-overview.png)
+ ![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-overview.png)
 
 Spring 特性:
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-feature.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/spring-feature.png)
 
 到了现在, 企业级开发的标配基本就是 **Spring5** + **Spring Boot 2** + **JDK 8** 
 
@@ -46,11 +46,11 @@ Java 是面向对象的编程语言, 一个个实例对象相互合作组成了�
 
 所谓的**IoC**(Inversion of Control, 控制反转): 就是由容器来负责控制对象的生命周期和对象间的关系. 以前是我们想要什么, 就自己创建什么, 现在是我们需要什么, 容器就给我们送来什么.
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/before-ioc-and-after.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/before-ioc-and-after.png)
 
 也就是说, 控制对象生命周期的不再是引用它的对象, 而是容器. 对具体对象, 以前是它控制其它对象, 现在所有对象都被容器控制, 所以这就叫**控制反转**.
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/ioc.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/ioc.png)
 
  **DI**(Dependency Injection, 依赖注入)：指的是容器在实例化对象的时候把它依赖的类注入给它, IoC 思想的实现.
 
@@ -319,7 +319,7 @@ emmm... 饶了一大圈, 还是加载了一个配置文件.
 
 总结一下流程:
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/myautoconfig-flow.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/myautoconfig-flow.png)
 
 但这里, 已经基本得到了自动配置的能力, 但还不是特别的方便, 如果加一个配置或修改一个配置, 需要改动源码, 我们需要遵循**开闭原则**. 
 
@@ -361,15 +361,15 @@ public final class MyConfigLoader {
 
 > 看了上面的轻量级实现, ``SpringApplication.run(...)` 为什么要传入一个 mainClass 应该心里有数了吧.
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-autoconfiguration-simple-flow.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-autoconfiguration-simple-flow.png)
 
 其中 processConfigurationClasses 简化逻辑如下:
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/process-configuration-classes.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/process-configuration-classes.png)
 
 这是一个递归的过程:
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/recursively-import-configuration-classes.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/recursively-import-configuration-classes.png)
 
 ## @SpringBootApplication
 
@@ -409,7 +409,7 @@ public @interface EnableAutoConfiguration {
 }
 ```
 
-![](https://cdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-application-annnotation.png)
+![](https://oldcdn.yangbingdong.com/img/spring-autoconfig-evolution/springboot-application-annnotation.png)
 
 SpringBoot 配置自动加载的原理其实就是上面的 MyEnableAutoConfig 是一样的, 通过 import 注解导入 `ImportSelector` 接口的实现, 而 SpringBoot 这里用的是 `AutoConfigurationImportSelector`:
 

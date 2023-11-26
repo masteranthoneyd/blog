@@ -8,7 +8,7 @@
 
 * 为什么会有 DNS 解析? 互联网上每一台计算机的唯一标识是它的 IP 地址, 但是 IP 地址并不方便记忆, 所以使用容易记忆的域名作为一个映射. 类比来说就是城市名与邮政的内部编码, 别人问你哪个城市, 说广州别人一下就记住了, 说编码谁懂. 再比如别人问你在那条街, 总不能跟别人说经纬度吧...
 
-![](https://cdn.yangbingdong.com/img/http-adventure/dns-resolve.png)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/dns-resolve.png)
 
 ## DNS 优化
 
@@ -38,7 +38,7 @@ DNS存在着多级缓存, 从离浏览器的距离排序的话, 有以下几种:
 
 TCP 3次握手, 建立连接.
 
-![](https://cdn.yangbingdong.com/img/http-adventure/tcp-sync.webp)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/tcp-sync.webp)
 
 老阿姨: 在家吗? 想去拜访您.
 
@@ -52,11 +52,11 @@ TCP 3次握手, 建立连接.
 
 浏览器构建 HTTP 请求报文并通过 TCP 协议中发送到服务器指定端口(HTTP协议80/8080, HTTPS协议443). HTTP请求报文是由三部分组成: **请求行**, **请求头部**和**请求数据**。
 
-![](https://cdn.yangbingdong.com/img/http-adventure/request-message-structure.webp)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/request-message-structure.webp)
 
-![](https://cdn.yangbingdong.com/img/http-adventure/request-message-example.webp)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/request-message-example.webp)
 
-![](https://cdn.yangbingdong.com/img/http-adventure/tcp-transport-stream.webp)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/tcp-transport-stream.webp)
 
 应用层: 客户端发送HTTP请求报文
 
@@ -68,11 +68,11 @@ TCP 3次握手, 建立连接.
 
 物理层: 物理传输bit
 
-![](https://cdn.yangbingdong.com/img/http-adventure/tcp-and-osi.webp)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/tcp-and-osi.webp)
 
 # Wireshark 抓包演示
 
-![](https://cdn.yangbingdong.com/img/http-adventure/wireshark.png)
+![](https://oldcdn.yangbingdong.com/img/http-adventure/wireshark.png)
 
 # HTTPS
 

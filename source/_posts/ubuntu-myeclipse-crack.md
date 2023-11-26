@@ -6,7 +6,7 @@ tags:
   - IDE
 date: 2017-01-11 11:52:00
 ---
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/myeclipseInfo.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/myeclipseInfo.png)
 
 # 前言
 > 之前一直用的是Eclipse Luna, 没有用MyEclipse是因为它**收钱**的- -, 去新公司工作需要用到MyEclipse, 下载安装happy地**试用**了将近一个月, 不幸, 试用期已过. 身为一个开源爱好者, 不想去用破解的（虚伪 - -）, 也不想出钱, 博主秉着屌丝的意志, 一番折腾过后, 搞定. 以下是经过参考与总结得到的操作步骤, 博主用的是Linux的发行版Ubuntu, 所以以下步骤针对Ubuntu系统, win与mac的步骤也大同小异. 
@@ -22,7 +22,7 @@ date: 2017-01-11 11:52:00
 ./MyEclipse-2015-stable-3.0-offline-installer-linux.run 
 ```
 
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/meInstall.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/meInstall.png)
 按`Nest`设置一下安装路径完成安装, 安装完之后不要选择运行MyEclipse
 
 **破解之前请不要开启你的MyEclipse, 要保持刚安装完的状态, 如果你已经开过了, 卸载重装吧——否则你就会遭遇打开编译器, 然后校验失败, 报错关闭**
@@ -33,7 +33,7 @@ date: 2017-01-11 11:52:00
 
 下载到本地解压后并进入目录会有以下文件
 
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/meFile.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/meFile.png)
 
 
 ## 打开注册机
@@ -49,7 +49,7 @@ java -jar cracker2015.jar
 
 运行之后出现如下界面 ↓
 
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/crack.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/crack.png)
 
 ## 开始生成注册信息 
 
@@ -69,13 +69,13 @@ java -jar cracker2015.jar
 
 把plugins文件中的文件复制到MyEclipse的plugins文件夹中, 覆盖原文件
 
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/plugins.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/plugins.png)
 
 # 运行MyEclipse
 
 打开了MyEclipse, 点击菜单栏中的`MyEclipse`->`Subscription information`, 激活成功, 激动ing=.=
 
-![](https://cdn.yangbingdong.com/img/ubuntu-myclipse-crack/myeclipseInfo.png)
+![](https://oldcdn.yangbingdong.com/img/ubuntu-myclipse-crack/myeclipseInfo.png)
 
 ------
 

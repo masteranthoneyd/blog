@@ -5,7 +5,7 @@ categories: [Programming, Java, Concurrent]
 tags: [Java, Concurrent]
 ---
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrnt-part1-banner.jpeg)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrnt-part1-banner.jpeg)
 
 
 > 时代在进步, 硬件也在进步, 为了提高 CPU 以及 IO 的利用率, 并发编程已经慢慢成为一项必备技能. 过往总对并发编程感到恐惧, 应为对其的陌生导致了编码方面的困难以及诸多的 BUG, 学习并发编程, 一定需要有一个系统性的学习过程.
@@ -23,7 +23,7 @@ tags: [Java, Concurrent]
 
 * 互斥(线程安全) -> `synchronized`、`ReadWriteLock`、`StampedLock`、`ThreadLocal` 等
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-concurrent-generalization.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-concurrent-generalization.png)
 
 # 并发编程Bug的源头
 
@@ -150,7 +150,7 @@ class X {
 
 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-sync-lock-module.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-sync-lock-module.png)
 
 ```java
 class Account {
@@ -245,7 +245,7 @@ class Account {
 
 以上代码会出现死锁, 如果两个线程分别调用 Account-A 以及 Account-B 转账操作, 会出现相互等待的情况.
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-sync-dead-lock.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-sync-dead-lock.png)
 
 只有以下这四个条件都发生时才会出现死锁: 
 
@@ -268,7 +268,7 @@ class Account {
 
 对于破坏占用且等待条件(增加一个管理员, 只有同时拿到两个资源才能执行转账操作):
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-break-dead-lock.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-break-dead-lock.png)
 
 ```java
 class Allocator {
@@ -343,7 +343,7 @@ while(!actr.apply(this, target))
 
 在 Java 语言里, 等待 - 通知机制可以有多种实现方式, 比如 Java 语言内置的 `synchronized` 配合 `wait()`、`notify()`、`notifyAll()` 这三个方法就能轻松实现. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-break-dead-lock02.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-break-dead-lock02.png)
 
 这个等待队列和互斥锁是一对一的关系, 每个互斥锁都有自己独立的等待队列. 
 
@@ -416,7 +416,7 @@ wait与sleep区别在于:
 
 在管程的发展史上, 先后出现过三种不同的管程模型, 分别是: Hasen 模型、Hoare 模型和 MESA 模型. 其中, 现在广泛应用的是 MESA 模型, 并且 Java 管程的实现参考的也是 MESA 模型. 
 
-![](https://cdn.yangbingdong.com/img/concurrent/monitor-module01.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/monitor-module01.png)
 
 ```java
 public class BlockedQueue<T>{
@@ -468,11 +468,11 @@ public class BlockedQueue<T>{
 
 通用的线程生命周期:
 
-![](https://cdn.yangbingdong.com/img/concurrent/general-thread-module.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/general-thread-module.png)
 
 Java 中线程的生命周期(对应 Thread.State 枚举类):
 
-![](https://cdn.yangbingdong.com/img/concurrent/java-thread-module.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/java-thread-module.png)
 
 * RUNNABLE 与 BLOCKED 的状态转换: 只有一种场景会触发这种转换, 就是线程等待 synchronized 的隐式锁. 
 * RUNNABLE 与 WAITING 的状态转换(三种场景):
@@ -513,7 +513,7 @@ CPU 去哪里找到调用方法的参数和返回地址: 通过 CPU 的**堆栈�
 
 局部变量的**作用域是方法内部**, 而方法与调用栈共存亡, 所以**局部变量就是放到了调用栈里**.
 
-![](https://cdn.yangbingdong.com/img/concurrent/method-stack.png)
+![](https://oldcdn.yangbingdong.com/img/concurrent/method-stack.png)
 
 **调用栈与线程的关系**: 每个线程都有自己独立的调用栈. 因为每个线程都有自己的调用栈, 局部变量保存在线程各自的调用栈里面, **不会共享**, 所以自然也就没有并发问题. 没有共享, 就没有伤害. 
 

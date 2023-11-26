@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot, Spring, Spring Security]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/spring-authentication-banner.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/spring-authentication-banner.png)
 
 # Preface
 
@@ -17,21 +17,21 @@ tags: [Java, Spring Boot, Spring, Spring Security]
 
 Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `DispatcherServlet` 之前触发. 普通的 Filter 称之为 Web Filter, 而 Spring Security 的 Filter 称之为 Security Filter:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/security-filters.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/security-filters.png)
 
 默认有哪些 Filter 可以看 `FilterComparator` 中的源码:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/filter-comparator.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/filter-comparator.png)
 
 ## 认证流程
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/core-service-Sequence.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/core-service-Sequence.png)
 
 ### 登录拦截
 
 在 `FilterComparator` 中有一个 `UsernamePasswordAuthenticationFilter`, 继承了 `AbstractAuthenticationProcessingFilter`, 它就是我们登录时用到的 Filter:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/username-password-authentication-filter.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/username-password-authentication-filter.png)
 
 * 可以看到, **默认情况下拦截 `/login` 端点的 POST 请求**, 当然, 可以通过配置改变这个 url.
 * 这里还有一个关键, 在 `attempAuthentication` 中, 用户名以及密码的参数是 `username` 以及 `password`, 并且是从 http parameter 中获取的, 如果要**支持 Json 格式的登录, 那就要重写这里**.
@@ -43,20 +43,20 @@ Spring Security 是基于嵌套 `Filter`(委派 Filter) 实现的, 在 `Dispatch
 
 认证通过 `AuthenticationManager` 进行的, 这是一个接口, 默认的实现类为 `ProviderManager`:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/provider-manager.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/provider-manager.png)
 
 可以看到实现类 `ProviderManager` 中维护了一个 `List<AuthenticationProvider>` 的列表, 存放多种认证方式, 实际上这是委托者模式的应用(Delegate)
 
 > 核心的认证入口始终只有一个: `AuthenticationManager`, 不同的认证方式: 用户名 + 密码(`UsernamePasswordAuthenticationToken`), 邮箱 + 密码, 手机号码 + 密码登录则对应了三个 `AuthenticationProvider`. 在默认策略下, 只需要通过一个 `AuthenticationProvider` 的认证, 即可被认为是登录成功.
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/spring%20security%20architecture.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/spring%20security%20architecture.png)
 
 一个最常用到的 `AuthenticationProvider` 实现类就是 `DaoAuthenticationProvider`, 里面比较重要的一个环节就是 `additionalAuthenticationChecks` (密码校验):
 
 *  通过 `UserDetailsService`  的实现类(需要用户自己实现)拿到 `UserDetails`
 * 将其中的 `password` 与 `UsernamePasswordAuthenticationToken` 中的 `credentials` 进行对比 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-security/dao-authentication-password-check.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-security/dao-authentication-password-check.png)
 
 登录成功后会执行 `AbstractAuthenticationProcessingFilter#successfulAuthentication` 将 `Authentication` 存到 `SecurityContextHolder` 中.
 
@@ -441,7 +441,7 @@ public class AuthorizationMvcConfigure implements WebMvcConfigurer {
 
 在这基础上拓展出 `用户-用户组-角色` 以及 `权限-类型-具体权限`.
 
-![](https://cdn.yangbingdong.com/img/spring-auth/auth-design.jpg)
+![](https://oldcdn.yangbingdong.com/img/spring-auth/auth-design.jpg)
 
 
 

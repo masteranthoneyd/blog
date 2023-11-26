@@ -5,7 +5,7 @@ categories: [Programming, Java, Design Pattern]
 tags: [Java, Design Pattern]
 ---
 
-![](https://cdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/designpatterns.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/designpatterns.png)
 
 # Preface
 
@@ -644,7 +644,7 @@ UML类的符号是一个被划分成三块的方框: 类名, 属性, 和操作. 
 - **组合**: 整体与部分的关系, 但是二者不可分离, 分离了就没有意义了, 例如, 公司类和部门类, 没有公司就没有部门；
 - **依赖**: 一种使用关系, 例如创建 A 类必须要有 B 类. 
 
-![](https://cdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/uml-relation.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/uml-relation.png)
 
 这是一个类图的记忆方法: ***[https://mp.weixin.qq.com/s/yfp5ejzm4kHW44kU876SYQ](https://mp.weixin.qq.com/s/yfp5ejzm4kHW44kU876SYQ)***
 
@@ -659,11 +659,11 @@ UML类的符号是一个被划分成三块的方框: 类名, 属性, 和操作. 
 2. 选择Stereotype Display -> Label, 这样矩形就显示出来了
 3. 同样是Format, 然后把Suppress Operations取消掉, 这样操作就可以显示出来了
 
-![](https://cdn.yangbingdong.com/img/learning-uml-and-using-staruml/interface-01.png)
+![](https://oldcdn.yangbingdong.com/img/learning-uml-and-using-staruml/interface-01.png)
 
-![](https://cdn.yangbingdong.com/img/learning-uml-and-using-staruml/interface-02.png)
+![](https://oldcdn.yangbingdong.com/img/learning-uml-and-using-staruml/interface-02.png)
 
 ## Gliffy
 *[Gliffy](https://www.gliffy.com/)*是一个*[在线](https://go.gliffy.com/go/html5/launch)*绘图工具, 支持Chrome插件, 非常强大. 
 
-![](https://cdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/gliffy.png)
+![](https://oldcdn.yangbingdong.com/img/design-pattern-uml-and-six-principle/gliffy.png)

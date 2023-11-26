@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Java, Spring Boot, Spring]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot.png)
 
 # Preface
 
@@ -17,9 +17,9 @@ tags: [Java, Spring Boot, Spring]
 
 ## Spring MVC 流程
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-process-new.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-process-new.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-convert-processing.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-convert-processing.png)
 
 1、  用户发送请求至前端控制器`DispatcherServlet`. 
 
@@ -47,7 +47,7 @@ tags: [Java, Spring Boot, Spring]
 
 ## Spring MVC集成FastJson
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/web-mvc-configurer.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/web-mvc-configurer.png)
 
 > ***[https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson](https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson)***
 
@@ -242,15 +242,15 @@ server:
 
 在Spring Boot 2.X 中, 对于MVC抛出的异常, 默认会映射到 `/error`:  
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-error.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-error.png)
 
 > 参考: ***[https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-error-handling](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-error-handling)***
 
 由于默认情况下, Spring MVC 将报错转发到 `/error` 接口, 所以对应的Spring中也会有默认的异常处理类 `BasicErrorController`:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error01.png)
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-boot-mvc-defalue-error02.png)
 
 ### 添加自定义的错误页面
 
@@ -403,11 +403,11 @@ public class XXXException extends RuntimeException {
 
 Spring Boot 2.X 中会有一个Resouce的Mapping来处理静态资源, 当输入一个不存在的请求时, 总会匹配到这个Mapping:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-mapping.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-mapping.png)
 
 此时的404错误是 `ResourceHttpRequestHandler#handleRequest` 中因为找不到resource从而调用`response#sendError` 发出的:
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-not-found.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-resource-not-found.png)
 
 一般地如果是前后分离的项目, 都不要将资源放在后端, 所以可以用过以下配置关闭这个万能的Mapping:
 
@@ -440,7 +440,7 @@ spring:
     throw-exception-if-no-handler-found: true
 ```
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-throw-not-found.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/spring-mvc-throw-not-found.png)
 
 之后可以通过 `@ExceptionHandler(value = NoHandlerFoundException.class)` 处理这个404了, 而不是转发到 `/error`.
 
@@ -591,7 +591,7 @@ public class WebConfig {
 - `Interceptor`可以访问`Action`的上下文, 值栈里的对象, 而`Filter`不能. 
 - 在`action`的生命周期里, `Interceptor`可以被多次调用, 而Filter只能在容器初始化时调用一次. 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/mvc-process.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/mvc-process.png)
 
 ## RequestBodyAdvice和ResponseBodyAdvice
 

@@ -4,7 +4,7 @@ date: 2017-01-10 23:49:28
 categories: Essay
 tags: [Hexo]
 ---
-![](https://cdn.yangbingdong.com/img/hello-world/start-trip.png)
+![](https://oldcdn.yangbingdong.com/img/hello-world/start-trip.png)
 {% centerquote %}
 Life is a generic method like [ public <T> Life doSomething(T t){} ],T is the part of life that requires you to play in a period of time,and the method will return a life you expect if you to be T.
 									—— ***沃·兹基硕德***

@@ -4,7 +4,7 @@ date: 2017-03-09 13:04:51
 categories: [Programming,Java]
 tags: [Java,JVM]
 ---
-![](https://cdn.yangbingdong.com/img/jvm/structure.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/structure.png)
 
 # 前言
 > 想要深刻地理解Java, 那么就要深入地理解底层——JVM(Java Virtual Machine | Java虚拟机). 
@@ -18,16 +18,16 @@ tags: [Java,JVM]
 
 ## 什么是JVM
 要想说明白什么 JVM 就不得不提另外两个概念, JRE 和 JDK, 初学者总是把这几个概念搞混. 
-![](https://cdn.yangbingdong.com/img/jvm/java-tutorial.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/java-tutorial.png)
 JVM, JRE, JDK 都是 Java 语言的支柱, 他们分工协作. 但不同的是 **JDK 和 JRE 是真实存在的**, 而 JVM 是一个**抽象**的概念, 并不真实存在. 
 
 ### JDK
 JDK(Java Development Kit) 是 Java 语言的软件开发工具包（SDK）. JDK 物理存在, 是 programming tools、JRE 和 JVM 的一个集合. 
-![](https://cdn.yangbingdong.com/img/jvm/jdk.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/jdk.png)
 
 ### JRE
 JRE（Java Runtime Environment）Java 运行时环境, JRE 物理存在, 主要由Java API 和 JVM 组成, 提供了用于执行 Java 应用程序最低要求的环境. 
-![](https://cdn.yangbingdong.com/img/jvm/jre.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/jre.png)
 
 ### JVM（Java Virtual Machine）
 JVM(Java Virtual Machine) 是一种软件实现, 执行像物理机程序的机器（即电脑）. 
@@ -38,7 +38,7 @@ JVM 并不是专为 Java 所实现的运行时, 实际上只要有其他编程�
 JVM实现了Java语言最重要的特征: 即平台无关性. 
 **平台无关性原理**: 编译后的 Java程序（`.class`文件）由**JVM执行**. JVM**屏蔽了与具体平台相关的信息**, 使程序可以在多种平台上不加修改地运行. Java虚拟机在执行字节码时, 把字节码解释成具体平台上的机器指令执行. 因此实现**Java平台无关性**. 
 ## JVM结构图
-![](https://cdn.yangbingdong.com/img/jvm/jvm-frame-diagram.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/jvm-frame-diagram.png)
 **JVM = 类加载器 classloader+ 执行引擎 executionengine + 运行时数据区域 runtime data area**
 首先Java源代码文件被Java编译器编译为字节码文件, 然后JVM中的**类加载器**加载完毕之后, 交由JVM**执行引擎**执行. 在整个程序执行过程中, JVM中的**运行时数据区（内存）**会用来存储程序执行期间需要用到的数据和相关信息. 
 因此, **在Java中我们常常说到的内存管理就是针对这段空间进行管理**（如何分配和回收内存空间）. 
@@ -52,7 +52,7 @@ ClassLoader把硬盘上的class文件**加载到JVM中的运行时数据区域**
 ## Runtime DataArea
 JVM运行时数据区 (JVM RuntimeArea)其实就是指 JVM在**运行期间**, 其**对JVM内存空间的划分和分配**. JVM在运行时将数据划分为了**以下几个区域来存储**. 
 程序员写的所有程序都被加载到运行时数据区域中. 
-![](https://cdn.yangbingdong.com/img/jvm/jvm-runtime-area.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/jvm-runtime-area.png)
 （图注: **JDK1.7已经把常量池转移到堆里面了！**）
 ### PC寄存器（The pc Register）
 （1）每一个Java线程**都有一个PC寄存器**, 用以**记录当前执行到哪个指令**. 
@@ -315,7 +315,7 @@ Copying算法将可用内存**按容量划分为大小相等的两块**, **每�
 最后, 因为每次回收都只回收少量对象, 所以**老年代一般使用的是标记整理算法**. 
 
 **注意**, 在方法区中有一个**永久代**（Permanet Generation）, 它用来存储class类、常量、方法描述等. 对永久代的回收主要回收两部分内容: **废弃常量**和**无用的类**. 
-![](https://cdn.yangbingdong.com/img/jvm/java-heap-memory.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/java-heap-memory.png)
 有关查看垃圾回收信息的JVM常见配置方式: 
 ```
 -XX:+PrintGCDetails
@@ -369,7 +369,7 @@ G1搜集器是当今搜集器技术发展最前沿的成果, 它是一款**面�
 
 # Java类加载机制总结
 
-![](https://cdn.yangbingdong.com/img/jvm/class.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/class.png)
 
 ## 类加载器的组织结构
 类加载器 `ClassLoader`是具有层次结构的, 也就是父子关系. 其中, **`Bootstrap`是所有类加载器的父亲**. 
@@ -379,7 +379,7 @@ G1搜集器是当今搜集器技术发展最前沿的成果, 它是一款**面�
 用于加载除了基本 API之外的一些拓展类. 
 （3）`AppClassLoader`: 加载应用程序和程序员**自定义的类**. 
 运行下面的程序, 结果也显示出来了: 
-![](https://cdn.yangbingdong.com/img/jvm/classlodertest.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/classlodertest.png)
 从运行结果可以看出加载器之间的**父子关系**, `ExtClassLoader`的父`Loader`返回了null
 原因是`BootstrapLoader`（启动类加载器）是用**`C`语言实现**的, 找不到一个确定的返回父`Loader`的方式. 
 
@@ -451,7 +451,7 @@ ClassLoader.loadClass(name, false);//第二个参数指Class是否被链接, 默
 **通过上面的描述, 如果程序依赖于`Class`是否被初始化, 就必须用`Class.forName(name)`了**
 
 # 自定义类加载器
-![](https://cdn.yangbingdong.com/img/jvm/calssloader.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/calssloader.png)
 ## 为什么需要自定义类加载器
 网上的大部分自定义类加载器文章, 几乎都是贴一段实现代码, 然后分析一两句自定义ClassLoader的原理. 但是个人觉得首先得把为什么需要自定义加载器这个问题搞清楚, 因为如果不明白它的作用的情况下, 还要去学习它显然是很让人困惑的. 
 首先介绍自定义类的**应用场景**: 
@@ -600,7 +600,7 @@ System.out.println(obj.getClass().getClassLoader());//打印出我们的自定�
 ```
 
 ### 运行结果
-![](https://cdn.yangbingdong.com/img/jvm/result.png)
+![](https://oldcdn.yangbingdong.com/img/jvm/result.png)
 
 至此关于自定义`ClassLoader`的内容总结完毕. 
 
@@ -686,7 +686,7 @@ java启动参数共分为三类:
 
 其三是非Stable参数（ `-XX`），此类参数各个jvm实现会有所不同，将来可能会随时取消，需要慎重使用
 
-![](https://cdn.yangbingdong.com/img/jvm/jvm-param.webp)
+![](https://oldcdn.yangbingdong.com/img/jvm/jvm-param.webp)
 
 正确打印日志:
 
@@ -720,7 +720,7 @@ OOM时执行脚本（比如重启）:
 
 附上两张来自 ***[无敌码农](https://mp.weixin.qq.com/s?__biz=MzU3NDY4NzQwNQ==&mid=2247483820&idx=1&sn=8418f0f6a618bb0f0ca0980af09a816f&chksm=fd2fd06eca5859786ab124dd204a7ec9b1ad3ed230b9b531086cc6729a277a05d3e8307b7e0d&scene=21#wechat_redirect)*** 的图片: 
 
-![](https://cdn.yangbingdong.com/img/jvm/jvm-men-thread.webp)
+![](https://oldcdn.yangbingdong.com/img/jvm/jvm-men-thread.webp)
 
 > **参考并转载于: **
 > ***[http://blog.csdn.net/seu_calvin/article/details/51404589](http://blog.csdn.net/seu_calvin/article/details/51404589)***

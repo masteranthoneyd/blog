@@ -5,7 +5,7 @@ categories: [Programming, Java]
 tags: [Java, MAT]
 ---
 
-![](https://cdn.yangbingdong.com/img/online-debug/locate.png)
+![](https://oldcdn.yangbingdong.com/img/online-debug/locate.png)
 
 # Preface
 
@@ -109,7 +109,7 @@ Jcmd <pid> JFR.start duration=120s filename=myrecording.jfr
 
 MAT默认的存储展示单位是 `Bytes`, 可在 `Window` -> `Preferences` 中设置:
 
-![](https://cdn.yangbingdong.com/img/online-debug/mat-setting.png)
+![](https://oldcdn.yangbingdong.com/img/online-debug/mat-setting.png)
 
 1. Keep unreachable objects：如果勾选这个，则在分析的时候会包含dump文件中的不可达对象；
 2. Hide the getting started wizard：隐藏分析完成后的首页，控制是否要展示一个对话框，用来展示内存泄漏分析、消耗最多内存的对象排序。
@@ -144,57 +144,57 @@ MAT默认的存储展示单位是 `Bytes`, 可在 `Window` -> `Preferences` 中�
 
 简单地说, `Shallow` 只是对象本身所占用的大小, 而 `Retained` 则包含了引用对象的大小.
 
-![](https://cdn.yangbingdong.com/img/online-debug/dump-file-opened.png)
+![](https://oldcdn.yangbingdong.com/img/online-debug/dump-file-opened.png)
 
 # 转载-如何应对在线故障
 
 > 原创出处: ***[http://www.rowkey.me/blog/2018/11/22/online-debug/](http://www.rowkey.me/blog/2018/11/22/online-debug/)***
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug01.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug01.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug02.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug02.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug03.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug03.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug04.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug04.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug05.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug05.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug06.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug06.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug07.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug07.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug08.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug08.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug09.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug09.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug10.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug10.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug11.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug11.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug12.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug12.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug13.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug13.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug14.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug14.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug15.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug15.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug16.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug16.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug17.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug17.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug18.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug18.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug19.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug19.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug20.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug20.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug21.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug21.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug22.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug22.jpeg)
 
-![](https://cdn.yangbingdong.com/img/online-debug/online-debug23.jpeg)
+![](https://oldcdn.yangbingdong.com/img/online-debug/online-debug23.jpeg)
 
 # Finally
 

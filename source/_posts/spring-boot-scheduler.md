@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Spring Boot, Java, Scheduler]
 ---
 
-![](https://cdn.yangbingdong.com/img/scheduler/scheduler-banner.jpg)
+![](https://oldcdn.yangbingdong.com/img/scheduler/scheduler-banner.jpg)
 
 # Preface
 
@@ -17,7 +17,7 @@ tags: [Spring Boot, Java, Scheduler]
 
 # Quartz
 
-![](https://cdn.yangbingdong.com/img/scheduler/quartz-logo.jpg)
+![](https://oldcdn.yangbingdong.com/img/scheduler/quartz-logo.jpg)
 
 > ***[官方文档](http://www.quartz-scheduler.org/documentation/)***
 >
@@ -638,7 +638,7 @@ Cron表达式由6~7项组成, 中间用空格分开. 从左到右依次是: 秒�
 
 > ***[https://github.com/ifesdjeen/hashed-wheel-timer](https://github.com/ifesdjeen/hashed-wheel-timer)***
 
-![](https://cdn.yangbingdong.com/img/scheduler/o_timewheel.png)
+![](https://oldcdn.yangbingdong.com/img/scheduler/o_timewheel.png)
 
 > 时间轮算法可以类比于时钟，如上图箭头（指针）按某一个方向按固定频率轮动，每一次跳动称为一个 tick。这样可以看出定时轮由个3个重要的属性参数，ticksPerWheel（一轮的tick数），tickDuration（一个tick的持续时间）以及 timeUnit（时间单位），例如当ticksPerWheel=60，tickDuration=1，timeUnit=秒，这就和现实中的始终的秒针走动完全类似了。
 

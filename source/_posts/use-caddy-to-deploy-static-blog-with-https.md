@@ -5,7 +5,7 @@ categories: [VPS]
 tags: [Hexo, VPS, Caddy]
 ---
 
-![](https://cdn.yangbingdong.com/img/caddy/caddy-banner.png)
+![](https://oldcdn.yangbingdong.com/img/caddy/caddy-banner.png)
 
 # Preface
 
@@ -23,7 +23,7 @@ tags: [Hexo, VPS, Caddy]
 
 在 ***[https://caddyserver.com/download](https://caddyserver.com/download)*** 中定制自己的Caddy安装脚本:
 
-![](https://cdn.yangbingdong.com/img/caddy/caddy-script.png)
+![](https://oldcdn.yangbingdong.com/img/caddy/caddy-script.png)
 
 Copy 一键安装脚本到服务器上安装即可, 比如:
 
@@ -217,9 +217,9 @@ abiosoft/caddy:no-stats
 
 如下图:
 
-![](https://cdn.yangbingdong.com/img/caddy/config-githun-webhook.png)
+![](https://oldcdn.yangbingdong.com/img/caddy/config-githun-webhook.png)
 
-![](https://cdn.yangbingdong.com/img/caddy/add-github-webhook.png)
+![](https://oldcdn.yangbingdong.com/img/caddy/add-github-webhook.png)
 
 - Content Type 需要选择 `application/json`
 

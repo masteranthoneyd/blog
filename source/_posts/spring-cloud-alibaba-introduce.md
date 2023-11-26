@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Cloud]
 tags: [Spring, Spring Cloud, Spring Cloud Alibaba]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/spring-cloud-alibaba-introduce.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/spring-cloud-alibaba-introduce.png)
 
 # Preface
 
@@ -299,7 +299,7 @@ Sentinel 的技术亮点:
 - 覆盖 API Gateway 场景, 为 Spring Cloud Gateway, Zuul 提供网关流量控制的能力
 - 实时监控和规则动态配置管理能力
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel.png)
 
 现假设有三个服务分别是 demo-gateway(业务网关), web-api-demo(web 应用, 负责接收用户请求并调用 dubbo-provider), dubbo-provider(服务提供者).
 
@@ -372,11 +372,11 @@ spring.cloud.sentinel.transport.dashboard=localhost:8080
 
 触发后可以在 Sentinel 的面板看到访问信息:
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel02.png)
 
 可以为每个链路设置限流:
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/sentinel01.png)
 
 更多限流规则请查看官方文档: ***[https://sentinelguard.io/zh-cn/docs/introduction.html](https://sentinelguard.io/zh-cn/docs/introduction.html)***
 
@@ -407,13 +407,13 @@ public class SentinelWebConfig {
 
 Spring 生态里有两个消息相关的模块和项目, 分别是 spring-messaging 模块和 Spring Integration 项目, 他们将消息模型进行了统一, 抽象成 `org.springframework.messaging.Message`:
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/messaging01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/messaging01.png)
 
 `Payload` 是一个泛型, 意味是消息体可以放任意数据类型. Header 是一个 `MessageHeaders` 类型的消息头. 
 
 Spring Cloud Stream 是在 Spring Integration 基础上封装的, 他们的关系如下:
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-alibaba/messaging02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-alibaba/messaging02.png)
 
 Spring Cloud Stream RocketMQ 的用法与其他 Binder 的用法一致, 不同的是依赖以及配置:
 

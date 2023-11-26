@@ -5,7 +5,7 @@ categories: [Programming, Java, Spring Boot]
 tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 ---
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/java-docker.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-docker-integration/java-docker.png)
 
 # Preface
 
@@ -19,7 +19,7 @@ tags: [Docker, Spring Boot, Java, Spring, Elasticsearch]
 
 下面是 Log4j2  官方性能测试结果: 
 
-![](https://cdn.yangbingdong.com/img/spring-boot-learning/log4j2-performance.png)
+![](https://oldcdn.yangbingdong.com/img/spring-boot-learning/log4j2-performance.png)
 
 ### Maven配置
 
@@ -914,15 +914,15 @@ null: null
 
 可以看到本地以及私有仓库都多了一个镜像: 
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/portainer.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-docker-integration/portainer.png)
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/harbor.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-docker-integration/harbor.png)
 
 **此处有个疑问**, 很明显看得出来这里上传了两个一样大小的包, 不知道是不是同一个jar包, 但id又不一样: 
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/duplicate01.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-docker-integration/duplicate01.png)
 
-![](https://cdn.yangbingdong.com/img/spring-cloud-docker-integration/duplicate02.png)
+![](https://oldcdn.yangbingdong.com/img/spring-cloud-docker-integration/duplicate02.png)
 
 ### 运行Docker
 
@@ -1093,7 +1093,7 @@ spring:
 
 #  Kafka、ELK collect logs
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/elk-arch1.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/elk-arch1.png)
 
 传统的应用可以将日志存到日志中, 但集成Docker之后, 日志怎么处理？放到容器的某个目录然后挂在出来？这样也可以, 但这样就相当于给容器与外界绑定了一个状态, 弹性伸缩怎么办？个人还是觉得通过队列与ELK管理Docker日志比较合理, 而且Log4j2**原生支持Kafka的Appender**. 
 
@@ -1177,7 +1177,7 @@ org.elasticsearch.license.LicenseVerifier.class org.elasticsearch.xpack.core.XPa
 ```
 使用 ***[Luyten](https://github.com/deathmarine/Luyten)*** 进行反编译
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/luyten.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/luyten.png)
 
 将两个类复制IDEA（**需要引入上面copy出来的lib以及`x-pack-core-6.4.0.jar`本身**）, 修改为如下样子: 
 
@@ -1252,7 +1252,7 @@ public class XPackBuild
 
 再编译放回jar包中:
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/jar-archive.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/jar-archive.png)
 
 ### 配置文件
 
@@ -1659,9 +1659,9 @@ $ docker exec elk_elk-elasticsearch_1 curl -XPUT 'http://0.0.0.0:9200/_xpack/lic
 ```
 
 
-![](https://cdn.yangbingdong.com/kibana-license.png)
+![](https://oldcdn.yangbingdong.com/kibana-license.png)
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana02.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/kibana02.png)
 
 ### 动态模板
 
@@ -1770,21 +1770,21 @@ docker-compose.yml 中添加配置文件的映射:
 
 在Kibana首页最下面找到: 
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-full-plugin-button.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/kibana-full-plugin-button.png)
 
 ### Discover每页显示行数
 
-找到Advanced Setting![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-admin-setting.png)
+找到Advanced Setting![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/kibana-admin-setting.png)
 
 点进去找到 `discover:sampleSize`再点击Edit修改:
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-page-size.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/kibana-page-size.png)
 
 ### 时区
 
 Kibana默认读取浏览器时区, 可通过`dateFormat:tz`进行修改: 
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/kibana-timezone.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/kibana-timezone.png)
 
 ## ElasticSearch UI
 
@@ -1895,7 +1895,7 @@ java -javaagent:/path/to/elastic-apm-agent-<version>.jar \
 
 启动后在Kibana的APM模块中更新一下索引, 效果图大概是这样的: 
 
-![](https://cdn.yangbingdong.com/img/docker-logs-collect/apm.png)
+![](https://oldcdn.yangbingdong.com/img/docker-logs-collect/apm.png)
 
 # log-pilot
 
