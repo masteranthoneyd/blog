@@ -2,6 +2,8 @@
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/9071e42eab7b13178362c8d6a22abdc1-a72fe6.jpg)
 
+
+
 # 前言
 
 构建一个博客大概可以分成两个纬度:
@@ -15,7 +17,7 @@
 
 以下是两个静态网站生成工具排行参考的链接:
 
-*  [***Static Site Generators - Top Open Source SSGs***](https://jamstack.org/generators/)
+*  [***Static Site Generators - Top Open Source SSGs***](https://jamstack.org/generators/) 
 *  [***Static Site Generator - Ranking - OSS Insight***](https://ossinsight.io/collections/static-site-generator/)
 
 人气比较高的几个:
@@ -24,9 +26,9 @@
 * [***Jekyll***](https://jekyllrb.com/)
 * [***Hexo***](https://hexo.io/)
 
-我之前博客用的就是 Hexo 来生成的,  这类框架对于简单生成一个博客还是挺方便的, 编写 Markdown 文档, 配置主体, 执行相应命令就能生成静态 html 文件, 然后可以通过直接放到服务器上通过反向代理访问.
+[***我的老博客***](https://yangbingdong.com/)用的就是 Hexo 来生成的,  这类框架对于简单生成一个博客还是挺方便的, 编写 Markdown 文档, 配置主体, 执行相应命令就能生成静态 html 文件, 然后可以通过直接放到服务器上通过反向代理访问.
 
-虽然上手容易操作简单, 但是想要实现一些额外的功能可能往往需要第三方的**集成**, 比如评论, 搜索等, 毕竟框架生成的只是静态页面, 不具备**服务端功能**.
+虽然上手容易操作简单, 但是想要实现一些额外的功能可能往往需要第三方的**集成**, 比如评论, 搜索等, 毕竟框架生成的只是静态页面, 不具备**服务端功能**. 
 
 很久之前(在我刚开始写博客的时候)我就考虑过需要的是一个比较整体, 功能比较完善的博客系统, 当时就有注意到 ***[Halo](https://docs.halo.run/)***, 只不过大概出于以下两点考虑并没有采取该框架:
 
@@ -41,7 +43,7 @@
 
 # 简介
 
-***[Halo](https://docs.halo.run/)*** [ˈheɪloʊ], 强大易用的开源建站工具.
+***[Halo](https://docs.halo.run/)*** [ˈheɪloʊ], 强大易用的开源建站工具. 
 
 Doc:  ***[https://docs.halo.run](https://docs.halo.run)***
 
@@ -53,7 +55,7 @@ Requirements:
 
 > Windows Docker Desktop 很方便~
 
-本地运行:
+本地运行: 
 
 ```
 docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.10
@@ -61,40 +63,41 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo
 
 访问 localhost:8080 即可访问后台.
 
-工作目录:
+工作目录: 
 
-- `db`: 存放 H2 Database 的物理文件, 如果你使用其他数据库, 那么不会存在这个目录.
-- `themes`: 里面包含用户所安装的主题.
-- `plugins`: 里面包含用户所安装的插件.
-- `attachments`: 附件目录.
-- `logs`: 运行日志目录.
-- `application.yaml`: 配置文件.
+- `db`: 存放 H2 Database 的物理文件, 如果你使用其他数据库, 那么不会存在这个目录. 
+- `themes`: 里面包含用户所安装的主题. 
+- `plugins`: 里面包含用户所安装的插件. 
+- `attachments`: 附件目录. 
+- `logs`: 运行日志目录. 
 
 # 安装 Halo
 
+> 参考指南: 使[***用 Docker Compose 部署***](https://docs.halo.run/getting-started/install/docker-compose)
+
 ## 环境准备
 
-我是用的是阿里云 ECS, 镜像使用的是 Alibaba Cloud Image, 但下面使用的命令都是比较通用的, 比如包管理工具 dnf, 所以理论上适用于大部分 Linux 操作系统.
-
-> 这里我是切换 root 用户运行
+> 我这里用的是 Ubuntu, 毕竟用习惯了操作比较顺手.
+>
+> 别忘了切换到 root 用户
 
 首先确保系统软件是最新的:
 
-```
-dnf update
+```bash
+apt update -y && apt upgrade -y
 ```
 
-安装 Docker, Docker Compose, 设置镜像加速:
+安装 Docker:
 
+```shell
+curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 ```
-dnf config-manager --add-repo=https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && \
-dnf -y install dnf-plugin-releasever-adapter --repo alinux3-plus && \
-dnf -y install docker-ce --nobest && \
-systemctl start docker && \
-systemctl enable docker && \
-dnf install python3-pip && \
-pip3 install -U pip setuptools && \
-pip3 install docker-compose && \
+
+> 新的 Docker 已经包含了 Compose 插件, 不再需要额外安装 docker-compose.
+
+设置镜像加速:
+
+```shell
 echo '{"registry-mirrors": ["https://3xhp3ile.mirror.aliyuncs.com"]}' > /etc/docker/daemon.json && \
 systemctl daemon-reload && \
 systemctl restart docker
@@ -102,13 +105,18 @@ systemctl restart docker
 
 ## 通过 Docker Compose 部署生产级别 Halo
 
+先创建 network, 用于后续打通 Nginx:
+
+```
+docker network create omininet
+```
+
 创建工作目录, 添加并运行 `docker-compose.yaml`:
 
 ```
-cd ~ && \
-mkdir halo && \ 
-cd halo && \
-tee /root/halo/docker-compose.yaml <<- EOF
+mkdir -p ~/app/halo && \
+cd ~/app/halo && \
+tee docker-compose.yaml <<- EOF
 version: "3"
 
 services:
@@ -116,11 +124,6 @@ services:
     image: halohub/halo:2.10
     container_name: halo
     restart: on-failure:3
-    depends_on:
-      halodb:
-        condition: service_healthy
-    networks:
-      halo_network:
     volumes:
       - ./halo2:/root/.halo2
     ports:
@@ -132,56 +135,35 @@ services:
       retries: 5
       start_period: 30s
     command:
-      - --spring.r2dbc.url=r2dbc:pool:mysql://halodb:3306/halo
+      - --spring.r2dbc.url=r2dbc:pool:mysql://host:3306/halo
       - --spring.r2dbc.username=root
-      # MySQL 的密码, 请保证与下方 MYSQL_ROOT_PASSWORD 的变量值一致。
-      - --spring.r2dbc.password=lifeissucks
+      - --spring.r2dbc.password=root
       - --spring.sql.init.platform=mysql
       # 外部访问地址, 请根据实际需要修改
       - --halo.external-url=https://blog.yangbingdong.com
 
-  halodb:
-    image: mysql:8.1.0
-    container_name: halodb
-    restart: on-failure:3
-    networks:
-      halo_network:
-    command: 
-      - --default-authentication-plugin=caching_sha2_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_general_ci
-      - --explicit_defaults_for_timestamp=true
-    volumes:
-      - ./mysql:/var/lib/mysql
-      - ./mysqlBackup:/data/mysqlBackup
-    ports:
-      - "3306:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
-      interval: 3s
-      retries: 5
-      start_period: 30s
-    environment:
-      # 请修改此密码, 并对应修改上方 Halo 服务的 SPRING_R2DBC_PASSWORD 变量值
-      - MYSQL_ROOT_PASSWORD=lifeissucks
-      - MYSQL_DATABASE=halo
-
 networks:
-  halo_network:
+  default:
+    external: true
+    name: omininet
 EOF
 ```
 
-* **注意**: `--halo.external-url` 填写成自己的域名
+* **注意**:
+  *  `--halo.external-url` 填写成自己的域名
+  * MySQL 我这里用的是 RDS, 自建 MySQL 参考官方文档
 
 启动:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
-不出意外访问 `ip:port` 可以进入系统, 初次打开创建用户设置密码, 之后就可以正常登录了, 默认界面大概长酱紫:
+不出意外访问 `ip:port` (**先打开 8090 端口, 后面配置反向代理后可关闭**)可以进入系统, 初次打开创建用户设置密码, 之后就可以正常登录了, 默认界面大概长酱紫:
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/63e63023eeab86e55d6de087ce089770-f7b8ff.png)
+
+
 
 # Nginx Proxy Manager: 配置反向代理
 
@@ -189,38 +171,56 @@ docker-compose up -d
 
 > 这里假设你已经有了一个域名, 并且降域名解析到了服务器.
 >
-> 在 ECS 中默认情况下 80 跟 443 端口应该是关闭的, 记得先打开, 另外 81 端口也要先打开, 因为 NPM 后台用的就是这个端口.
+> **在 ECS 中默认情况下 80 跟 443 端口应该是关闭的**, **记得先打开!!!** 另外 81 端口也要先打开, 因为 NPM 后台用的就是这个端口.
 
 ## 部署
 
 ```
-mkdir -p ~/data/docker_data/nginxproxymanager && \
-cd ~/data/docker_data/nginxproxymanager && \
+mkdir -p ~/app/npm && \
+cd ~/app/npm && \
 tee docker-compose.yaml <<- EOF
 version: '3'
 services:
   app:
     image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm
     restart: unless-stopped
     ports:
-      - '80:80'              # 不建议修改端口
-      - '81:81'              # 可以把冒号左边的 81 端口修改成你服务器上没有被占用的端口
-      - '443:443'            # 不建议修改端口
+      # These ports are in format <host-port>:<container-port>
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+      # Add any other Stream port you want to expose
+      # - '21:21' # FTP
+    environment:
+      # Mysql/Maria connection parameters:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "user"
+      DB_MYSQL_PASSWORD: "pwd"
+      DB_MYSQL_NAME: "npm"
+      # Uncomment this if IPv6 is not enabled on your host
+      # DISABLE_IPV6: 'true'
     volumes:
-      - ./data:/data         # 点号表示当前文件夹, 冒号左边的意思是在当前文件夹下创建一个 data 目录, 用于存放数据, 如果不存在的话, 会自动创建
-      - ./letsencrypt:/etc/letsencrypt  # 点号表示当前文件夹, 冒号左边的意思是在当前文件夹下创建一个 letsencrypt 目录, 用于存放证书, 如果不存在的话, 会自动创建
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+networks:
+  default:
+    external: true
+    name: omininet
 EOF
 ```
 
 启动:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 没有意外的话这时候访问服务器外网 `ip:81` 或者 `域名:81` 的域名即可打开 NPM 后台, 默认用户名: ` admin@example.com ` 密码: `changeme`
 
-第一次登陆会提示更改用户名和密码, 建议修改一个复杂一点的密码.
+ 第一次登陆会提示更改用户名和密码, 建议修改一个复杂一点的密码.
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/1cca93f5e7b82cb70254443962f2930d-a43588.png)
 
@@ -228,12 +228,11 @@ docker-compose up -d
 
 进入首页后, 点击  `Proxy Hosts` ->  `Add Proxy Host`, 配置大概如图所示
 
-![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/54b034c85691b9cb13a033a277410fff-132c0f.png)
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/6bfd60df2933f4ffabf935a2f19c5d3b-9348b5.png)
 
 - `Domain Names` : 填我们 Halo 网站的域名, 首先记得做好 DNS 解析, 把域名绑定到我们的服务器的 IP 上
 - `Scheme` : 默认 `http` 即可, 除非你有自签名证书
-- `Forward Hostname/IP` : 填入服务器的 IP, 或者 Docker 容器内部的 IP(如果 NPM 和 Halo 搭建在同一台服务器上的话)
-  - Docker 内部 ip 可通过 ` ip addr show docker0 ` 命令查看
+- `Forward Hostname/IP` : 填入服务器的 IP, 或者 Docker 服务名(如果使用同一个 Docker )
 - `Forward Port`: 填入 Halo 映射出的端口, 这边默认是 `8090`
 - `Cache Assets` : 缓存, 可以选择打开
 - `Block Common Exploits`:  阻止常见的漏洞, 可以选择打开
@@ -252,7 +251,7 @@ docker-compose up -d
 
 也可以选择给 NPM 加个域名解析并配置 SSL, 比如我就是这么玩的:
 
-![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/635dd120caa83ab36025fccd5cda43da-4427d8.png)
+![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/90d54cc8849a5b0f20397c0086a057e3-a34c8c.png)
 
 # OSS + CND 存储博客图片
 
@@ -266,22 +265,11 @@ Halo 自带一个附件功能, 虽然可以上传图片, 但是其不建议把�
 
 ![](https://image.cdn.yangbingdong.com/image/building-personal-blog-with-halo-and-alibaba-cloud/23cae7ac2ce4543d5aa8febfa379906f-c01ee8.png)
 
-**推荐组合使用流量包**:
+**推荐组合使用流量包**: 
 
 * CDN静态HTTPS请求包
 * CDN下行流量（中国内地）
 * 对象存储OSS资源包（包月）-标准存储包（中国内地）
-
-# 安全相关
-
-## 服务器安全建议
-
-* 关闭 root 用户账号密码登录, 阿里云 ECS 默认就是关闭的
-* 使用证书登录
-
-## 安全分析
-
-https://github.com/chaitin/xray
 
 # 技巧篇
 
@@ -313,8 +301,10 @@ https://github.com/chaitin/xray
 
 # 其他建议
 
-* 为确保可移植性, 最好使用 Markdown 格式编写文章, 方便以后想切换底层博客框架的时候文章不会那么难迁移.
+* 为确保**可移植性**, 最好使用通用的 Markdown 格式编写文章, 方便以后想切换底层博客框架的时候文章不会那么难迁移.
 
-# TODO
+# 总结
 
-* Halo, MySQL, NPM 分别使用不用的 docker-compose, 并且使用相同的 external-network
+本文主要介绍了基于 Halo + Alibaba Cloud Stack 搭建个人博客, 但这套东西需要一些成本(对我来说还能接受), 比如 OSS, CDN, ECS, 域名等, 见仁见智吧, 有些东西也不是必要的, 比如 CDN. 
+
+追求性价比可以用华为云或者腾讯云, 甚至直接使用 Hexo + Github Pages 直接都能省掉服务器跟域名成本, 不好的地方可能就是访问速度会相对慢一点.
