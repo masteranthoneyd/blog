@@ -16,7 +16,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 9
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
@@ -34,7 +34,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - 接口允许定义 `private` 方法
 - `@SafeVarargs` 允许声明在实例 private 方法上
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
@@ -70,7 +70,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - JDBC-ODBC 桥接移除
   - JDBC 4.2 升级
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **新增**
 
@@ -104,14 +104,14 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 10
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
 - 本地变量类型推断: [***JEP 286: Local-Variable Type Inference***](https://openjdk.org/jeps/286)
   - 用 var 来声明变量, 相关阅读:  [***Java 10 新特性之局部变量类型推断***](https://zhuanlan.zhihu.com/p/34911982)
 
-### 主要 API 变化
+**主要 API 变化**
 
 **更新**
 
@@ -124,7 +124,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - 安全(Security): 
   - [***JEP 319***](https://openjdk.org/jeps/319), 默认根证书
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **新增**
 
@@ -146,7 +146,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 11(LTS)
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
@@ -156,7 +156,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - Lambda 参数局部变量语句: ***[JEP 323: Local-Variable Syntax for Lambda Parameters](https://openjdk.java.net/jeps/323)***
   - 可以在 Lambda 表达式中使用 var
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
@@ -182,7 +182,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - java.corba (CORBA)
   - java.transaction (JTA)
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **新增**
 
@@ -217,19 +217,19 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 12
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
 - **[预览] Switch 语句优化**([***JEP 325: Switch Expressions (Preview)***](https://openjdk.java.net/jeps/325))
 
-### 主要 API 变化
+**主要 API 变化**
 
 * `String` 新增了 `indent` 方法处理缩进
 * `Files` 新增了 `mismatch` 来对比两个文件
 *  `NumberFormat` 新增了对复杂的数字进行格式化的支持: `getCompactNumberInstance`
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **新增**
 
@@ -248,7 +248,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 13
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
@@ -256,14 +256,14 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - 新增 `yield` 关键字
 - [预览] **文件块**([***JEP 355: Text Blocks (Preview)***](https://openjdk.java.net/jeps/355))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **更新**
 
 - 网络(Network): 重新实现 Socket API([***JEP 353: Reimplement the Legacy Socket API***](https://openjdk.java.net/jeps/353))
   - 虚拟线程铺垫
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **更新**
 
@@ -273,7 +273,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 14
 
-### 主要语言变化
+**主要语言变化**
 
 **新增**
 
@@ -287,13 +287,13 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   -   `record Person(String name, Long id){}`
 - **Switch 语句优化(转正)**([***JEP 361: Switch Expressions (Standard)***](https://openjdk.java.net/jeps/361))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
 - [孵化] 外部内存访问 API([***JEP 370: Foreign-Memory Access API (Incubator)***](https://openjdk.java.net/jeps/370))
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **更新**
 
@@ -315,7 +315,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 15
 
-### 主要语言变化
+**主要语言变化**
 
 **引入**
 
@@ -330,7 +330,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [预览] instanceof 语句优化([***JEP 375: Pattern Matching for instanceof (Second Preview)***](https://openjdk.java.net/jeps/375))
 - [预览] Record 类型([***JEP 384: Records (Second Preview)***](https://openjdk.java.net/jeps/384))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
@@ -341,7 +341,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - 网络(Network): 重新实现 Socket API([***JEP 353: Reimplement the Legacy Socket API***](https://openjdk.java.net/jeps/353))
 - Remote Method Invocation(RMI): [***JEP 385: Deprecate RMI Activation for Removal***](https://openjdk.java.net/jeps/385)
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **更新**
 
@@ -361,7 +361,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 16
 
-### 主要语言变化
+**主要语言变化**
 
 **引入**
 
@@ -371,12 +371,12 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 **更新**
 
+- Stream 新增 `toList()` 方法, 直接可转换成不可变的 List 
+  - `list.stream().toList()`
 - 模块化(Modular): JDK 内部 API 默认强封装([***JEP 396: Strongly Encapsulate JDK Internals by Default***](https://openjdk.java.net/jeps/396))
 - [孵化] 向量 API([***JEP 338: Vector API (Incubator)***](https://openjdk.java.net/jeps/338))
   -   API 将使开发人员能够轻松地用 Java 编写可移植的高性能向量算法
 - [预览] Sealed 类([***JEP 397: Sealed Classes (Second Preview)***](https://openjdk.java.net/jeps/397))
-
-### 主要 API 变化
 
 **引入**
 
@@ -390,7 +390,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - 控制: 可以自由的选择如何释放内存(显式、隐式等). 
   - 可用: 如果需要访问外部内存, API 应该是 `sun.misc.Unsafe`.
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **引入**
 
@@ -411,7 +411,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 17(LTS)
 
-### 主要语言变化
+**主要语言变化**
 
 **引入**
 
@@ -428,7 +428,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - 类似 `instanceof` 的匹配+转换: `case Integer i -> String.format("int %d", i);`
 - [孵化] 向量 API([***JEP 414: Vector API (Second Incubator)***](https://openjdk.java.net/jeps/414))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
@@ -448,7 +448,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - 用户界面(UI): 
   - Applet: 不推荐使用, 未来移除([***JEP 398: Deprecate the Applet API for Removal***](https://openjdk.java.net/jeps/398))
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **引入**
 
@@ -466,7 +466,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 18
 
-### 主要语言变化
+**主要语言变化**
 
 **更新**
 
@@ -474,7 +474,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [预览] `switch`语句模式匹配 [***JEP 420: Pattern Matching for switch (Second Preview)***](https://openjdk.java.net/jeps/420)
 - 默认字符集为 UTF-8 [***JEP 400:UTF-8 by Default***](https://openjdk.java.net/jeps/400)
 
-### 主要 API 变化
+**主要 API 变化**
 
 **更新**
 
@@ -487,7 +487,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
   - 简单 Web Server [***JEP 408: Simple Web Server***](https://openjdk.java.net/jeps/408)
   - IP 地址解析 [***JEP 418: Internet-Address Resolution SPI***](https://openjdk.java.net/jeps/418)
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **更新**
 
@@ -497,7 +497,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 19
 
-### 主要语言变化
+**主要语言变化**
 
 **更新**
 
@@ -506,7 +506,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [预览] `switch`语句模式匹配([***JEP 427: Pattern Matching for switch (Third Preview)***](https://openjdk.java.net/jeps/427))
 - [孵化] 向量 API([***JEP 426: Vector API (Fourth Incubator)***](https://openjdk.java.net/jeps/426))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **更新**
 
@@ -514,7 +514,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [孵化] 结构化并发([***JEP 428: Structured Concurrency (Incubator)***](https://openjdk.java.net/jeps/428))
   -  [`StructuredTaskScope`](https://download.java.net/java/early_access/loom/docs/api/jdk.incubator.concurrent/jdk/incubator/concurrent/StructuredTaskScope.html)
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **引入**
 
@@ -523,7 +523,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 20
 
-### 主要语言变化
+**主要语言变化**
 
 **引入**
 
@@ -533,7 +533,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [预览] `switch`语句模式匹配([***JEP 433: Pattern Matching for switch (Fourth Preview)***](https://openjdk.java.net/jeps/433))
 - [孵化] 向量 API([***JEP 438: Vector API (Fifth Incubator)***](https://openjdk.java.net/jeps/438))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **更新**
 
@@ -542,7 +542,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 ## Java 21(LTS)
 
-### 主要语言变化
+**主要语言变化**
 
 **引入**
 
@@ -559,7 +559,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 
 - [孵化] 向量 API([***JEP 448: Vector API (Sixth Incubator)***](https://openjdk.java.net/jeps/448))
 
-### 主要 API 变化
+**主要 API 变化**
 
 **引入**
 
@@ -571,7 +571,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - [预览] 外部 Native 函数和内存 API([***JEP 442: Foreign Function & Memory API (Third Preview)***](https://openjdk.java.net/jeps/442))
 - [预览] 结构化并发([***JEP 453: Structured Concurrency (Preview)***](https://openjdk.java.net/jeps/453))
 
-### 主要 JVM 变化
+**主要 JVM 变化**
 
 **更新**
 

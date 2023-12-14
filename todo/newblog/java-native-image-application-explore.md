@@ -29,4 +29,6 @@ GraalVM 最早关于 GraalVM 工作可以追溯到 2012 年, 然而，最初的�
 
 * Windows 下建议使用 Docker 构建 Native Image, 避免出现奇奇怪怪的问题, Quarkus 以及 Spring Boot 都有支持.
 * Windows 下是用 Docker Desktop 管理 Docker 的, 尽量多分配点资源, 否则容易出现编译慢甚至卡死的现象, 辛苦等半天结果编译失败了 T.T
+        
+     
 
