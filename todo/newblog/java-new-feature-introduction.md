@@ -494,6 +494,7 @@ Java 8 之后的10年里 Oracle 先后发布了13个版本, 其中3个 LTS 版�
 - 不推荐 Finalization, 未来删除 [***JEP 421: Deprecate Finalization for Removal***](https://openjdk.java.net/jeps/421)
 - 工具(Tools)
   - javadoc: API 文档增加代码片段 [***JEP 413: Code Snippets in Java API Documentation***](https://openjdk.java.net/jeps/413)
+    - 使用姿势: `{@snippet : System.out.print("a");}`
 
 ## Java 19
 
